@@ -32,6 +32,18 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.local.example
+!.env.example
+
+# claude code local state
+.claude/
+
+# python scraper
+scraper/.env
+scraper/cache/
+scraper/__pycache__/
+scraper/.venv/
+scraper/.pytest_cache/
 
 # vercel
 .vercel
