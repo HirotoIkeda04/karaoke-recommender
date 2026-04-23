@@ -38,6 +38,9 @@ yarn-error.log*
 # claude code local state
 .claude/
 
+# supabase CLI local cache
+/supabase/.temp/
+
 # python scraper
 scraper/.env
 scraper/cache/
