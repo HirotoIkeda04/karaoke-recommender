@@ -22,6 +22,19 @@ DEFAULT_MARKET = "JP"
 REQUEST_TIMEOUT_SEC = 30
 # Spotify は通常 60s で expire しないが安全側に 60s 前倒しで再発行
 TOKEN_EXPIRY_BUFFER_SEC = 60
+# これを超える Retry-After は「今日の quota 超過」とみなして即 fail
+MAX_RETRY_AFTER_SEC = 120
+
+
+class SpotifyQuotaExceeded(RuntimeError):
+    """Spotify の日次 quota を使い切った状態。呼び出し側で特別扱いする。"""
+
+    def __init__(self, retry_after_sec: int) -> None:
+        super().__init__(
+            f"Spotify returned Retry-After={retry_after_sec}s (> {MAX_RETRY_AFTER_SEC}s); "
+            f"quota likely exceeded"
+        )
+        self.retry_after_sec = retry_after_sec
 
 
 @dataclass
@@ -154,6 +167,12 @@ class SpotifyClient:
             )
             if resp.status_code == 429:
                 retry_after = int(resp.headers.get("Retry-After", "2"))
+                if retry_after > MAX_RETRY_AFTER_SEC:
+                    logger.error(
+                        "spotify: Retry-After=%ds exceeds cap; treating as quota exceeded",
+                        retry_after,
+                    )
+                    raise SpotifyQuotaExceeded(retry_after)
                 logger.warning(
                     "spotify: rate limited; sleeping %ds (attempt %d)",
                     retry_after, attempt + 1,

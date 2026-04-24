@@ -11,7 +11,12 @@ from unittest.mock import MagicMock
 import pytest
 import requests
 
-from fetch_spotify import SpotifyClient, _pick_images, _track_from_api
+from fetch_spotify import (
+    SpotifyClient,
+    SpotifyQuotaExceeded,
+    _pick_images,
+    _track_from_api,
+)
 
 
 def _mk_response(
@@ -163,6 +168,16 @@ class TestSpotifyClientSearch:
         client = self._mk_client(session)
         client.search_track("A", "B")
         assert session.get.call_count == 2
+
+    def test_quota_exceeded_raises(self) -> None:
+        """Retry-After が 120s を超えたら SpotifyQuotaExceeded を raise。"""
+        session = MagicMock()
+        session.post.return_value = self._mk_token_response()
+        session.get.return_value = _mk_response(429, headers={"Retry-After": "85000"})
+        client = self._mk_client(session)
+        with pytest.raises(SpotifyQuotaExceeded) as exc_info:
+            client.search_track("A", "B")
+        assert exc_info.value.retry_after_sec == 85000
 
     def test_401_refreshes_token(self) -> None:
         session = MagicMock()

@@ -48,6 +48,10 @@ scraper/.venv/
 scraper/.pytest_cache/
 scraper/.ruff_cache/
 scraper/**/__pycache__/
+scraper/output/unmatched.csv
+scraper/output/scraping_report.md
+scraper/output/match_cache.jsonl
+scraper/output/run_log.txt
 
 # vercel
 .vercel
