@@ -44,9 +44,10 @@ yarn-error.log*
 # python scraper
 scraper/.env
 scraper/cache/
-scraper/__pycache__/
 scraper/.venv/
 scraper/.pytest_cache/
+scraper/.ruff_cache/
+scraper/**/__pycache__/
 
 # vercel
 .vercel
