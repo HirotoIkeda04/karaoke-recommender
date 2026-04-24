@@ -128,6 +128,8 @@ class TestNormalizeNotation:
             ("hi A", "hiA"),  # 内部の半角スペース除去
             ("hi　A", "hiA"),  # 全角スペース除去
             ("mid2F＃", "mid2F#"),  # 全角 # → 半角 #
+            ("‎mid1D#", "mid1D#"),  # LRM 混入 (karaoto 実データに存在)
+            ("﻿hiA", "hiA"),  # BOM 混入
         ],
     )
     def test_normalize(self, raw: str, expected: str) -> None:

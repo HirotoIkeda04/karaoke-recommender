@@ -42,18 +42,32 @@ MIDI_MIN = min(NOTE_TABLE.values())  # 21
 MIDI_MAX = max(NOTE_TABLE.values())  # 92
 
 
+# 不可視文字 (双方向制御・ゼロ幅系) を除去
+_INVISIBLE_CHARS = {
+    "​",  # ZERO WIDTH SPACE
+    "‌",  # ZERO WIDTH NON-JOINER
+    "‍",  # ZERO WIDTH JOINER
+    "‎",  # LEFT-TO-RIGHT MARK
+    "‏",  # RIGHT-TO-LEFT MARK
+    "﻿",  # BYTE ORDER MARK
+}
+
+
 def normalize_notation(raw: str) -> str:
     """表記揺れを吸収。
 
     - 前後空白を除去
     - ♯ → #
-    - 全角英数字・#・スペース → 半角
+    - 全角英字・#・スペース → 半角
+    - 不可視制御文字 (LRM/BOM 等) を除去
     - ♭ は ``b`` に置換するのみ(MIDI 表には含まれないため、呼び出し側でエラーになる)
     """
     s = raw.strip()
     s = s.replace("♯", "#").replace("♭", "b")
     result: list[str] = []
     for ch in s:
+        if ch in _INVISIBLE_CHARS:
+            continue
         code = ord(ch)
         if 0xFF21 <= code <= 0xFF3A:  # FULLWIDTH A-Z
             result.append(chr(code - 0xFF21 + ord("A")))
