@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:types": "set -a && . ./.env.local && set +a && supabase gen types typescript --project-id ewxonrgcvkjuaksybrko > src/types/database.ts"
+    "db:types": "set -a && . ./.env.local && set +a && supabase gen types typescript --project-id ewxonrgcvkjuaksybrko > src/types/database.ts",
+    "seed:songs": "node --env-file=.env.local --import tsx scripts/seed-songs.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
@@ -34,6 +35,7 @@
     "eslint-config-next": "16.2.4",
     "supabase": "^2.95.0",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
