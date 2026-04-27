@@ -125,7 +125,7 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-1 flex-col items-center gap-3 overflow-hidden px-4 py-3">
+    <div className="mx-auto flex max-w-md flex-col items-center gap-5 px-4 py-6">
       {/* 次の 2 枚のジャケット画像を裏で先読み */}
       {queue.slice(1, 3).map((song) =>
         song.image_url_medium ? (
@@ -144,7 +144,7 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
         </div>
       ) : null}
 
-      <div className="relative w-full max-w-[20rem] flex-1 min-h-0">
+      <div className="relative h-[30rem] w-full max-w-[22rem]">
         {/* 後ろのカード (next 1, next 2): 中身も描画して、スワイプ中に
             真っ白な空のカードが見えてしまう問題を解消 */}
         {upcoming.map((song, idx) => (
@@ -175,7 +175,7 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
       </div>
 
       {/* 4 評価ボタン (丸いアイコンボタン + ラベル) */}
-      <div className="grid w-full shrink-0 grid-cols-4 gap-2">
+      <div className="grid w-full grid-cols-4 gap-2">
         {RATINGS.map((r) => (
           <button
             key={r.value}
@@ -199,7 +199,7 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
 
       {/* 知らない/スキップ (col-span-3, 苦手〜得意の列幅) + 戻る (col-span-1, 練習中の列) */}
       {/* 上の評価ボタン行と同じ grid-cols-4/gap-2 で列を揃える */}
-      <div className="grid w-full shrink-0 grid-cols-4 gap-2">
+      <div className="grid w-full grid-cols-4 gap-2">
         <button
           type="button"
           onClick={handleSkip}
@@ -347,14 +347,14 @@ function SwipeCard({
 function SongCardContent({ song }: { song: Song }) {
   return (
     <div className="flex h-full flex-col">
-      {/* ジャケット: 上部 edge-to-edge、画面に応じて伸縮 (object-cover で常に塗り潰す) */}
-      <div className="relative min-h-0 w-full flex-1 bg-zinc-200 dark:bg-zinc-800">
+      {/* ジャケット: カード上部に edge-to-edge で配置 (余白なし) */}
+      <div className="relative aspect-square w-full shrink-0 bg-zinc-200 dark:bg-zinc-800">
         {song.image_url_medium ? (
           <Image
             src={song.image_url_medium}
             alt={`${song.title} のジャケット`}
             fill
-            sizes="20rem"
+            sizes="22rem"
             priority
             className="object-cover"
             draggable={false}
@@ -366,10 +366,10 @@ function SongCardContent({ song }: { song: Song }) {
         )}
       </div>
 
-      {/* テキスト/ボタン領域: 画像下に padding。shrink-0 で自然サイズ維持 */}
-      <div className="flex shrink-0 flex-col gap-1.5 p-3">
+      {/* テキスト/ボタン領域: 画像下に padding を取って配置 */}
+      <div className="flex flex-1 flex-col justify-between gap-2 p-3">
         <div className="w-full">
-          <h2 className="line-clamp-1 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+          <h2 className="line-clamp-1 text-base font-semibold text-zinc-900 dark:text-zinc-50">
             {song.title}
           </h2>
           <p className="text-xs text-zinc-600 dark:text-zinc-400">

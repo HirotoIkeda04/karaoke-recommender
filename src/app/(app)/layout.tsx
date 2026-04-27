@@ -29,9 +29,7 @@ export default async function AppLayout({
     <div className="flex min-h-dvh flex-col">
       <AppHeader user={user} />
       {/* main の bottom padding: BottomNav の高さ (~5rem) + ホームインジケータ safe-area */}
-      {/* flex flex-col: 子ページが flex-1 で main 全体を埋められるようにする
-         (例: 評価デッキ / でカードを画面高に合わせる) */}
-      <main className="flex flex-1 flex-col pb-[calc(5rem+env(safe-area-inset-bottom))]">
+      <main className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))]">
         {children}
       </main>
       <AppBottomNav />
