@@ -40,7 +40,10 @@ def _match_cache_key(song: RawSong) -> str:
 
 
 def _load_match_cache(path: Path) -> dict[str, dict]:
-    """前回までに取れた matched の結果をロード。キーは (title, artist)。"""
+    """前回までに確定した match 結果をロード。matched / unmatched 両方を含む。
+
+    キーは (title, artist) の TAB 区切り。
+    """
     cache: dict[str, dict] = {}
     if not path.exists():
         return cache
@@ -55,29 +58,31 @@ def _load_match_cache(path: Path) -> dict[str, dict]:
 
 
 def _append_match_cache(path: Path, result: MatchResult) -> None:
-    """確定した match 結果を jsonl 形式で逐次追記。"""
+    """確定した match 結果を jsonl 形式で逐次追記。matched / unmatched 両方記録。"""
     track = result.track
-    if track is None:
-        return
-    entry = {
+    entry: dict = {
         "title": result.raw_song.title,
         "artist": result.raw_song.artist,
         "strategy": result.strategy,
         "similarity": result.similarity,
-        "track": dataclasses.asdict(track),
+        "track": dataclasses.asdict(track) if track else None,
     }
+    if result.reason:
+        entry["reason"] = result.reason
     with path.open("a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False))
         f.write("\n")
 
 
 def _result_from_cache(song: RawSong, entry: dict) -> MatchResult:
-    track = SpotifyTrack(**entry["track"])
+    track_data = entry.get("track")
+    track = SpotifyTrack(**track_data) if track_data else None
     return MatchResult(
         raw_song=song,
         track=track,
-        similarity=entry.get("similarity", 1.0),
+        similarity=entry.get("similarity", 1.0 if track else 0.0),
         strategy=entry.get("strategy", "cached"),
+        reason=entry.get("reason", ""),
     )
 
 
@@ -207,40 +212,52 @@ def run(
 
     cache_path = output_dir / "match_cache.jsonl"
     match_cache = _load_match_cache(cache_path)
-    if match_cache:
-        logger.info("resume: loaded %d cached matches", len(match_cache))
 
+    # 1st pass: cache から matched / unmatched を復元、未確定のみ to_process に積む
     matched: list[MatchResult] = []
     unmatched: list[MatchResult] = []
+    to_process: list[RawSong] = []
+    for song in songs:
+        cached = match_cache.get(_match_cache_key(song))
+        if cached is None:
+            to_process.append(song)
+            continue
+        result = _result_from_cache(song, cached)
+        if result.matched:
+            matched.append(result)
+        else:
+            unmatched.append(result)
+    if match_cache:
+        logger.info(
+            "resume: loaded %d cached (matched=%d, unmatched=%d), %d to process",
+            len(match_cache), len(matched), len(unmatched), len(to_process),
+        )
+
+    # 2nd pass: 未確定曲を Spotify に問い合わせる
     quota_hit = False
     processed = 0
-    for i, song in enumerate(songs, start=1):
-        cached = match_cache.get(_match_cache_key(song))
-        if cached is not None:
-            matched.append(_result_from_cache(song, cached))
-            continue
-
+    for i, song in enumerate(to_process, start=1):
         try:
             result = matcher.match(song)
         except SpotifyQuotaExceeded as e:
             logger.error(
-                "spotify quota exceeded at song %d/%d (retry_after=%ds); "
+                "spotify quota exceeded at to_process %d/%d (retry_after=%ds); "
                 "writing partial results",
-                i, len(songs), e.retry_after_sec,
+                i, len(to_process), e.retry_after_sec,
             )
             quota_hit = True
             break
 
         if result.matched:
             matched.append(result)
-            _append_match_cache(cache_path, result)
         else:
             unmatched.append(result)
+        _append_match_cache(cache_path, result)
         processed += 1
         if i % 50 == 0:
             logger.info(
-                "progress: %d/%d (matched=%d, unmatched=%d)",
-                i, len(songs), len(matched), len(unmatched),
+                "progress: %d/%d new (matched_total=%d, unmatched_total=%d)",
+                i, len(to_process), len(matched), len(unmatched),
             )
         time.sleep(SPOTIFY_REQUEST_INTERVAL_SEC)
 
