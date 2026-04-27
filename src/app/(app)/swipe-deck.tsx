@@ -49,7 +49,7 @@ const RATINGS: ReadonlyArray<{
     value: "medium",
     label: "普通",
     Icon: Minus,
-    color: "bg-zinc-500 hover:bg-zinc-600 active:bg-zinc-700",
+    color: "bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700",
   },
   {
     value: "easy",
@@ -61,7 +61,7 @@ const RATINGS: ReadonlyArray<{
     value: "practicing",
     label: "練習中",
     Icon: Dumbbell,
-    color: "bg-amber-500 hover:bg-amber-600 active:bg-amber-700",
+    color: "bg-purple-500 hover:bg-purple-600 active:bg-purple-700",
   },
 ];
 
@@ -281,15 +281,15 @@ function SwipeCard({
         b = 68;
       }
     } else {
-      // 縦方向: 上=普通(zinc) / 下=練習中(amber)
+      // 縦方向: 上=普通(yellow) / 下=練習中(purple)
       if (yn < 0) {
-        r = 113;
-        g = 113;
-        b = 122;
+        r = 234;
+        g = 179;
+        b = 8;
       } else {
-        r = 245;
-        g = 158;
-        b = 11;
+        r = 168;
+        g = 85;
+        b = 247;
       }
     }
     const blurPx = i * 50;
@@ -457,13 +457,13 @@ function SwipeOverlay({ x, y, opacity }: SwipeOverlayProps) {
       </motion.div>
       <motion.div
         style={{ opacity: mediumOpacity }}
-        className="absolute left-1/2 top-4 -translate-x-1/2 rounded-lg border-4 border-zinc-400 px-3 py-1 text-lg font-bold text-zinc-600"
+        className="absolute left-1/2 top-4 -translate-x-1/2 rounded-lg border-4 border-yellow-400 px-3 py-1 text-lg font-bold text-yellow-600"
       >
         普通
       </motion.div>
       <motion.div
         style={{ opacity: practicingOpacity }}
-        className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-lg border-4 border-amber-400 px-3 py-1 text-lg font-bold text-amber-600"
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-lg border-4 border-purple-400 px-3 py-1 text-lg font-bold text-purple-600"
       >
         練習中
       </motion.div>

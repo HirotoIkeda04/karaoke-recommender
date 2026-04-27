@@ -19,9 +19,9 @@ type Song = Pick<
 
 const RATING_BADGE: Record<string, { label: string; color: string }> = {
   hard: { label: "苦手", color: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200" },
-  medium: { label: "普通", color: "bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200" },
+  medium: { label: "普通", color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200" },
   easy: { label: "得意", color: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200" },
-  practicing: { label: "練習中", color: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200" },
+  practicing: { label: "練習中", color: "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-200" },
 };
 
 interface SongCardProps {

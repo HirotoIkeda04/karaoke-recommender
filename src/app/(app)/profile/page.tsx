@@ -10,8 +10,8 @@ const MIN_FOR_ESTIMATE = 5; // この件数以上で音域推定を表示
 
 const RATING_META: Record<Rating, { label: string; color: string }> = {
   easy: { label: "得意", color: "bg-emerald-500" },
-  practicing: { label: "練習中", color: "bg-amber-500" },
-  medium: { label: "普通", color: "bg-zinc-500" },
+  practicing: { label: "練習中", color: "bg-purple-500" },
+  medium: { label: "普通", color: "bg-yellow-500" },
   hard: { label: "苦手", color: "bg-red-500" },
 };
 
