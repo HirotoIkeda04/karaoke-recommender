@@ -51,8 +51,6 @@ export default async function SongsPage() {
 
   return (
     <div className="mx-auto max-w-md space-y-4 px-4 py-4">
-      <h1 className="text-lg font-semibold">楽曲を検索</h1>
-
       {songsRes.error ? (
         <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
           {songsRes.error.message}

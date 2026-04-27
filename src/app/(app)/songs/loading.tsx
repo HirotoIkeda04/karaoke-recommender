@@ -9,8 +9,6 @@ export default function Loading() {
       role="status"
       aria-label="読み込み中"
     >
-      <div className="h-6 w-32 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-
       {/* 検索フォーム */}
       <div className="space-y-2">
         <div className="h-10 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />
