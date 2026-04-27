@@ -24,7 +24,10 @@ export function AppBottomNav() {
         paddingBottom: "max(0.25rem, env(safe-area-inset-bottom))",
       }}
     >
-      <ul className="mx-auto flex max-w-md justify-around">
+      {/* grid grid-cols-4 で 4 タブを必ず等分。
+          ラベル長(評価/検索/マイライブラリ/音域)に依存せず、
+          各タブの中心が画面の 1/8, 3/8, 5/8, 7/8 に常に固定される */}
+      <ul className="mx-auto grid max-w-md grid-cols-4">
         {ITEMS.map((item) => {
           const Icon = item.icon;
           const active =
@@ -32,11 +35,11 @@ export function AppBottomNav() {
               ? pathname === "/"
               : pathname.startsWith(item.href);
           return (
-            <li key={item.href}>
+            <li key={item.href} className="min-w-0">
               <Link
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center gap-0.5 px-2 py-2 text-[11px] whitespace-nowrap",
+                  "flex w-full flex-col items-center gap-0.5 px-1 py-2 text-[10px] whitespace-nowrap",
                   active
                     ? "text-pink-600 dark:text-pink-400"
                     : "text-zinc-500 dark:text-zinc-400",
