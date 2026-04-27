@@ -14,6 +14,7 @@ interface ProfilePageProps {
     spotify_synced?: string;
     matched?: string;
     found?: string;
+    sync_detail?: string;
   }>;
 }
 
@@ -32,6 +33,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
   const params = await searchParams;
   const spotifyConnected = params.spotify_connected === "true";
   const spotifyError = params.spotify_error ?? null;
+  const syncDetail = params.sync_detail ?? null;
   const spotifySynced = params.spotify_synced === "true";
   const syncMatched = params.matched ? parseInt(params.matched, 10) : null;
   const syncFound = params.found ? parseInt(params.found, 10) : null;
@@ -105,7 +107,12 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       ) : null}
       {spotifyError ? (
         <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
-          Spotify 操作に失敗しました ({spotifyError})
+          <p>Spotify 操作に失敗しました ({spotifyError})</p>
+          {syncDetail ? (
+            <pre className="mt-1 overflow-auto whitespace-pre-wrap break-words text-[10px] text-red-700 dark:text-red-300">
+              {syncDetail}
+            </pre>
+          ) : null}
         </div>
       ) : null}
 

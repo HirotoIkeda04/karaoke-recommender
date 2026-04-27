@@ -155,9 +155,14 @@ export async function syncUserSpotify(userId: string): Promise<SyncResult> {
   for (const [src, tracks] of Object.entries(tracksBySource) as Array<
     [Source, Array<{ id: string; rank: number | null }>]
   >) {
+    // recently_played 等は同曲が複数回登場し得る (連続再生)。
+    // primary key = (user_id, song_id, source) に重複は禁物なので源泉単位で dedupe。
+    const seenSongs = new Set<string>();
     for (const t of tracks) {
       const songId = trackToSong.get(t.id);
       if (!songId) continue;
+      if (seenSongs.has(songId)) continue;
+      seenSongs.add(songId);
       rows.push({
         user_id: userId,
         song_id: songId,

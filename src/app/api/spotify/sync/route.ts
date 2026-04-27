@@ -50,7 +50,11 @@ export async function POST(req: NextRequest) {
     console.error("Spotify sync error:", err);
     const message = err instanceof Error ? err.message : "unknown";
     if (isFormSubmission(req)) {
-      return redirectToProfile(req, { spotify_error: "sync_failed" });
+      return redirectToProfile(req, {
+        spotify_error: "sync_failed",
+        // URL 長制限のため 200 文字に切る
+        sync_detail: message.slice(0, 200),
+      });
     }
     return NextResponse.json({ error: message }, { status: 500 });
   }
