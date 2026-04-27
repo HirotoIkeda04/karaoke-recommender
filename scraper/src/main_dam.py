@@ -29,6 +29,11 @@ from fetch_vocal_range import (
 )
 from match_karaoto import KaraotoEntry, build_index as build_karaoto_index, lookup as karaoto_lookup
 from scrape_dam import DamSong, fetch_all_rankings
+from scrape_dam_generation import (
+    DEFAULT_YEAR_RANGE,
+    GENRE_CODES,
+    fetch_all_generations,
+)
 
 logger = logging.getLogger("scraper.dam")
 
@@ -205,16 +210,64 @@ def _build_payload(
     return base
 
 
-def run(*, fetch_itunes: bool = True) -> int:
+def _merge_song_lists(*lists: list[DamSong]) -> list[DamSong]:
+    """複数の DamSong list を (title, artist, request_no) でユニーク化、source_pages を統合。"""
+    by_key: dict[tuple[str, str, str], DamSong] = {}
+    for songs in lists:
+        for s in songs:
+            key = (s.title, s.artist, s.request_no)
+            if key in by_key:
+                by_key[key] = DamSong(
+                    title=s.title,
+                    artist=s.artist,
+                    request_no=s.request_no,
+                    source_pages=by_key[key].source_pages + s.source_pages,
+                )
+            else:
+                by_key[key] = s
+    return list(by_key.values())
+
+
+def run(
+    *,
+    fetch_itunes: bool = True,
+    generation_genres: list[str] | None = None,
+    generation_years: list[int] | None = None,
+) -> int:
+    """DAM ランキング + (任意で) /generation/ ページをマージ取得し、
+    karaoto/vocal-range で音域、iTunes でジャケを補完して JSON 出力する。
+
+    Args:
+        generation_genres: 取得する genreCode のリスト (例: ['001', '005'])。
+            None なら /generation/ は skip。
+        generation_years: 取得する年のリスト。None なら DEFAULT_YEAR_RANGE (1949-2025) 全部。
+    """
     contact = require("SCRAPER_CONTACT_EMAIL")
 
     cache_dir = SCRAPER_ROOT / "cache" / "dam"
     output_dir = SCRAPER_ROOT / "output"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Step 1: DAM ランキングページから全曲取得
-    songs = fetch_all_rankings(cache_dir, contact)
-    logger.info("DAM rankings yielded %d unique songs", len(songs))
+    # Step 1a: DAM 既存ランキングページから取得
+    rankings_songs = fetch_all_rankings(cache_dir, contact)
+    logger.info("DAM rankings yielded %d unique songs", len(rankings_songs))
+
+    # Step 1b: /generation/ から年×ジャンル網羅取得 (オプション)
+    if generation_genres:
+        gen_cache_dir = SCRAPER_ROOT / "cache" / "dam" / "generation"
+        years = generation_years if generation_years else DEFAULT_YEAR_RANGE
+        logger.info(
+            "fetching DAM /generation/: %d years × %d genres = %d pages",
+            len(years), len(generation_genres), len(years) * len(generation_genres),
+        )
+        gen_songs = fetch_all_generations(
+            gen_cache_dir, contact, years=years, genre_codes=generation_genres,
+        )
+        logger.info("DAM generation yielded %d unique songs", len(gen_songs))
+        songs = _merge_song_lists(rankings_songs, gen_songs)
+        logger.info("merged total: %d unique songs", len(songs))
+    else:
+        songs = rankings_songs
 
     # Step 1.5: karaoto キャッシュから (title, artist) インデックスを構築
     # → DAM 曲のうち karaoto にも載っている曲は range_*_midi を補完できる
@@ -324,6 +377,21 @@ def main(argv: list[str] | None = None) -> int:
         help="iTunes での画像/年補完をスキップ(高速確認用)",
     )
     parser.add_argument(
+        "--generation-genres",
+        default="",
+        help=(
+            "DAM /generation/ から取得するジャンルコード (カンマ区切り)。"
+            "例: '001' でヒット曲のみ、'001,002,003,004,005' で全 5 ジャンル。"
+            "未指定なら /generation/ は skip。"
+            f"利用可能: {', '.join(f'{k}={v}' for k, v in GENRE_CODES.items())}"
+        ),
+    )
+    parser.add_argument(
+        "--generation-years",
+        default="",
+        help="取得年範囲 (カンマ区切り or START-END)。例: '1949-2025' or '2010,2015,2020'。未指定なら 1949-2025 全部。",
+    )
+    parser.add_argument(
         "--log-level", default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
     )
@@ -334,7 +402,28 @@ def main(argv: list[str] | None = None) -> int:
         format="%(asctime)s %(levelname)s %(name)s - %(message)s",
     )
 
-    return run(fetch_itunes=not args.no_itunes)
+    genres: list[str] | None = None
+    if args.generation_genres:
+        genres = [g.strip() for g in args.generation_genres.split(",") if g.strip()]
+        unknown = [g for g in genres if g not in GENRE_CODES]
+        if unknown:
+            parser.error(f"unknown generation genre code(s): {unknown}. "
+                         f"valid: {list(GENRE_CODES.keys())}")
+
+    years: list[int] | None = None
+    if args.generation_years:
+        spec = args.generation_years.strip()
+        if "-" in spec and "," not in spec:
+            start, end = spec.split("-", 1)
+            years = list(range(int(start), int(end) + 1))
+        else:
+            years = [int(y) for y in spec.split(",") if y.strip()]
+
+    return run(
+        fetch_itunes=not args.no_itunes,
+        generation_genres=genres,
+        generation_years=years,
+    )
 
 
 if __name__ == "__main__":
