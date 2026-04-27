@@ -7,6 +7,7 @@ import {
   useMotionValue,
   useTransform,
 } from "framer-motion";
+import { Bookmark, Check, Minus, RotateCcw, X } from "lucide-react";
 import Image from "next/image";
 import { startTransition, useState } from "react";
 
@@ -35,37 +36,32 @@ const SWIPE_THRESHOLD = 110;
 const RATINGS: ReadonlyArray<{
   value: Rating;
   label: string;
-  emoji: string;
+  Icon: typeof X;
   color: string;
-  hint: string;
 }> = [
   {
     value: "hard",
     label: "苦手",
-    emoji: "❌",
-    color: "bg-red-500 hover:bg-red-600 text-white",
-    hint: "← スワイプ",
+    Icon: X,
+    color: "bg-red-500 hover:bg-red-600 active:bg-red-700",
   },
   {
     value: "medium",
     label: "普通",
-    emoji: "△",
-    color: "bg-zinc-500 hover:bg-zinc-600 text-white",
-    hint: "↓",
+    Icon: Minus,
+    color: "bg-zinc-500 hover:bg-zinc-600 active:bg-zinc-700",
   },
   {
     value: "easy",
     label: "得意",
-    emoji: "⭕",
-    color: "bg-emerald-500 hover:bg-emerald-600 text-white",
-    hint: "→ スワイプ",
+    Icon: Check,
+    color: "bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700",
   },
   {
     value: "practicing",
     label: "練習中",
-    emoji: "🔖",
-    color: "bg-amber-500 hover:bg-amber-600 text-white",
-    hint: "↑",
+    Icon: Bookmark,
+    color: "bg-amber-500 hover:bg-amber-600 active:bg-amber-700",
   },
 ];
 
@@ -79,29 +75,20 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
 
   const handleRate = (rating: Rating) => {
     if (!current) return;
-    // isPending は意図的にチェックしない: server action は fire-and-forget で
-    // 並列実行を許し、ユーザーは即座に次のカードへ進める。
     setError(null);
     const songId = current.id;
     const songSnapshot = current;
-    // 楽観的に front から外す
     setQueue((q) => q.slice(1));
     setLastAction({ song: songSnapshot, rating });
     startTransition(async () => {
       const result = await rateSong({ songId, rating });
       if (!result.ok) {
-        // 失敗時はエラー表示のみ。queue は巻き戻さない(連打中の体験を保つ)
-        // 失敗した曲は、リロード時に未評価扱いになるので再度評価できる
         setError(result.error ?? "保存に失敗しました");
         setLastAction(null);
       }
     });
   };
 
-  /**
-   * 知らない曲などを評価せず次へ。DB 書き込みは行わない。
-   * 「戻る」で取り消し可能。リロードすると再表示される(セッション内のみ非表示)。
-   */
   const handleSkip = () => {
     if (!current) return;
     setError(null);
@@ -110,16 +97,13 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
     setLastAction({ song: songSnapshot, rating: null });
   };
 
-  /**
-   * 直前の評価/スキップを取り消す。queue 先頭に戻し、評価済みなら DB からも削除。
-   */
   const handleUndo = () => {
     if (!lastAction) return;
     setError(null);
     const { song, rating } = lastAction;
     setLastAction(null);
     setQueue((q) => [song, ...q]);
-    if (rating === null) return; // スキップなら DB 操作なし
+    if (rating === null) return;
     startTransition(async () => {
       const result = await unrateSong(song.id);
       if (!result.ok) {
@@ -141,8 +125,8 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
   }
 
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-6 px-4 py-6">
-      {/* 次の 2 枚のジャケット画像を裏で先読み(React 19 が <head> へ hoist) */}
+    <div className="mx-auto flex max-w-md flex-col items-center gap-5 px-4 py-6">
+      {/* 次の 2 枚のジャケット画像を裏で先読み */}
       {queue.slice(1, 3).map((song) =>
         song.image_url_medium ? (
           <link
@@ -160,7 +144,7 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
         </div>
       ) : null}
 
-      <div className="relative h-[26rem] w-full">
+      <div className="relative h-[28rem] w-full">
         {/* 後ろのカード (next 1, next 2) */}
         {upcoming.map((song, idx) => (
           <div
@@ -187,31 +171,7 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
         </AnimatePresence>
       </div>
 
-      {/* 補助操作: 戻る / スキップ */}
-      <div className="flex w-full items-center justify-between">
-        <button
-          type="button"
-          onClick={handleUndo}
-          disabled={!lastAction}
-          className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-30 disabled:hover:bg-transparent dark:text-zinc-400 dark:hover:bg-zinc-800"
-          aria-label="直前の評価を取り消して戻る"
-        >
-          <span aria-hidden>↺</span>
-          <span>戻る</span>
-        </button>
-        <button
-          type="button"
-          onClick={handleSkip}
-          disabled={!current}
-          className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-30 disabled:hover:bg-transparent dark:text-zinc-400 dark:hover:bg-zinc-800"
-          aria-label="この曲を評価せずスキップ"
-        >
-          <span>知らない / スキップ</span>
-          <span aria-hidden>↷</span>
-        </button>
-      </div>
-
-      {/* 4 択ボタン */}
+      {/* 4 評価ボタン (丸いアイコンボタン + ラベル) */}
       <div className="grid w-full grid-cols-4 gap-2">
         {RATINGS.map((r) => (
           <button
@@ -219,17 +179,41 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
             type="button"
             disabled={!current}
             onClick={() => handleRate(r.value)}
-            className={`flex flex-col items-center gap-1 rounded-xl px-2 py-3 text-xs font-medium transition disabled:opacity-50 ${r.color}`}
+            className="flex flex-col items-center gap-1.5 transition disabled:opacity-50"
+            aria-label={r.label}
           >
-            <span className="text-xl">{r.emoji}</span>
-            {r.label}
+            <span
+              className={`flex size-14 items-center justify-center rounded-full text-white shadow-sm transition ${r.color}`}
+            >
+              <r.Icon className="size-6" />
+            </span>
+            <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+              {r.label}
+            </span>
           </button>
         ))}
       </div>
 
-      <p className="text-center text-xs text-zinc-500 dark:text-zinc-500">
-        スワイプ: ← 苦手 / → 得意 / ↑ 練習中 / ↓ 普通
-      </p>
+      {/* 知らない/スキップ (横長 pill) + 戻る (丸) */}
+      <div className="flex w-full items-center gap-2">
+        <button
+          type="button"
+          onClick={handleSkip}
+          disabled={!current}
+          className="flex-1 rounded-full bg-zinc-100 px-4 py-3 text-sm font-medium text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-300 disabled:opacity-30 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+        >
+          知らない / スキップ
+        </button>
+        <button
+          type="button"
+          onClick={handleUndo}
+          disabled={!lastAction}
+          className="flex size-12 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-300 disabled:opacity-30 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+          aria-label="直前の評価を取り消して戻る"
+        >
+          <RotateCcw className="size-5" />
+        </button>
+      </div>
     </div>
   );
 }
@@ -252,9 +236,70 @@ function SwipeCard({
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-200, 0, 200], [-15, 0, 15]);
+
+  // スワイプ強度 (0〜1)。x/y が SWIPE_THRESHOLD に近づくほど 1 に
+  const intensity = useTransform([x, y], ([xv, yv]) =>
+    Math.min(
+      1,
+      Math.max(Math.abs(xv as number), Math.abs(yv as number)) / 150,
+    ),
+  );
+
+  // 明度: スワイプ中はカード自体が 1.00 → 1.12 に明るくなる (subtle な「光る」感)
+  const filter = useTransform(
+    intensity,
+    (i) => `brightness(${1 + (i as number) * 0.12})`,
+  );
+
+  // box-shadow: スワイプ方向に応じた色のハロー (blur が広がる) を演出
+  // blur 半径とアルファが intensity に比例して強まる
+  const boxShadow = useTransform([x, y], ([xv, yv]) => {
+    const xn = xv as number;
+    const yn = yv as number;
+    const ax = Math.abs(xn);
+    const ay = Math.abs(yn);
+    const i = Math.min(1, Math.max(ax, ay) / 150);
+    if (i < 0.05) {
+      return "0 4px 12px rgba(0,0,0,0.08)";
+    }
+    let r = 0,
+      g = 0,
+      b = 0;
+    if (ax > ay) {
+      // 横方向: 右=得意(emerald) / 左=苦手(red)
+      if (xn > 0) {
+        r = 16;
+        g = 185;
+        b = 129;
+      } else {
+        r = 239;
+        g = 68;
+        b = 68;
+      }
+    } else {
+      // 縦方向: 上=練習中(amber) / 下=普通(zinc)
+      if (yn < 0) {
+        r = 245;
+        g = 158;
+        b = 11;
+      } else {
+        r = 113;
+        g = 113;
+        b = 122;
+      }
+    }
+    const blurPx = i * 50;
+    const alpha = i * 0.55;
+    return `0 0 ${blurPx}px rgba(${r},${g},${b},${alpha})`;
+  });
+
   const overlayOpacity = useTransform(
     [x, y],
-    ([xv, yv]) => Math.min(1, Math.max(Math.abs(xv as number), Math.abs(yv as number)) / 150),
+    ([xv, yv]) =>
+      Math.min(
+        1,
+        Math.max(Math.abs(xv as number), Math.abs(yv as number)) / 150,
+      ),
   );
 
   const handleDragEnd = (
@@ -278,7 +323,7 @@ function SwipeCard({
 
   return (
     <motion.div
-      style={{ x, y, rotate }}
+      style={{ x, y, rotate, filter, boxShadow }}
       drag
       dragElastic={0.6}
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
@@ -287,7 +332,7 @@ function SwipeCard({
       animate={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0.9, opacity: 0, transition: { duration: 0.15 } }}
       whileTap={{ cursor: "grabbing" }}
-      className="absolute inset-0 cursor-grab touch-none select-none rounded-2xl border border-zinc-200 bg-white p-4 shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+      className="absolute inset-0 cursor-grab touch-none select-none rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
     >
       <SongCardContent song={song} />
       <SwipeOverlay x={x} y={y} opacity={overlayOpacity} />
@@ -297,8 +342,9 @@ function SwipeCard({
 
 function SongCardContent({ song }: { song: Song }) {
   return (
-    <div className="flex h-full flex-col items-center justify-between gap-3">
-      <div className="relative aspect-square w-full max-w-[14rem] overflow-hidden rounded-xl bg-zinc-200 dark:bg-zinc-800">
+    <div className="flex h-full flex-col justify-between gap-3">
+      {/* ジャケット (中央) */}
+      <div className="relative aspect-square w-full max-w-[14rem] self-center overflow-hidden rounded-xl bg-zinc-200 dark:bg-zinc-800">
         {song.image_url_medium ? (
           <Image
             src={song.image_url_medium}
@@ -316,7 +362,8 @@ function SongCardContent({ song }: { song: Song }) {
         )}
       </div>
 
-      <div className="w-full text-center">
+      {/* 曲名 + アーティスト・発売年 (左寄せ) */}
+      <div className="w-full">
         <h2 className="line-clamp-2 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
           {song.title}
         </h2>
@@ -326,32 +373,34 @@ function SongCardContent({ song }: { song: Song }) {
         </p>
       </div>
 
-      {song.spotify_track_id ? (
-        <a
-          href={`https://open.spotify.com/track/${song.spotify_track_id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          // ドラッグ開始イベントを止めて、ボタン押下時にスワイプが発火しないようにする
-          onPointerDown={(e) => e.stopPropagation()}
-          draggable={false}
-          className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500 px-4 py-1.5 text-xs font-medium text-emerald-600 transition hover:bg-emerald-50 active:bg-emerald-100 dark:border-emerald-500 dark:text-emerald-400 dark:hover:bg-emerald-950 dark:active:bg-emerald-900"
-          aria-label={`${song.title} を Spotify で聴く(新しいタブで開きます)`}
-        >
-          <span aria-hidden>▶</span>
-          Spotify で試聴
-        </a>
-      ) : null}
-
+      {/* 音域情報 */}
       <dl className="grid w-full grid-cols-2 gap-x-4 gap-y-1 rounded-lg bg-zinc-100 px-3 py-2 text-xs dark:bg-zinc-800">
         <dt className="text-zinc-600 dark:text-zinc-400">地声</dt>
         <dd className="text-right font-mono">
-          {midiToKaraoke(song.range_low_midi)} 〜 {midiToKaraoke(song.range_high_midi)}
+          {midiToKaraoke(song.range_low_midi)} 〜{" "}
+          {midiToKaraoke(song.range_high_midi)}
         </dd>
         <dt className="text-zinc-600 dark:text-zinc-400">裏声</dt>
         <dd className="text-right font-mono">
           {midiToKaraoke(song.falsetto_max_midi)}
         </dd>
       </dl>
+
+      {/* Spotify 試聴ボタン (音域の下、中央配置) */}
+      {song.spotify_track_id ? (
+        <a
+          href={`https://open.spotify.com/track/${song.spotify_track_id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          onPointerDown={(e) => e.stopPropagation()}
+          draggable={false}
+          className="inline-flex items-center justify-center gap-1.5 self-center rounded-full border border-emerald-500 px-4 py-1.5 text-xs font-medium text-emerald-600 transition hover:bg-emerald-50 active:bg-emerald-100 dark:border-emerald-500 dark:text-emerald-400 dark:hover:bg-emerald-950 dark:active:bg-emerald-900"
+          aria-label={`${song.title} を Spotify で聴く(新しいタブで開きます)`}
+        >
+          <span aria-hidden>▶</span>
+          Spotify で試聴
+        </a>
+      ) : null}
     </div>
   );
 }
@@ -363,18 +412,25 @@ interface SwipeOverlayProps {
 }
 
 function SwipeOverlay({ x, y, opacity }: SwipeOverlayProps) {
-  // 各方向の表示タイミングをモーション値で導出 (フックは loop しない)
   const easyOpacity = useTransform([x, y], ([xv, yv]) =>
-    (xv as number) > 0 && Math.abs(xv as number) > Math.abs(yv as number) ? 1 : 0,
+    (xv as number) > 0 && Math.abs(xv as number) > Math.abs(yv as number)
+      ? 1
+      : 0,
   );
   const hardOpacity = useTransform([x, y], ([xv, yv]) =>
-    (xv as number) < 0 && Math.abs(xv as number) > Math.abs(yv as number) ? 1 : 0,
+    (xv as number) < 0 && Math.abs(xv as number) > Math.abs(yv as number)
+      ? 1
+      : 0,
   );
   const practicingOpacity = useTransform([x, y], ([xv, yv]) =>
-    (yv as number) < 0 && Math.abs(yv as number) > Math.abs(xv as number) ? 1 : 0,
+    (yv as number) < 0 && Math.abs(yv as number) > Math.abs(xv as number)
+      ? 1
+      : 0,
   );
   const mediumOpacity = useTransform([x, y], ([xv, yv]) =>
-    (yv as number) > 0 && Math.abs(yv as number) > Math.abs(xv as number) ? 1 : 0,
+    (yv as number) > 0 && Math.abs(yv as number) > Math.abs(xv as number)
+      ? 1
+      : 0,
   );
 
   return (
