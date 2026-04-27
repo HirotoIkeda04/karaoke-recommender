@@ -7,7 +7,7 @@ import {
   useMotionValue,
   useTransform,
 } from "framer-motion";
-import { Bookmark, Check, Minus, RotateCcw, X } from "lucide-react";
+import { Check, Dumbbell, Minus, RotateCcw, X } from "lucide-react";
 import Image from "next/image";
 import { startTransition, useState } from "react";
 
@@ -60,7 +60,7 @@ const RATINGS: ReadonlyArray<{
   {
     value: "practicing",
     label: "練習中",
-    Icon: Bookmark,
+    Icon: Dumbbell,
     color: "bg-amber-500 hover:bg-amber-600 active:bg-amber-700",
   },
 ];
@@ -145,17 +145,20 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
       ) : null}
 
       <div className="relative h-[28rem] w-full">
-        {/* 後ろのカード (next 1, next 2) */}
+        {/* 後ろのカード (next 1, next 2): 中身も描画して、スワイプ中に
+            真っ白な空のカードが見えてしまう問題を解消 */}
         {upcoming.map((song, idx) => (
           <div
             key={song.id}
-            className="absolute inset-0 rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+            className="absolute inset-0 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
             style={{
               transform: `translateY(${(idx + 1) * 8}px) scale(${1 - (idx + 1) * 0.04})`,
               zIndex: -idx - 1,
               opacity: 1 - (idx + 1) * 0.15,
             }}
-          />
+          >
+            <SongCardContent song={song} />
+          </div>
         ))}
 
         {/* 先頭カード (ドラッグ可能) */}
@@ -165,8 +168,8 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
             song={current}
             onSwipeLeft={() => handleRate("hard")}
             onSwipeRight={() => handleRate("easy")}
-            onSwipeUp={() => handleRate("practicing")}
-            onSwipeDown={() => handleRate("medium")}
+            onSwipeUp={() => handleRate("medium")}
+            onSwipeDown={() => handleRate("practicing")}
           />
         </AnimatePresence>
       </div>
@@ -278,15 +281,15 @@ function SwipeCard({
         b = 68;
       }
     } else {
-      // 縦方向: 上=練習中(amber) / 下=普通(zinc)
+      // 縦方向: 上=普通(zinc) / 下=練習中(amber)
       if (yn < 0) {
-        r = 245;
-        g = 158;
-        b = 11;
-      } else {
         r = 113;
         g = 113;
         b = 122;
+      } else {
+        r = 245;
+        g = 158;
+        b = 11;
       }
     }
     const blurPx = i * 50;
@@ -423,12 +426,13 @@ function SwipeOverlay({ x, y, opacity }: SwipeOverlayProps) {
       ? 1
       : 0,
   );
-  const practicingOpacity = useTransform([x, y], ([xv, yv]) =>
+  // 上=普通, 下=練習中 に変更
+  const mediumOpacity = useTransform([x, y], ([xv, yv]) =>
     (yv as number) < 0 && Math.abs(yv as number) > Math.abs(xv as number)
       ? 1
       : 0,
   );
-  const mediumOpacity = useTransform([x, y], ([xv, yv]) =>
+  const practicingOpacity = useTransform([x, y], ([xv, yv]) =>
     (yv as number) > 0 && Math.abs(yv as number) > Math.abs(xv as number)
       ? 1
       : 0,
@@ -452,16 +456,16 @@ function SwipeOverlay({ x, y, opacity }: SwipeOverlayProps) {
         苦手
       </motion.div>
       <motion.div
-        style={{ opacity: practicingOpacity }}
-        className="absolute left-1/2 top-4 -translate-x-1/2 rounded-lg border-4 border-amber-400 px-3 py-1 text-lg font-bold text-amber-600"
-      >
-        練習中
-      </motion.div>
-      <motion.div
         style={{ opacity: mediumOpacity }}
-        className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-lg border-4 border-zinc-400 px-3 py-1 text-lg font-bold text-zinc-600"
+        className="absolute left-1/2 top-4 -translate-x-1/2 rounded-lg border-4 border-zinc-400 px-3 py-1 text-lg font-bold text-zinc-600"
       >
         普通
+      </motion.div>
+      <motion.div
+        style={{ opacity: practicingOpacity }}
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-lg border-4 border-amber-400 px-3 py-1 text-lg font-bold text-amber-600"
+      >
+        練習中
       </motion.div>
     </motion.div>
   );
