@@ -71,11 +71,19 @@ def _similarity(a: str, b: str) -> float:
     return SequenceMatcher(None, na, nb).ratio()
 
 
-def _upgrade_artwork(url: str | None, size: int = 600) -> str | None:
-    """artworkUrl100 (100x100) を size x size に書き換える。"""
+def upgrade_artwork(url: str | None, size: int = 600) -> str | None:
+    """artworkUrl の URL 内の `NxNbb.jpg` を任意サイズに書き換える。
+
+    iTunes の artwork CDN は URL 末尾の `100x100bb.jpg` を任意のピクセル数に
+    書き換えるだけで対応する解像度の画像を返す(再エンコード済)。
+    """
     if not url:
         return None
     return re.sub(r"/\d+x\d+(bb)?\.(jpg|png)", f"/{size}x{size}bb.\\2", url)
+
+
+# 後方互換: 古い名前を残しておく(他モジュールが使っていた場合に備えて)
+_upgrade_artwork = upgrade_artwork
 
 
 # --- API 呼び出し ----------------------------------------------------------

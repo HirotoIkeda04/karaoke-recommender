@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from config import SCRAPER_ROOT, require
-from fetch_itunes import ItunesClient, ItunesRateLimited, ItunesTrack
+from fetch_itunes import ItunesClient, ItunesRateLimited, ItunesTrack, upgrade_artwork
 from scrape_dam import DamSong, fetch_all_rankings
 
 logger = logging.getLogger("scraper.dam")
@@ -62,11 +62,17 @@ def _build_payload(song: DamSong, track: ItunesTrack | None) -> dict:
         "source_pages": list(song.source_pages),
     }
     if track is not None:
+        # サイズ方針:
+        #   small  = 100x100 (リスト thumbnail 48px native ≈ 96 retina)
+        #   medium = 600x600 (スワイプカード 22rem ≈ 352 native ≈ 700 retina)
+        #   large  = 1200x1200 (詳細ページ全画面 + retina)
+        # iTunes は URL 末尾の `100x100bb` を任意サイズに書き換えれば再エンコード
+        # 済みの解像度を返すため、追加 API call なしで取得できる。
         base.update({
             "release_year": track.release_year,
-            "image_url_small": track.artwork_url_60,
-            "image_url_medium": track.artwork_url_100,
-            "image_url_large": track.artwork_url_600,
+            "image_url_small": track.artwork_url_100,
+            "image_url_medium": upgrade_artwork(track.artwork_url_100, 600),
+            "image_url_large": upgrade_artwork(track.artwork_url_100, 1200),
             "itunes_track_view_url": track.track_view_url,
             "itunes_similarity": track.similarity,
         })
