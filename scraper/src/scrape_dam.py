@@ -32,18 +32,18 @@ REQUEST_TIMEOUT_SEC = 30
 
 
 # ランキングページの一覧。複数を組み合わせて重複排除することで
-# 単発で 300〜500 曲規模のカバレッジを確保する。
+# 単発で 200〜400 曲規模のカバレッジを確保する。
+#
+# enka / vocaloid は対象外:
+#   音域データを公開しているサイト (karaoto, vocal-range.com) が J-POP 中心で
+#   演歌/ボカロのカバレッジが極端に低い (実測 87% が未取得)。
+#   音域不明の曲を大量に投入すると評価デッキの UX が悪化するため除外。
 RANKING_PAGES: dict[str, str] = {
     "main":         "/ranking/",                       # デイリー/週間/月間 総合
     "year":         "/ranking/year.html",              # 年間
     "firsthalf":    "/ranking/firsthalf.html",         # 上半期
     "secondhalf":   "/ranking/secondhalf.html",        # 下半期
-    "anime_monthly":    "/app/dam/ranking/anime-monthly.html",
-    "vocaloid_monthly": "/app/dam/ranking/vocaloid-monthly.html",
-    "vtuber_monthly":   "/app/dam/ranking/vtuber-monthly.html",
-    "enka_monthly":     "/app/dam/ranking/enka-monthly.html",
     "duet_monthly":     "/app/dam/ranking/duet-monthly.html",
-    "foreign_monthly":  "/app/dam/ranking/foreign-monthly.html",
 }
 
 

@@ -236,6 +236,65 @@ async function main() {
     }
   }
 
+  // ----- Orphan cleanup -----
+  // 過去 seed:dam で投入したが、現 JSON には居ない曲 (= ジャンル除外で消えた等) を整理:
+  //   - karaoto 由来データ (spotify_track_id か range_high_midi) を持つ行: dam_request_no
+  //     と source_urls から DAM 関連のみ削除し、行自体は残す
+  //   - 純 DAM 行 (上記が無い): 行ごと DELETE
+  const currentDamIds = new Set(seed.songs.map((s) => s.dam_request_no));
+  const { data: allDamRows, error: orphErr } = await supabase
+    .from("songs")
+    .select(
+      "id, dam_request_no, spotify_track_id, range_high_midi, source_urls, title, artist",
+    )
+    .not("dam_request_no", "is", null);
+  if (orphErr) {
+    console.error("orphan scan failed:", orphErr);
+    process.exit(1);
+  }
+
+  let orphanDeleted = 0;
+  let orphanCleared = 0;
+  for (const row of allDamRows ?? []) {
+    if (!row.dam_request_no || currentDamIds.has(row.dam_request_no)) continue;
+
+    const isMergedKaraoto =
+      row.spotify_track_id !== null || row.range_high_midi !== null;
+    const damUrl =
+      `https://www.clubdam.com/karaokesearch/songleaf.html?requestNo=${row.dam_request_no}`;
+
+    if (isMergedKaraoto) {
+      const cleanedUrls = (row.source_urls ?? []).filter((u) => u !== damUrl);
+      const { error: updErr } = await supabase
+        .from("songs")
+        .update({ dam_request_no: null, source_urls: cleanedUrls })
+        .eq("id", row.id);
+      if (updErr) {
+        console.error(
+          `orphan clear failed for ${row.title} (${row.dam_request_no}):`,
+          updErr,
+        );
+        stats.errors++;
+        continue;
+      }
+      orphanCleared++;
+    } else {
+      const { error: delErr } = await supabase
+        .from("songs")
+        .delete()
+        .eq("id", row.id);
+      if (delErr) {
+        console.error(
+          `orphan delete failed for ${row.title} (${row.dam_request_no}):`,
+          delErr,
+        );
+        stats.errors++;
+        continue;
+      }
+      orphanDeleted++;
+    }
+  }
+
   const { count: total, error: countErr } = await supabase
     .from("songs")
     .select("*", { count: "exact", head: true });
@@ -247,6 +306,7 @@ async function main() {
   console.log(
     `\ndone. inserted=${stats.inserted} updated=${stats.updated} ` +
     `dups_deleted=${stats.duplicatesDeleted} range_filled=${stats.rangeFilled} ` +
+    `orphan_deleted=${orphanDeleted} orphan_cleared=${orphanCleared} ` +
     `errors=${stats.errors}\ntable_total=${total}`,
   );
 
