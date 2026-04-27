@@ -13,10 +13,17 @@ import { Button } from "@/components/ui/button";
 import { midiToKaraoke } from "@/lib/note";
 import type { Database } from "@/types/database";
 
-import { rateSong } from "./actions";
+import { rateSong, unrateSong } from "./actions";
 
 type Song = Database["public"]["Tables"]["songs"]["Row"];
 type Rating = Database["public"]["Enums"]["rating_type"];
+
+/**
+ * 直前のアクション。「戻る」で取り消すために保持する。
+ * - rating !== null: rateSong を実行済み → unrateSong で取り消し
+ * - rating === null: スキップ(DB書き込みなし)→ queue に戻すだけ
+ */
+type LastAction = { song: Song; rating: Rating | null };
 
 interface SwipeDeckProps {
   initialSongs: Song[];
@@ -63,6 +70,7 @@ const RATINGS: ReadonlyArray<{
 
 export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
   const [queue, setQueue] = useState(initialSongs);
+  const [lastAction, setLastAction] = useState<LastAction | null>(null);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -73,14 +81,47 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
     if (!current || isPending) return;
     setError(null);
     const songId = current.id;
+    const songSnapshot = current;
     // 楽観的に front から外す
     setQueue((q) => q.slice(1));
+    setLastAction({ song: songSnapshot, rating });
     startTransition(async () => {
       const result = await rateSong({ songId, rating });
       if (!result.ok) {
         setError(result.error ?? "保存に失敗しました");
-        // 失敗時は queue 先頭に戻す
-        setQueue((q) => [current, ...q]);
+        // 失敗時は queue 先頭に戻す + undo 履歴も巻き戻す
+        setQueue((q) => [songSnapshot, ...q]);
+        setLastAction(null);
+      }
+    });
+  };
+
+  /**
+   * 知らない曲などを評価せず次へ。DB 書き込みは行わない。
+   * 「戻る」で取り消し可能。リロードすると再表示される(セッション内のみ非表示)。
+   */
+  const handleSkip = () => {
+    if (!current || isPending) return;
+    setError(null);
+    const songSnapshot = current;
+    setQueue((q) => q.slice(1));
+    setLastAction({ song: songSnapshot, rating: null });
+  };
+
+  /**
+   * 直前の評価/スキップを取り消す。queue 先頭に戻し、評価済みなら DB からも削除。
+   */
+  const handleUndo = () => {
+    if (!lastAction || isPending) return;
+    setError(null);
+    const { song, rating } = lastAction;
+    setLastAction(null);
+    setQueue((q) => [song, ...q]);
+    if (rating === null) return; // スキップなら DB 操作なし
+    startTransition(async () => {
+      const result = await unrateSong(song.id);
+      if (!result.ok) {
+        setError(result.error ?? "戻す操作に失敗しました");
       }
     });
   };
@@ -130,6 +171,30 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
             onSwipeDown={() => handleRate("medium")}
           />
         </AnimatePresence>
+      </div>
+
+      {/* 補助操作: 戻る / スキップ */}
+      <div className="flex w-full items-center justify-between">
+        <button
+          type="button"
+          onClick={handleUndo}
+          disabled={!lastAction || isPending}
+          className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-30 disabled:hover:bg-transparent dark:text-zinc-400 dark:hover:bg-zinc-800"
+          aria-label="直前の評価を取り消して戻る"
+        >
+          <span aria-hidden>↺</span>
+          <span>戻る</span>
+        </button>
+        <button
+          type="button"
+          onClick={handleSkip}
+          disabled={!current || isPending}
+          className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-30 disabled:hover:bg-transparent dark:text-zinc-400 dark:hover:bg-zinc-800"
+          aria-label="この曲を評価せずスキップ"
+        >
+          <span>知らない / スキップ</span>
+          <span aria-hidden>↷</span>
+        </button>
       </div>
 
       {/* 4 択ボタン */}
