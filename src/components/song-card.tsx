@@ -1,4 +1,4 @@
-import { Check, Dumbbell, Minus, X } from "lucide-react";
+import { Check, Dumbbell, Headphones, Minus, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -49,9 +49,11 @@ const RATING_BADGE: Record<
 interface SongCardProps {
   song: Song;
   rating?: string | null;
+  /** Spotify で聴いたことがある曲かどうか (バッジ表示用) */
+  isKnown?: boolean;
 }
 
-export function SongCard({ song, rating }: SongCardProps) {
+export function SongCard({ song, rating, isKnown = false }: SongCardProps) {
   const badge = rating ? RATING_BADGE[rating] : null;
   const image = song.image_url_small ?? song.image_url_medium;
 
@@ -88,6 +90,12 @@ export function SongCard({ song, rating }: SongCardProps) {
               <badge.Icon className="size-3" aria-hidden />
               {badge.label}
             </span>
+          ) : null}
+          {isKnown ? (
+            <Headphones
+              className="size-3 shrink-0 text-emerald-500"
+              aria-label="Spotify で聴いたことがある曲"
+            />
           ) : null}
         </div>
         <p className="truncate text-xs text-zinc-600 dark:text-zinc-400">

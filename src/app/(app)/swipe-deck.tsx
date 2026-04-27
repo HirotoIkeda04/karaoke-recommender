@@ -7,9 +7,17 @@ import {
   useMotionValue,
   useTransform,
 } from "framer-motion";
-import { Check, Dumbbell, Minus, Play, RotateCcw, X } from "lucide-react";
+import {
+  Check,
+  Dumbbell,
+  Headphones,
+  Minus,
+  Play,
+  RotateCcw,
+  X,
+} from "lucide-react";
 import Image from "next/image";
-import { startTransition, useState } from "react";
+import { startTransition, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { midiToKaraoke } from "@/lib/note";
@@ -29,6 +37,8 @@ type LastAction = { song: Song; rating: Rating | null };
 
 interface SwipeDeckProps {
   initialSongs: Song[];
+  /** Spotify で聴いたことがある曲の id 一覧 (バッジ表示用、未連携なら空配列) */
+  knownSongIds?: string[];
 }
 
 const SWIPE_THRESHOLD = 110;
@@ -65,10 +75,14 @@ const RATINGS: ReadonlyArray<{
   },
 ];
 
-export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
+export function SwipeDeck({
+  initialSongs,
+  knownSongIds = [],
+}: SwipeDeckProps) {
   const [queue, setQueue] = useState(initialSongs);
   const [lastAction, setLastAction] = useState<LastAction | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const knownSet = useMemo(() => new Set(knownSongIds), [knownSongIds]);
 
   const current = queue[0];
   const upcoming = queue.slice(1, 3);
@@ -166,7 +180,7 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
               opacity: 1 - (idx + 1) * 0.15,
             }}
           >
-            <SongCardContent song={song} />
+            <SongCardContent song={song} isKnown={knownSet.has(song.id)} />
           </div>
         ))}
 
@@ -175,6 +189,7 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
           <SwipeCard
             key={current.id}
             song={current}
+            isKnown={knownSet.has(current.id)}
             onSwipeLeft={() => handleRate("hard")}
             onSwipeRight={() => handleRate("easy")}
             onSwipeUp={() => handleRate("medium")}
@@ -233,6 +248,7 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
 
 interface SwipeCardProps {
   song: Song;
+  isKnown?: boolean;
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
   onSwipeUp: () => void;
@@ -241,6 +257,7 @@ interface SwipeCardProps {
 
 function SwipeCard({
   song,
+  isKnown = false,
   onSwipeLeft,
   onSwipeRight,
   onSwipeUp,
@@ -347,15 +364,32 @@ function SwipeCard({
       whileTap={{ cursor: "grabbing" }}
       className="absolute inset-0 cursor-grab touch-none select-none overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
     >
-      <SongCardContent song={song} />
+      <SongCardContent song={song} isKnown={isKnown} />
       <SwipeOverlay x={x} y={y} opacity={overlayOpacity} />
     </motion.div>
   );
 }
 
-function SongCardContent({ song }: { song: Song }) {
+function SongCardContent({
+  song,
+  isKnown = false,
+}: {
+  song: Song;
+  isKnown?: boolean;
+}) {
   return (
     <div className="flex h-full flex-col">
+      {/* 「Spotify で聴いたことある」バッジ: カード左上 */}
+      {isKnown ? (
+        <div
+          className="absolute left-3 top-3 z-10 inline-flex items-center gap-1 rounded-full bg-emerald-500/95 px-2 py-0.5 text-[10px] font-medium text-white shadow-sm backdrop-blur"
+          aria-label="Spotify で聴いたことがある曲"
+        >
+          <Headphones className="size-3" aria-hidden />
+          聴いたことある
+        </div>
+      ) : null}
+
       {/* ジャケット: カード上部に edge-to-edge で配置 (余白なし) */}
       <div className="relative aspect-square w-full shrink-0 bg-zinc-200 dark:bg-zinc-800">
         {song.image_url_medium ? (

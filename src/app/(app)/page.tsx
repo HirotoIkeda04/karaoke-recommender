@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
+import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
@@ -13,11 +14,16 @@ type Song = Database["public"]["Tables"]["songs"]["Row"];
 export default async function HomePage() {
   const supabase = await createClient();
 
-  // 未評価の代表曲を 20 件ずつデッキに積む
-  const { data, error } = await supabase.rpc("get_unrated_songs", {
-    p_limit: 20,
-    p_popular_only: true,
-  });
+  // 未評価の代表曲を 20 件ずつデッキに積む。
+  // 並行して、Spotify で聴いたことのある song_id 集合も取得 (バッジ表示用)。
+  const [unratedRes, knownIds] = await Promise.all([
+    supabase.rpc("get_unrated_songs", {
+      p_limit: 20,
+      p_popular_only: true,
+    }),
+    getUserKnownSongIds(),
+  ]);
+  const { data, error } = unratedRes;
 
   if (error) {
     return (
@@ -46,5 +52,7 @@ export default async function HomePage() {
     );
   }
 
-  return <SwipeDeck initialSongs={songs} />;
+  return (
+    <SwipeDeck initialSongs={songs} knownSongIds={Array.from(knownIds)} />
+  );
 }

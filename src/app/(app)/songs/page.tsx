@@ -1,3 +1,4 @@
+import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
@@ -23,13 +24,17 @@ export default async function SongsPage() {
 
   // 全曲を一括取得 (artist 順 → title 順)
   // ローカルでフィルタするので server-side LIMIT は無し
-  const songsRes = await supabase
-    .from("songs")
-    .select(
-      "id,title,artist,release_year,range_low_midi,range_high_midi,falsetto_max_midi,image_url_small,image_url_medium",
-    )
-    .order("artist", { ascending: true })
-    .order("title", { ascending: true });
+  // 並行して、Spotify 連携済なら聴いたことある曲 ID も取得
+  const [songsRes, knownIds] = await Promise.all([
+    supabase
+      .from("songs")
+      .select(
+        "id,title,artist,release_year,range_low_midi,range_high_midi,falsetto_max_midi,image_url_small,image_url_medium",
+      )
+      .order("artist", { ascending: true })
+      .order("title", { ascending: true }),
+    getUserKnownSongIds(),
+  ]);
 
   // 自分の評価マップを構築 (rating badge 表示用)
   const ratings: Record<string, string> = {};
@@ -56,7 +61,11 @@ export default async function SongsPage() {
           {songsRes.error.message}
         </div>
       ) : (
-        <LiveSearch songs={songs} ratings={ratings} />
+        <LiveSearch
+          songs={songs}
+          ratings={ratings}
+          knownSongIds={Array.from(knownIds)}
+        />
       )}
     </div>
   );

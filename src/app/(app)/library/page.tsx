@@ -1,6 +1,7 @@
 import { Check, Dumbbell, Minus, X } from "lucide-react";
 import Link from "next/link";
 
+import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
@@ -53,10 +54,11 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   // active タブの曲を取得
   // SortableList でクライアント側ソートするため LIMIT を撤廃
   // (1 ユーザーの 1 タブに数千件入るのは現実的でないので問題なし)
-  const { data: rows, error } = await supabase
-    .from("evaluations")
-    .select(
-      `
+  const [evalQueryRes, knownIds] = await Promise.all([
+    supabase
+      .from("evaluations")
+      .select(
+        `
       rating,
       updated_at,
       song:songs (
@@ -65,10 +67,13 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
         image_url_small, image_url_medium
       )
     `,
-    )
-    .eq("user_id", userId)
-    .eq("rating", activeTab)
-    .order("updated_at", { ascending: false });
+      )
+      .eq("user_id", userId)
+      .eq("rating", activeTab)
+      .order("updated_at", { ascending: false }),
+    getUserKnownSongIds(),
+  ]);
+  const { data: rows, error } = evalQueryRes;
 
   return (
     <div className="mx-auto max-w-md space-y-4 px-4 py-4">
@@ -108,7 +113,10 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
           このカテゴリの曲はまだありません
         </div>
       ) : (
-        <SortableList evaluations={(rows ?? []) as unknown as EvaluationRow[]} />
+        <SortableList
+          evaluations={(rows ?? []) as unknown as EvaluationRow[]}
+          knownSongIds={Array.from(knownIds)}
+        />
       )}
     </div>
   );

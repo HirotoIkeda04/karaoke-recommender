@@ -29,6 +29,8 @@ export interface EvaluationRow {
 
 interface SortableListProps {
   evaluations: EvaluationRow[];
+  /** Spotify で聴いたことがある song_id リスト (バッジ表示用) */
+  knownSongIds?: string[];
 }
 
 type SortKey = "updated" | "artist" | "release_year" | "range_high";
@@ -72,11 +74,15 @@ function compareEvaluation(
   }
 }
 
-export function SortableList({ evaluations }: SortableListProps) {
+export function SortableList({
+  evaluations,
+  knownSongIds = [],
+}: SortableListProps) {
   const [sortKey, setSortKey] = useState<SortKey>("updated");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const knownSet = useMemo(() => new Set(knownSongIds), [knownSongIds]);
 
   // ドロップダウンの click-outside 閉じる
   useEffect(() => {
@@ -188,7 +194,11 @@ export function SortableList({ evaluations }: SortableListProps) {
         {sorted.map((r) =>
           r.song ? (
             <li key={r.song.id}>
-              <SongCard song={r.song} rating={r.rating} />
+              <SongCard
+                song={r.song}
+                rating={r.rating}
+                isKnown={knownSet.has(r.song.id)}
+              />
             </li>
           ) : null,
         )}

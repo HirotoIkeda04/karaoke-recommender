@@ -23,6 +23,8 @@ interface LiveSearchProps {
   songs: Song[];
   /** key: song_id, value: rating */
   ratings: Record<string, string>;
+  /** Spotify で聴いたことがある song_id 一覧 */
+  knownSongIds?: string[];
 }
 
 const HIGH_OPTIONS = [
@@ -42,7 +44,11 @@ function normalize(s: string): string {
   return s.toLowerCase().normalize("NFKC");
 }
 
-export function LiveSearch({ songs, ratings }: LiveSearchProps) {
+export function LiveSearch({
+  songs,
+  ratings,
+  knownSongIds = [],
+}: LiveSearchProps) {
   const [query, setQuery] = useState("");
   const [highMax, setHighMax] = useState("");
   const [highMin, setHighMin] = useState("");
@@ -50,6 +56,8 @@ export function LiveSearch({ songs, ratings }: LiveSearchProps) {
   // 入力を絶対遅らせないために、フィルタ計算側を deferred 値で動かす
   // (React 19 concurrent rendering: 高負荷フィルタ中もタイピングが詰まらない)
   const deferredQuery = useDeferredValue(query);
+
+  const knownSet = useMemo(() => new Set(knownSongIds), [knownSongIds]);
 
   const filtered = useMemo(() => {
     const normalizedQ = normalize(deferredQuery.trim());
@@ -156,7 +164,11 @@ export function LiveSearch({ songs, ratings }: LiveSearchProps) {
         <ul className={isStale ? "opacity-70 transition-opacity" : undefined}>
           {filtered.map((s) => (
             <li key={s.id}>
-              <SongCard song={s} rating={ratings[s.id] ?? null} />
+              <SongCard
+                song={s}
+                rating={ratings[s.id] ?? null}
+                isKnown={knownSet.has(s.id)}
+              />
             </li>
           ))}
         </ul>
