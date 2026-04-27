@@ -7,7 +7,7 @@ import {
   useMotionValue,
   useTransform,
 } from "framer-motion";
-import { Check, Dumbbell, Minus, RotateCcw, X } from "lucide-react";
+import { Check, Dumbbell, Minus, Play, RotateCcw, X } from "lucide-react";
 import Image from "next/image";
 import { startTransition, useState } from "react";
 
@@ -375,7 +375,7 @@ function SongCardContent({ song }: { song: Song }) {
         )}
       </div>
 
-      {/* テキスト/ボタン領域: 画像下に padding を取って配置 */}
+      {/* テキスト領域: 画像下に padding を取って配置 */}
       <div className="flex flex-1 flex-col justify-between gap-2 p-3">
         <div className="w-full">
           <h2 className="line-clamp-1 text-base font-semibold text-zinc-900 dark:text-zinc-50">
@@ -399,23 +399,22 @@ function SongCardContent({ song }: { song: Song }) {
             {midiToKaraoke(song.falsetto_max_midi)}
           </dd>
         </dl>
-
-        {/* Spotify 試聴ボタン */}
-        {song.spotify_track_id ? (
-          <a
-            href={`https://open.spotify.com/track/${song.spotify_track_id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            onPointerDown={(e) => e.stopPropagation()}
-            draggable={false}
-            className="inline-flex items-center justify-center gap-1 self-center rounded-full border border-emerald-500 px-3 py-1 text-[11px] font-medium text-emerald-600 transition hover:bg-emerald-50 active:bg-emerald-100 dark:border-emerald-500 dark:text-emerald-400 dark:hover:bg-emerald-950 dark:active:bg-emerald-900"
-            aria-label={`${song.title} を Spotify で聴く(新しいタブで開きます)`}
-          >
-            <span aria-hidden>▶</span>
-            Spotify で試聴
-          </a>
-        ) : null}
       </div>
+
+      {/* Spotify 再生ボタン: カード右下角に outlined 円形ボタン */}
+      {song.spotify_track_id ? (
+        <a
+          href={`https://open.spotify.com/track/${song.spotify_track_id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          onPointerDown={(e) => e.stopPropagation()}
+          draggable={false}
+          className="absolute bottom-3 right-3 flex size-10 items-center justify-center rounded-full border-2 border-emerald-500 bg-white text-emerald-600 transition hover:bg-emerald-50 active:bg-emerald-100 dark:bg-zinc-900 dark:text-emerald-400 dark:hover:bg-emerald-950 dark:active:bg-emerald-900"
+          aria-label={`${song.title} を Spotify で再生(新しいタブで開きます)`}
+        >
+          <Play className="size-4 fill-current" />
+        </a>
+      ) : null}
     </div>
   );
 }
