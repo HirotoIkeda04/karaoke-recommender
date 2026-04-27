@@ -22,6 +22,11 @@ from pathlib import Path
 
 from config import SCRAPER_ROOT, require
 from fetch_itunes import ItunesClient, ItunesRateLimited, ItunesTrack, upgrade_artwork
+from fetch_vocal_range import (
+    VocalRangeClient,
+    VocalRangeMatch,
+    VocalRangeRateLimited,
+)
 from match_karaoto import KaraotoEntry, build_index as build_karaoto_index, lookup as karaoto_lookup
 from scrape_dam import DamSong, fetch_all_rankings
 
@@ -54,22 +59,124 @@ def _append_itunes_cache(path: Path, request_no: str, track: ItunesTrack | None)
         f.write("\n")
 
 
+def _load_vocal_range_cache(path: Path) -> dict[str, dict | None]:
+    """request_no -> match dict (or None)。"""
+    cache: dict[str, dict | None] = {}
+    if not path.exists():
+        return cache
+    with path.open(encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            entry = json.loads(line)
+            cache[entry["request_no"]] = entry["match"]
+    return cache
+
+
+def _append_vocal_range_cache(
+    path: Path, request_no: str, match: VocalRangeMatch | None,
+) -> None:
+    entry = {"request_no": request_no, "match": match.__dict__ if match else None}
+    with path.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, ensure_ascii=False))
+        f.write("\n")
+
+
+def _enrich_vocal_range(
+    songs: list[DamSong],
+    karaoto_index: dict,
+    contact: str,
+    cache_path: Path,
+) -> dict[str, VocalRangeMatch | None]:
+    """karaoto に無い曲のみ vocal-range.com を引いて結果を返す(request_no キー)。"""
+    cache = _load_vocal_range_cache(cache_path)
+    logger.info("vocal-range cache: %d entries", len(cache))
+
+    # karaoto に無いものだけ対象
+    targets = [
+        s for s in songs
+        if karaoto_lookup(s.title, s.artist, karaoto_index) is None
+    ]
+    logger.info("vocal-range targets (no karaoto match): %d/%d", len(targets), len(songs))
+
+    client = VocalRangeClient(contact)
+    out: dict[str, VocalRangeMatch | None] = {}
+    hits = 0
+    misses = 0
+    cache_used = 0
+    rate_limited = False
+
+    for i, song in enumerate(targets, start=1):
+        if song.request_no in cache:
+            cached = cache[song.request_no]
+            match = VocalRangeMatch(**cached) if cached else None
+            cache_used += 1
+        elif rate_limited:
+            match = None
+        else:
+            try:
+                match = client.best_match(song.title, song.artist)
+            except VocalRangeRateLimited:
+                logger.error(
+                    "vocal-range rate limited at %d/%d; remaining will be left empty",
+                    i, len(targets),
+                )
+                rate_limited = True
+                match = None
+            _append_vocal_range_cache(cache_path, song.request_no, match)
+
+        out[song.request_no] = match
+        if match:
+            hits += 1
+        else:
+            misses += 1
+
+        if i % 25 == 0:
+            logger.info(
+                "vocal-range progress: %d/%d (hits=%d, misses=%d, cache_used=%d)",
+                i, len(targets), hits, misses, cache_used,
+            )
+
+    logger.info(
+        "vocal-range done: hits=%d, misses=%d, cached_used=%d, rate_limited=%s",
+        hits, misses, cache_used, rate_limited,
+    )
+    return out
+
+
 def _build_payload(
     song: DamSong,
     track: ItunesTrack | None,
     karaoto: KaraotoEntry | None,
+    vocal_range: VocalRangeMatch | None,
 ) -> dict:
-    """1 曲分の出力 payload (seed-dam-songs.ts が読み込む形)。"""
+    """1 曲分の出力 payload (seed-dam-songs.ts が読み込む形)。
+
+    range の優先度: karaoto > vocal-range.com (karaoto は手動キュレーションで
+    精度が高いため。vocal-range は補助フォールバック)。
+    """
+    range_low = karaoto.range_low_midi if karaoto else None
+    range_high = karaoto.range_high_midi if karaoto else None
+    falsetto = karaoto.falsetto_max_midi if karaoto else None
+    if vocal_range is not None:
+        if range_low is None:
+            range_low = vocal_range.range_low_midi
+        if range_high is None:
+            range_high = vocal_range.range_high_midi
+        if falsetto is None:
+            falsetto = vocal_range.falsetto_max_midi
+
     base: dict = {
         "title": song.title,
         "artist": song.artist,
         "dam_request_no": song.request_no,
         "source_pages": list(song.source_pages),
-        # karaoto マッチが取れた曲のみ range が埋まる(なければ全て None)
-        "range_low_midi": karaoto.range_low_midi if karaoto else None,
-        "range_high_midi": karaoto.range_high_midi if karaoto else None,
-        "falsetto_max_midi": karaoto.falsetto_max_midi if karaoto else None,
+        "range_low_midi": range_low,
+        "range_high_midi": range_high,
+        "falsetto_max_midi": falsetto,
         "karaoto_source_url": karaoto.source_url if karaoto else None,
+        "vocal_range_source_url": vocal_range.source_url if vocal_range else None,
     }
     if track is not None:
         # サイズ方針:
@@ -121,12 +228,23 @@ def run(*, fetch_itunes: bool = True) -> int:
         karaoto_hits, len(songs),
     )
 
+    # Step 1.6: karaoto に無い曲は vocal-range.com (J-POP 音域の沼) を試す
+    # ここはネット呼び出しが発生するためキャッシュ前提。--no-vocal-range で skip 可。
+    vocal_range_cache_path = output_dir / "dam_vocal_range_cache.jsonl"
+    vocal_range_lookups: dict[str, VocalRangeMatch | None] = _enrich_vocal_range(
+        songs, karaoto_index, contact, vocal_range_cache_path,
+    )
+
     # Step 2: iTunes でジャケ + 年情報を補完
     payloads: list[dict] = []
     if not fetch_itunes:
         logger.info("--no-itunes specified, skipping artwork enrichment")
         payloads = [
-            _build_payload(s, None, karaoto_lookup(s.title, s.artist, karaoto_index))
+            _build_payload(
+                s, None,
+                karaoto_lookup(s.title, s.artist, karaoto_index),
+                vocal_range_lookups.get(s.request_no),
+            )
             for s in songs
         ]
     else:
@@ -172,7 +290,9 @@ def run(*, fetch_itunes: bool = True) -> int:
                 )
 
             payloads.append(_build_payload(
-                song, track, karaoto_lookup(song.title, song.artist, karaoto_index),
+                song, track,
+                karaoto_lookup(song.title, song.artist, karaoto_index),
+                vocal_range_lookups.get(song.request_no),
             ))
 
         logger.info(
