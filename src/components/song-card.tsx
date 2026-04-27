@@ -69,11 +69,9 @@ export function SongCard({ song, rating }: SongCardProps) {
         </div>
         <p className="truncate text-xs text-zinc-600 dark:text-zinc-400">
           {song.artist}
-          {song.release_year ? ` · ${song.release_year}` : ""}
-        </p>
-        <p className="mt-0.5 truncate font-mono text-[11px] text-zinc-500 dark:text-zinc-500">
-          {midiToKaraoke(song.range_low_midi)} 〜 {midiToKaraoke(song.range_high_midi)}
-          {song.falsetto_max_midi ? ` / 裏 ${midiToKaraoke(song.falsetto_max_midi)}` : ""}
+          {song.range_high_midi !== null
+            ? ` · ${midiToKaraoke(song.range_high_midi)}`
+            : ""}
         </p>
       </div>
     </Link>

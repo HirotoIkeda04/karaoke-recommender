@@ -35,7 +35,6 @@ export default function Loading() {
             <div className="size-14 shrink-0 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />
             <div className="min-w-0 flex-1 space-y-1.5">
               <div className="h-4 w-3/4 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-              <div className="h-3 w-1/2 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
               <div className="h-3 w-2/3 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
             </div>
           </li>
