@@ -76,12 +76,8 @@ async function main() {
     image_url_small: s.image_url_small,
     source_urls: buildSourceUrls(s),
     is_popular: true,
-    // dam_request_no は migration 005 で追加された新列。型再生成前なので as any。
     dam_request_no: s.dam_request_no,
     match_status: "pending",
-  } as SongInsert & {
-    dam_request_no: string;
-    match_status: "pending";
   }));
 
   const itunesHits = seed.songs.filter((s) => s.image_url_large !== null).length;

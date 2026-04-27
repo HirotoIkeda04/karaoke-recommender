@@ -56,16 +56,20 @@ export type Database = {
         Row: {
           artist: string
           created_at: string
+          dam_request_no: string | null
           falsetto_max_midi: number | null
           id: string
           image_url_large: string | null
           image_url_medium: string | null
           image_url_small: string | null
           is_popular: boolean
+          last_spotify_attempt_at: string | null
+          match_status: Database["public"]["Enums"]["song_match_status"]
           range_high_midi: number | null
           range_low_midi: number | null
           release_year: number | null
           source_urls: string[] | null
+          spotify_attempt_count: number
           spotify_track_id: string | null
           title: string
           updated_at: string
@@ -73,16 +77,20 @@ export type Database = {
         Insert: {
           artist: string
           created_at?: string
+          dam_request_no?: string | null
           falsetto_max_midi?: number | null
           id?: string
           image_url_large?: string | null
           image_url_medium?: string | null
           image_url_small?: string | null
           is_popular?: boolean
+          last_spotify_attempt_at?: string | null
+          match_status?: Database["public"]["Enums"]["song_match_status"]
           range_high_midi?: number | null
           range_low_midi?: number | null
           release_year?: number | null
           source_urls?: string[] | null
+          spotify_attempt_count?: number
           spotify_track_id?: string | null
           title: string
           updated_at?: string
@@ -90,84 +98,94 @@ export type Database = {
         Update: {
           artist?: string
           created_at?: string
+          dam_request_no?: string | null
           falsetto_max_midi?: number | null
           id?: string
           image_url_large?: string | null
           image_url_medium?: string | null
           image_url_small?: string | null
           is_popular?: boolean
+          last_spotify_attempt_at?: string | null
+          match_status?: Database["public"]["Enums"]["song_match_status"]
           range_high_midi?: number | null
           range_low_midi?: number | null
           release_year?: number | null
           source_urls?: string[] | null
+          spotify_attempt_count?: number
           spotify_track_id?: string | null
           title?: string
           updated_at?: string
         }
         Relationships: []
       }
-      // 以下 2 テーブルは migration 004 で追加。
-      // `pnpm db:types` 再実行で自動更新される(手動編集はこの comment ごと消えてよい)。
-      user_spotify_connections: {
-        Row: {
-          user_id: string
-          spotify_user_id: string
-          spotify_display_name: string | null
-          access_token: string
-          refresh_token: string
-          scopes: string[]
-          expires_at: string
-          connected_at: string
-          last_synced_at: string | null
-          updated_at: string
-        }
-        Insert: {
-          user_id: string
-          spotify_user_id: string
-          spotify_display_name?: string | null
-          access_token: string
-          refresh_token: string
-          scopes: string[]
-          expires_at: string
-          connected_at?: string
-          last_synced_at?: string | null
-          updated_at?: string
-        }
-        Update: {
-          user_id?: string
-          spotify_user_id?: string
-          spotify_display_name?: string | null
-          access_token?: string
-          refresh_token?: string
-          scopes?: string[]
-          expires_at?: string
-          connected_at?: string
-          last_synced_at?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
       user_known_songs: {
         Row: {
-          user_id: string
-          song_id: string
-          source: "top_short_term" | "top_medium_term" | "top_long_term" | "recently_played" | "saved"
-          rank: number | null
           last_seen: string
+          rank: number | null
+          song_id: string
+          source: string
+          user_id: string
         }
         Insert: {
-          user_id: string
-          song_id: string
-          source: "top_short_term" | "top_medium_term" | "top_long_term" | "recently_played" | "saved"
-          rank?: number | null
           last_seen?: string
+          rank?: number | null
+          song_id: string
+          source: string
+          user_id: string
         }
         Update: {
-          user_id?: string
-          song_id?: string
-          source?: "top_short_term" | "top_medium_term" | "top_long_term" | "recently_played" | "saved"
-          rank?: number | null
           last_seen?: string
+          rank?: number | null
+          song_id?: string
+          source?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_known_songs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_spotify_connections: {
+        Row: {
+          access_token: string
+          connected_at: string
+          expires_at: string
+          last_synced_at: string | null
+          refresh_token: string
+          scopes: string[]
+          spotify_display_name: string | null
+          spotify_user_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          connected_at?: string
+          expires_at: string
+          last_synced_at?: string | null
+          refresh_token: string
+          scopes: string[]
+          spotify_display_name?: string | null
+          spotify_user_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          connected_at?: string
+          expires_at?: string
+          last_synced_at?: string | null
+          refresh_token?: string
+          scopes?: string[]
+          spotify_display_name?: string | null
+          spotify_user_id?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -188,22 +206,25 @@ export type Database = {
       }
     }
     Functions: {
-
       get_unrated_songs: {
         Args: { p_limit?: number; p_popular_only?: boolean }
         Returns: {
           artist: string
           created_at: string
+          dam_request_no: string | null
           falsetto_max_midi: number | null
           id: string
           image_url_large: string | null
           image_url_medium: string | null
           image_url_small: string | null
           is_popular: boolean
+          last_spotify_attempt_at: string | null
+          match_status: Database["public"]["Enums"]["song_match_status"]
           range_high_midi: number | null
           range_low_midi: number | null
           release_year: number | null
           source_urls: string[] | null
+          spotify_attempt_count: number
           spotify_track_id: string | null
           title: string
           updated_at: string
@@ -225,6 +246,12 @@ export type Database = {
     }
     Enums: {
       rating_type: "hard" | "medium" | "easy" | "practicing"
+      song_match_status:
+        | "pending"
+        | "matched"
+        | "unmatched"
+        | "no_spotify"
+        | "external"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -353,6 +380,13 @@ export const Constants = {
   public: {
     Enums: {
       rating_type: ["hard", "medium", "easy", "practicing"],
+      song_match_status: [
+        "pending",
+        "matched",
+        "unmatched",
+        "no_spotify",
+        "external",
+      ],
     },
   },
 } as const
