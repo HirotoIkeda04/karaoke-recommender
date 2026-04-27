@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Search, Star, User } from "lucide-react";
+import { Home, LibraryBig, Search, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 const ITEMS = [
   { href: "/", label: "評価", icon: Home },
   { href: "/songs", label: "検索", icon: Search },
-  { href: "/library", label: "マイライブラリ", icon: Star },
+  { href: "/library", label: "マイライブラリ", icon: LibraryBig },
   { href: "/profile", label: "音域", icon: User },
 ] as const;
 
@@ -39,7 +39,7 @@ export function AppBottomNav() {
               <Link
                 href={item.href}
                 className={cn(
-                  "flex w-full flex-col items-center gap-0.5 px-1 py-2 text-[10px] whitespace-nowrap",
+                  "flex w-full flex-col items-center gap-0.5 px-1 py-1.5 text-[10px] whitespace-nowrap",
                   active
                     ? "text-pink-600 dark:text-pink-400"
                     : "text-zinc-500 dark:text-zinc-400",
