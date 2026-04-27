@@ -276,11 +276,16 @@ function SwipeCard({
     ),
   );
 
-  // 明度: スワイプ中はカード自体が 1.00 → 1.12 に明るくなる (subtle な「光る」感)
-  const filter = useTransform(
-    intensity,
-    (i) => `brightness(${1 + (i as number) * 0.12})`,
-  );
+  // スワイプ中はカード背面 (ジャケ画像 + テキスト) を
+  //   - かなり明るく (brightness 1.00 → 1.55)
+  //   - 彩度を少しだけ下げ (saturate 1.00 → 0.85)
+  //   - ぼかす     (blur 0 → 3px)
+  // ことで、上に重なる「苦手」「得意」等のラベル文字のコントラストを稼ぐ。
+  // この filter は SwipeOverlay には掛けない (ラベル自体がボケては本末転倒なため)。
+  const filter = useTransform(intensity, (i) => {
+    const t = i as number;
+    return `brightness(${1 + t * 0.55}) saturate(${1 - t * 0.15}) blur(${t * 3}px)`;
+  });
 
   // box-shadow: スワイプ方向に応じた色のハロー (blur が広がる) を演出
   // blur 半径とアルファが intensity に比例して強まる
@@ -354,7 +359,7 @@ function SwipeCard({
 
   return (
     <motion.div
-      style={{ x, y, rotate, filter, boxShadow }}
+      style={{ x, y, rotate, boxShadow }}
       drag
       dragElastic={0.6}
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
@@ -365,7 +370,11 @@ function SwipeCard({
       whileTap={{ cursor: "grabbing" }}
       className="absolute inset-0 cursor-grab touch-none select-none overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
     >
-      <SongCardContent song={song} isKnown={isKnown} />
+      {/* filter はカード背面 (画像 + テキスト) のみに適用。
+          SwipeOverlay (ラベル) はこの外側に置いて影響を受けないようにする */}
+      <motion.div className="absolute inset-0" style={{ filter }}>
+        <SongCardContent song={song} isKnown={isKnown} />
+      </motion.div>
       <SwipeOverlay x={x} y={y} opacity={overlayOpacity} />
     </motion.div>
   );
