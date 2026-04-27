@@ -4,7 +4,7 @@ import { updateSession } from "@/lib/supabase/middleware";
 
 const PUBLIC_PATHS = ["/login", "/auth"] as const;
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   return updateSession(request, PUBLIC_PATHS);
 }
 
