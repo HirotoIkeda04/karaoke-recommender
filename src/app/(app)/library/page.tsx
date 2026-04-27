@@ -1,8 +1,9 @@
 import Link from "next/link";
 
-import { SongCard } from "@/components/song-card";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
+
+import { SortableList, type EvaluationRow } from "./sortable-list";
 
 export const dynamic = "force-dynamic";
 
@@ -25,9 +26,10 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
 
   const supabase = await createClient();
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const userId = session?.user?.id;
+  if (!userId) {
     return null; // middleware で防がれる想定
   }
 
@@ -35,19 +37,25 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const { data: counts } = await supabase
     .from("evaluations")
     .select("rating", { count: "exact" })
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
 
   const tabCounts: Record<Rating, number> = {
-    easy: 0, medium: 0, hard: 0, practicing: 0,
+    easy: 0,
+    medium: 0,
+    hard: 0,
+    practicing: 0,
   };
   for (const row of counts ?? []) {
     tabCounts[row.rating as Rating] += 1;
   }
 
-  // active タブの曲を取得 (評価更新が新しい順)
+  // active タブの曲を取得
+  // SortableList でクライアント側ソートするため LIMIT を撤廃
+  // (1 ユーザーの 1 タブに数千件入るのは現実的でないので問題なし)
   const { data: rows, error } = await supabase
     .from("evaluations")
-    .select(`
+    .select(
+      `
       rating,
       updated_at,
       song:songs (
@@ -55,16 +63,14 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
         range_low_midi, range_high_midi, falsetto_max_midi,
         image_url_small, image_url_medium
       )
-    `)
-    .eq("user_id", user.id)
+    `,
+    )
+    .eq("user_id", userId)
     .eq("rating", activeTab)
-    .order("updated_at", { ascending: false })
-    .limit(200);
+    .order("updated_at", { ascending: false });
 
   return (
     <div className="mx-auto max-w-md space-y-4 px-4 py-4">
-      <h1 className="text-lg font-semibold">評価済み</h1>
-
       <div className="grid grid-cols-4 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
         {TABS.map((tab) => {
           const active = tab.value === activeTab;
@@ -78,7 +84,9 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
                   : "text-zinc-600 dark:text-zinc-400"
               }`}
             >
-              <span>{tab.emoji} {tab.label}</span>
+              <span>
+                {tab.emoji} {tab.label}
+              </span>
               <span className="text-[10px] tabular-nums text-zinc-500">
                 {tabCounts[tab.value]}
               </span>
@@ -98,15 +106,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
           このカテゴリの曲はまだありません
         </div>
       ) : (
-        <ul className="space-y-2">
-          {(rows ?? []).map((r) => (
-            r.song ? (
-              <li key={r.song.id}>
-                <SongCard song={r.song} rating={r.rating} />
-              </li>
-            ) : null
-          ))}
-        </ul>
+        <SortableList evaluations={(rows ?? []) as unknown as EvaluationRow[]} />
       )}
     </div>
   );

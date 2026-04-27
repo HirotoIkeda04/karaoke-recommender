@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 const ITEMS = [
   { href: "/", label: "評価", icon: Home },
   { href: "/songs", label: "検索", icon: Search },
-  { href: "/library", label: "履歴", icon: Star },
+  { href: "/library", label: "マイライブラリ", icon: Star },
   { href: "/profile", label: "音域", icon: User },
 ] as const;
 
@@ -36,7 +36,7 @@ export function AppBottomNav() {
               <Link
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center gap-0.5 px-4 py-2 text-xs",
+                  "flex flex-col items-center gap-0.5 px-2 py-2 text-[11px] whitespace-nowrap",
                   active
                     ? "text-pink-600 dark:text-pink-400"
                     : "text-zinc-500 dark:text-zinc-400",
