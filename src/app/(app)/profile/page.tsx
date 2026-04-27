@@ -11,6 +11,9 @@ interface ProfilePageProps {
   searchParams: Promise<{
     spotify_connected?: string;
     spotify_error?: string;
+    spotify_synced?: string;
+    matched?: string;
+    found?: string;
   }>;
 }
 
@@ -29,6 +32,9 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
   const params = await searchParams;
   const spotifyConnected = params.spotify_connected === "true";
   const spotifyError = params.spotify_error ?? null;
+  const spotifySynced = params.spotify_synced === "true";
+  const syncMatched = params.matched ? parseInt(params.matched, 10) : null;
+  const syncFound = params.found ? parseInt(params.found, 10) : null;
 
   const supabase = await createClient();
   const {
@@ -48,11 +54,29 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       .eq("user_id", user.id),
     supabase
       .from("user_spotify_connections")
-      .select("spotify_user_id, spotify_display_name, connected_at")
+      .select("spotify_user_id, spotify_display_name, connected_at, last_synced_at")
       .eq("user_id", user.id)
       .maybeSingle(),
   ]);
   const spotifyConnection = spotifyRes.data ?? null;
+
+  // 接続済みなら、user_known_songs の件数も取得して「聴いたことある曲数」を表示
+  let knownSongsCount = 0;
+  if (spotifyConnection) {
+    const { count } = await supabase
+      .from("user_known_songs")
+      .select("song_id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+    // 同じ曲が複数 source に登録されているので distinct 値はクエリで取れない
+    // 簡易に: distinct count を別クエリで
+    const { data: distinctRows } = await supabase
+      .from("user_known_songs")
+      .select("song_id")
+      .eq("user_id", user.id);
+    knownSongsCount = distinctRows
+      ? new Set(distinctRows.map((r) => r.song_id)).size
+      : (count ?? 0);
+  }
 
   const estimate = estRes.data;
   const counts: Record<Rating, number> = {
@@ -68,15 +92,20 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
 
   return (
     <div className="mx-auto max-w-md space-y-5 px-4 py-4">
-      {/* Spotify 連携の通知バナー (callback 経由のみ表示) */}
+      {/* Spotify 連携の通知バナー (callback / sync 経由) */}
       {spotifyConnected ? (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200">
-          Spotify 連携が完了しました 🎉
+          Spotify 連携が完了しました 🎉 続けて「同期する」を押すと曲データを取り込めます。
+        </div>
+      ) : null}
+      {spotifySynced && syncMatched !== null && syncFound !== null ? (
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200">
+          同期完了 ✅ Spotify から {syncFound} 曲取得、うち {syncMatched} 曲があなたのライブラリにマッチしました。
         </div>
       ) : null}
       {spotifyError ? (
         <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
-          Spotify 連携に失敗しました ({spotifyError})
+          Spotify 操作に失敗しました ({spotifyError})
         </div>
       ) : null}
 
@@ -159,17 +188,51 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
         {spotifyConnection ? (
           <>
             <p className="text-xs text-zinc-600 dark:text-zinc-400">
-              連携済み: {spotifyConnection.spotify_display_name ?? "Spotify ユーザー"}
+              連携済み:{" "}
+              <span className="font-medium text-zinc-800 dark:text-zinc-200">
+                {spotifyConnection.spotify_display_name ?? "Spotify ユーザー"}
+              </span>
             </p>
-            {/* 連携解除フォーム (POST で /api/spotify/disconnect) */}
-            <form action="/api/spotify/disconnect" method="POST">
-              <button
-                type="submit"
-                className="rounded-md border border-red-200 px-3 py-1.5 text-xs text-red-700 transition hover:bg-red-50 dark:border-red-900 dark:text-red-300 dark:hover:bg-red-950"
-              >
-                連携を解除する
-              </button>
-            </form>
+
+            {/* 同期統計 */}
+            {spotifyConnection.last_synced_at ? (
+              <div className="rounded-lg bg-zinc-100 px-3 py-2 text-xs dark:bg-zinc-800">
+                <p className="text-zinc-700 dark:text-zinc-300">
+                  聴いたことある曲: <strong>{knownSongsCount}</strong> 曲
+                </p>
+                <p className="mt-0.5 text-zinc-500">
+                  最終同期:{" "}
+                  {new Date(spotifyConnection.last_synced_at).toLocaleString(
+                    "ja-JP",
+                    { dateStyle: "short", timeStyle: "short" },
+                  )}
+                </p>
+              </div>
+            ) : (
+              <p className="text-xs text-zinc-500">
+                まだ同期していません。下のボタンを押して曲データを取り込んでください。
+              </p>
+            )}
+
+            {/* 同期ボタン + 解除ボタン */}
+            <div className="flex flex-wrap items-center gap-2">
+              <form action="/api/spotify/sync" method="POST">
+                <button
+                  type="submit"
+                  className="rounded-full bg-emerald-500 px-4 py-1.5 text-xs font-medium text-white transition hover:bg-emerald-600 active:bg-emerald-700"
+                >
+                  Spotify を同期する
+                </button>
+              </form>
+              <form action="/api/spotify/disconnect" method="POST">
+                <button
+                  type="submit"
+                  className="rounded-md border border-red-200 px-3 py-1.5 text-xs text-red-700 transition hover:bg-red-50 dark:border-red-900 dark:text-red-300 dark:hover:bg-red-950"
+                >
+                  連携を解除する
+                </button>
+              </form>
+            </div>
           </>
         ) : (
           <>
