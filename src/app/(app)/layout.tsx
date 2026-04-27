@@ -10,9 +10,13 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
+  // パフォーマンス最適化: 表示用ユーザー情報なら getSession で十分。
+  // 書き込み権限が必要な server action (rateSong 等) は getUser で再検証する。
+  // 詳細は src/lib/supabase/middleware.ts のコメント参照。
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user ?? null;
 
   // middleware で防がれる想定だが、二重防御
   if (!user) {

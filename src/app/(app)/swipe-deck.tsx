@@ -142,6 +142,18 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
 
   return (
     <div className="mx-auto flex max-w-md flex-col items-center gap-6 px-4 py-6">
+      {/* 次の 2 枚のジャケット画像を裏で先読み(React 19 が <head> へ hoist) */}
+      {queue.slice(1, 3).map((song) =>
+        song.image_url_medium ? (
+          <link
+            key={`preload-${song.id}`}
+            rel="preload"
+            as="image"
+            href={song.image_url_medium}
+          />
+        ) : null,
+      )}
+
       {error ? (
         <div className="w-full rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
           {error}

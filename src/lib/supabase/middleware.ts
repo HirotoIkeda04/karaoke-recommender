@@ -36,9 +36,16 @@ export async function updateSession(
     },
   );
 
+  // パフォーマンス最適化: routing 判定だけならネット往復なしの getSession で十分。
+  // (getUser は Supabase サーバーで JWT 検証する分 150-300ms の往復が加わる)
+  // セキュリティ: revoke 後も JWT 有効期限 (default 1h) 中は通るが、
+  //   - 書き込み系 server action は getUser を使う
+  //   - データアクセスは RLS が JWT 署名から auth.uid() を取得して防御
+  // 個人+友人レベルではこの程度のラグは許容範囲。
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user ?? null;
 
   const pathname = request.nextUrl.pathname;
   const isPublic = publicPaths.some(
