@@ -141,16 +141,17 @@ export function SwipeDeck({
   return (
     <div className="mx-auto flex max-w-md flex-col items-center gap-5 overflow-hidden px-4 py-6">
       {/* 次の 2 枚のジャケット画像を裏で先読み */}
-      {queue.slice(1, 3).map((song) =>
-        song.image_url_medium ? (
+      {queue.slice(1, 3).map((song) => {
+        const preloadSrc = song.image_url_large ?? song.image_url_medium;
+        return preloadSrc ? (
           <link
             key={`preload-${song.id}`}
             rel="preload"
             as="image"
-            href={song.image_url_medium}
+            href={preloadSrc}
           />
-        ) : null,
-      )}
+        ) : null;
+      })}
 
       {error ? (
         <div className="w-full rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
@@ -392,9 +393,9 @@ function SongCardContent({
 
       {/* ジャケット: カード上部に edge-to-edge で配置 (余白なし) */}
       <div className="relative aspect-square w-full shrink-0 bg-zinc-200 dark:bg-zinc-800">
-        {song.image_url_medium ? (
+        {song.image_url_large ?? song.image_url_medium ? (
           <Image
-            src={song.image_url_medium}
+            src={(song.image_url_large ?? song.image_url_medium)!}
             alt={`${song.title} のジャケット`}
             fill
             sizes="22rem"
