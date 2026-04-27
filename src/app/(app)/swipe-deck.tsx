@@ -144,13 +144,13 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
         </div>
       ) : null}
 
-      <div className="relative h-[28rem] w-full">
+      <div className="relative h-[30rem] w-full max-w-[22rem]">
         {/* 後ろのカード (next 1, next 2): 中身も描画して、スワイプ中に
             真っ白な空のカードが見えてしまう問題を解消 */}
         {upcoming.map((song, idx) => (
           <div
             key={song.id}
-            className="absolute inset-0 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+            className="absolute inset-0 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
             style={{
               transform: `translateY(${(idx + 1) * 8}px) scale(${1 - (idx + 1) * 0.04})`,
               zIndex: -idx - 1,
@@ -336,7 +336,7 @@ function SwipeCard({
       animate={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0.9, opacity: 0, transition: { duration: 0.15 } }}
       whileTap={{ cursor: "grabbing" }}
-      className="absolute inset-0 cursor-grab touch-none select-none rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
+      className="absolute inset-0 cursor-grab touch-none select-none overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
     >
       <SongCardContent song={song} />
       <SwipeOverlay x={x} y={y} opacity={overlayOpacity} />
@@ -346,15 +346,15 @@ function SwipeCard({
 
 function SongCardContent({ song }: { song: Song }) {
   return (
-    <div className="flex h-full flex-col justify-between gap-3">
-      {/* ジャケット (中央) */}
-      <div className="relative aspect-square w-full max-w-[14rem] self-center overflow-hidden rounded-xl bg-zinc-200 dark:bg-zinc-800">
+    <div className="flex h-full flex-col">
+      {/* ジャケット: カード上部に edge-to-edge で配置 (余白なし) */}
+      <div className="relative aspect-square w-full shrink-0 bg-zinc-200 dark:bg-zinc-800">
         {song.image_url_medium ? (
           <Image
             src={song.image_url_medium}
             alt={`${song.title} のジャケット`}
             fill
-            sizes="14rem"
+            sizes="22rem"
             priority
             className="object-cover"
             draggable={false}
@@ -366,45 +366,47 @@ function SongCardContent({ song }: { song: Song }) {
         )}
       </div>
 
-      {/* 曲名 + アーティスト・発売年 (左寄せ) */}
-      <div className="w-full">
-        <h2 className="line-clamp-2 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-          {song.title}
-        </h2>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          {song.artist}
-          {song.release_year ? ` · ${song.release_year}` : ""}
-        </p>
+      {/* テキスト/ボタン領域: 画像下に padding を取って配置 */}
+      <div className="flex flex-1 flex-col justify-between gap-2 p-3">
+        <div className="w-full">
+          <h2 className="line-clamp-1 text-base font-semibold text-zinc-900 dark:text-zinc-50">
+            {song.title}
+          </h2>
+          <p className="text-xs text-zinc-600 dark:text-zinc-400">
+            {song.artist}
+            {song.release_year ? ` · ${song.release_year}` : ""}
+          </p>
+        </div>
+
+        {/* 音域情報 (compact) */}
+        <dl className="grid w-full grid-cols-2 gap-x-3 gap-y-0.5 rounded bg-zinc-100 px-2 py-1 text-[11px] dark:bg-zinc-800">
+          <dt className="text-zinc-600 dark:text-zinc-400">地声</dt>
+          <dd className="text-right font-mono">
+            {midiToKaraoke(song.range_low_midi)} 〜{" "}
+            {midiToKaraoke(song.range_high_midi)}
+          </dd>
+          <dt className="text-zinc-600 dark:text-zinc-400">裏声</dt>
+          <dd className="text-right font-mono">
+            {midiToKaraoke(song.falsetto_max_midi)}
+          </dd>
+        </dl>
+
+        {/* Spotify 試聴ボタン */}
+        {song.spotify_track_id ? (
+          <a
+            href={`https://open.spotify.com/track/${song.spotify_track_id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onPointerDown={(e) => e.stopPropagation()}
+            draggable={false}
+            className="inline-flex items-center justify-center gap-1 self-center rounded-full border border-emerald-500 px-3 py-1 text-[11px] font-medium text-emerald-600 transition hover:bg-emerald-50 active:bg-emerald-100 dark:border-emerald-500 dark:text-emerald-400 dark:hover:bg-emerald-950 dark:active:bg-emerald-900"
+            aria-label={`${song.title} を Spotify で聴く(新しいタブで開きます)`}
+          >
+            <span aria-hidden>▶</span>
+            Spotify で試聴
+          </a>
+        ) : null}
       </div>
-
-      {/* 音域情報 */}
-      <dl className="grid w-full grid-cols-2 gap-x-4 gap-y-1 rounded-lg bg-zinc-100 px-3 py-2 text-xs dark:bg-zinc-800">
-        <dt className="text-zinc-600 dark:text-zinc-400">地声</dt>
-        <dd className="text-right font-mono">
-          {midiToKaraoke(song.range_low_midi)} 〜{" "}
-          {midiToKaraoke(song.range_high_midi)}
-        </dd>
-        <dt className="text-zinc-600 dark:text-zinc-400">裏声</dt>
-        <dd className="text-right font-mono">
-          {midiToKaraoke(song.falsetto_max_midi)}
-        </dd>
-      </dl>
-
-      {/* Spotify 試聴ボタン (音域の下、中央配置) */}
-      {song.spotify_track_id ? (
-        <a
-          href={`https://open.spotify.com/track/${song.spotify_track_id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          onPointerDown={(e) => e.stopPropagation()}
-          draggable={false}
-          className="inline-flex items-center justify-center gap-1.5 self-center rounded-full border border-emerald-500 px-4 py-1.5 text-xs font-medium text-emerald-600 transition hover:bg-emerald-50 active:bg-emerald-100 dark:border-emerald-500 dark:text-emerald-400 dark:hover:bg-emerald-950 dark:active:bg-emerald-900"
-          aria-label={`${song.title} を Spotify で聴く(新しいタブで開きます)`}
-        >
-          <span aria-hidden>▶</span>
-          Spotify で試聴
-        </a>
-      ) : null}
     </div>
   );
 }
