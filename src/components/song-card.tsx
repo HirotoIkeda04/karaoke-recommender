@@ -70,7 +70,7 @@ export function SongCard({ song, rating }: SongCardProps) {
         <p className="truncate text-xs text-zinc-600 dark:text-zinc-400">
           {song.artist}
           {song.range_high_midi !== null
-            ? ` · ${midiToKaraoke(song.range_high_midi)}`
+            ? ` · 〜 ${midiToKaraoke(song.range_high_midi)}`
             : ""}
         </p>
       </div>
