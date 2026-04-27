@@ -153,7 +153,7 @@ export function LiveSearch({ songs, ratings }: LiveSearchProps) {
           該当する曲がありません
         </div>
       ) : (
-        <ul className={`space-y-2 ${isStale ? "opacity-70 transition-opacity" : ""}`}>
+        <ul className={isStale ? "opacity-70 transition-opacity" : undefined}>
           {filtered.map((s) => (
             <li key={s.id}>
               <SongCard song={s} rating={ratings[s.id] ?? null} />

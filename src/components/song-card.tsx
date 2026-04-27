@@ -36,7 +36,7 @@ export function SongCard({ song, rating }: SongCardProps) {
   return (
     <Link
       href={`/songs/${song.id}`}
-      className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-3 transition hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800/60"
+      className="flex items-center gap-3 rounded-md p-2 transition hover:bg-zinc-100 active:bg-zinc-100 dark:hover:bg-zinc-800/60 dark:active:bg-zinc-800/60"
     >
       <div className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-zinc-200 dark:bg-zinc-800">
         {image ? (
@@ -70,7 +70,7 @@ export function SongCard({ song, rating }: SongCardProps) {
         <p className="truncate text-xs text-zinc-600 dark:text-zinc-400">
           {song.artist}
           {song.range_high_midi !== null
-            ? ` · 〜 ${midiToKaraoke(song.range_high_midi)}`
+            ? ` · ~ ${midiToKaraoke(song.range_high_midi)}`
             : ""}
         </p>
       </div>

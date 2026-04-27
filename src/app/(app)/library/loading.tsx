@@ -26,11 +26,11 @@ export default function Loading() {
       </div>
 
       {/* SongCard 風リスト */}
-      <ul className="space-y-2">
+      <ul>
         {[0, 1, 2, 3, 4].map((i) => (
           <li
             key={i}
-            className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900"
+            className="flex items-center gap-3 rounded-md p-2"
           >
             <div className="size-14 shrink-0 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />
             <div className="min-w-0 flex-1 space-y-1.5">

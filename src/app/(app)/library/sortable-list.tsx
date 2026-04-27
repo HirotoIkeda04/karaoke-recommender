@@ -184,7 +184,7 @@ export function SortableList({ evaluations }: SortableListProps) {
       </div>
 
       {/* 曲リスト */}
-      <ul className="space-y-2">
+      <ul>
         {sorted.map((r) =>
           r.song ? (
             <li key={r.song.id}>
