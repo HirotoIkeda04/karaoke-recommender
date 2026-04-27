@@ -277,14 +277,14 @@ function SwipeCard({
   );
 
   // スワイプ中はカード背面 (ジャケ画像 + テキスト) を
-  //   - かなり明るく (brightness 1.00 → 1.55)
+  //   - 明るく (brightness 1.00 → 1.35)
   //   - 彩度を少しだけ下げ (saturate 1.00 → 0.85)
-  //   - ぼかす     (blur 0 → 3px)
+  //   - ぼかす (blur 0 → 3px)
   // ことで、上に重なる「苦手」「得意」等のラベル文字のコントラストを稼ぐ。
   // この filter は SwipeOverlay には掛けない (ラベル自体がボケては本末転倒なため)。
   const filter = useTransform(intensity, (i) => {
     const t = i as number;
-    return `brightness(${1 + t * 0.55}) saturate(${1 - t * 0.15}) blur(${t * 3}px)`;
+    return `brightness(${1 + t * 0.35}) saturate(${1 - t * 0.15}) blur(${t * 3}px)`;
   });
 
   // box-shadow: スワイプ方向に応じた色のハロー (blur が広がる) を演出
