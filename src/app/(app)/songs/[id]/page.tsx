@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -47,13 +48,15 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
 
   return (
     <div className="mx-auto max-w-md space-y-5 px-4 py-4">
-      <div className="aspect-square w-full overflow-hidden rounded-2xl bg-zinc-200 dark:bg-zinc-800">
+      <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-zinc-200 dark:bg-zinc-800">
         {image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={image}
             alt={`${song.title} のジャケット`}
-            className="h-full w-full object-cover"
+            fill
+            sizes="(max-width: 28rem) 100vw, 28rem"
+            priority
+            className="object-cover"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-5xl text-zinc-400">

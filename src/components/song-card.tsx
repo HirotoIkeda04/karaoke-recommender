@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { midiToKaraoke } from "@/lib/note";
@@ -37,13 +38,14 @@ export function SongCard({ song, rating }: SongCardProps) {
       href={`/songs/${song.id}`}
       className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-3 transition hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800/60"
     >
-      <div className="size-14 shrink-0 overflow-hidden rounded-lg bg-zinc-200 dark:bg-zinc-800">
+      <div className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-zinc-200 dark:bg-zinc-800">
         {image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={image}
             alt=""
-            className="h-full w-full object-cover"
+            fill
+            sizes="3.5rem"
+            className="object-cover"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-xl text-zinc-400">

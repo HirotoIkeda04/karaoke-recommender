@@ -1,4 +1,5 @@
 import type { User } from "@supabase/supabase-js";
+import Image from "next/image";
 
 import { SignOutButton } from "@/components/sign-out-button";
 
@@ -22,10 +23,11 @@ export function AppHeader({ user }: AppHeaderProps) {
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           {avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={avatarUrl}
               alt={name}
+              width={28}
+              height={28}
               className="size-7 rounded-full border border-zinc-200 dark:border-zinc-700"
             />
           ) : (

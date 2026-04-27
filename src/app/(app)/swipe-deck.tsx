@@ -7,7 +7,8 @@ import {
   useMotionValue,
   useTransform,
 } from "framer-motion";
-import { useState, useTransition } from "react";
+import Image from "next/image";
+import { startTransition, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { midiToKaraoke } from "@/lib/note";
@@ -71,14 +72,15 @@ const RATINGS: ReadonlyArray<{
 export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
   const [queue, setQueue] = useState(initialSongs);
   const [lastAction, setLastAction] = useState<LastAction | null>(null);
-  const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
   const current = queue[0];
   const upcoming = queue.slice(1, 3);
 
   const handleRate = (rating: Rating) => {
-    if (!current || isPending) return;
+    if (!current) return;
+    // isPending は意図的にチェックしない: server action は fire-and-forget で
+    // 並列実行を許し、ユーザーは即座に次のカードへ進める。
     setError(null);
     const songId = current.id;
     const songSnapshot = current;
@@ -88,9 +90,9 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
     startTransition(async () => {
       const result = await rateSong({ songId, rating });
       if (!result.ok) {
+        // 失敗時はエラー表示のみ。queue は巻き戻さない(連打中の体験を保つ)
+        // 失敗した曲は、リロード時に未評価扱いになるので再度評価できる
         setError(result.error ?? "保存に失敗しました");
-        // 失敗時は queue 先頭に戻す + undo 履歴も巻き戻す
-        setQueue((q) => [songSnapshot, ...q]);
         setLastAction(null);
       }
     });
@@ -101,7 +103,7 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
    * 「戻る」で取り消し可能。リロードすると再表示される(セッション内のみ非表示)。
    */
   const handleSkip = () => {
-    if (!current || isPending) return;
+    if (!current) return;
     setError(null);
     const songSnapshot = current;
     setQueue((q) => q.slice(1));
@@ -112,7 +114,7 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
    * 直前の評価/スキップを取り消す。queue 先頭に戻し、評価済みなら DB からも削除。
    */
   const handleUndo = () => {
-    if (!lastAction || isPending) return;
+    if (!lastAction) return;
     setError(null);
     const { song, rating } = lastAction;
     setLastAction(null);
@@ -178,7 +180,7 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
         <button
           type="button"
           onClick={handleUndo}
-          disabled={!lastAction || isPending}
+          disabled={!lastAction}
           className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-30 disabled:hover:bg-transparent dark:text-zinc-400 dark:hover:bg-zinc-800"
           aria-label="直前の評価を取り消して戻る"
         >
@@ -188,7 +190,7 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
         <button
           type="button"
           onClick={handleSkip}
-          disabled={!current || isPending}
+          disabled={!current}
           className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-30 disabled:hover:bg-transparent dark:text-zinc-400 dark:hover:bg-zinc-800"
           aria-label="この曲を評価せずスキップ"
         >
@@ -203,7 +205,7 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
           <button
             key={r.value}
             type="button"
-            disabled={isPending}
+            disabled={!current}
             onClick={() => handleRate(r.value)}
             className={`flex flex-col items-center gap-1 rounded-xl px-2 py-3 text-xs font-medium transition disabled:opacity-50 ${r.color}`}
           >
@@ -284,13 +286,15 @@ function SwipeCard({
 function SongCardContent({ song }: { song: Song }) {
   return (
     <div className="flex h-full flex-col items-center justify-between gap-3">
-      <div className="aspect-square w-full max-w-[14rem] overflow-hidden rounded-xl bg-zinc-200 dark:bg-zinc-800">
+      <div className="relative aspect-square w-full max-w-[14rem] overflow-hidden rounded-xl bg-zinc-200 dark:bg-zinc-800">
         {song.image_url_medium ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={song.image_url_medium}
             alt={`${song.title} のジャケット`}
-            className="h-full w-full object-cover"
+            fill
+            sizes="14rem"
+            priority
+            className="object-cover"
             draggable={false}
           />
         ) : (
