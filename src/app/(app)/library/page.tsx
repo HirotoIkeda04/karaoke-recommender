@@ -1,3 +1,4 @@
+import { Check, Dumbbell, Minus, X } from "lucide-react";
 import Link from "next/link";
 
 import { createClient } from "@/lib/supabase/server";
@@ -9,11 +10,11 @@ export const dynamic = "force-dynamic";
 
 type Rating = Database["public"]["Enums"]["rating_type"];
 
-const TABS: ReadonlyArray<{ value: Rating; label: string; emoji: string }> = [
-  { value: "easy", label: "得意", emoji: "⭕" },
-  { value: "practicing", label: "練習中", emoji: "🔖" },
-  { value: "medium", label: "普通", emoji: "△" },
-  { value: "hard", label: "苦手", emoji: "❌" },
+const TABS: ReadonlyArray<{ value: Rating; label: string; Icon: typeof X }> = [
+  { value: "easy", label: "得意", Icon: Check },
+  { value: "practicing", label: "練習中", Icon: Dumbbell },
+  { value: "medium", label: "普通", Icon: Minus },
+  { value: "hard", label: "苦手", Icon: X },
 ];
 
 interface LibraryPageProps {
@@ -84,8 +85,9 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
                   : "text-zinc-600 dark:text-zinc-400"
               }`}
             >
-              <span>
-                {tab.emoji} {tab.label}
+              <span className="inline-flex items-center gap-1">
+                <tab.Icon className="size-3.5" aria-hidden />
+                {tab.label}
               </span>
               <span className="text-[10px] tabular-nums text-zinc-500">
                 {tabCounts[tab.value]}

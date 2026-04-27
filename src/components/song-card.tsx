@@ -1,3 +1,4 @@
+import { Check, Dumbbell, Minus, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -17,11 +18,32 @@ type Song = Pick<
   | "image_url_medium"
 >;
 
-const RATING_BADGE: Record<string, { label: string; color: string }> = {
-  hard: { label: "苦手", color: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200" },
-  medium: { label: "普通", color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200" },
-  easy: { label: "得意", color: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200" },
-  practicing: { label: "練習中", color: "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-200" },
+const RATING_BADGE: Record<
+  string,
+  { label: string; color: string; Icon: typeof X }
+> = {
+  hard: {
+    label: "苦手",
+    color: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200",
+    Icon: X,
+  },
+  medium: {
+    label: "普通",
+    color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200",
+    Icon: Minus,
+  },
+  easy: {
+    label: "得意",
+    color:
+      "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200",
+    Icon: Check,
+  },
+  practicing: {
+    label: "練習中",
+    color:
+      "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-200",
+    Icon: Dumbbell,
+  },
 };
 
 interface SongCardProps {
@@ -61,8 +83,9 @@ export function SongCard({ song, rating }: SongCardProps) {
           </p>
           {badge ? (
             <span
-              className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium ${badge.color}`}
+              className={`inline-flex shrink-0 items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-medium ${badge.color}`}
             >
+              <badge.Icon className="size-3" aria-hidden />
               {badge.label}
             </span>
           ) : null}

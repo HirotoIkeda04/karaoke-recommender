@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, Dumbbell, Minus, X } from "lucide-react";
 import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -9,11 +10,16 @@ import { rateSong, unrateSong } from "../../actions";
 
 type Rating = Database["public"]["Enums"]["rating_type"];
 
-const RATINGS: ReadonlyArray<{ value: Rating; label: string; color: string }> = [
-  { value: "hard", label: "❌ 苦手", color: "bg-red-500 text-white" },
-  { value: "medium", label: "△ 普通", color: "bg-zinc-500 text-white" },
-  { value: "easy", label: "⭕ 得意", color: "bg-emerald-500 text-white" },
-  { value: "practicing", label: "🔖 練習中", color: "bg-amber-500 text-white" },
+const RATINGS: ReadonlyArray<{
+  value: Rating;
+  label: string;
+  Icon: typeof X;
+  color: string;
+}> = [
+  { value: "hard", label: "苦手", Icon: X, color: "bg-red-500 text-white" },
+  { value: "medium", label: "普通", Icon: Minus, color: "bg-yellow-500 text-white" },
+  { value: "easy", label: "得意", Icon: Check, color: "bg-emerald-500 text-white" },
+  { value: "practicing", label: "練習中", Icon: Dumbbell, color: "bg-purple-500 text-white" },
 ];
 
 interface RatingControlsProps {
@@ -72,10 +78,13 @@ export function RatingControls({
               type="button"
               disabled={isPending}
               onClick={() => handleRate(r.value)}
-              className={`rounded-lg px-3 py-2 text-sm font-medium transition disabled:opacity-50 ${
-                active ? r.color : "bg-zinc-200 text-zinc-700 hover:bg-zinc-300 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+              className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition disabled:opacity-50 ${
+                active
+                  ? r.color
+                  : "bg-zinc-200 text-zinc-700 hover:bg-zinc-300 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
               }`}
             >
+              <r.Icon className="size-4" aria-hidden />
               {r.label}
             </button>
           );
