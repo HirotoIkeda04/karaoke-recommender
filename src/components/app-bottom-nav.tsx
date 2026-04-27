@@ -45,7 +45,7 @@ export function AppBottomNav() {
                     : "text-zinc-500 dark:text-zinc-400",
                 )}
               >
-                <Icon className="size-5" aria-hidden />
+                <Icon className="size-6" aria-hidden />
                 <span>{item.label}</span>
               </Link>
             </li>
