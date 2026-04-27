@@ -1,0 +1,79 @@
+import Link from "next/link";
+
+import { midiToKaraoke } from "@/lib/note";
+import type { Database } from "@/types/database";
+
+type Song = Pick<
+  Database["public"]["Tables"]["songs"]["Row"],
+  | "id"
+  | "title"
+  | "artist"
+  | "release_year"
+  | "range_low_midi"
+  | "range_high_midi"
+  | "falsetto_max_midi"
+  | "image_url_small"
+  | "image_url_medium"
+>;
+
+const RATING_BADGE: Record<string, { label: string; color: string }> = {
+  hard: { label: "苦手", color: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200" },
+  medium: { label: "普通", color: "bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200" },
+  easy: { label: "得意", color: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200" },
+  practicing: { label: "練習中", color: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200" },
+};
+
+interface SongCardProps {
+  song: Song;
+  rating?: string | null;
+}
+
+export function SongCard({ song, rating }: SongCardProps) {
+  const badge = rating ? RATING_BADGE[rating] : null;
+  const image = song.image_url_small ?? song.image_url_medium;
+
+  return (
+    <Link
+      href={`/songs/${song.id}`}
+      className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-3 transition hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800/60"
+    >
+      <div className="size-14 shrink-0 overflow-hidden rounded-lg bg-zinc-200 dark:bg-zinc-800">
+        {image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={image}
+            alt=""
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-xl text-zinc-400">
+            ♪
+          </div>
+        )}
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+            {song.title}
+          </p>
+          {badge ? (
+            <span
+              className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium ${badge.color}`}
+            >
+              {badge.label}
+            </span>
+          ) : null}
+        </div>
+        <p className="truncate text-xs text-zinc-600 dark:text-zinc-400">
+          {song.artist}
+          {song.release_year ? ` · ${song.release_year}` : ""}
+        </p>
+        <p className="mt-0.5 truncate font-mono text-[11px] text-zinc-500 dark:text-zinc-500">
+          {midiToKaraoke(song.range_low_midi)} 〜 {midiToKaraoke(song.range_high_midi)}
+          {song.falsetto_max_midi ? ` / 裏 ${midiToKaraoke(song.falsetto_max_midi)}` : ""}
+        </p>
+      </div>
+    </Link>
+  );
+}

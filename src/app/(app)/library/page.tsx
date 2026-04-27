@@ -1,0 +1,113 @@
+import Link from "next/link";
+
+import { SongCard } from "@/components/song-card";
+import { createClient } from "@/lib/supabase/server";
+import type { Database } from "@/types/database";
+
+export const dynamic = "force-dynamic";
+
+type Rating = Database["public"]["Enums"]["rating_type"];
+
+const TABS: ReadonlyArray<{ value: Rating; label: string; emoji: string }> = [
+  { value: "easy", label: "得意", emoji: "⭕" },
+  { value: "practicing", label: "練習中", emoji: "🔖" },
+  { value: "medium", label: "普通", emoji: "△" },
+  { value: "hard", label: "苦手", emoji: "❌" },
+];
+
+interface LibraryPageProps {
+  searchParams: Promise<{ tab?: string }>;
+}
+
+export default async function LibraryPage({ searchParams }: LibraryPageProps) {
+  const params = await searchParams;
+  const activeTab = (params.tab ?? "easy") as Rating;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return null; // middleware で防がれる想定
+  }
+
+  // 全タブ件数を一発で取る
+  const { data: counts } = await supabase
+    .from("evaluations")
+    .select("rating", { count: "exact" })
+    .eq("user_id", user.id);
+
+  const tabCounts: Record<Rating, number> = {
+    easy: 0, medium: 0, hard: 0, practicing: 0,
+  };
+  for (const row of counts ?? []) {
+    tabCounts[row.rating as Rating] += 1;
+  }
+
+  // active タブの曲を取得 (評価更新が新しい順)
+  const { data: rows, error } = await supabase
+    .from("evaluations")
+    .select(`
+      rating,
+      updated_at,
+      song:songs (
+        id, title, artist, release_year,
+        range_low_midi, range_high_midi, falsetto_max_midi,
+        image_url_small, image_url_medium
+      )
+    `)
+    .eq("user_id", user.id)
+    .eq("rating", activeTab)
+    .order("updated_at", { ascending: false })
+    .limit(200);
+
+  return (
+    <div className="mx-auto max-w-md space-y-4 px-4 py-4">
+      <h1 className="text-lg font-semibold">評価済み</h1>
+
+      <div className="grid grid-cols-4 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
+        {TABS.map((tab) => {
+          const active = tab.value === activeTab;
+          return (
+            <Link
+              key={tab.value}
+              href={`/library?tab=${tab.value}`}
+              className={`flex flex-col items-center gap-0.5 rounded-md px-2 py-2 text-xs ${
+                active
+                  ? "bg-white shadow-sm dark:bg-zinc-900"
+                  : "text-zinc-600 dark:text-zinc-400"
+              }`}
+            >
+              <span>{tab.emoji} {tab.label}</span>
+              <span className="text-[10px] tabular-nums text-zinc-500">
+                {tabCounts[tab.value]}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+
+      {error ? (
+        <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
+          {error.message}
+        </div>
+      ) : null}
+
+      {(rows ?? []).length === 0 ? (
+        <div className="rounded-lg border border-zinc-200 bg-white p-6 text-center text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+          このカテゴリの曲はまだありません
+        </div>
+      ) : (
+        <ul className="space-y-2">
+          {(rows ?? []).map((r) => (
+            r.song ? (
+              <li key={r.song.id}>
+                <SongCard song={r.song} rating={r.rating} />
+              </li>
+            ) : null
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
