@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "db:types": "set -a && . ./.env.local && set +a && supabase gen types typescript --project-id ewxonrgcvkjuaksybrko > src/types/database.ts",
-    "seed:songs": "node --env-file=.env.local --import tsx scripts/seed-songs.ts"
+    "seed:songs": "node --env-file=.env.local --import tsx scripts/seed-songs.ts",
+    "seed:dam": "node --env-file=.env.local --import tsx scripts/seed-dam-songs.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
