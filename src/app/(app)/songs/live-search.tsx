@@ -99,7 +99,7 @@ export function LiveSearch({ songs, ratings }: LiveSearchProps) {
         autoCapitalize="off"
         autoCorrect="off"
         spellCheck={false}
-        className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm placeholder:text-zinc-400 focus:border-pink-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900"
+        className="w-full rounded-lg bg-zinc-100 px-3 py-2 text-sm placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-pink-500 dark:bg-zinc-800 dark:placeholder:text-zinc-400"
       />
 
       {/* 範囲フィルタ: [下限] ≤ 最高音 ≤ [上限] という視覚的に直感的な配置 */}
@@ -108,7 +108,7 @@ export function LiveSearch({ songs, ratings }: LiveSearchProps) {
           value={highMin}
           onChange={(e) => setHighMin(e.target.value)}
           aria-label="最高音の下限"
-          className="flex-1 rounded border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className="flex-1 rounded bg-zinc-100 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 dark:bg-zinc-800"
         >
           {HIGH_OPTIONS.map((v) => (
             <option key={`min-${v}`} value={v}>
@@ -123,7 +123,7 @@ export function LiveSearch({ songs, ratings }: LiveSearchProps) {
           value={highMax}
           onChange={(e) => setHighMax(e.target.value)}
           aria-label="最高音の上限"
-          className="flex-1 rounded border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className="flex-1 rounded bg-zinc-100 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 dark:bg-zinc-800"
         >
           {HIGH_OPTIONS.map((v) => (
             <option key={`max-${v}`} value={v}>

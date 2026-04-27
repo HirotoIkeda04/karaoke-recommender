@@ -38,17 +38,17 @@ export function SongCard({ song, rating }: SongCardProps) {
       href={`/songs/${song.id}`}
       className="flex items-center gap-3 rounded-md p-2 transition hover:bg-zinc-100 active:bg-zinc-100 dark:hover:bg-zinc-800/60 dark:active:bg-zinc-800/60"
     >
-      <div className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-zinc-200 dark:bg-zinc-800">
+      <div className="relative size-12 shrink-0 overflow-hidden rounded-md bg-white dark:bg-zinc-900">
         {image ? (
           <Image
             src={image}
             alt=""
             fill
-            sizes="3.5rem"
+            sizes="3rem"
             className="object-cover"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-xl text-zinc-400">
+          <div className="flex h-full w-full items-center justify-center text-lg text-zinc-400">
             ♪
           </div>
         )}
