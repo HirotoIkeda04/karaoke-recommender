@@ -22,6 +22,7 @@ from pathlib import Path
 
 from config import SCRAPER_ROOT, require
 from fetch_itunes import ItunesClient, ItunesRateLimited, ItunesTrack, upgrade_artwork
+from match_karaoto import KaraotoEntry, build_index as build_karaoto_index, lookup as karaoto_lookup
 from scrape_dam import DamSong, fetch_all_rankings
 
 logger = logging.getLogger("scraper.dam")
@@ -53,13 +54,22 @@ def _append_itunes_cache(path: Path, request_no: str, track: ItunesTrack | None)
         f.write("\n")
 
 
-def _build_payload(song: DamSong, track: ItunesTrack | None) -> dict:
+def _build_payload(
+    song: DamSong,
+    track: ItunesTrack | None,
+    karaoto: KaraotoEntry | None,
+) -> dict:
     """1 曲分の出力 payload (seed-dam-songs.ts が読み込む形)。"""
     base: dict = {
         "title": song.title,
         "artist": song.artist,
         "dam_request_no": song.request_no,
         "source_pages": list(song.source_pages),
+        # karaoto マッチが取れた曲のみ range が埋まる(なければ全て None)
+        "range_low_midi": karaoto.range_low_midi if karaoto else None,
+        "range_high_midi": karaoto.range_high_midi if karaoto else None,
+        "falsetto_max_midi": karaoto.falsetto_max_midi if karaoto else None,
+        "karaoto_source_url": karaoto.source_url if karaoto else None,
     }
     if track is not None:
         # サイズ方針:
@@ -99,11 +109,26 @@ def run(*, fetch_itunes: bool = True) -> int:
     songs = fetch_all_rankings(cache_dir, contact)
     logger.info("DAM rankings yielded %d unique songs", len(songs))
 
+    # Step 1.5: karaoto キャッシュから (title, artist) インデックスを構築
+    # → DAM 曲のうち karaoto にも載っている曲は range_*_midi を補完できる
+    karaoto_cache_dir = SCRAPER_ROOT / "cache" / "karaoto"
+    karaoto_index = build_karaoto_index(karaoto_cache_dir, contact)
+    karaoto_hits = sum(
+        1 for s in songs if karaoto_lookup(s.title, s.artist, karaoto_index)
+    )
+    logger.info(
+        "karaoto cross-ref: %d/%d DAM songs have range data",
+        karaoto_hits, len(songs),
+    )
+
     # Step 2: iTunes でジャケ + 年情報を補完
     payloads: list[dict] = []
     if not fetch_itunes:
         logger.info("--no-itunes specified, skipping artwork enrichment")
-        payloads = [_build_payload(s, None) for s in songs]
+        payloads = [
+            _build_payload(s, None, karaoto_lookup(s.title, s.artist, karaoto_index))
+            for s in songs
+        ]
     else:
         cache_path = output_dir / "dam_itunes_cache.jsonl"
         cache = _load_itunes_cache(cache_path)
@@ -146,7 +171,9 @@ def run(*, fetch_itunes: bool = True) -> int:
                     i, len(songs), hits, misses, cached_used,
                 )
 
-            payloads.append(_build_payload(song, track))
+            payloads.append(_build_payload(
+                song, track, karaoto_lookup(song.title, song.artist, karaoto_index),
+            ))
 
         logger.info(
             "iTunes done: hits=%d, misses=%d, cached_used=%d, rate_limited=%s",

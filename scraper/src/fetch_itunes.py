@@ -18,9 +18,11 @@ import logging
 import re
 import time
 from dataclasses import dataclass
-from difflib import SequenceMatcher
 
 import requests
+
+from text_match import normalize as _normalize_text
+from text_match import similarity as _similarity_text
 
 logger = logging.getLogger(__name__)
 
@@ -47,28 +49,10 @@ class ItunesTrack:
     similarity: float = 0.0
 
 
-# --- 正規化 -----------------------------------------------------------------
+# --- 正規化 (text_match モジュールから流用) ---------------------------------
 
-_RE_PARENS = re.compile(r"[（(][^）)]*[）)]")
-_RE_BRACKETS = re.compile(r"[\[【][^\]】]*[\]】]")
-_RE_FEAT = re.compile(r"\b(?:feat\.?|featuring|with)\b.*", re.IGNORECASE)
-_RE_NONALNUM = re.compile(r"[^\w぀-ゟ゠-ヿ一-鿿]+")
-
-
-def _normalize(s: str) -> str:
-    s = s.lower()
-    s = _RE_PARENS.sub("", s)
-    s = _RE_BRACKETS.sub("", s)
-    s = _RE_FEAT.sub("", s)
-    s = _RE_NONALNUM.sub("", s)
-    return s.strip()
-
-
-def _similarity(a: str, b: str) -> float:
-    na, nb = _normalize(a), _normalize(b)
-    if not na or not nb:
-        return 0.0
-    return SequenceMatcher(None, na, nb).ratio()
+_normalize = _normalize_text
+_similarity = _similarity_text
 
 
 def upgrade_artwork(url: str | None, size: int = 600) -> str | None:

@@ -8,6 +8,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/45/b1/53/45b153d5-e943-6cd9-620e-0a4c66b7525b/VEATP-45199.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/45/b1/53/45b153d5-e943-6cd9-620e-0a4c66b7525b/VEATP-45199.jpg/600x600bb.jpg",
@@ -26,6 +30,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 55,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 74,
+      "karaoto_source_url": "https://karaoto.net/max_key/38",
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/09/89/00/09890002-b2de-3637-39b2-f6c2d34d0e93/197189854859.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/09/89/00/09890002-b2de-3637-39b2-f6c2d34d0e93/197189854859.jpg/600x600bb.jpg",
@@ -44,6 +52,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7b/b9/27/7bb92776-1f4a-06c6-e36e-de889f2b8620/25UMGIM01757.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7b/b9/27/7bb92776-1f4a-06c6-e36e-de889f2b8620/25UMGIM01757.rgb.jpg/600x600bb.jpg",
@@ -62,6 +74,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 58,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/39",
       "release_year": 1995,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/68/d7/mzi.anmgzqdl.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/68/d7/mzi.anmgzqdl.jpg/600x600bb.jpg",
@@ -80,6 +96,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 50,
+      "range_high_midi": 67,
+      "falsetto_max_midi": 72,
+      "karaoto_source_url": "https://karaoto.net/max_key/34",
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bd/d6/8f/bdd68f1b-8588-3e91-faab-ab9d7ca35c2f/21UMGIM28078.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bd/d6/8f/bdd68f1b-8588-3e91-faab-ab9d7ca35c2f/21UMGIM28078.rgb.jpg/600x600bb.jpg",
@@ -98,6 +118,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 54,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/38",
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/67/34/90/67349087-0609-2be4-4963-fd4682ae8c46/190295600341.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/67/34/90/67349087-0609-2be4-4963-fd4682ae8c46/190295600341.jpg/600x600bb.jpg",
@@ -116,6 +140,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 49,
+      "range_high_midi": 68,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/35",
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/61/89/9e/61899ec0-432b-d07f-0f6d-04fb01572ecd/jacket_ESXX01814B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/61/89/9e/61899ec0-432b-d07f-0f6d-04fb01572ecd/jacket_ESXX01814B00Z_550.jpg/600x600bb.jpg",
@@ -133,6 +161,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e0/f9/f1/e0f9f1f3-a088-b28d-6760-a28accabc705/4547366775181.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e0/f9/f1/e0f9f1f3-a088-b28d-6760-a28accabc705/4547366775181.jpg/600x600bb.jpg",
@@ -151,6 +183,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 55,
+      "range_high_midi": 69,
+      "falsetto_max_midi": 72,
+      "karaoto_source_url": "https://karaoto.net/max_key/36",
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/d9/de/51/d9de5146-6d3a-2002-bc8f-77e2e47c1c3b/4547366544138.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/d9/de/51/d9de5146-6d3a-2002-bc8f-77e2e47c1c3b/4547366544138.jpg/600x600bb.jpg",
@@ -169,6 +205,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 59,
+      "range_high_midi": 68,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/35",
       "release_year": 2013,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/74/3f/9c/743f9c6d-873f-07b5-6dd9-b1e3e87cee7e/jacket_SEXX00739B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/74/3f/9c/743f9c6d-873f-07b5-6dd9-b1e3e87cee7e/jacket_SEXX00739B00Z_550.jpg/600x600bb.jpg",
@@ -187,6 +227,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/4c/3b/b2/4c3bb247-3be8-0c57-aa9a-7f1775a7b7a8/24UMGIM32931.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/4c/3b/b2/4c3bb247-3be8-0c57-aa9a-7f1775a7b7a8/24UMGIM32931.rgb.jpg/600x600bb.jpg",
@@ -202,6 +246,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/45/b1/53/45b153d5-e943-6cd9-620e-0a4c66b7525b/VEATP-45199.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/45/b1/53/45b153d5-e943-6cd9-620e-0a4c66b7525b/VEATP-45199.jpg/600x600bb.jpg",
@@ -220,6 +268,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 52,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 74,
+      "karaoto_source_url": "https://karaoto.net/max_key/38",
       "release_year": 2013,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ad/35/1f/ad351f01-3b1e-e723-77db-3a7d88221e5e/00602577303753.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ad/35/1f/ad351f01-3b1e-e723-77db-3a7d88221e5e/00602577303753.rgb.jpg/600x600bb.jpg",
@@ -238,6 +290,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 50,
+      "range_high_midi": 68,
+      "falsetto_max_midi": 70,
+      "karaoto_source_url": "https://karaoto.net/max_key/35",
       "release_year": 2003,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/5f/e6/5a/5fe65a3b-98a0-b453-02a2-aad961438a39/00602557541564.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/5f/e6/5a/5fe65a3b-98a0-b453-02a2-aad961438a39/00602557541564.rgb.jpg/600x600bb.jpg",
@@ -256,6 +312,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2001,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/62/3b/85/623b858b-d88f-2c04-cb5d-4923e1d64190/mzi.beiflkay.tif/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/62/3b/85/623b858b-d88f-2c04-cb5d-4923e1d64190/mzi.beiflkay.tif/600x600bb.jpg",
@@ -274,6 +334,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 54,
+      "range_high_midi": 70,
+      "falsetto_max_midi": 73,
+      "karaoto_source_url": "https://karaoto.net/max_key/37",
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/87/88/05/8788059e-117b-439e-f3f1-e0e2da15db31/bigup13058482.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/87/88/05/8788059e-117b-439e-f3f1-e0e2da15db31/bigup13058482.jpg/600x600bb.jpg",
@@ -292,6 +356,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 55,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 79,
+      "karaoto_source_url": "https://karaoto.net/max_key/39",
       "release_year": 2019,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/2a/41/8b/2a418bf1-65d4-c9ac-07ee-e885d16f7a1b/21UM1IM54529.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/2a/41/8b/2a418bf1-65d4-c9ac-07ee-e885d16f7a1b/21UM1IM54529.rgb.jpg/600x600bb.jpg",
@@ -310,6 +378,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 52,
+      "range_high_midi": 69,
+      "falsetto_max_midi": 72,
+      "karaoto_source_url": "https://karaoto.net/max_key/36",
       "release_year": 1996,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/29/c0/30/29c030c7-ae9c-a201-ef47-bf9a8b2ed31a/00600406212191.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/29/c0/30/29c030c7-ae9c-a201-ef47-bf9a8b2ed31a/00600406212191.rgb.jpg/600x600bb.jpg",
@@ -326,6 +398,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/64/7f/83/647f8398-9ac9-21f6-49cc-bec4e9723637/4547366732757.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/64/7f/83/647f8398-9ac9-21f6-49cc-bec4e9723637/4547366732757.jpg/600x600bb.jpg",
@@ -344,6 +420,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 55,
+      "range_high_midi": 70,
+      "falsetto_max_midi": 70,
+      "karaoto_source_url": "https://karaoto.net/max_key/37",
       "release_year": 2014,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/b7/ee/d0/b7eed00e-24b2-b619-9f42-324fdc674128/00602557538304.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/b7/ee/d0/b7eed00e-24b2-b619-9f42-324fdc674128/00602557538304.rgb.jpg/600x600bb.jpg",
@@ -360,6 +440,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/ed/98/80/ed988042-5b77-8c62-276b-a651c0b90528/4573694759388.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/ed/98/80/ed988042-5b77-8c62-276b-a651c0b90528/4573694759388.jpg/600x600bb.jpg",
@@ -378,6 +462,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ab/d0/0e/abd00ec3-abb4-63c1-522e-3a7334607af2/190295651053.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ab/d0/0e/abd00ec3-abb4-63c1-522e-3a7334607af2/190295651053.jpg/600x600bb.jpg",
@@ -395,6 +483,10 @@
         "firsthalf",
         "duet_monthly"
       ],
+      "range_low_midi": 48,
+      "range_high_midi": 67,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/34",
       "release_year": 2004,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/79/8b/74/798b74e3-d88b-6107-48cb-1c03a7f86dba/VEATP-44545.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/79/8b/74/798b74e3-d88b-6107-48cb-1c03a7f86dba/VEATP-44545.jpg/600x600bb.jpg",
@@ -413,6 +505,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 55,
+      "range_high_midi": 68,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/35",
       "release_year": 2001,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/74/3f/9c/743f9c6d-873f-07b5-6dd9-b1e3e87cee7e/jacket_SEXX00739B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/74/3f/9c/743f9c6d-873f-07b5-6dd9-b1e3e87cee7e/jacket_SEXX00739B00Z_550.jpg/600x600bb.jpg",
@@ -431,6 +527,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 51,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 77,
+      "karaoto_source_url": "https://karaoto.net/max_key/40",
       "release_year": 2023,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/25/22/db/2522db04-1404-086a-c8a2-253484030b36/23UMGIM37150.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/25/22/db/2522db04-1404-086a-c8a2-253484030b36/23UMGIM37150.rgb.jpg/600x600bb.jpg",
@@ -449,6 +549,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1999,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/bd/da/b4/bddab4d2-176e-6438-76dc-54bd4eac3914/18UMGIM22257.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/bd/da/b4/bddab4d2-176e-6438-76dc-54bd4eac3914/18UMGIM22257.rgb.jpg/600x600bb.jpg",
@@ -467,6 +571,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 53,
+      "range_high_midi": 75,
+      "falsetto_max_midi": 80,
+      "karaoto_source_url": "https://karaoto.net/max_key/42",
       "release_year": 2008,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/36/42/35/3642352a-1d6d-75ef-255b-d0ee6ed397c0/HY_SUPER_BEST.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/36/42/35/3642352a-1d6d-75ef-255b-d0ee6ed397c0/HY_SUPER_BEST.jpg/600x600bb.jpg",
@@ -485,6 +593,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 53,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 77,
+      "karaoto_source_url": "https://karaoto.net/max_key/39",
       "release_year": 1999,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/bb/b1/26/bbb12681-ba77-f107-2a16-c684f685b464/dj.jqehhfti.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/bb/b1/26/bbb12681-ba77-f107-2a16-c684f685b464/dj.jqehhfti.jpg/600x600bb.jpg",
@@ -503,6 +615,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 55,
+      "range_high_midi": 70,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/37",
       "release_year": 2008,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/59/71/a5/5971a58d-9b81-1c64-195e-9e896c804d06/00044002897312.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/59/71/a5/5971a58d-9b81-1c64-195e-9e896c804d06/00044002897312.rgb.jpg/600x600bb.jpg",
@@ -521,6 +637,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/44/35/c7/4435c703-3647-654b-16a7-ab74885f71da/VEATP-43484.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/44/35/c7/4435c703-3647-654b-16a7-ab74885f71da/VEATP-43484.jpg/600x600bb.jpg",
@@ -539,6 +659,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2005,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a6/e0/7e/a6e07e13-7bb3-2cc7-0f36-45ca28138d8e/06UMGIM42910.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a6/e0/7e/a6e07e13-7bb3-2cc7-0f36-45ca28138d8e/06UMGIM42910.rgb.jpg/600x600bb.jpg",
@@ -557,6 +681,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 49,
+      "range_high_midi": 68,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/35",
       "release_year": 1994,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/dd/75/e0/dd75e05f-63d9-6226-bd48-819de6980d59/jacket_MHXX00790B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/dd/75/e0/dd75e05f-63d9-6226-bd48-819de6980d59/jacket_MHXX00790B00Z_550.jpg/600x600bb.jpg",
@@ -573,6 +701,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2014,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/7b/30/aa/7b30aa0a-0b3f-bb03-4dce-70840e227444/jacket_KSCL02520B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/7b/30/aa/7b30aa0a-0b3f-bb03-4dce-70840e227444/jacket_KSCL02520B00Z_550.jpg/600x600bb.jpg",
@@ -591,6 +723,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2001,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/19/4e/25/194e2593-b153-3547-5ac5-e78333b9f88c/4517331094562.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/19/4e/25/194e2593-b153-3547-5ac5-e78333b9f88c/4517331094562.jpg/600x600bb.jpg",
@@ -606,6 +742,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0c/57/00/0c570009-660c-0faa-c53b-8f06ce2b04ea/25UM2IM10507.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0c/57/00/0c570009-660c-0faa-c53b-8f06ce2b04ea/25UM2IM10507.rgb.jpg/600x600bb.jpg",
@@ -624,6 +764,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/b8/0d/73/b80d73a6-3519-9990-837b-d3f009fa55df/jacket_BVXX01113B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/b8/0d/73/b80d73a6-3519-9990-837b-d3f009fa55df/jacket_BVXX01113B00Z_550.jpg/600x600bb.jpg",
@@ -642,6 +786,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2015,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/b4/ae/05/b4ae053f-54ad-a984-f0bb-84f35c7c1c73/00600406609519.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/b4/ae/05/b4ae053f-54ad-a984-f0bb-84f35c7c1c73/00600406609519.rgb.jpg/600x600bb.jpg",
@@ -660,6 +808,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/bd/c0/80/bdc08023-823d-b74c-0b58-e161fe8ae68b/190296458705.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/bd/c0/80/bdc08023-823d-b74c-0b58-e161fe8ae68b/190296458705.jpg/600x600bb.jpg",
@@ -678,6 +830,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1992,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/be/ad/7b/bead7b6e-2fb4-fd9c-5980-15122cee5cb3/COKM_31282.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/be/ad/7b/bead7b6e-2fb4-fd9c-5980-15122cee5cb3/COKM_31282.jpg/600x600bb.jpg",
@@ -696,6 +852,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 45,
+      "range_high_midi": 70,
+      "falsetto_max_midi": 72,
+      "karaoto_source_url": "https://karaoto.net/max_key/37",
       "release_year": 2011,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/26/b6/e7/26b6e7e2-1cbb-4dde-edfb-e44e1f881cbd/00602577303739.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/26/b6/e7/26b6e7e2-1cbb-4dde-edfb-e44e1f881cbd/00602577303739.rgb.jpg/600x600bb.jpg",
@@ -712,6 +872,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d0/c4/4d/d0c44ddb-0fd9-ef8c-7839-33a103cb08dc/4547366759990.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d0/c4/4d/d0c44ddb-0fd9-ef8c-7839-33a103cb08dc/4547366759990.jpg/600x600bb.jpg",
@@ -730,6 +894,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 50,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/39",
       "release_year": 2007,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/05/9d/f2/059df254-f389-2b79-133d-6a0ed2fadbdb/jacket_SRCL06599B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/05/9d/f2/059df254-f389-2b79-133d-6a0ed2fadbdb/jacket_SRCL06599B00Z_550.jpg/600x600bb.jpg",
@@ -748,6 +916,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2022,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/e1/ec/d4/e1ecd4b4-4f2f-c49e-fa95-958c6b4cf7ab/22UM1IM16537.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/e1/ec/d4/e1ecd4b4-4f2f-c49e-fa95-958c6b4cf7ab/22UM1IM16537.rgb.jpg/600x600bb.jpg",
@@ -766,6 +938,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1985,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/d6/4c/f3/d64cf3ec-62af-b7d0-c509-536bb6d4d452/dj.ogeqayav.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/d6/4c/f3/d64cf3ec-62af-b7d0-c509-536bb6d4d452/dj.ogeqayav.jpg/600x600bb.jpg",
@@ -784,6 +960,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 47,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 71,
+      "karaoto_source_url": "https://karaoto.net/max_key/38",
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/86/b0/9d/86b09d63-367a-563a-1e24-d5d62c220ac8/jacket_SRCL09749B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/86/b0/9d/86b09d63-367a-563a-1e24-d5d62c220ac8/jacket_SRCL09749B00Z_550.jpg/600x600bb.jpg",
@@ -802,6 +982,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 52,
+      "range_high_midi": 69,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/36",
       "release_year": 2022,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/cc/2f/5c/cc2f5c71-d976-d503-f107-ef0f71a14b84/wands-0121.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/cc/2f/5c/cc2f5c71-d976-d503-f107-ef0f71a14b84/wands-0121.jpg/600x600bb.jpg",
@@ -819,6 +1003,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3c/fa/e2/3cfae229-2054-f6e6-0efe-842b119eddbb/199806798683.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3c/fa/e2/3cfae229-2054-f6e6-0efe-842b119eddbb/199806798683.jpg/600x600bb.jpg",
@@ -837,6 +1025,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 61,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/41",
       "release_year": 2007,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/1b/06/4b/1b064b9d-4912-9a2c-94fc-4caadf42fbab/00044002558121.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/1b/06/4b/1b064b9d-4912-9a2c-94fc-4caadf42fbab/00044002558121.rgb.jpg/600x600bb.jpg",
@@ -855,6 +1047,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 53,
+      "range_high_midi": 70,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/37",
       "release_year": 1992,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/ad/d7/78/add7785f-da7a-26c9-2157-1c6057bca0bb/YCCI10481P000000.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/ad/d7/78/add7785f-da7a-26c9-2157-1c6057bca0bb/YCCI10481P000000.jpg/600x600bb.jpg",
@@ -874,6 +1070,10 @@
         "vocaloid_monthly",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2016,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/06/fa/ea/06faea93-525a-ed28-5521-a3774a7afc35/4589686423939_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/06/fa/ea/06faea93-525a-ed28-5521-a3774a7afc35/4589686423939_cover.jpg/600x600bb.jpg",
@@ -892,6 +1092,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2012,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/7c/54/bc/7c54bc9f-634c-137b-5a0b-c2c1292f6a26/4517331089100.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/7c/54/bc/7c54bc9f-634c-137b-5a0b-c2c1292f6a26/4517331089100.jpg/600x600bb.jpg",
@@ -910,6 +1114,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/71/a6/91/71a691bc-b5a6-7903-4b13-608611c2f2b3/4580789670411.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/71/a6/91/71a691bc-b5a6-7903-4b13-608611c2f2b3/4580789670411.jpg/600x600bb.jpg",
@@ -928,6 +1136,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 51,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 76,
+      "karaoto_source_url": "https://karaoto.net/max_key/40",
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/34/27/08/3427087f-2d39-4847-9b19-052dd3589014/18UMGIM36633.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/34/27/08/3427087f-2d39-4847-9b19-052dd3589014/18UMGIM36633.rgb.jpg/600x600bb.jpg",
@@ -946,6 +1158,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 51,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 73,
+      "karaoto_source_url": "https://karaoto.net/max_key/39",
       "release_year": 2019,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/9c/7d/88/9c7d883d-4477-bf68-f56f-a726030a63a2/PCCA_04822.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/9c/7d/88/9c7d883d-4477-bf68-f56f-a726030a63a2/PCCA_04822.jpg/600x600bb.jpg",
@@ -961,6 +1177,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": 52,
+      "range_high_midi": 66,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/33",
       "release_year": 2012,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/72/21/06/7221069c-3f4d-fb99-288b-945da4a420bf/00602577303838.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/72/21/06/7221069c-3f4d-fb99-288b-945da4a420bf/00602577303838.rgb.jpg/600x600bb.jpg",
@@ -979,6 +1199,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 52,
+      "range_high_midi": 69,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/36",
       "release_year": 1997,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/9c/53/53/9c53530b-d170-6093-84e8-2038db7c680d/jacket_SRXX01869B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/9c/53/53/9c53530b-d170-6093-84e8-2038db7c680d/jacket_SRXX01869B00Z_550.jpg/600x600bb.jpg",
@@ -997,6 +1221,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 48,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 79,
+      "karaoto_source_url": "https://karaoto.net/max_key/39",
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/37/30/a9/3730a9f0-50d3-e4e1-9f4d-620b30380414/18UMGIM80785.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/37/30/a9/3730a9f0-50d3-e4e1-9f4d-620b30380414/18UMGIM80785.rgb.jpg/600x600bb.jpg",
@@ -1015,6 +1243,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2015,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/d1/3e/e3/d13ee389-2cbc-62d5-de57-7945db378685/jacket_SRCL08919B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/d1/3e/e3/d13ee389-2cbc-62d5-de57-7945db378685/jacket_SRCL08919B00Z_550.jpg/600x600bb.jpg",
@@ -1033,6 +1265,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2002,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/b8/aa/55/b8aa55b9-c925-bdbc-50c4-cb98c5313657/cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/b8/aa/55/b8aa55b9-c925-bdbc-50c4-cb98c5313657/cover.jpg/600x600bb.jpg",
@@ -1049,6 +1285,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 49,
+      "range_high_midi": 69,
+      "falsetto_max_midi": 71,
+      "karaoto_source_url": "https://karaoto.net/max_key/36",
       "release_year": 2016,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d9/55/96/d955961f-f9f7-4aa9-720f-36ddc0c46d0c/00602577303951.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d9/55/96/d955961f-f9f7-4aa9-720f-36ddc0c46d0c/00602577303951.rgb.jpg/600x600bb.jpg",
@@ -1067,6 +1307,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 52,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 76,
+      "karaoto_source_url": "https://karaoto.net/max_key/40",
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d9/5c/85/d95c85ae-0227-9b9b-0d6d-ae1e45bb1ee5/25UMGIM98719.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d9/5c/85/d95c85ae-0227-9b9b-0d6d-ae1e45bb1ee5/25UMGIM98719.rgb.jpg/600x600bb.jpg",
@@ -1085,6 +1329,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1997,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/d2/0e/85/d20e854b-865c-6c54-f4ac-a0500dbcef6a/VEATP-34575.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/d2/0e/85/d20e854b-865c-6c54-f4ac-a0500dbcef6a/VEATP-34575.jpg/600x600bb.jpg",
@@ -1103,6 +1351,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2011,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/26/b6/e7/26b6e7e2-1cbb-4dde-edfb-e44e1f881cbd/00602577303739.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/26/b6/e7/26b6e7e2-1cbb-4dde-edfb-e44e1f881cbd/00602577303739.rgb.jpg/600x600bb.jpg",
@@ -1121,6 +1373,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 52,
+      "range_high_midi": 75,
+      "falsetto_max_midi": 77,
+      "karaoto_source_url": "https://karaoto.net/max_key/42",
       "release_year": 1999,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/d1/a6/81/d1a681b9-aa68-6148-5a50-69fd4c95cc37/00602567241966.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/d1/a6/81/d1a681b9-aa68-6148-5a50-69fd4c95cc37/00602567241966.rgb.jpg/600x600bb.jpg",
@@ -1139,6 +1395,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2023,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/83/f7/c3/83f7c3fc-1108-f70c-f823-b69342aec931/4582649083355.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/83/f7/c3/83f7c3fc-1108-f70c-f823-b69342aec931/4582649083355.jpg/600x600bb.jpg",
@@ -1154,6 +1414,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/9f/8a/0b/9f8a0bc1-e6ee-5873-4fc9-9a75b0d58e2a/4547366794816.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/9f/8a/0b/9f8a0bc1-e6ee-5873-4fc9-9a75b0d58e2a/4547366794816.jpg/600x600bb.jpg",
@@ -1169,6 +1433,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2011,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f6/4c/e7/f64ce745-cb2a-c64c-2a18-6089665897ac/00602577303777.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f6/4c/e7/f64ce745-cb2a-c64c-2a18-6089665897ac/00602577303777.rgb.jpg/600x600bb.jpg",
@@ -1187,6 +1455,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2007,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/8e/10/2a/8e102abd-d981-e370-82db-2ae5c98baac3/194491537920.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/8e/10/2a/8e102abd-d981-e370-82db-2ae5c98baac3/194491537920.jpg/600x600bb.jpg",
@@ -1202,6 +1474,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2023,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/d6/25/e4/d625e415-b30c-46bd-6f68-4a75b8a7583d/5054197672378.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/d6/25/e4/d625e415-b30c-46bd-6f68-4a75b8a7583d/5054197672378.jpg/600x600bb.jpg",
@@ -1220,6 +1496,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/2e/b0/3e/2eb03e07-08bf-df9e-2815-1b88f8146e79/4547366482928.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/2e/b0/3e/2eb03e07-08bf-df9e-2815-1b88f8146e79/4547366482928.jpg/600x600bb.jpg",
@@ -1235,6 +1515,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/7a/42/e7/7a42e713-738d-2a21-52e4-1b1414c0f830/VEATP-42540.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/7a/42/e7/7a42e713-738d-2a21-52e4-1b1414c0f830/VEATP-42540.jpg/600x600bb.jpg",
@@ -1253,6 +1537,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 57,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 74,
+      "karaoto_source_url": "https://karaoto.net/max_key/38",
       "release_year": 2008,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/49/82/a0/4982a066-6dbf-5482-d68b-aa154848ee6c/jacket_ESCL03139B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/49/82/a0/4982a066-6dbf-5482-d68b-aa154848ee6c/jacket_ESCL03139B00Z_550.jpg/600x600bb.jpg",
@@ -1271,6 +1559,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/e3/e5/7a/e3e57a00-ed2d-69d6-bf00-347d7c37f3bd/PA00074572_0_90261_jacket.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/e3/e5/7a/e3e57a00-ed2d-69d6-bf00-347d7c37f3bd/PA00074572_0_90261_jacket.jpg/600x600bb.jpg",
@@ -1287,6 +1579,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 48,
+      "range_high_midi": 69,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/36",
       "release_year": 2015,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/85/20/c6/8520c637-179b-b204-8e71-57a483ba4b25/VEATP-32980.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/85/20/c6/8520c637-179b-b204-8e71-57a483ba4b25/VEATP-32980.jpg/600x600bb.jpg",
@@ -1303,6 +1599,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2008,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/d7/b1/1b/d7b11b82-b4f2-02be-48e2-a73aba23d297/PCCA_02740.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/d7/b1/1b/d7b11b82-b4f2-02be-48e2-a73aba23d297/PCCA_02740.jpg/600x600bb.jpg",
@@ -1320,6 +1620,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 50,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 71,
+      "karaoto_source_url": "https://karaoto.net/max_key/38",
       "release_year": 2015,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/5d/d1/f0/5dd1f0aa-4b50-e6b1-73b1-fb740989afba/00602577303906.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/5d/d1/f0/5dd1f0aa-4b50-e6b1-73b1-fb740989afba/00602577303906.rgb.jpg/600x600bb.jpg",
@@ -1338,6 +1642,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 49,
+      "range_high_midi": 66,
+      "falsetto_max_midi": 66,
+      "karaoto_source_url": "https://karaoto.net/max_key/33",
       "release_year": 1996,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/9a/1f/95/9a1f95f7-260c-7399-6c07-920cf889d452/jacket_MHXX00952B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/9a/1f/95/9a1f95f7-260c-7399-6c07-920cf889d452/jacket_MHXX00952B00Z_550.jpg/600x600bb.jpg",
@@ -1354,6 +1662,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d5/b9/bc/d5b9bc67-dc87-e451-1ccb-67f3e8b77aa6/25UMGIM41036.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d5/b9/bc/d5b9bc67-dc87-e451-1ccb-67f3e8b77aa6/25UMGIM41036.rgb.jpg/600x600bb.jpg",
@@ -1372,6 +1684,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 47,
+      "range_high_midi": 69,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/36",
       "release_year": 2004,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music/24/05/c4/mzi.wyjzyljh.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music/24/05/c4/mzi.wyjzyljh.jpg/600x600bb.jpg",
@@ -1390,6 +1706,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 44,
+      "range_high_midi": 69,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/36",
       "release_year": 2008,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/05/dd/70/05dd70e7-7e34-1836-4683-ff416d11a35c/dj.xwkpljqa.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/05/dd/70/05dd70e7-7e34-1836-4683-ff416d11a35c/dj.xwkpljqa.jpg/600x600bb.jpg",
@@ -1405,6 +1725,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": 46,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 78,
+      "karaoto_source_url": "https://karaoto.net/max_key/38",
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/06/58/ed/0658ed8e-c987-1e86-9b9b-ad36dc14f83e/4547366711691.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/06/58/ed/0658ed8e-c987-1e86-9b9b-ad36dc14f83e/4547366711691.jpg/600x600bb.jpg",
@@ -1423,6 +1747,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/af/1d/c2/af1dc23c-09fb-3f77-4288-27d15e60bb00/190296596384.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/af/1d/c2/af1dc23c-09fb-3f77-4288-27d15e60bb00/190296596384.jpg/600x600bb.jpg",
@@ -1439,6 +1767,10 @@
         "firsthalf",
         "duet_monthly"
       ],
+      "range_low_midi": 47,
+      "range_high_midi": 66,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/33",
       "release_year": 2004,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/6e/76/86/6e768676-23e9-443e-d3a5-bc1b4687cf94/190295515805.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/6e/76/86/6e768676-23e9-443e-d3a5-bc1b4687cf94/190295515805.jpg/600x600bb.jpg",
@@ -1454,6 +1786,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": 46,
+      "range_high_midi": 67,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/34",
       "release_year": 2014,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/a0/83/f4/a083f4f3-3853-d374-3870-957a7df3791a/TFCC-86457WW.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/a0/83/f4/a083f4f3-3853-d374-3870-957a7df3791a/TFCC-86457WW.jpg/600x600bb.jpg",
@@ -1469,6 +1805,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": 49,
+      "range_high_midi": 68,
+      "falsetto_max_midi": 68,
+      "karaoto_source_url": "https://karaoto.net/max_key/35",
       "release_year": 2014,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/9d/1e/4d/9d1e4da0-f56e-5375-a780-7dd04f06479b/00600406441225.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/9d/1e/4d/9d1e4da0-f56e-5375-a780-7dd04f06479b/00600406441225.rgb.jpg/600x600bb.jpg",
@@ -1487,6 +1827,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 44,
+      "range_high_midi": 69,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/36",
       "release_year": 2019,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/13/15/68/131568b1-d119-8407-feb6-d451364f204f/GZCA-5295.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/13/15/68/131568b1-d119-8407-feb6-d451364f204f/GZCA-5295.jpg/600x600bb.jpg",
@@ -1505,6 +1849,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 40,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 76,
+      "karaoto_source_url": "https://karaoto.net/max_key/38",
       "release_year": 2019,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/d6/9e/54/d69e54ca-2d82-f291-d745-9a706aa26940/19UMGIM59475.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/d6/9e/54/d69e54ca-2d82-f291-d745-9a706aa26940/19UMGIM59475.rgb.jpg/600x600bb.jpg",
@@ -1520,6 +1868,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": 56,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 74,
+      "karaoto_source_url": "https://karaoto.net/max_key/39",
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/21/ed/60/21ed6035-13b7-1347-0341-da967f77f04c/5054197247347.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/21/ed/60/21ed6035-13b7-1347-0341-da967f77f04c/5054197247347.jpg/600x600bb.jpg",
@@ -1535,6 +1887,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": 57,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 74,
+      "karaoto_source_url": "https://karaoto.net/max_key/39",
       "release_year": 2003,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/68/3f/b9/683fb922-8df7-99a9-e9b9-ee60a8e57ef4/mzi.tiiutkky.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/68/3f/b9/683fb922-8df7-99a9-e9b9-ee60a8e57ef4/mzi.tiiutkky.jpg/600x600bb.jpg",
@@ -1553,6 +1909,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 59,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 73,
+      "karaoto_source_url": "https://karaoto.net/max_key/40",
       "release_year": 2010,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/26/e1/47/26e147d9-3f35-203f-ef83-9d8cf0a62b8b/jacket_ESCL03528B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/26/e1/47/26e147d9-3f35-203f-ef83-9d8cf0a62b8b/jacket_ESCL03528B00Z_550.jpg/600x600bb.jpg",
@@ -1571,6 +1931,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 51,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/39",
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/40/e8/2d/40e82dfb-55b4-7016-1127-357ab78d3f7f/jk.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/40/e8/2d/40e82dfb-55b4-7016-1127-357ab78d3f7f/jk.jpg/600x600bb.jpg",
@@ -1588,6 +1952,10 @@
         "firsthalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2023,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/7c/c3/3e/7cc33e9c-39b7-68d3-c16c-ee8f60e54afb/4547366614626.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/7c/c3/3e/7cc33e9c-39b7-68d3-c16c-ee8f60e54afb/4547366614626.jpg/600x600bb.jpg",
@@ -1606,6 +1974,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 45,
+      "range_high_midi": 70,
+      "falsetto_max_midi": 74,
+      "karaoto_source_url": "https://karaoto.net/max_key/37",
       "release_year": 2000,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/79/e7/70/79e7709a-96a4-9029-e22c-f9252575a6ec/VEATP-30872.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/79/e7/70/79e7709a-96a4-9029-e22c-f9252575a6ec/VEATP-30872.jpg/600x600bb.jpg",
@@ -1621,6 +1993,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/73/91/aa/7391aabc-81d8-2bcb-3b0f-8e24bc855745/4547366775211.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/73/91/aa/7391aabc-81d8-2bcb-3b0f-8e24bc855745/4547366775211.jpg/600x600bb.jpg",
@@ -1639,6 +2015,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/12/81/dc/1281dc28-48e6-5ff7-642d-6cf4d487d9e0/4547366660890.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/12/81/dc/1281dc28-48e6-5ff7-642d-6cf4d487d9e0/4547366660890.jpg/600x600bb.jpg",
@@ -1657,6 +2037,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2017,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f8/e0/c3/f8e0c344-3035-ce6c-aaf4-9efd2cfb8a4b/jacket_SRXX02423B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f8/e0/c3/f8e0c344-3035-ce6c-aaf4-9efd2cfb8a4b/jacket_SRXX02423B00Z_550.jpg/600x600bb.jpg",
@@ -1675,6 +2059,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d1/f0/19/d1f01983-f104-2b34-0983-e8dc3ff17601/24UMGIM94859.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d1/f0/19/d1f01983-f104-2b34-0983-e8dc3ff17601/24UMGIM94859.rgb.jpg/600x600bb.jpg",
@@ -1690,6 +2078,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": 57,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 74,
+      "karaoto_source_url": "https://karaoto.net/max_key/38",
       "release_year": 2015,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ef/d0/e1/efd0e1b5-e770-23c7-6366-e149fcf11c95/4547366752632.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ef/d0/e1/efd0e1b5-e770-23c7-6366-e149fcf11c95/4547366752632.jpg/600x600bb.jpg",
@@ -1705,6 +2097,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2009,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/7d/65/aa/7d65aa4c-6bcf-35ff-203e-4e2a65418e33/mzi.ucbxsmxx.tif/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/7d/65/aa/7d65aa4c-6bcf-35ff-203e-4e2a65418e33/mzi.ucbxsmxx.tif/600x600bb.jpg",
@@ -1720,6 +2116,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": 49,
+      "range_high_midi": 66,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/33",
       "release_year": 2008,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music/d8/f9/05/mzi.ggdrxfyf.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music/d8/f9/05/mzi.ggdrxfyf.jpg/600x600bb.jpg",
@@ -1739,6 +2139,10 @@
         "enka_monthly",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1977,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fc/f9/5a/fcf95aee-2619-52fc-66a1-89682dec2008/cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fc/f9/5a/fcf95aee-2619-52fc-66a1-89682dec2008/cover.jpg/600x600bb.jpg",
@@ -1757,6 +2161,10 @@
         "enka_monthly",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2012,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/0c/76/d0/0c76d032-5533-3504-da7c-98160c17f60f/dj.alvifjxi.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/0c/76/d0/0c76d032-5533-3504-da7c-98160c17f60f/dj.alvifjxi.jpg/600x600bb.jpg",
@@ -1775,6 +2183,10 @@
         "enka_monthly",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2008,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/61/fa/f1/61faf1ac-fb6c-e8c8-b053-14ff50b704e2/00044002896971.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/61/fa/f1/61faf1ac-fb6c-e8c8-b053-14ff50b704e2/00044002896971.rgb.jpg/600x600bb.jpg",
@@ -1790,6 +2202,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/b5/28/cb/b528cbcb-6619-7fef-1985-6d95d085c479/4547366780321.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/b5/28/cb/b528cbcb-6619-7fef-1985-6d95d085c479/4547366780321.jpg/600x600bb.jpg",
@@ -1805,6 +2221,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": 55,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/39",
       "release_year": 1982,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/bb/7a/91/bb7a9111-1bb6-d932-f0b1-6336c124858b/jacket_MHCL20128B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/bb/7a/91/bb7a9111-1bb6-d932-f0b1-6336c124858b/jacket_MHCL20128B00Z_550.jpg/600x600bb.jpg",
@@ -1822,6 +2242,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 54,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 73,
+      "karaoto_source_url": "https://karaoto.net/max_key/38",
       "release_year": 1995,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d2/b2/da/d2b2dadb-068a-6641-ee96-9a3150906cbe/00600406212184.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d2/b2/da/d2b2dadb-068a-6641-ee96-9a3150906cbe/00600406212184.rgb.jpg/600x600bb.jpg",
@@ -1840,6 +2264,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1989,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/7b/7c/36/7b7c36bb-eb3e-52bc-bbc4-0301e448ba97/jacket_ESCB01018B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/7b/7c/36/7b7c36bb-eb3e-52bc-bbc4-0301e448ba97/jacket_ESCB01018B00Z_550.jpg/600x600bb.jpg",
@@ -1855,6 +2283,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": 53,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/38",
       "release_year": 1994,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/96/1d/65/961d6574-e8e6-8e6b-32d6-93ec2ed5a416/dj.wojuzgpi.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/96/1d/65/961d6574-e8e6-8e6b-32d6-93ec2ed5a416/dj.wojuzgpi.jpg/600x600bb.jpg",
@@ -1870,6 +2302,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1986,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/11/7b/f6/117bf6e5-9ee5-b0c9-f4f1-f37bc10a785c/00044007947326.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/11/7b/f6/117bf6e5-9ee5-b0c9-f4f1-f37bc10a785c/00044007947326.rgb.jpg/600x600bb.jpg",
@@ -1886,6 +2322,10 @@
         "firsthalf",
         "duet_monthly"
       ],
+      "range_low_midi": 57,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/39",
       "release_year": 2007,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music62/v4/37/9b/14/379b14f4-bd5b-35cf-95e4-a83feccc3cfa/mzm.vsokwoas.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music62/v4/37/9b/14/379b14f4-bd5b-35cf-95e4-a83feccc3cfa/mzm.vsokwoas.jpg/600x600bb.jpg",
@@ -1904,6 +2344,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 51,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/39",
       "release_year": 2007,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/58/87/c8/5887c8c6-81f4-2a4d-a054-0b12c178a07d/00044002467034.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/58/87/c8/5887c8c6-81f4-2a4d-a054-0b12c178a07d/00044002467034.rgb.jpg/600x600bb.jpg",
@@ -1919,6 +2363,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": 53,
+      "range_high_midi": 70,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/37",
       "release_year": 2006,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/08/d4/12/08d412fa-1959-1db8-76be-cf4c12be6d37/00602557728750.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/08/d4/12/08d412fa-1959-1db8-76be-cf4c12be6d37/00602557728750.rgb.jpg/600x600bb.jpg",
@@ -1934,6 +2382,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2007,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music1/v4/01/ec/2c/01ec2c78-a9cc-e365-6bd1-0e6ad1816110/ANTCD-15250.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music1/v4/01/ec/2c/01ec2c78-a9cc-e365-6bd1-0e6ad1816110/ANTCD-15250.jpg/600x600bb.jpg",
@@ -1950,6 +2402,10 @@
         "enka_monthly",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1984,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/61/fa/f1/61faf1ac-fb6c-e8c8-b053-14ff50b704e2/00044002896971.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/61/fa/f1/61faf1ac-fb6c-e8c8-b053-14ff50b704e2/00044002896971.rgb.jpg/600x600bb.jpg",
@@ -1965,6 +2421,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/aa/f1/62/aaf16249-0d92-763a-5a78-65ea3ac568d2/24UMGIM04362.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/aa/f1/62/aaf16249-0d92-763a-5a78-65ea3ac568d2/24UMGIM04362.rgb.jpg/600x600bb.jpg",
@@ -1983,6 +2443,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 47,
+      "range_high_midi": 69,
+      "falsetto_max_midi": 69,
+      "karaoto_source_url": "https://karaoto.net/max_key/36",
       "release_year": 2005,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/36/1b/f2/361bf2e3-ae78-e0d9-5092-d4c428e5a9fa/VEATP-44550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/36/1b/f2/361bf2e3-ae78-e0d9-5092-d4c428e5a9fa/VEATP-44550.jpg/600x600bb.jpg",
@@ -2001,6 +2465,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2012,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music49/v4/61/c2/53/61c253e3-f57d-006a-a8a6-a2a2710ec0ed/VEATP-33298.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music49/v4/61/c2/53/61c253e3-f57d-006a-a8a6-a2a2710ec0ed/VEATP-33298.jpg/600x600bb.jpg",
@@ -2019,6 +2487,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 75,
+      "karaoto_source_url": "https://karaoto.net/max_key/40",
       "release_year": 2003,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/a2/f2/6a/a2f26a50-2d41-4b26-772a-d1069f40d538/jacket_AICL01700B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/a2/f2/6a/a2f26a50-2d41-4b26-772a-d1069f40d538/jacket_AICL01700B00Z_550.jpg/600x600bb.jpg",
@@ -2037,6 +2509,10 @@
         "secondhalf",
         "duet_monthly"
       ],
+      "range_low_midi": 53,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 75,
+      "karaoto_source_url": "https://karaoto.net/max_key/40",
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/85/0b/1b/850b1b4c-f529-6828-4b2b-a5a187ec61c6/190295235017.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/85/0b/1b/850b1b4c-f529-6828-4b2b-a5a187ec61c6/190295235017.jpg/600x600bb.jpg",
@@ -2052,6 +2528,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a3/3d/b9/a33db9e9-1d2a-1d9c-38e5-327e6f6b7146/ANTCD-A0000017755.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a3/3d/b9/a33db9e9-1d2a-1d9c-38e5-327e6f6b7146/ANTCD-A0000017755.jpg/600x600bb.jpg",
@@ -2067,6 +2547,10 @@
         "main",
         "duet_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/af/1d/c2/af1dc23c-09fb-3f77-4288-27d15e60bb00/190296596384.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/af/1d/c2/af1dc23c-09fb-3f77-4288-27d15e60bb00/190296596384.jpg/600x600bb.jpg",
@@ -2083,6 +2567,10 @@
         "firsthalf",
         "secondhalf"
       ],
+      "range_low_midi": 50,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 78,
+      "karaoto_source_url": "https://karaoto.net/max_key/40",
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/7e/e5/e6/7ee5e6f7-9c93-f121-fca0-e371dbce8f6e/4547366665246.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/7e/e5/e6/7ee5e6f7-9c93-f121-fca0-e371dbce8f6e/4547366665246.jpg/600x600bb.jpg",
@@ -2099,6 +2587,10 @@
         "firsthalf",
         "secondhalf"
       ],
+      "range_low_midi": 47,
+      "range_high_midi": 69,
+      "falsetto_max_midi": 73,
+      "karaoto_source_url": "https://karaoto.net/max_key/36",
       "release_year": 2015,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/29/ec/e8/29ece87b-ca51-50eb-30a5-6b3efdeb8767/00602577303920.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/29/ec/e8/29ece87b-ca51-50eb-30a5-6b3efdeb8767/00602577303920.rgb.jpg/600x600bb.jpg",
@@ -2114,6 +2606,10 @@
         "year",
         "firsthalf"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1d/0c/47/1d0c4791-7f6a-9b41-4acb-ea3e8794324e/0198448350686_cover.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1d/0c/47/1d0c4791-7f6a-9b41-4acb-ea3e8794324e/0198448350686_cover.png/600x600bb.jpg",
@@ -2129,6 +2625,10 @@
         "year",
         "secondhalf"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f2/13/a2/f213a26f-355f-95da-c119-a0571d28cdd1/25UMGIM46524.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f2/13/a2/f213a26f-355f-95da-c119-a0571d28cdd1/25UMGIM46524.rgb.jpg/600x600bb.jpg",
@@ -2145,6 +2645,10 @@
         "firsthalf",
         "secondhalf"
       ],
+      "range_low_midi": 54,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 78,
+      "karaoto_source_url": "https://karaoto.net/max_key/40",
       "release_year": 2023,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/3a/17/eb/3a17eb30-eacb-82eb-51df-d1321dbb55bc/197188492205.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/3a/17/eb/3a17eb30-eacb-82eb-51df-d1321dbb55bc/197188492205.jpg/600x600bb.jpg",
@@ -2161,6 +2665,10 @@
         "firsthalf",
         "secondhalf"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/06/a1/d8/06a1d861-418e-3fb1-e873-356f7f49090b/ANTCD-A0000002767.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/06/a1/d8/06a1d861-418e-3fb1-e873-356f7f49090b/ANTCD-A0000002767.jpg/600x600bb.jpg",
@@ -2176,6 +2684,10 @@
         "year",
         "firsthalf"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2022,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/63/24/b6/6324b6d9-8535-8783-3a2a-bc838dd45826/4582467702803.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/63/24/b6/6324b6d9-8535-8783-3a2a-bc838dd45826/4582467702803.jpg/600x600bb.jpg",
@@ -2191,6 +2703,10 @@
         "year",
         "secondhalf"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/c9/40/9e/c9409e84-c0ea-c389-3be3-2343ec3dfb3b/4547366539806.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/c9/40/9e/c9409e84-c0ea-c389-3be3-2343ec3dfb3b/4547366539806.jpg/600x600bb.jpg",
@@ -2206,6 +2722,10 @@
         "year",
         "secondhalf"
       ],
+      "range_low_midi": 54,
+      "range_high_midi": 76,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/43",
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/88/ce/67/88ce6774-3358-e238-5244-1b0788adea50/4547366475562.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/88/ce/67/88ce6774-3358-e238-5244-1b0788adea50/4547366475562.jpg/600x600bb.jpg",
@@ -2221,6 +2741,10 @@
         "year",
         "firsthalf"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/9a/07/1f/9a071fe9-265c-8e16-1677-4851ffa12326/764656012038_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/9a/07/1f/9a071fe9-265c-8e16-1677-4851ffa12326/764656012038_cover.jpg/600x600bb.jpg",
@@ -2236,6 +2760,10 @@
         "year",
         "firsthalf"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2022,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/b7/20/05/b7200500-e97d-8c79-7cf2-99a6fb1aaf4d/22UMGIM50592.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/b7/20/05/b7200500-e97d-8c79-7cf2-99a6fb1aaf4d/22UMGIM50592.rgb.jpg/600x600bb.jpg",
@@ -2251,6 +2779,10 @@
         "year",
         "firsthalf"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/b1/9e/93/b19e93cf-8713-547c-0cbc-4a971a178771/ANTCD-A0000014608.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/b1/9e/93/b19e93cf-8713-547c-0cbc-4a971a178771/ANTCD-A0000014608.jpg/600x600bb.jpg",
@@ -2267,6 +2799,10 @@
         "firsthalf",
         "secondhalf"
       ],
+      "range_low_midi": 44,
+      "range_high_midi": 68,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/35",
       "release_year": 2001,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/50/85/26/50852674-2973-742b-d4ea-8d0bae94f344/TFCC-87080WW.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/50/85/26/50852674-2973-742b-d4ea-8d0bae94f344/TFCC-87080WW.jpg/600x600bb.jpg",
@@ -2283,6 +2819,10 @@
         "firsthalf",
         "secondhalf"
       ],
+      "range_low_midi": 50,
+      "range_high_midi": 65,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/32",
       "release_year": 2012,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/7e/b4/76/7eb47679-4c56-9275-1a39-77ad820edb7f/TFCC-86389.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/7e/b4/76/7eb47679-4c56-9275-1a39-77ad820edb7f/TFCC-86389.jpg/600x600bb.jpg",
@@ -2298,6 +2838,10 @@
         "year",
         "secondhalf"
       ],
+      "range_low_midi": 52,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 79,
+      "karaoto_source_url": "https://karaoto.net/max_key/41",
       "release_year": 2019,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/b3/ae/3b/b3ae3bd0-47cc-6349-1d0d-a01928796a62/jacket_VVXX00432B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/b3/ae/3b/b3ae3bd0-47cc-6349-1d0d-a01928796a62/jacket_VVXX00432B00Z_550.jpg/600x600bb.jpg",
@@ -2313,6 +2857,10 @@
         "year",
         "secondhalf"
       ],
+      "range_low_midi": 45,
+      "range_high_midi": 69,
+      "falsetto_max_midi": 71,
+      "karaoto_source_url": "https://karaoto.net/max_key/36",
       "release_year": 1990,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/5c/52/4b/5c524bc7-dae9-d734-d8ab-8013ef84130f/VEATP-30856.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/5c/52/4b/5c524bc7-dae9-d734-d8ab-8013ef84130f/VEATP-30856.jpg/600x600bb.jpg",
@@ -2327,6 +2875,10 @@
       "source_pages": [
         "firsthalf"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/14/69/00/146900a6-0e3b-22e9-3533-f23c09ff67c1/199999104193.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/14/69/00/146900a6-0e3b-22e9-3533-f23c09ff67c1/199999104193.png/600x600bb.jpg",
@@ -2341,6 +2893,10 @@
       "source_pages": [
         "firsthalf"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1992,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/95/31/98/953198da-f3be-e4cd-c3a9-7cea7cc4523a/NOPA-2381.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/95/31/98/953198da-f3be-e4cd-c3a9-7cea7cc4523a/NOPA-2381.jpg/600x600bb.jpg",
@@ -2355,6 +2911,10 @@
       "source_pages": [
         "firsthalf"
       ],
+      "range_low_midi": 57,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 75,
+      "karaoto_source_url": "https://karaoto.net/max_key/41",
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/79/a0/43/79a043ae-43d3-0065-2efa-f08796e897d3/4547366807875.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/79/a0/43/79a043ae-43d3-0065-2efa-f08796e897d3/4547366807875.jpg/600x600bb.jpg",
@@ -2369,6 +2929,10 @@
       "source_pages": [
         "firsthalf"
       ],
+      "range_low_midi": 50,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 74,
+      "karaoto_source_url": "https://karaoto.net/max_key/39",
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/d9/de/51/d9de5146-6d3a-2002-bc8f-77e2e47c1c3b/4547366544138.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/d9/de/51/d9de5146-6d3a-2002-bc8f-77e2e47c1c3b/4547366544138.jpg/600x600bb.jpg",
@@ -2383,6 +2947,10 @@
       "source_pages": [
         "firsthalf"
       ],
+      "range_low_midi": 52,
+      "range_high_midi": 66,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": "https://karaoto.net/max_key/33",
       "release_year": 2004,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/af/0f/6f/af0f6f87-1503-2dab-ea45-26fb70d191ff/00600406643247.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/af/0f/6f/af0f6f87-1503-2dab-ea45-26fb70d191ff/00600406643247.rgb.jpg/600x600bb.jpg",
@@ -2397,6 +2965,10 @@
       "source_pages": [
         "firsthalf"
       ],
+      "range_low_midi": 52,
+      "range_high_midi": 64,
+      "falsetto_max_midi": 67,
+      "karaoto_source_url": "https://karaoto.net/max_key/31",
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/f1/cd/f7/f1cdf773-5dca-3d6d-6c14-2fb9871a83a9/197189838330.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/f1/cd/f7/f1cdf773-5dca-3d6d-6c14-2fb9871a83a9/197189838330.jpg/600x600bb.jpg",
@@ -2411,6 +2983,10 @@
       "source_pages": [
         "firsthalf"
       ],
+      "range_low_midi": 57,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 76,
+      "karaoto_source_url": "https://karaoto.net/max_key/41",
       "release_year": 2022,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/91/a6/68/91a66879-7537-53b4-5efe-fe75358034a0/22UMGIM59964.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/91/a6/68/91a66879-7537-53b4-5efe-fe75358034a0/22UMGIM59964.rgb.jpg/600x600bb.jpg",
@@ -2425,6 +3001,10 @@
       "source_pages": [
         "secondhalf"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2014,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/fc/56/26/fc562659-e258-c30e-8dea-2381545a7806/jacket_AICL02706B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/fc/56/26/fc562659-e258-c30e-8dea-2381545a7806/jacket_AICL02706B00Z_550.jpg/600x600bb.jpg",
@@ -2439,6 +3019,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2023,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/2d/61/87/2d61872b-e284-b12c-9d97-c402260d74df/PCSP_05281_A.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/2d/61/87/2d61872b-e284-b12c-9d97-c402260d74df/PCSP_05281_A.jpg/600x600bb.jpg",
@@ -2453,6 +3037,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2022,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/82/12/06/821206f2-6649-a3ff-43ee-68e937ffa723/859758167370_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/82/12/06/821206f2-6649-a3ff-43ee-68e937ffa723/859758167370_cover.jpg/600x600bb.jpg",
@@ -2467,6 +3055,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2012,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/5c/e4/a7/5ce4a765-30e1-6548-d16c-ad7a779aeff4/5021732641717.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/5c/e4/a7/5ce4a765-30e1-6548-d16c-ad7a779aeff4/5021732641717.jpg/600x600bb.jpg",
@@ -2481,6 +3073,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/39/76/6c/39766c80-c1b8-6e9a-edea-3ee7423448d6/4511820-60460.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/39/76/6c/39766c80-c1b8-6e9a-edea-3ee7423448d6/4511820-60460.jpg/600x600bb.jpg",
@@ -2495,6 +3091,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2014,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7f/12/61/7f1261b0-de22-e103-012c-0563a654da69/825646170524.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7f/12/61/7f1261b0-de22-e103-012c-0563a654da69/825646170524.jpg/600x600bb.jpg",
@@ -2509,6 +3109,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2017,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0e/de/38/0ede3889-98db-a7d5-9006-5ddff24859dc/5021732651983.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0e/de/38/0ede3889-98db-a7d5-9006-5ddff24859dc/5021732651983.jpg/600x600bb.jpg",
@@ -2523,6 +3127,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2023,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/d9/84/c3/d984c37b-cfba-9892-3560-ee5ccc2642c4/TFCC-86897WW.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/d9/84/c3/d984c37b-cfba-9892-3560-ee5ccc2642c4/TFCC-86897WW.jpg/600x600bb.jpg",
@@ -2537,6 +3145,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2015,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music7/v4/77/42/2d/77422d00-071d-3b54-a411-d9d9f96e5624/QWCE_00436_itunes.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music7/v4/77/42/2d/77422d00-071d-3b54-a411-d9d9f96e5624/QWCE_00436_itunes.png/600x600bb.jpg",
@@ -2551,6 +3163,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/69/3c/70/693c7078-17bf-e0e3-6d15-fc96edf4eb88/093249_J.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/69/3c/70/693c7078-17bf-e0e3-6d15-fc96edf4eb88/093249_J.jpg/600x600bb.jpg",
@@ -2565,6 +3181,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/48/f8/90/48f890ad-8031-8ac2-3ecb-bd63ef144a78/PA00075598_0_91166_jacket.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/48/f8/90/48f890ad-8031-8ac2-3ecb-bd63ef144a78/PA00075598_0_91166_jacket.jpg/600x600bb.jpg",
@@ -2579,6 +3199,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2010,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/e8/54/8e/e8548ebe-3db7-e56c-dd2e-e75026b2a02e/PA00116257_0_164493_jacket.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/e8/54/8e/e8548ebe-3db7-e56c-dd2e-e75026b2a02e/PA00116257_0_164493_jacket.jpg/600x600bb.jpg",
@@ -2593,6 +3217,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2011,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/9b/54/1b/9b541b7e-731f-ff21-3fe4-c83c25355286/KRHS-37246_40mP.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/9b/54/1b/9b541b7e-731f-ff21-3fe4-c83c25355286/KRHS-37246_40mP.jpg/600x600bb.jpg",
@@ -2607,6 +3235,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/4c/ee/d2/4ceed268-77e9-350e-7583-28392b233601/PCCG_01912.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/4c/ee/d2/4ceed268-77e9-350e-7583-28392b233601/PCCG_01912.jpg/600x600bb.jpg",
@@ -2621,6 +3253,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/d6/7c/3c/d67c3c9b-a5ba-cc8d-5d0e-4ed96e9eecc3/ANTCD-46505.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/d6/7c/3c/d67c3c9b-a5ba-cc8d-5d0e-4ed96e9eecc3/ANTCD-46505.jpg/600x600bb.jpg",
@@ -2635,6 +3271,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2014,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music7/v4/af/f3/00/aff30009-60fd-5e1d-916d-50a6de86aee9/cap.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music7/v4/af/f3/00/aff30009-60fd-5e1d-916d-50a6de86aee9/cap.jpg/600x600bb.jpg",
@@ -2649,6 +3289,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d2/60/c1/d260c1d1-419c-aa4c-2e63-15e222cddf37/859757343263_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d2/60/c1/d260c1d1-419c-aa4c-2e63-15e222cddf37/859757343263_cover.jpg/600x600bb.jpg",
@@ -2663,6 +3307,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2016,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/39/41/89/394189a4-f84a-0384-ac8b-35020bc218da/GHOST_shokai_Jacket3000.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/39/41/89/394189a4-f84a-0384-ac8b-35020bc218da/GHOST_shokai_Jacket3000.jpg/600x600bb.jpg",
@@ -2677,6 +3325,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2009,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/68/55/99/68559901-5592-0b1b-84c8-05bbf0db83a6/QWCE_00118_itunes.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/68/55/99/68559901-5592-0b1b-84c8-05bbf0db83a6/QWCE_00118_itunes.png/600x600bb.jpg",
@@ -2691,6 +3343,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2013,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/d2/2e/bf/d22ebf32-b5e6-a6a8-8676-c6312caafdd5/QWCE_00663_2.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/d2/2e/bf/d22ebf32-b5e6-a6a8-8676-c6312caafdd5/QWCE_00663_2.jpg/600x600bb.jpg",
@@ -2705,6 +3361,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2023,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/67/c0/b4/67c0b4a9-1af2-c51f-fb9f-564f2ec9c08a/23UMGIM01993.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/67/c0/b4/67c0b4a9-1af2-c51f-fb9f-564f2ec9c08a/23UMGIM01993.rgb.jpg/600x600bb.jpg",
@@ -2719,6 +3379,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bd/80/90/bd8090e3-2abc-06c5-1631-984a9e156d0e/PA00139699_0_187519_jacket.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bd/80/90/bd8090e3-2abc-06c5-1631-984a9e156d0e/PA00139699_0_187519_jacket.jpg/600x600bb.jpg",
@@ -2733,6 +3397,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2017,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/80/0d/c3/800dc3e4-21f4-74d5-c5db-8c37ba562786/4525853084398.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/80/0d/c3/800dc3e4-21f4-74d5-c5db-8c37ba562786/4525853084398.jpg/600x600bb.jpg",
@@ -2747,6 +3415,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2013,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/f6/a2/af/f6a2affc-e480-13f1-170c-38b07f89652f/KRHS-92359_VariousArt_MIKUNOPOLI.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/f6/a2/af/f6a2affc-e480-13f1-170c-38b07f89652f/KRHS-92359_VariousArt_MIKUNOPOLI.jpg/600x600bb.jpg",
@@ -2761,6 +3433,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/bb/36/aa/bb36aa2e-dd8d-4392-3fe3-f4a20ceb612b/PA00168049_0_207463_jacket.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/bb/36/aa/bb36aa2e-dd8d-4392-3fe3-f4a20ceb612b/PA00168049_0_207463_jacket.jpg/600x600bb.jpg",
@@ -2775,6 +3451,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2015,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/0f/2b/2b/0f2b2bc4-963d-5372-db8d-45810130b9be/PA00074663_0_90344_jacket.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/0f/2b/2b/0f2b2bc4-963d-5372-db8d-45810130b9be/PA00074663_0_90344_jacket.jpg/600x600bb.jpg",
@@ -2789,6 +3469,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/3f/ce/cf/3fcecf1a-d576-9101-b458-8803783e7093/PA00092382_0_142863_jacket.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/3f/ce/cf/3fcecf1a-d576-9101-b458-8803783e7093/PA00092382_0_142863_jacket.jpg/600x600bb.jpg",
@@ -2803,6 +3487,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/89/13/42/891342f3-9866-33b6-e0a8-96d92aad4881/096362_J.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/89/13/42/891342f3-9866-33b6-e0a8-96d92aad4881/096362_J.jpg/600x600bb.jpg",
@@ -2817,6 +3505,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/4d/3b/db/4d3bdb5c-bc33-8e8d-0b57-d020e95d0366/859757536290_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/4d/3b/db/4d3bdb5c-bc33-8e8d-0b57-d020e95d0366/859757536290_cover.jpg/600x600bb.jpg",
@@ -2831,6 +3523,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2013,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/70/d0/1d/70d01d0a-b5db-0fb5-8c56-57f4c9d681fa/V_LOVE_25_HEARTS.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/70/d0/1d/70d01d0a-b5db-0fb5-8c56-57f4c9d681fa/V_LOVE_25_HEARTS.jpg/600x600bb.jpg",
@@ -2845,6 +3541,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2012,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music3/v4/8a/0d/a8/8a0da89d-0954-b694-0ccb-bb727a56ff3a/QWCE_00366_itunes.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music3/v4/8a/0d/a8/8a0da89d-0954-b694-0ccb-bb727a56ff3a/QWCE_00366_itunes.png/600x600bb.jpg",
@@ -2859,6 +3559,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3e/75/9b/3e759b36-d77b-94ba-a46c-5302bc4c9c36/4511820-60462.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3e/75/9b/3e759b36-d77b-94ba-a46c-5302bc4c9c36/4511820-60462.jpg/600x600bb.jpg",
@@ -2873,6 +3577,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/9d/6b/a2/9d6ba2f6-9132-b2bc-c4e0-3dd095377898/859756306436_cover.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/9d/6b/a2/9d6ba2f6-9132-b2bc-c4e0-3dd095377898/859756306436_cover.png/600x600bb.jpg",
@@ -2887,6 +3595,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2010,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/01/55/57/015557e0-4e1f-3651-005d-815a621afd1e/QWCE_00178_itunes.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/01/55/57/015557e0-4e1f-3651-005d-815a621afd1e/QWCE_00178_itunes.png/600x600bb.jpg",
@@ -2901,6 +3613,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2023,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/0f/41/b0/0f41b07e-d90e-e63a-38d5-c25fab9d67c0/3617222213308_cover.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/0f/41/b0/0f41b07e-d90e-e63a-38d5-c25fab9d67c0/3617222213308_cover.png/600x600bb.jpg",
@@ -2915,6 +3631,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2016,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/39/41/89/394189a4-f84a-0384-ac8b-35020bc218da/GHOST_shokai_Jacket3000.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/39/41/89/394189a4-f84a-0384-ac8b-35020bc218da/GHOST_shokai_Jacket3000.jpg/600x600bb.jpg",
@@ -2929,6 +3649,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/87/ab/2e/87ab2eb5-adbc-81fa-c86d-8efcc0f92252/196006092917.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/87/ab/2e/87ab2eb5-adbc-81fa-c86d-8efcc0f92252/196006092917.jpg/600x600bb.jpg",
@@ -2943,6 +3667,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2010,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/01/55/57/015557e0-4e1f-3651-005d-815a621afd1e/QWCE_00178_itunes.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/01/55/57/015557e0-4e1f-3651-005d-815a621afd1e/QWCE_00178_itunes.png/600x600bb.jpg",
@@ -2957,6 +3685,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/60/34/9a/60349ab8-e86b-c49d-4cd0-84d31b27a58b/859755480434_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/60/34/9a/60349ab8-e86b-c49d-4cd0-84d31b27a58b/859755480434_cover.jpg/600x600bb.jpg",
@@ -2971,6 +3703,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/fc/88/76/fc8876bd-fa79-1c53-a654-7b2ba48eb0aa/084300_J.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/fc/88/76/fc8876bd-fa79-1c53-a654-7b2ba48eb0aa/084300_J.jpg/600x600bb.jpg",
@@ -2985,6 +3721,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2019,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ed/ce/7a/edce7af7-1bf6-5ac2-9ea6-2ac853af7053/5021732654168.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ed/ce/7a/edce7af7-1bf6-5ac2-9ea6-2ac853af7053/5021732654168.jpg/600x600bb.jpg",
@@ -2999,6 +3739,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2022,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/94/90/ca/9490ca14-5f46-ce4f-5205-9060547b85a3/4511820-95509.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/94/90/ca/9490ca14-5f46-ce4f-5205-9060547b85a3/4511820-95509.jpg/600x600bb.jpg",
@@ -3013,6 +3757,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2015,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music62/v4/67/dc/c1/67dcc184-6816-e260-c391-220746774b46/JK_MekakucityMs2_FIX_JK_1.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music62/v4/67/dc/c1/67dcc184-6816-e260-c391-220746774b46/JK_MekakucityMs2_FIX_JK_1.jpg/600x600bb.jpg",
@@ -3027,6 +3775,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/01/bc/ed/01bcedab-04e1-1cb1-957a-400c5efe4b47/PA00074627_0_90308_jacket.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/01/bc/ed/01bcedab-04e1-1cb1-957a-400c5efe4b47/PA00074627_0_90308_jacket.jpg/600x600bb.jpg",
@@ -3041,6 +3793,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2011,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music1/v4/01/1e/f5/011ef53d-b907-7d2b-fd53-4d8186c506e8/QWCE_00185_itunes.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music1/v4/01/1e/f5/011ef53d-b907-7d2b-fd53-4d8186c506e8/QWCE_00185_itunes.png/600x600bb.jpg",
@@ -3055,6 +3811,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/ba/5b/fe/ba5bfe84-8eb8-4312-3650-a7e8b2e92459/859756966555_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/ba/5b/fe/ba5bfe84-8eb8-4312-3650-a7e8b2e92459/859756966555_cover.jpg/600x600bb.jpg",
@@ -3069,6 +3829,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2017,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/4c/4b/1f/4c4b1f90-66d4-1c72-e66b-bde9fea695f5/859756036586_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/4c/4b/1f/4c4b1f90-66d4-1c72-e66b-bde9fea695f5/859756036586_cover.jpg/600x600bb.jpg",
@@ -3083,6 +3847,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/51/d4/2e/51d42e6d-f6b6-54de-19b2-b8a645d64da2/SCGA-00116.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/51/d4/2e/51d42e6d-f6b6-54de-19b2-b8a645d64da2/SCGA-00116.jpg/600x600bb.jpg",
@@ -3097,6 +3865,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2017,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/06/fa/ea/06faea93-525a-ed28-5521-a3774a7afc35/4589686423939_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/06/fa/ea/06faea93-525a-ed28-5521-a3774a7afc35/4589686423939_cover.jpg/600x600bb.jpg",
@@ -3111,6 +3883,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2019,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/f5/8f/8b/f58f8ba6-622b-efe3-8b8d-a936296369e7/PA00075686_0_91246_jacket.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/f5/8f/8b/f58f8ba6-622b-efe3-8b8d-a936296369e7/PA00075686_0_91246_jacket.jpg/600x600bb.jpg",
@@ -3125,6 +3901,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2022,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/41/9d/17/419d17e6-6c43-8e06-0682-eb02ae7e771f/4582364268709_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/41/9d/17/419d17e6-6c43-8e06-0682-eb02ae7e771f/4582364268709_cover.jpg/600x600bb.jpg",
@@ -3139,6 +3919,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2023,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/5d/55/3b/5d553b3f-e5f0-9ae6-69cc-0741c89c794a/4582649048019.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/5d/55/3b/5d553b3f-e5f0-9ae6-69cc-0741c89c794a/4582649048019.jpg/600x600bb.jpg",
@@ -3153,6 +3937,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/c4/bc/88/c4bc8860-a8a3-e662-0702-b4040d4dc4dc/4582109070611.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/c4/bc/88/c4bc8860-a8a3-e662-0702-b4040d4dc4dc/4582109070611.jpg/600x600bb.jpg",
@@ -3167,6 +3955,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/fc/88/76/fc8876bd-fa79-1c53-a654-7b2ba48eb0aa/084300_J.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/fc/88/76/fc8876bd-fa79-1c53-a654-7b2ba48eb0aa/084300_J.jpg/600x600bb.jpg",
@@ -3181,6 +3973,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2012,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/25/64/6f/25646f35-e08e-ea49-3952-f49a5d52f9ba/KRHS-92035.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/25/64/6f/25646f35-e08e-ea49-3952-f49a5d52f9ba/KRHS-92035.jpg/600x600bb.jpg",
@@ -3195,6 +3991,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2013,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/73/05/22/7305223b-ac3f-a9b2-dbf8-70d0fb645604/QWCE_00267_itunes.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/73/05/22/7305223b-ac3f-a9b2-dbf8-70d0fb645604/QWCE_00267_itunes.png/600x600bb.jpg",
@@ -3209,6 +4009,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2016,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/90/0a/df900a21-8c01-c600-3898-78572b3a7bd3/4562251593879_cover.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/90/0a/df900a21-8c01-c600-3898-78572b3a7bd3/4562251593879_cover.png/600x600bb.jpg",
@@ -3223,6 +4027,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2009,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music1/v4/f5/60/9e/f5609e4f-348d-7f81-9440-0168a9ceef91/QWCE_10027_itunes.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music1/v4/f5/60/9e/f5609e4f-348d-7f81-9440-0168a9ceef91/QWCE_10027_itunes.png/600x600bb.jpg",
@@ -3237,6 +4045,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/da/2f/aa/da2faa7f-5df1-8374-4c2e-c7a54263a11c/PA00088055_0_137679_jacket.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/da/2f/aa/da2faa7f-5df1-8374-4c2e-c7a54263a11c/PA00088055_0_137679_jacket.jpg/600x600bb.jpg",
@@ -3251,6 +4063,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0f/69/4f/0f694f8d-fa26-d738-5f5e-d67d5fa69c35/4550753926752_cover.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0f/69/4f/0f694f8d-fa26-d738-5f5e-d67d5fa69c35/4550753926752_cover.png/600x600bb.jpg",
@@ -3265,6 +4081,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2017,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music117/v4/8f/af/7f/8faf7f9b-3b4e-c238-019f-416754beb9f3/QWCE_00639.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music117/v4/8f/af/7f/8faf7f9b-3b4e-c238-019f-416754beb9f3/QWCE_00639.jpg/600x600bb.jpg",
@@ -3279,6 +4099,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2012,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ba/58/80/ba58805b-c10f-f47e-f51c-1056bd9d4b2a/QWCE_00261_itunes.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ba/58/80/ba58805b-c10f-f47e-f51c-1056bd9d4b2a/QWCE_00261_itunes.png/600x600bb.jpg",
@@ -3293,6 +4117,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2023,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/ff/40/be/ff40beb0-82bd-dcfb-b1c6-a40c23fc760e/PA00129089_0_174606_jacket.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/ff/40/be/ff40beb0-82bd-dcfb-b1c6-a40c23fc760e/PA00129089_0_174606_jacket.jpg/600x600bb.jpg",
@@ -3307,6 +4135,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2017,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/4c/4b/1f/4c4b1f90-66d4-1c72-e66b-bde9fea695f5/859756036586_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/4c/4b/1f/4c4b1f90-66d4-1c72-e66b-bde9fea695f5/859756036586_cover.jpg/600x600bb.jpg",
@@ -3321,6 +4153,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/bf/b3/97/bfb39797-a975-4dd2-08d4-d9381abc0a96/4511820-60373.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/bf/b3/97/bfb39797-a975-4dd2-08d4-d9381abc0a96/4511820-60373.jpg/600x600bb.jpg",
@@ -3335,6 +4171,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/6d/96/3a/6d963a84-9696-f420-e4c9-4f7442633147/4511820-60674.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/6d/96/3a/6d963a84-9696-f420-e4c9-4f7442633147/4511820-60674.jpg/600x600bb.jpg",
@@ -3349,6 +4189,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/6e/df/9d/6edf9dee-9d19-7b18-c063-23d0f1dcd7f2/4522197130613_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/6e/df/9d/6edf9dee-9d19-7b18-c063-23d0f1dcd7f2/4522197130613_cover.jpg/600x600bb.jpg",
@@ -3363,6 +4207,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/40/b9/f7/40b9f72f-4bb4-8dac-9976-f116b7a81c9e/096909_J.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/40/b9/f7/40b9f72f-4bb4-8dac-9976-f116b7a81c9e/096909_J.jpg/600x600bb.jpg",
@@ -3377,6 +4225,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/0c/0f/72/0c0f72c2-5483-df6a-1cb2-d56e53fdaf8b/PA00090997_0_141196_jacket.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/0c/0f/72/0c0f72c2-5483-df6a-1cb2-d56e53fdaf8b/PA00090997_0_141196_jacket.jpg/600x600bb.jpg",
@@ -3391,6 +4243,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2014,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music3/v4/8a/0d/a8/8a0da89d-0954-b694-0ccb-bb727a56ff3a/QWCE_00366_itunes.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music3/v4/8a/0d/a8/8a0da89d-0954-b694-0ccb-bb727a56ff3a/QWCE_00366_itunes.png/600x600bb.jpg",
@@ -3405,6 +4261,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2023,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/19/9a/ac/199aacf2-c4b3-cf40-2f16-32f64a3ad8cc/PA00132777_1_178530_jacket.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/19/9a/ac/199aacf2-c4b3-cf40-2f16-32f64a3ad8cc/PA00132777_1_178530_jacket.jpg/600x600bb.jpg",
@@ -3419,6 +4279,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/28/f6/7a/28f67aff-5499-0572-b713-981f55a09b6c/4573694678023.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/28/f6/7a/28f67aff-5499-0572-b713-981f55a09b6c/4573694678023.jpg/600x600bb.jpg",
@@ -3433,6 +4297,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2014,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/2e/05/37/2e053713-845b-6000-3f23-96e5908c15bf/DGSA10095B_jk.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/2e/05/37/2e053713-845b-6000-3f23-96e5908c15bf/DGSA10095B_jk.jpg/600x600bb.jpg",
@@ -3447,6 +4315,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/13/81/a2/1381a2ee-1261-4807-8cb8-f77d8fd41c65/4582649103336.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/13/81/a2/1381a2ee-1261-4807-8cb8-f77d8fd41c65/4582649103336.jpg/600x600bb.jpg",
@@ -3461,6 +4333,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2010,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/3b/de/25/3bde256e-3fb4-98ab-f673-d3642d355e2d/JK_BEST_1500-1400.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/3b/de/25/3bde256e-3fb4-98ab-f673-d3642d355e2d/JK_BEST_1500-1400.jpg/600x600bb.jpg",
@@ -3475,6 +4351,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2017,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/06/fa/ea/06faea93-525a-ed28-5521-a3774a7afc35/4589686423939_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/06/fa/ea/06faea93-525a-ed28-5521-a3774a7afc35/4589686423939_cover.jpg/600x600bb.jpg",
@@ -3489,6 +4369,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/27/57/20/275720d0-56d5-6cd3-f842-c5800856633e/5021732765086_cover.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/27/57/20/275720d0-56d5-6cd3-f842-c5800856633e/5021732765086_cover.png/600x600bb.jpg",
@@ -3503,6 +4387,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/5c/53/e7/5c53e7bb-43b4-8b85-af49-cb603ceb03df/PCCA_06218_A.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/5c/53/e7/5c53e7bb-43b4-8b85-af49-cb603ceb03df/PCCA_06218_A.jpg/600x600bb.jpg",
@@ -3517,6 +4405,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2016,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/90/0a/df900a21-8c01-c600-3898-78572b3a7bd3/4562251593879_cover.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/90/0a/df900a21-8c01-c600-3898-78572b3a7bd3/4562251593879_cover.png/600x600bb.jpg",
@@ -3531,6 +4423,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2017,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/5c/c9/41/5cc941e0-b538-90ff-276b-f3004dd18ca4/PA00075725_0_91284_jacket.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/5c/c9/41/5cc941e0-b538-90ff-276b-f3004dd18ca4/PA00075725_0_91284_jacket.jpg/600x600bb.jpg",
@@ -3545,6 +4441,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2016,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music62/v4/f9/31/41/f931419f-9ada-ca66-0aea-b2f972bf2ac1/859753972023_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music62/v4/f9/31/41/f931419f-9ada-ca66-0aea-b2f972bf2ac1/859753972023_cover.jpg/600x600bb.jpg",
@@ -3559,6 +4459,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/45/8e/1d458eb7-4ae7-9f67-4fb0-d42ed4633e6b/4550711192793_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/45/8e/1d458eb7-4ae7-9f67-4fb0-d42ed4633e6b/4550711192793_cover.jpg/600x600bb.jpg",
@@ -3573,6 +4477,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/5b/8b/4c/5b8b4cbe-1212-bc65-bbac-cc58761a88ce/859757385133_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/5b/8b/4c/5b8b4cbe-1212-bc65-bbac-cc58761a88ce/859757385133_cover.jpg/600x600bb.jpg",
@@ -3587,6 +4495,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7f/d1/f2/7fd1f256-6a66-8fff-a1c7-eef85b21c0ca/4550752620477_cover.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7f/d1/f2/7fd1f256-6a66-8fff-a1c7-eef85b21c0ca/4550752620477_cover.png/600x600bb.jpg",
@@ -3601,6 +4513,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2e/c1/ff/2ec1ff7c-887e-cbcc-c468-41f2070db69e/4550711469390_cover.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2e/c1/ff/2ec1ff7c-887e-cbcc-c468-41f2070db69e/4550711469390_cover.png/600x600bb.jpg",
@@ -3615,6 +4531,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2022,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/a7/1a/1e/a71a1eea-07ce-36a7-a658-5fa2cac10605/4511820-95611.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/a7/1a/1e/a71a1eea-07ce-36a7-a658-5fa2cac10605/4511820-95611.jpg/600x600bb.jpg",
@@ -3629,6 +4549,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2014,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7f/12/61/7f1261b0-de22-e103-012c-0563a654da69/825646170524.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7f/12/61/7f1261b0-de22-e103-012c-0563a654da69/825646170524.jpg/600x600bb.jpg",
@@ -3643,6 +4567,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d9/0b/99/d90b99c6-f6c8-efe8-5caa-5528f26ecee2/25UMGIM91945.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d9/0b/99/d90b99c6-f6c8-efe8-5caa-5528f26ecee2/25UMGIM91945.rgb.jpg/600x600bb.jpg",
@@ -3657,6 +4585,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2014,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/4c/ee/d2/4ceed268-77e9-350e-7583-28392b233601/PCCG_01912.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/4c/ee/d2/4ceed268-77e9-350e-7583-28392b233601/PCCG_01912.jpg/600x600bb.jpg",
@@ -3671,6 +4603,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/d3/85/9f/d3859fde-aa78-22fe-9ebd-2448011379d6/PA00083731_0_136910_jacket.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/d3/85/9f/d3859fde-aa78-22fe-9ebd-2448011379d6/PA00083731_0_136910_jacket.jpg/600x600bb.jpg",
@@ -3685,6 +4621,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/93/28/2c/93282c99-2f1e-f595-6f8b-c7176f460bc4/4571640675362_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/93/28/2c/93282c99-2f1e-f595-6f8b-c7176f460bc4/4571640675362_cover.jpg/600x600bb.jpg",
@@ -3699,6 +4639,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2011,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/ef/e0/c4/efe0c4a9-972d-7d47-5784-67871be98a38/QWCE_10036_itunes.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/ef/e0/c4/efe0c4a9-972d-7d47-5784-67871be98a38/QWCE_10036_itunes.png/600x600bb.jpg",
@@ -3713,6 +4657,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2014,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7f/12/61/7f1261b0-de22-e103-012c-0563a654da69/825646170524.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7f/12/61/7f1261b0-de22-e103-012c-0563a654da69/825646170524.jpg/600x600bb.jpg",
@@ -3727,6 +4675,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2014,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/89/34/c7/8934c7cf-b00d-e818-4d5e-461bcdf37002/4571374919688_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/89/34/c7/8934c7cf-b00d-e818-4d5e-461bcdf37002/4571374919688_cover.jpg/600x600bb.jpg",
@@ -3741,6 +4693,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2013,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/f6/a2/af/f6a2affc-e480-13f1-170c-38b07f89652f/KRHS-92359_VariousArt_MIKUNOPOLI.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/f6/a2/af/f6a2affc-e480-13f1-170c-38b07f89652f/KRHS-92359_VariousArt_MIKUNOPOLI.jpg/600x600bb.jpg",
@@ -3755,6 +4711,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2022,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/99/30/e0/9930e057-88bf-1117-a072-edc6cb2db6b8/859758318772_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/99/30/e0/9930e057-88bf-1117-a072-edc6cb2db6b8/859758318772_cover.jpg/600x600bb.jpg",
@@ -3769,6 +4729,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2013,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/ec/db/36/ecdb36ad-c0bc-1c4e-c085-a242be1ddbca/dgsa10074jk.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/ec/db/36/ecdb36ad-c0bc-1c4e-c085-a242be1ddbca/dgsa10074jk.jpg/600x600bb.jpg",
@@ -3783,6 +4747,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/78/da/28/78da2889-4351-329f-b6dd-773d77b8bf78/4550709625166_cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/78/da/28/78da2889-4351-329f-b6dd-773d77b8bf78/4550709625166_cover.jpg/600x600bb.jpg",
@@ -3797,6 +4765,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/37/9a/ad/379aad56-b799-8c18-e45d-9b4120c329b2/4511820-60708.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/37/9a/ad/379aad56-b799-8c18-e45d-9b4120c329b2/4511820-60708.jpg/600x600bb.jpg",
@@ -3811,6 +4783,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2012,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music1/v4/6d/25/87/6d258747-2142-2ebf-79d1-cf83d25b1324/QWCE_00215_itunes.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music1/v4/6d/25/87/6d258747-2142-2ebf-79d1-cf83d25b1324/QWCE_00215_itunes.png/600x600bb.jpg",
@@ -3825,6 +4801,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/5a/55/ac/5a55ac05-98ea-e5d2-6a1b-6fa5ac60100b/PA00075970_0_91507_jacket.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/5a/55/ac/5a55ac05-98ea-e5d2-6a1b-6fa5ac60100b/PA00075970_0_91507_jacket.jpg/600x600bb.jpg",
@@ -3839,6 +4819,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2024,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/4e/46/4c/4e464cde-fd93-cd7c-f88e-f93dbdae1257/4511820-60048.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/4e/46/4c/4e464cde-fd93-cd7c-f88e-f93dbdae1257/4511820-60048.jpg/600x600bb.jpg",
@@ -3853,6 +4837,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/35/62/d0/3562d0bf-77ad-0c3e-00af-23e177df1288/4511820-60984.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/35/62/d0/3562d0bf-77ad-0c3e-00af-23e177df1288/4511820-60984.jpg/600x600bb.jpg",
@@ -3867,6 +4855,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2021,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/1c/c6/4e/1cc64ebb-f521-7107-ac4a-a44a9f549619/859757026050_cover.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/1c/c6/4e/1cc64ebb-f521-7107-ac4a-a44a9f549619/859757026050_cover.png/600x600bb.jpg",
@@ -3881,6 +4873,10 @@
       "source_pages": [
         "vocaloid_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/37/f2/19/37f219f7-3cca-39f8-97d4-2efece961f97/4550753694200_cover.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/37/f2/19/37f219f7-3cca-39f8-97d4-2efece961f97/4550753694200_cover.png/600x600bb.jpg",
@@ -3895,6 +4891,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2011,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/95/c7/3b/95c73bc8-967d-74ae-ca7c-604d703cc955/10945100.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/95/c7/3b/95c73bc8-967d-74ae-ca7c-604d703cc955/10945100.jpg/600x600bb.jpg",
@@ -3909,6 +4909,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2008,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/0d/59/53/0d5953d8-5b2b-5aca-db06-a2a624a72764/mzi.dvcrlvya.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/0d/59/53/0d5953d8-5b2b-5aca-db06-a2a624a72764/mzi.dvcrlvya.jpg/600x600bb.jpg",
@@ -3923,6 +4927,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1989,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music/ca/49/8c/mzi.hwnfcwzl.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music/ca/49/8c/mzi.hwnfcwzl.jpg/600x600bb.jpg",
@@ -3937,6 +4945,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1979,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/94/c1/5d/94c15dbd-e895-f358-82ed-2c6205de77b7/00600406788702.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/94/c1/5d/94c15dbd-e895-f358-82ed-2c6205de77b7/00600406788702.rgb.jpg/600x600bb.jpg",
@@ -3951,6 +4963,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1986,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music/4b/b0/39/mzi.bounrukx.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music/4b/b0/39/mzi.bounrukx.jpg/600x600bb.jpg",
@@ -3965,6 +4981,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1989,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music6/v4/40/5c/08/405c0814-5da1-6757-8448-5cbba58ad613/asset.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music6/v4/40/5c/08/405c0814-5da1-6757-8448-5cbba58ad613/asset.jpg/600x600bb.jpg",
@@ -3979,6 +4999,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1996,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/de/5b/e1/de5be1f0-9182-009e-4af5-fcc1d8e764d0/mzi.ywhtbmap.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/de/5b/e1/de5be1f0-9182-009e-4af5-fcc1d8e764d0/mzi.ywhtbmap.jpg/600x600bb.jpg",
@@ -3993,6 +5017,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1949,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music7/v4/16/e7/d7/16e7d733-dabc-805f-6d7a-11c5f2b96985/COCP-39207.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music7/v4/16/e7/d7/16e7d733-dabc-805f-6d7a-11c5f2b96985/COCP-39207.jpg/600x600bb.jpg",
@@ -4007,6 +5035,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d1/86/c4/d186c4b9-3660-2e70-51c9-66536eeef311/cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d1/86/c4/d186c4b9-3660-2e70-51c9-66536eeef311/cover.jpg/600x600bb.jpg",
@@ -4021,6 +5053,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c4/07/2a/c4072a49-f887-f95d-fad5-7aa51720bf4d/CRCN-8830.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c4/07/2a/c4072a49-f887-f95d-fad5-7aa51720bf4d/CRCN-8830.jpg/600x600bb.jpg",
@@ -4035,6 +5071,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1963,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music/65/b5/9e/mzi.sfxclhkg.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music/65/b5/9e/mzi.sfxclhkg.jpg/600x600bb.jpg",
@@ -4049,6 +5089,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1987,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/93/13/ce/9313cecb-9d69-365d-4aa2-f00fdd581f8b/COCP-36980.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/93/13/ce/9313cecb-9d69-365d-4aa2-f00fdd581f8b/COCP-36980.jpg/600x600bb.jpg",
@@ -4063,6 +5107,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2007,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music7/v4/16/e7/d7/16e7d733-dabc-805f-6d7a-11c5f2b96985/COCP-39207.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music7/v4/16/e7/d7/16e7d733-dabc-805f-6d7a-11c5f2b96985/COCP-39207.jpg/600x600bb.jpg",
@@ -4077,6 +5125,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1982,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/37/a5/65/37a56520-8cd6-12cf-a0d7-68dbbcbb2eea/CRCN41094.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/37/a5/65/37a56520-8cd6-12cf-a0d7-68dbbcbb2eea/CRCN41094.jpg/600x600bb.jpg",
@@ -4091,6 +5143,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1968,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/88/dd/ae/88ddae40-687c-143c-a2e3-74fa73004d39/mzi.qdpivibc.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/88/dd/ae/88ddae40-687c-143c-a2e3-74fa73004d39/mzi.qdpivibc.jpg/600x600bb.jpg",
@@ -4105,6 +5161,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/24/16/a7/2416a753-8a03-1345-866b-52bafa2ef45e/TKCA-91687.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/24/16/a7/2416a753-8a03-1345-866b-52bafa2ef45e/TKCA-91687.jpg/600x600bb.jpg",
@@ -4119,6 +5179,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2010,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/e0/e8/3f/e0e83fbd-ee03-48c9-88c6-e8087a7c9087/TKCA-74230.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/e0/e8/3f/e0e83fbd-ee03-48c9-88c6-e8087a7c9087/TKCA-74230.jpg/600x600bb.jpg",
@@ -4133,6 +5197,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1971,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/24/4f/7d/244f7d79-08ad-03da-54de-8e64346ac042/cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/24/4f/7d/244f7d79-08ad-03da-54de-8e64346ac042/cover.jpg/600x600bb.jpg",
@@ -4147,6 +5215,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2010,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music/3d/f6/2d/mzi.axlkqjim.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music/3d/f6/2d/mzi.axlkqjim.jpg/600x600bb.jpg",
@@ -4161,6 +5233,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/5b/2b/64/5b2b6466-3382-ba14-3b85-b0a38557f9e0/CRCNX-41566.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/5b/2b/64/5b2b6466-3382-ba14-3b85-b0a38557f9e0/CRCNX-41566.jpg/600x600bb.jpg",
@@ -4175,6 +5251,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1976,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/18/ea/2b/18ea2b16-d986-6a5a-11c7-12028e2cd21f/05099907032356.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/18/ea/2b/18ea2b16-d986-6a5a-11c7-12028e2cd21f/05099907032356.jpg/600x600bb.jpg",
@@ -4189,6 +5269,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/33/4d/a0/334da0bc-68bc-52b2-9859-131c02724094/TKCA-75299.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/33/4d/a0/334da0bc-68bc-52b2-9859-131c02724094/TKCA-75299.jpg/600x600bb.jpg",
@@ -4203,6 +5287,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2015,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/d4/57/51/d457517e-7d64-47bb-9a0e-144fdeb857c4/TECE-3338.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/d4/57/51/d457517e-7d64-47bb-9a0e-144fdeb857c4/TECE-3338.jpg/600x600bb.jpg",
@@ -4217,6 +5305,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1998,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/6b/f0/df/6bf0df12-fa6a-f89a-18b2-ff76513e1ed5/00602557446173.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/6b/f0/df/6bf0df12-fa6a-f89a-18b2-ff76513e1ed5/00602557446173.rgb.jpg/600x600bb.jpg",
@@ -4231,6 +5323,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1968,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/95/be/8b/95be8bc4-9a5d-4ebd-8193-9f37edf2d995/COCP-41258.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/95/be/8b/95be8bc4-9a5d-4ebd-8193-9f37edf2d995/COCP-41258.jpg/600x600bb.jpg",
@@ -4245,6 +5341,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2023,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/76/22/a0/7622a0be-74cf-34af-e7ec-78277b1e3cbe/NOPA-5585.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/76/22/a0/7622a0be-74cf-34af-e7ec-78277b1e3cbe/NOPA-5585.jpg/600x600bb.jpg",
@@ -4259,6 +5359,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/ba/65/7a/ba657a4d-3f2a-3427-3660-20bb62a285b4/cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/ba/65/7a/ba657a4d-3f2a-3427-3660-20bb62a285b4/cover.jpg/600x600bb.jpg",
@@ -4273,6 +5377,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1987,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/97/9c/a4/979ca487-9417-6d5d-9c5c-ed7439743ddf/21UM1IM50088.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/97/9c/a4/979ca487-9417-6d5d-9c5c-ed7439743ddf/21UM1IM50088.rgb.jpg/600x600bb.jpg",
@@ -4287,6 +5395,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1980,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/d8/36/a6/d836a6e0-d432-a506-c815-6b1413c5c1e4/COCP-40511.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/d8/36/a6/d836a6e0-d432-a506-c815-6b1413c5c1e4/COCP-40511.jpg/600x600bb.jpg",
@@ -4301,6 +5413,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2003,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/39/fb/d1/39fbd1c6-3880-9c50-21dd-53063c5610ed/4580789535840.png/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/39/fb/d1/39fbd1c6-3880-9c50-21dd-53063c5610ed/4580789535840.png/600x600bb.jpg",
@@ -4315,6 +5431,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2022,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/d6/e8/88/d6e88834-d7ed-1ca4-80c2-826a3658bf42/VEATP-40727.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/d6/e8/88/d6e88834-d7ed-1ca4-80c2-826a3658bf42/VEATP-40727.jpg/600x600bb.jpg",
@@ -4329,6 +5449,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1981,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music1/v4/7f/65/bd/7f65bd25-b629-5ed7-ebe2-fe787601432c/COCP-38997.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music1/v4/7f/65/bd/7f65bd25-b629-5ed7-ebe2-fe787601432c/COCP-38997.jpg/600x600bb.jpg",
@@ -4343,6 +5467,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1987,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/22/36/d2/2236d27f-8bcb-1a93-3a77-d4f33a34eecd/mzi.xsrjamtj.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/22/36/d2/2236d27f-8bcb-1a93-3a77-d4f33a34eecd/mzi.xsrjamtj.jpg/600x600bb.jpg",
@@ -4357,6 +5485,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2008,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/61/fa/f1/61faf1ac-fb6c-e8c8-b053-14ff50b704e2/00044002896971.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/61/fa/f1/61faf1ac-fb6c-e8c8-b053-14ff50b704e2/00044002896971.rgb.jpg/600x600bb.jpg",
@@ -4371,6 +5503,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2007,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/95/c7/3b/95c73bc8-967d-74ae-ca7c-604d703cc955/10945100.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/95/c7/3b/95c73bc8-967d-74ae-ca7c-604d703cc955/10945100.jpg/600x600bb.jpg",
@@ -4385,6 +5521,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1979,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/21/28/f1/2128f145-1f58-f8f4-a076-394cf27dfcc4/mzi.zefzeiyj.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/21/28/f1/2128f145-1f58-f8f4-a076-394cf27dfcc4/mzi.zefzeiyj.jpg/600x600bb.jpg",
@@ -4399,6 +5539,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/b1/f9/0b/b1f90bdf-e564-0d2d-dbd0-d8f986a0fea1/NOPA-8374.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/b1/f9/0b/b1f90bdf-e564-0d2d-dbd0-d8f986a0fea1/NOPA-8374.jpg/600x600bb.jpg",
@@ -4413,6 +5557,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1986,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/af/e3/43/afe34383-9e3e-060c-4ebd-2fd04370518c/dj.ellrgxye.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/af/e3/43/afe34383-9e3e-060c-4ebd-2fd04370518c/dj.ellrgxye.jpg/600x600bb.jpg",
@@ -4427,6 +5575,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2018,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/54/13/cd/5413cdeb-c1e9-1bbb-7a60-0df13d42b6c9/CRCN-41297.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/54/13/cd/5413cdeb-c1e9-1bbb-7a60-0df13d42b6c9/CRCN-41297.jpg/600x600bb.jpg",
@@ -4441,6 +5593,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2013,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/6f/dc/48/6fdc487c-109a-4e1a-d6a0-dc3e2fb52a45/jacket_MHXX00727B00Z_550.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/6f/dc/48/6fdc487c-109a-4e1a-d6a0-dc3e2fb52a45/jacket_MHXX00727B00Z_550.jpg/600x600bb.jpg",
@@ -4455,6 +5611,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2007,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/fd/24/f1/fd24f13c-948c-d1fe-50e0-02964ec8b810/cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/fd/24/f1/fd24f13c-948c-d1fe-50e0-02964ec8b810/cover.jpg/600x600bb.jpg",
@@ -4469,6 +5629,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1962,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/fd/19/46/fd1946bb-ce16-033a-2556-5964be26baed/VICL-65645.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/fd/19/46/fd1946bb-ce16-033a-2556-5964be26baed/VICL-65645.jpg/600x600bb.jpg",
@@ -4483,6 +5647,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1982,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/32/3a/59/323a59ee-287b-80d7-0421-b7fdf2821f04/mzi.xworkcnt.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/32/3a/59/323a59ee-287b-80d7-0421-b7fdf2821f04/mzi.xworkcnt.jpg/600x600bb.jpg",
@@ -4497,6 +5665,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5a/af/c8/5aafc8ed-173d-0d9e-d3e5-71b74ed333e2/CRCN-8819.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5a/af/c8/5aafc8ed-173d-0d9e-d3e5-71b74ed333e2/CRCN-8819.jpg/600x600bb.jpg",
@@ -4511,6 +5683,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1998,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/21/b8/17/21b817b8-eabe-44f5-10c6-1760e4d3d271/VICL-36418.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/21/b8/17/21b817b8-eabe-44f5-10c6-1760e4d3d271/VICL-36418.jpg/600x600bb.jpg",
@@ -4525,6 +5701,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1985,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/73/e6/ef/73e6efd9-d692-46db-9b4c-00e2ce85f380/00600406244598.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/73/e6/ef/73e6efd9-d692-46db-9b4c-00e2ce85f380/00600406244598.rgb.jpg/600x600bb.jpg",
@@ -4539,6 +5719,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2014,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music1/v4/1c/8a/89/1c8a89be-5a04-7bed-3669-7365b95a3136/COCP-38869.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music1/v4/1c/8a/89/1c8a89be-5a04-7bed-3669-7365b95a3136/COCP-38869.jpg/600x600bb.jpg",
@@ -4553,6 +5737,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1987,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/91/6d/4b/916d4b1e-b97c-fd0d-8ddd-0266d87c3562/COCP-40140.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/91/6d/4b/916d4b1e-b97c-fd0d-8ddd-0266d87c3562/COCP-40140.jpg/600x600bb.jpg",
@@ -4567,6 +5755,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1991,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/ea/62/0c/ea620c25-7422-7bc5-1889-eb3ccd3dd318/00602577409752.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/ea/62/0c/ea620c25-7422-7bc5-1889-eb3ccd3dd318/00602577409752.rgb.jpg/600x600bb.jpg",
@@ -4581,6 +5773,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2008,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/48/12/a4/4812a497-b009-db6f-fc5e-3f047426a8c0/FKCX-5095.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/48/12/a4/4812a497-b009-db6f-fc5e-3f047426a8c0/FKCX-5095.jpg/600x600bb.jpg",
@@ -4595,6 +5791,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1974,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ab/d3/bf/abd3bf4c-cfd3-7244-d560-c29596b1e6bc/00600406589941.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ab/d3/bf/abd3bf4c-cfd3-7244-d560-c29596b1e6bc/00600406589941.rgb.jpg/600x600bb.jpg",
@@ -4609,6 +5809,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2017,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/e8/88/46/e88846fe-b528-ed63-53d1-4d7234bcb8f9/CDSOL-1764_jkt.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/e8/88/46/e88846fe-b528-ed63-53d1-4d7234bcb8f9/CDSOL-1764_jkt.jpg/600x600bb.jpg",
@@ -4623,6 +5827,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2014,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music1/v4/6a/76/65/6a7665e8-8471-c71b-277d-9fc6128b3537/COZP-994.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music1/v4/6a/76/65/6a7665e8-8471-c71b-277d-9fc6128b3537/COZP-994.jpg/600x600bb.jpg",
@@ -4637,6 +5845,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1969,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/72/0a/97/720a978d-8f9b-e5c3-68c2-91524c55ead0/4547366630527.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/72/0a/97/720a978d-8f9b-e5c3-68c2-91524c55ead0/4547366630527.jpg/600x600bb.jpg",
@@ -4651,6 +5863,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1964,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music18/v4/63/7f/b8/637fb8ff-6d7d-54fd-22a1-5a4b46e597d0/COCP-39587.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music18/v4/63/7f/b8/637fb8ff-6d7d-54fd-22a1-5a4b46e597d0/COCP-39587.jpg/600x600bb.jpg",
@@ -4665,6 +5881,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2012,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music/8e/9c/44/mzi.giclxdes.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music/8e/9c/44/mzi.giclxdes.jpg/600x600bb.jpg",
@@ -4679,6 +5899,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2009,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/c2/5f/b1/c25fb1e9-962a-b660-b547-b8258c92bfd2/18UMGIM61114.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/c2/5f/b1/c25fb1e9-962a-b660-b547-b8258c92bfd2/18UMGIM61114.rgb.jpg/600x600bb.jpg",
@@ -4693,6 +5917,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1957,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music/4b/b0/39/mzi.bounrukx.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music/4b/b0/39/mzi.bounrukx.jpg/600x600bb.jpg",
@@ -4707,6 +5935,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2001,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music7/v4/16/e7/d7/16e7d733-dabc-805f-6d7a-11c5f2b96985/COCP-39207.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music7/v4/16/e7/d7/16e7d733-dabc-805f-6d7a-11c5f2b96985/COCP-39207.jpg/600x600bb.jpg",
@@ -4721,6 +5953,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2015,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/d4/57/51/d457517e-7d64-47bb-9a0e-144fdeb857c4/TECE-3338.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/d4/57/51/d457517e-7d64-47bb-9a0e-144fdeb857c4/TECE-3338.jpg/600x600bb.jpg",
@@ -4735,6 +5971,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1998,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/17/16/3f/17163f03-11a6-d555-3154-da83ea643fd7/00094631392559.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/17/16/3f/17163f03-11a6-d555-3154-da83ea643fd7/00094631392559.jpg/600x600bb.jpg",
@@ -4749,6 +5989,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2012,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/42/be/7c/42be7c86-e20d-06f5-5ac9-ea766f98d8f5/NJPA-28.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/42/be/7c/42be7c86-e20d-06f5-5ac9-ea766f98d8f5/NJPA-28.jpg/600x600bb.jpg",
@@ -4763,6 +6007,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": null,
       "image_url_small": null,
       "image_url_medium": null,
@@ -4777,6 +6025,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2003,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/e9/cb/d6/e9cbd694-f092-86df-e423-9ce8bcb84284/VICL-35496.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/e9/cb/d6/e9cbd694-f092-86df-e423-9ce8bcb84284/VICL-35496.jpg/600x600bb.jpg",
@@ -4791,6 +6043,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2017,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/60/3d/53/603d535a-0328-8774-9d89-7270140c4fa9/NOPA-3547.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/60/3d/53/603d535a-0328-8774-9d89-7270140c4fa9/NOPA-3547.jpg/600x600bb.jpg",
@@ -4805,6 +6061,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/45/2e/0a/452e0a00-0e4f-f0f7-7587-82349204208b/KICX-1121.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/45/2e/0a/452e0a00-0e4f-f0f7-7587-82349204208b/KICX-1121.jpg/600x600bb.jpg",
@@ -4819,6 +6079,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/06/a1/74/06a1743a-a6a4-82b3-a949-21b8b08b7316/CRCN-8808.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/06/a1/74/06a1743a-a6a4-82b3-a949-21b8b08b7316/CRCN-8808.jpg/600x600bb.jpg",
@@ -4833,6 +6097,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/4a/df/86/4adf86ee-f7d6-75cd-e21d-ace1869cb979/NOPA-3320.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/4a/df/86/4adf86ee-f7d6-75cd-e21d-ace1869cb979/NOPA-3320.jpg/600x600bb.jpg",
@@ -4847,6 +6115,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/29/1b/7d/291b7d52-72ca-b219-4a66-e87cffdf2b7f/ticket.ziafjpxr.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/29/1b/7d/291b7d52-72ca-b219-4a66-e87cffdf2b7f/ticket.ziafjpxr.jpg/600x600bb.jpg",
@@ -4861,6 +6133,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2009,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/84/09/39/84093960-10e7-2669-8dd2-6cf469abad97/cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/84/09/39/84093960-10e7-2669-8dd2-6cf469abad97/cover.jpg/600x600bb.jpg",
@@ -4875,6 +6151,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1975,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/38/6a/76/386a763f-2844-8c11-a8e9-19c50dbb862f/KICX-4565.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/38/6a/76/386a763f-2844-8c11-a8e9-19c50dbb862f/KICX-4565.jpg/600x600bb.jpg",
@@ -4889,6 +6169,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1986,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/f3/61/b0/f361b0b4-f6d4-e49e-1229-52d4ae716cb0/CRCN-41300.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/f3/61/b0/f361b0b4-f6d4-e49e-1229-52d4ae716cb0/CRCN-41300.jpg/600x600bb.jpg",
@@ -4903,6 +6187,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1952,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music/4b/b0/39/mzi.bounrukx.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music/4b/b0/39/mzi.bounrukx.jpg/600x600bb.jpg",
@@ -4917,6 +6205,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1983,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/8a/e4/d5/8ae4d507-8563-63d9-34bb-70842105012e/mzi.ffwiuall.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/8a/e4/d5/8ae4d507-8563-63d9-34bb-70842105012e/mzi.ffwiuall.jpg/600x600bb.jpg",
@@ -4931,6 +6223,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1984,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/b7/b3/59/b7b359bf-441e-54bf-dc0a-7bcfadb836f9/dj.bmpfwayp.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/b7/b3/59/b7b359bf-441e-54bf-dc0a-7bcfadb836f9/dj.bmpfwayp.jpg/600x600bb.jpg",
@@ -4945,6 +6241,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2010,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/a6/62/eb/a662ebbc-9f12-b647-fcee-57bc23ec525a/KICX-855.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/a6/62/eb/a662ebbc-9f12-b647-fcee-57bc23ec525a/KICX-855.jpg/600x600bb.jpg",
@@ -4959,6 +6259,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1990,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music/32/d5/09/mzi.oxndyfea.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music/32/d5/09/mzi.oxndyfea.jpg/600x600bb.jpg",
@@ -4973,6 +6277,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2022,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/60/e3/3f/60e33fa7-b1f2-9805-a02d-c812ff698600/TKCA-75076.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/60/e3/3f/60e33fa7-b1f2-9805-a02d-c812ff698600/TKCA-75076.jpg/600x600bb.jpg",
@@ -4987,6 +6295,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/09/14/95/091495a1-8577-f961-9206-411b0dee343d/NOPA-8346.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/09/14/95/091495a1-8577-f961-9206-411b0dee343d/NOPA-8346.jpg/600x600bb.jpg",
@@ -5001,6 +6313,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2004,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/4e/12/4d/4e124d8e-90cb-4d2a-0619-7430ce570fbb/VICL-64536.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/4e/12/4d/4e124d8e-90cb-4d2a-0619-7430ce570fbb/VICL-64536.jpg/600x600bb.jpg",
@@ -5015,6 +6331,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1987,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/e3/7d/de/e37ddedc-4094-7ba7-f4cc-cc82b4b47d61/00094631402852.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/e3/7d/de/e37ddedc-4094-7ba7-f4cc-cc82b4b47d61/00094631402852.jpg/600x600bb.jpg",
@@ -5029,6 +6349,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1994,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a6/57/2d/a6572def-680b-36c7-025e-1b26b542359b/cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a6/57/2d/a6572def-680b-36c7-025e-1b26b542359b/cover.jpg/600x600bb.jpg",
@@ -5043,6 +6367,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2009,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/c1/a2/ff/c1a2ff38-e395-ee39-71e4-36864b62971c/16UMGIM62771.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/c1/a2/ff/c1a2ff38-e395-ee39-71e4-36864b62971c/16UMGIM62771.rgb.jpg/600x600bb.jpg",
@@ -5057,6 +6385,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2013,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/9a/39/fd/9a39fdf2-1af3-01d9-e767-2ccea9afb306/11865000.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/9a/39/fd/9a39fdf2-1af3-01d9-e767-2ccea9afb306/11865000.jpg/600x600bb.jpg",
@@ -5071,6 +6403,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2002,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music/19/8f/2f/mzi.eouedycb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music/19/8f/2f/mzi.eouedycb.jpg/600x600bb.jpg",
@@ -5085,6 +6421,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2007,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music/ff/e3/db/mzi.nppsfdwi.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music/ff/e3/db/mzi.nppsfdwi.jpg/600x600bb.jpg",
@@ -5099,6 +6439,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/bb/8b/ef/bb8befe5-5d52-4c06-fc2f-592091961a9f/cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/bb/8b/ef/bb8befe5-5d52-4c06-fc2f-592091961a9f/cover.jpg/600x600bb.jpg",
@@ -5113,6 +6457,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2017,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/79/4d/94/794d942c-9ab7-8cd0-3eea-3737ceaec46e/cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/79/4d/94/794d942c-9ab7-8cd0-3eea-3737ceaec46e/cover.jpg/600x600bb.jpg",
@@ -5127,6 +6475,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2016,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/77/f0/72/77f072c9-9584-d755-5f12-53a60ee35bf7/cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/77/f0/72/77f072c9-9584-d755-5f12-53a60ee35bf7/cover.jpg/600x600bb.jpg",
@@ -5141,6 +6493,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2017,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/0a/da/f4/0adaf48f-88a4-f826-309b-4350ce131578/00602557650433.rgb.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/0a/da/f4/0adaf48f-88a4-f826-309b-4350ce131578/00602557650433.rgb.jpg/600x600bb.jpg",
@@ -5155,6 +6511,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2020,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/69/d4/cc/69d4cc7e-41f7-b947-1dc4-99af190c19c6/KICX-1122.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/69/d4/cc/69d4cc7e-41f7-b947-1dc4-99af190c19c6/KICX-1122.jpg/600x600bb.jpg",
@@ -5169,6 +6529,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/6d/7f/9f/6d7f9f00-fdcb-987f-9ced-07472dd9f98e/NOPA-7830.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/6d/7f/9f/6d7f9f00-fdcb-987f-9ced-07472dd9f98e/NOPA-7830.jpg/600x600bb.jpg",
@@ -5183,6 +6547,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2012,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/9c/5e/8f/9c5e8f98-6fbd-a471-f63a-3e06031fd598/KICX-1024_1400_72.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/9c/5e/8f/9c5e8f98-6fbd-a471-f63a-3e06031fd598/KICX-1024_1400_72.jpg/600x600bb.jpg",
@@ -5197,6 +6565,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1982,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/2a/e1/ea/2ae1eaff-6ac2-56ae-a5f4-7b9c5cf4367c/4560427468273.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/2a/e1/ea/2ae1eaff-6ac2-56ae-a5f4-7b9c5cf4367c/4560427468273.jpg/600x600bb.jpg",
@@ -5211,6 +6583,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1992,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Features/57/e7/12/dj.xrgcmikh.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Features/57/e7/12/dj.xrgcmikh.jpg/600x600bb.jpg",
@@ -5225,6 +6601,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2014,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music3/v4/c5/25/4b/c5254bf4-661f-3629-45ab-47058b57c3cf/COCP-38828.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music3/v4/c5/25/4b/c5254bf4-661f-3629-45ab-47058b57c3cf/COCP-38828.jpg/600x600bb.jpg",
@@ -5239,6 +6619,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2025,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f5/5d/e0/f55de0d7-0f3d-12ff-ebe9-baa976a9b7a2/CRCN-8802.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f5/5d/e0/f55de0d7-0f3d-12ff-ebe9-baa976a9b7a2/CRCN-8802.jpg/600x600bb.jpg",
@@ -5253,6 +6637,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2002,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/20/7f/47/207f4790-1167-3c60-c488-5b63d7f6605a/COCA-15708.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/20/7f/47/207f4790-1167-3c60-c488-5b63d7f6605a/COCA-15708.jpg/600x600bb.jpg",
@@ -5267,6 +6655,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1975,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/fe/08/b4/fe08b479-22ad-821e-cd10-adb5556dc893/COCP-40120.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/fe/08/b4/fe08b479-22ad-821e-cd10-adb5556dc893/COCP-40120.jpg/600x600bb.jpg",
@@ -5281,6 +6673,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 2026,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/af/d5/0d/afd50d1c-73ab-eb29-5faf-722d71da88e2/cover.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/af/d5/0d/afd50d1c-73ab-eb29-5faf-722d71da88e2/cover.jpg/600x600bb.jpg",
@@ -5295,6 +6691,10 @@
       "source_pages": [
         "enka_monthly"
       ],
+      "range_low_midi": null,
+      "range_high_midi": null,
+      "falsetto_max_midi": null,
+      "karaoto_source_url": null,
       "release_year": 1964,
       "image_url_small": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/74/48/26/7448261e-4673-698f-873a-83f319b31c67/COKM_31327.jpg/100x100bb.jpg",
       "image_url_medium": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/74/48/26/7448261e-4673-698f-873a-83f319b31c67/COKM_31327.jpg/600x600bb.jpg",
@@ -5304,7 +6704,7 @@
     }
   ],
   "metadata": {
-    "scraped_at": "2026-04-27T12:29:53.936565+00:00",
+    "scraped_at": "2026-04-27T12:56:03.797098+00:00",
     "total_count": 350,
     "sources": [
       "clubdam.com",
