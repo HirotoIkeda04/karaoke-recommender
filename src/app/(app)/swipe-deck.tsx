@@ -125,7 +125,7 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
   }
 
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-5 px-4 py-6">
+    <div className="mx-auto flex max-w-md flex-col items-center gap-5 overflow-hidden px-4 py-6">
       {/* 次の 2 枚のジャケット画像を裏で先読み */}
       {queue.slice(1, 3).map((song) =>
         song.image_url_medium ? (
@@ -144,7 +144,16 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
         </div>
       ) : null}
 
-      <div className="relative h-[30rem] w-full max-w-[22rem]">
+      {/* カードサイズ: 通常 22rem 幅 × 30rem 高、画面が狭ければ比率を保ちつつ縮小 */}
+      {/* width = min(22rem, 利用可能高さ × 22/30) で、aspect-ratio により height は自動算出 */}
+      <div
+        className="relative"
+        style={{
+          aspectRatio: "22 / 30",
+          width:
+            "min(22rem, calc((100svh - 23rem - env(safe-area-inset-bottom)) * 22 / 30))",
+        }}
+      >
         {/* 後ろのカード (next 1, next 2): 中身も描画して、スワイプ中に
             真っ白な空のカードが見えてしまう問題を解消 */}
         {upcoming.map((song, idx) => (
