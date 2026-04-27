@@ -1,9 +1,8 @@
 "use client";
 
 import { Check, Dumbbell, Minus, X } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 
-import { Button } from "@/components/ui/button";
 import type { Database } from "@/types/database";
 
 import { rateSong, unrateSong } from "../../actions";
@@ -22,11 +21,18 @@ const RATINGS: ReadonlyArray<{
   { value: "practicing", label: "練習中", Icon: Dumbbell, color: "bg-purple-500 text-white" },
 ];
 
+const RATING_LABELS: Record<Rating, string> = RATINGS.reduce(
+  (acc, r) => ({ ...acc, [r.value]: r.label }),
+  {} as Record<Rating, string>,
+);
+
 interface RatingControlsProps {
   songId: string;
   initialRating: Rating | null;
   initialMemo: string;
 }
+
+type Toast = { id: number; message: string };
 
 export function RatingControls({
   songId,
@@ -37,9 +43,15 @@ export function RatingControls({
   const [memo, setMemo] = useState(initialMemo);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [toast, setToast] = useState<Toast | null>(null);
 
-  const persist = (nextRating: Rating | null, nextMemo: string) => {
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 2200);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  const persist = (nextRating: Rating | null, nextMemo: string, message: string) => {
     setError(null);
     startTransition(async () => {
       const res = nextRating
@@ -48,27 +60,28 @@ export function RatingControls({
       if (!res.ok) {
         setError(res.error ?? "保存に失敗しました");
       } else {
-        setSavedAt(Date.now());
+        setToast({ id: Date.now(), message });
       }
     });
   };
 
   const handleRate = (next: Rating) => {
-    setRating(next);
-    persist(next, memo);
-  };
-
-  const handleUnrate = () => {
-    setRating(null);
-    persist(null, "");
+    if (rating === next) {
+      setRating(null);
+      setMemo("");
+      persist(null, "", "評価を取り消しました");
+    } else {
+      setRating(next);
+      persist(next, memo, `評価を「${RATING_LABELS[next]}」に変更しました`);
+    }
   };
 
   const handleMemoBlur = () => {
-    if (rating) persist(rating, memo);
+    if (rating) persist(rating, memo, "メモを保存しました");
   };
 
   return (
-    <div className="space-y-3">
+    <div className="relative space-y-3">
       <div className="grid grid-cols-2 gap-2">
         {RATINGS.map((r) => {
           const active = rating === r.value;
@@ -78,6 +91,7 @@ export function RatingControls({
               type="button"
               disabled={isPending}
               onClick={() => handleRate(r.value)}
+              aria-pressed={active}
               className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition disabled:opacity-50 ${
                 active
                   ? r.color
@@ -101,25 +115,21 @@ export function RatingControls({
         className="w-full resize-none rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm placeholder:text-zinc-400 focus:border-pink-500 focus:outline-none disabled:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:disabled:bg-zinc-950"
       />
 
-      {rating ? (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleUnrate}
-          disabled={isPending}
-          className="text-zinc-500 hover:text-zinc-700"
-        >
-          評価を取り消す
-        </Button>
-      ) : null}
-
       {error ? (
         <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
-      ) : savedAt ? (
-        <p className="text-xs text-emerald-600 dark:text-emerald-400">
-          保存しました
-        </p>
+      ) : null}
+
+      {toast ? (
+        <div
+          key={toast.id}
+          role="status"
+          aria-live="polite"
+          className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center px-4"
+        >
+          <div className="animate-in fade-in slide-in-from-bottom-2 rounded-full bg-zinc-900/90 px-4 py-2 text-xs font-medium text-white shadow-lg backdrop-blur dark:bg-zinc-100/90 dark:text-zinc-900">
+            {toast.message}
+          </div>
+        </div>
       ) : null}
     </div>
   );
