@@ -284,7 +284,7 @@ function SwipeCard({
 function SongCardContent({ song }: { song: Song }) {
   return (
     <div className="flex h-full flex-col items-center justify-between gap-3">
-      <div className="aspect-square w-full max-w-[16rem] overflow-hidden rounded-xl bg-zinc-200 dark:bg-zinc-800">
+      <div className="aspect-square w-full max-w-[14rem] overflow-hidden rounded-xl bg-zinc-200 dark:bg-zinc-800">
         {song.image_url_medium ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -309,6 +309,22 @@ function SongCardContent({ song }: { song: Song }) {
           {song.release_year ? ` · ${song.release_year}` : ""}
         </p>
       </div>
+
+      {song.spotify_track_id ? (
+        <a
+          href={`https://open.spotify.com/track/${song.spotify_track_id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          // ドラッグ開始イベントを止めて、ボタン押下時にスワイプが発火しないようにする
+          onPointerDown={(e) => e.stopPropagation()}
+          draggable={false}
+          className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500 px-4 py-1.5 text-xs font-medium text-emerald-600 transition hover:bg-emerald-50 active:bg-emerald-100 dark:border-emerald-500 dark:text-emerald-400 dark:hover:bg-emerald-950 dark:active:bg-emerald-900"
+          aria-label={`${song.title} を Spotify で聴く(新しいタブで開きます)`}
+        >
+          <span aria-hidden>▶</span>
+          Spotify で試聴
+        </a>
+      ) : null}
 
       <dl className="grid w-full grid-cols-2 gap-x-4 gap-y-1 rounded-lg bg-zinc-100 px-3 py-2 text-xs dark:bg-zinc-800">
         <dt className="text-zinc-600 dark:text-zinc-400">地声</dt>
