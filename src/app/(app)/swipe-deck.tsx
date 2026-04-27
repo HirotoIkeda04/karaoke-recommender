@@ -194,13 +194,14 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
         ))}
       </div>
 
-      {/* 知らない/スキップ (横長 pill) + 戻る (丸) */}
-      <div className="flex w-full items-center gap-2">
+      {/* 知らない/スキップ (col-span-3, 苦手〜得意の列幅) + 戻る (col-span-1, 練習中の列) */}
+      {/* 上の評価ボタン行と同じ grid-cols-4/gap-2 で列を揃える */}
+      <div className="grid w-full grid-cols-4 gap-2">
         <button
           type="button"
           onClick={handleSkip}
           disabled={!current}
-          className="flex-1 rounded-full bg-zinc-100 px-4 py-3 text-sm font-medium text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-300 disabled:opacity-30 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+          className="col-span-3 h-14 rounded-full bg-zinc-100 px-4 text-sm font-medium text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-300 disabled:opacity-30 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
         >
           知らない / スキップ
         </button>
@@ -208,7 +209,7 @@ export function SwipeDeck({ initialSongs }: SwipeDeckProps) {
           type="button"
           onClick={handleUndo}
           disabled={!lastAction}
-          className="flex size-12 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-300 disabled:opacity-30 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+          className="mx-auto flex size-14 items-center justify-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-300 disabled:opacity-30 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
           aria-label="直前の評価を取り消して戻る"
         >
           <RotateCcw className="size-5" />
