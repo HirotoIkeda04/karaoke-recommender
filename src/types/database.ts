@@ -106,6 +106,71 @@ export type Database = {
         }
         Relationships: []
       }
+      // 以下 2 テーブルは migration 004 で追加。
+      // `pnpm db:types` 再実行で自動更新される(手動編集はこの comment ごと消えてよい)。
+      user_spotify_connections: {
+        Row: {
+          user_id: string
+          spotify_user_id: string
+          spotify_display_name: string | null
+          access_token: string
+          refresh_token: string
+          scopes: string[]
+          expires_at: string
+          connected_at: string
+          last_synced_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          spotify_user_id: string
+          spotify_display_name?: string | null
+          access_token: string
+          refresh_token: string
+          scopes: string[]
+          expires_at: string
+          connected_at?: string
+          last_synced_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          spotify_user_id?: string
+          spotify_display_name?: string | null
+          access_token?: string
+          refresh_token?: string
+          scopes?: string[]
+          expires_at?: string
+          connected_at?: string
+          last_synced_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_known_songs: {
+        Row: {
+          user_id: string
+          song_id: string
+          source: "top_short_term" | "top_medium_term" | "top_long_term" | "recently_played" | "saved"
+          rank: number | null
+          last_seen: string
+        }
+        Insert: {
+          user_id: string
+          song_id: string
+          source: "top_short_term" | "top_medium_term" | "top_long_term" | "recently_played" | "saved"
+          rank?: number | null
+          last_seen?: string
+        }
+        Update: {
+          user_id?: string
+          song_id?: string
+          source?: "top_short_term" | "top_medium_term" | "top_long_term" | "recently_played" | "saved"
+          rank?: number | null
+          last_seen?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       user_voice_estimate: {
@@ -123,6 +188,7 @@ export type Database = {
       }
     }
     Functions: {
+
       get_unrated_songs: {
         Args: { p_limit?: number; p_popular_only?: boolean }
         Returns: {
