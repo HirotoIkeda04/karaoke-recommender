@@ -21,7 +21,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from config import SCRAPER_ROOT, require
-from fetch_itunes import ItunesClient, ItunesRateLimited, ItunesTrack, upgrade_artwork
+from fetch_itunes import (
+    ItunesClient,
+    ItunesRateLimited,
+    ItunesTrack,
+    is_cached_track_karaoke,
+    upgrade_artwork,
+)
 from fetch_vocal_range import (
     VocalRangeClient,
     VocalRangeMatch,
@@ -39,8 +45,14 @@ logger = logging.getLogger("scraper.dam")
 
 
 def _load_itunes_cache(path: Path) -> dict[str, dict]:
-    """request_no -> iTunes 結果(またはマッチ無しのマーカ)。"""
+    """request_no -> iTunes 結果(またはマッチ無しのマーカ)。
+
+    既存エントリのうち artistName/trackName がカラオケ/オルゴール/インスト系
+    キーワードを含むものは「汚染」と見なし読み込まない (= 次回 fetch で
+    refresh される)。matcher のフィルタロジック追加に追随するため。
+    """
     cache: dict[str, dict] = {}
+    invalidated = 0
     if not path.exists():
         return cache
     with path.open(encoding="utf-8") as f:
@@ -49,7 +61,16 @@ def _load_itunes_cache(path: Path) -> dict[str, dict]:
             if not line:
                 continue
             entry = json.loads(line)
+            track = entry.get("track")
+            if track is not None and is_cached_track_karaoke(track):
+                invalidated += 1
+                continue  # skip → forces refetch
             cache[entry["request_no"]] = entry
+    if invalidated:
+        logger.info(
+            "itunes cache: invalidated %d entries detected as karaoke/cover",
+            invalidated,
+        )
     return cache
 
 
