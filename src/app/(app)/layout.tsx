@@ -24,9 +24,14 @@ export default async function AppLayout({
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
+    // min-h-dvh: 動的ビューポート高 (iOS Safari の URL バー伸縮に追従、
+    //   100vh のような固定値ではなく現在の表示領域を毎フレーム反映する)
+    <div className="flex min-h-dvh flex-col">
       <AppHeader user={user} />
-      <main className="flex-1 pb-20">{children}</main>
+      {/* main の bottom padding: BottomNav の高さ (~5rem) + ホームインジケータ safe-area */}
+      <main className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))]">
+        {children}
+      </main>
       <AppBottomNav />
     </div>
   );

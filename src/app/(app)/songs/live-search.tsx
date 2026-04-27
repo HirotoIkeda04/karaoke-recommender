@@ -94,7 +94,7 @@ export function LiveSearch({ songs, ratings }: LiveSearchProps) {
         type="search"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="曲名 / アーティストを検索する"
+        placeholder="楽曲 / アーティストを検索する"
         autoComplete="off"
         autoCapitalize="off"
         autoCorrect="off"

@@ -17,7 +17,13 @@ export function AppBottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-10 border-t border-zinc-200 bg-white/95 px-2 py-1 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/95">
+    <nav
+      className="fixed inset-x-0 bottom-0 z-10 border-t border-zinc-200 bg-white/95 px-2 pt-1 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/95"
+      // ホームインジケータ領域を避けつつ、最低限の bottom padding を確保
+      style={{
+        paddingBottom: "max(0.25rem, env(safe-area-inset-bottom))",
+      }}
+    >
       <ul className="mx-auto flex max-w-md justify-around">
         {ITEMS.map((item) => {
           const Icon = item.icon;
