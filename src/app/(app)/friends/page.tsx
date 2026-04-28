@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 
+import { CreateRoomButton } from "./create-room-button";
 import { FriendList, type FriendItem } from "./friend-list";
 import { InviteLinkSection } from "./invite-link-section";
 
@@ -68,6 +69,8 @@ export default async function FriendsPage() {
   return (
     <div className="mx-auto max-w-md space-y-5 px-4 py-4">
       <h1 className="text-lg font-semibold">フレンド</h1>
+
+      <CreateRoomButton />
 
       <InviteLinkSection />
 
