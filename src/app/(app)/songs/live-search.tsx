@@ -25,6 +25,8 @@ interface LiveSearchProps {
   ratings: Record<string, string>;
   /** Spotify で聴いたことがある song_id 一覧 */
   knownSongIds?: string[];
+  /** DB 上の総楽曲数 (songs は PostgREST の 1000 行制限で頭打ちになりうるため別途渡す) */
+  totalCount: number;
 }
 
 const HIGH_OPTIONS = [
@@ -48,6 +50,7 @@ export function LiveSearch({
   songs,
   ratings,
   knownSongIds = [],
+  totalCount,
 }: LiveSearchProps) {
   const [query, setQuery] = useState("");
   const [highMax, setHighMax] = useState("");
@@ -143,7 +146,8 @@ export function LiveSearch({
 
       <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-500">
         <span className={isStale ? "opacity-60" : undefined}>
-          {filtered.length} 件
+          {filtered.length.toLocaleString()} 件 / 全{" "}
+          {totalCount.toLocaleString()} 曲
         </span>
         {isFiltering ? (
           <button

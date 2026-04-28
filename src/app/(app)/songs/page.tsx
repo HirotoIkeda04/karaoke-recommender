@@ -25,7 +25,8 @@ export default async function SongsPage() {
   // 全曲を一括取得 (artist 順 → title 順)
   // ローカルでフィルタするので server-side LIMIT は無し
   // 並行して、Spotify 連携済なら聴いたことある曲 ID も取得
-  const [songsRes, knownIds] = await Promise.all([
+  // また総件数も取得 (PostgREST のデフォルト 1000 行制限により songs.length では総数が分からないため)
+  const [songsRes, totalRes, knownIds] = await Promise.all([
     supabase
       .from("songs")
       .select(
@@ -33,6 +34,7 @@ export default async function SongsPage() {
       )
       .order("artist", { ascending: true })
       .order("title", { ascending: true }),
+    supabase.from("songs").select("id", { count: "exact", head: true }),
     getUserKnownSongIds(),
   ]);
 
@@ -65,6 +67,7 @@ export default async function SongsPage() {
           songs={songs}
           ratings={ratings}
           knownSongIds={Array.from(knownIds)}
+          totalCount={totalRes.count ?? songs.length}
         />
       )}
     </div>
