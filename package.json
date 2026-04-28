@@ -11,9 +11,11 @@
     "seed:songs": "node --env-file=.env.local --import tsx scripts/seed-songs.ts",
     "seed:dam": "node --env-file=.env.local --import tsx scripts/seed-dam-songs.ts",
     "refresh:karaoto-images": "node --env-file=.env.local --import tsx scripts/refresh-karaoto-images.ts",
-    "apply:range": "node --env-file=.env.local --import tsx scripts/apply-range-data.ts"
+    "apply:range": "node --env-file=.env.local --import tsx scripts/apply-range-data.ts",
+    "bulk:label-artists": "node --env-file=.env.local --import tsx scripts/bulk-label-artists.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.91.1",
     "@base-ui/react": "^1.4.1",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.104.1",
