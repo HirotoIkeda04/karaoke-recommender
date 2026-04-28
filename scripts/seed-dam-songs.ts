@@ -133,11 +133,18 @@ interface MergeStats {
 }
 
 async function main() {
+  // --keep-orphans: 「現 JSON に居ない既存 DB 行」を消さない
+  // (incremental seed:dam で前年データを誤消去しないため)
+  const keepOrphans = process.argv.includes("--keep-orphans");
+
   const seedPath = resolve(process.cwd(), "scraper/output/dam_songs.json");
   const seed: SeedFile = JSON.parse(readFileSync(seedPath, "utf-8"));
   console.log(
     `loaded ${seed.songs.length} DAM songs (scraped_at=${seed.metadata.scraped_at})`,
   );
+  if (keepOrphans) {
+    console.log("--keep-orphans: orphan cleanup を skip します");
+  }
 
   const itunesHits = seed.songs.filter((s) => s.image_url_large).length;
   const karaotoHits = seed.songs.filter((s) => s.range_high_midi !== null).length;
@@ -241,6 +248,13 @@ async function main() {
   //   - karaoto 由来データ (spotify_track_id か range_high_midi) を持つ行: dam_request_no
   //     と source_urls から DAM 関連のみ削除し、行自体は残す
   //   - 純 DAM 行 (上記が無い): 行ごと DELETE
+  //
+  // --keep-orphans 指定時は skip (incremental seed:dam で前年データを誤消去しないため)
+  let orphanDeleted = 0;
+  let orphanCleared = 0;
+  if (keepOrphans) {
+    console.log("\n[orphan cleanup skipped (--keep-orphans)]");
+  } else {
   const currentDamIds = new Set(seed.songs.map((s) => s.dam_request_no));
   const { data: allDamRows, error: orphErr } = await supabase
     .from("songs")
@@ -253,8 +267,6 @@ async function main() {
     process.exit(1);
   }
 
-  let orphanDeleted = 0;
-  let orphanCleared = 0;
   for (const row of allDamRows ?? []) {
     if (!row.dam_request_no || currentDamIds.has(row.dam_request_no)) continue;
 
@@ -294,6 +306,7 @@ async function main() {
       orphanDeleted++;
     }
   }
+  }  // end of "if (!keepOrphans)"
 
   const { count: total, error: countErr } = await supabase
     .from("songs")

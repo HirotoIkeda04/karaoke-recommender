@@ -16,6 +16,7 @@ import argparse
 import dataclasses
 import json
 import logging
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -256,6 +257,44 @@ def _build_payload(
     return base
 
 
+_RE_GEN_YEAR = re.compile(r"^gen_(\d{4})_")
+
+
+def _latest_year(song: DamSong) -> int:
+    """source_pages から最新の generation 年を返す。
+
+    rankings のみの曲 (gen_YYYY_NNN を含まない) は 9999 を返し、
+    年降順ソートで先頭に来るようにする(= 最も新しい扱い)。
+    """
+    years: list[int] = []
+    for p in song.source_pages:
+        m = _RE_GEN_YEAR.match(p)
+        if m:
+            years.append(int(m.group(1)))
+    return max(years) if years else 9999
+
+
+def _write_dam_songs_json(
+    payloads: list[dict],
+    out_path: Path,
+    scraped_at: datetime,
+    fetch_itunes: bool,
+) -> None:
+    payload = {
+        "songs": payloads,
+        "metadata": {
+            "scraped_at": scraped_at.isoformat(),
+            "total_count": len(payloads),
+            "sources": (
+                ["clubdam.com", "itunes.apple.com"] if fetch_itunes else ["clubdam.com"]
+            ),
+        },
+    }
+    out_path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+
 def _merge_song_lists(*lists: list[DamSong]) -> list[DamSong]:
     """複数の DamSong list を (title, artist, request_no) でユニーク化、source_pages を統合。"""
     by_key: dict[tuple[str, str, str], DamSong] = {}
@@ -277,6 +316,7 @@ def _merge_song_lists(*lists: list[DamSong]) -> list[DamSong]:
 def run(
     *,
     fetch_itunes: bool = True,
+    fetch_vocal_range: bool = True,
     generation_genres: list[str] | None = None,
     generation_years: list[int] | None = None,
 ) -> int:
@@ -329,103 +369,113 @@ def run(
 
     # Step 1.6: karaoto に無い曲は vocal-range.com (J-POP 音域の沼) を試す
     # ここはネット呼び出しが発生するためキャッシュ前提。--no-vocal-range で skip 可。
-    vocal_range_cache_path = output_dir / "dam_vocal_range_cache.jsonl"
-    vocal_range_lookups: dict[str, VocalRangeMatch | None] = _enrich_vocal_range(
-        songs, karaoto_index, contact, vocal_range_cache_path,
-    )
+    vocal_range_lookups: dict[str, VocalRangeMatch | None]
+    if fetch_vocal_range:
+        vocal_range_cache_path = output_dir / "dam_vocal_range_cache.jsonl"
+        vocal_range_lookups = _enrich_vocal_range(
+            songs, karaoto_index, contact, vocal_range_cache_path,
+        )
+    else:
+        logger.info("--no-vocal-range specified, skipping vocal-range.com fallback")
+        vocal_range_lookups = {}
 
     # Step 2: iTunes でジャケ + 年情報を補完
+    # 年降順 (新しい順) でソートし、年が変わるたびに dam_songs.json を
+    # チェックポイント書き出しすることで、長時間 run の途中で
+    # `pnpm seed:dam --keep-orphans` で部分的に DB 反映できる。
+    out_path = output_dir / "dam_songs.json"
+    scraped_at = datetime.now(timezone.utc)
+
+    songs_sorted = sorted(songs, key=lambda s: -_latest_year(s))
+
     payloads: list[dict] = []
     if not fetch_itunes:
         logger.info("--no-itunes specified, skipping artwork enrichment")
-        payloads = [
-            _build_payload(
+        for s in songs_sorted:
+            payloads.append(_build_payload(
                 s, None,
                 karaoto_lookup(s.title, s.artist, karaoto_index),
                 vocal_range_lookups.get(s.request_no),
-            )
-            for s in songs
-        ]
-    else:
-        cache_path = output_dir / "dam_itunes_cache.jsonl"
-        cache = _load_itunes_cache(cache_path)
-        logger.info("itunes cache: %d entries", len(cache))
-
-        client = ItunesClient()
-        hits = 0
-        misses = 0
-        cached_used = 0
-        rate_limited = False
-        for i, song in enumerate(songs, start=1):
-            track: ItunesTrack | None = None
-            karaoto_entry = karaoto_lookup(song.title, song.artist, karaoto_index)
-            # 元曲発売年: karaoto の release_date があれば優先 (例 "2023/04/25")
-            expected_year: int | None = None
-            if karaoto_entry and karaoto_entry.source_url:
-                # karaoto は range のみ持ち release_date は別フィールド。今は未取得。
-                # 将来 karaoto から release_date を渡せるようになれば expected_year に。
-                pass
-            if song.request_no in cache:
-                # 新 schema: raw_results からローカル再評価
-                cached = cache[song.request_no]
-                raw_results = cached.get("raw_results", [])
-                track = pick_best_from_raw(
-                    raw_results, song.title, song.artist, expected_year,
-                )
-                cached_used += 1
-            elif rate_limited:
-                # 429 検知後はそれ以降の API call を行わない(キャッシュ無しは未取得扱い)
-                pass
-            else:
-                try:
-                    raw_results, track = client.search_and_pick(
-                        song.title, song.artist, expected_year,
-                    )
-                except ItunesRateLimited:
-                    raw_results = []
-                    track = None
-                    logger.error(
-                        "iTunes rate limited at %d/%d; remaining will be saved without artwork",
-                        i, len(songs),
-                    )
-                    rate_limited = True
-                _append_itunes_cache(cache_path, song.request_no, raw_results, track)
-
-            if track is not None:
-                hits += 1
-            else:
-                misses += 1
-
-            if i % 25 == 0:
-                logger.info(
-                    "progress: %d/%d (hits=%d, misses=%d, cache_used=%d)",
-                    i, len(songs), hits, misses, cached_used,
-                )
-
-            payloads.append(_build_payload(
-                song, track, karaoto_entry,
-                vocal_range_lookups.get(song.request_no),
             ))
+        _write_dam_songs_json(payloads, out_path, scraped_at, fetch_itunes=False)
+        logger.info("wrote %d songs to %s", len(payloads), out_path)
+        return 0
 
-        logger.info(
-            "iTunes done: hits=%d, misses=%d, cached_used=%d, rate_limited=%s",
-            hits, misses, cached_used, rate_limited,
-        )
+    cache_path = output_dir / "dam_itunes_cache.jsonl"
+    cache = _load_itunes_cache(cache_path)
+    logger.info("itunes cache: %d entries", len(cache))
 
-    # Step 3: JSON 出力
-    out_path = output_dir / "dam_songs.json"
-    payload = {
-        "songs": payloads,
-        "metadata": {
-            "scraped_at": datetime.now(timezone.utc).isoformat(),
-            "total_count": len(payloads),
-            "sources": ["clubdam.com", "itunes.apple.com"] if fetch_itunes else ["clubdam.com"],
-        },
-    }
-    out_path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+    client = ItunesClient()
+    hits = 0
+    misses = 0
+    cached_used = 0
+    rate_limited = False
+    prev_year: int | None = None
+    for i, song in enumerate(songs_sorted, start=1):
+        cur_year = _latest_year(song)
+        if prev_year is not None and cur_year != prev_year:
+            # 年境界 → チェックポイント書き出し
+            _write_dam_songs_json(payloads, out_path, scraped_at, fetch_itunes=True)
+            year_label = "rankings" if prev_year == 9999 else str(prev_year)
+            logger.info(
+                "CHECKPOINT: year %s done. dam_songs.json: %d songs (incremental seed:dam --keep-orphans が安全)",
+                year_label, len(payloads),
+            )
+
+        track: ItunesTrack | None = None
+        karaoto_entry = karaoto_lookup(song.title, song.artist, karaoto_index)
+        expected_year: int | None = None
+        if karaoto_entry and karaoto_entry.source_url:
+            pass
+
+        if song.request_no in cache:
+            cached = cache[song.request_no]
+            raw_results = cached.get("raw_results", [])
+            track = pick_best_from_raw(
+                raw_results, song.title, song.artist, expected_year,
+            )
+            cached_used += 1
+        elif rate_limited:
+            pass
+        else:
+            try:
+                raw_results, track = client.search_and_pick(
+                    song.title, song.artist, expected_year,
+                )
+            except ItunesRateLimited:
+                raw_results = []
+                track = None
+                logger.error(
+                    "iTunes rate limited at %d/%d; remaining will be saved without artwork",
+                    i, len(songs_sorted),
+                )
+                rate_limited = True
+            _append_itunes_cache(cache_path, song.request_no, raw_results, track)
+
+        if track is not None:
+            hits += 1
+        else:
+            misses += 1
+
+        if i % 25 == 0:
+            logger.info(
+                "progress: %d/%d (hits=%d, misses=%d, cache_used=%d)",
+                i, len(songs_sorted), hits, misses, cached_used,
+            )
+
+        payloads.append(_build_payload(
+            song, track, karaoto_entry,
+            vocal_range_lookups.get(song.request_no),
+        ))
+        prev_year = cur_year
+
+    # 最後の年もチェックポイントとして書き出す (= 最終 JSON)
+    _write_dam_songs_json(payloads, out_path, scraped_at, fetch_itunes=True)
+    logger.info(
+        "iTunes done: hits=%d, misses=%d, cached_used=%d, rate_limited=%s",
+        hits, misses, cached_used, rate_limited,
     )
-    logger.info("wrote %d songs to %s", len(payloads), out_path)
+    logger.info("wrote %d songs to %s (final)", len(payloads), out_path)
     return 0
 
 
@@ -434,6 +484,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--no-itunes", action="store_true",
         help="iTunes での画像/年補完をスキップ(高速確認用)",
+    )
+    parser.add_argument(
+        "--no-vocal-range", action="store_true",
+        help="vocal-range.com での音域フォールバックをスキップ(古い曲ばかりの run で時間節約)",
     )
     parser.add_argument(
         "--generation-genres",
@@ -480,6 +534,7 @@ def main(argv: list[str] | None = None) -> int:
 
     return run(
         fetch_itunes=not args.no_itunes,
+        fetch_vocal_range=not args.no_vocal_range,
         generation_genres=genres,
         generation_years=years,
     )
