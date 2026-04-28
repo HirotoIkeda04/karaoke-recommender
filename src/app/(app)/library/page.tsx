@@ -1,6 +1,7 @@
 import { Check, Dumbbell, Minus, X } from "lucide-react";
 import Link from "next/link";
 
+import { GENRE_CODES, type GenreCode } from "@/lib/genres";
 import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
@@ -47,7 +48,9 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   }
   const userId = user.id;
 
-  // === 並列取得: 評価一覧 / プロフィール / 音域 / フレンド数 / 評価年代分布 / Spotify ===
+  // === 並列取得: 評価一覧 / プロフィール / 音域 / フレンド数 / 評価年代分布 / Spotify / ジャンル分布 ===
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const [
     evalQueryRes,
     knownIds,
@@ -56,6 +59,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
     friendshipsRes,
     yearDistRes,
     spotifyRes,
+    genreDistRes,
   ] = await Promise.all([
     supabase
       .from("evaluations")
@@ -98,6 +102,11 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
       .select("spotify_user_id, spotify_display_name, connected_at, last_synced_at")
       .eq("user_id", userId)
       .maybeSingle(),
+    // ジャンル分布 (014 マイグレーションの view) — db:types 再生成までは型が乗らないので as キャスト
+    sb
+      .from("user_genre_distribution")
+      .select("genre, song_count")
+      .eq("user_id", userId),
   ]);
   const { data: rows, error } = evalQueryRes;
 
@@ -120,6 +129,17 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
     if (typeof year !== "number") continue;
     const decade = Math.floor(year / 10) * 10;
     eraBuckets[decade] = (eraBuckets[decade] ?? 0) + 1;
+  }
+
+  // ジャンル分布: 不正値はサイレントスキップ (タクソノミ更新時の互換性確保)
+  const genreBuckets: Partial<Record<GenreCode, number>> = {};
+  const genreCodeSet = new Set<string>(GENRE_CODES);
+  for (const row of (genreDistRes.data ?? []) as Array<{
+    genre: string;
+    song_count: number;
+  }>) {
+    if (!genreCodeSet.has(row.genre)) continue;
+    genreBuckets[row.genre as GenreCode] = row.song_count;
   }
 
   const displayName = profileRes.data?.display_name ?? "(未設定)";
@@ -161,6 +181,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
         friendCount={friendCount}
         voiceEstimate={voiceEstimate}
         eraBuckets={eraBuckets}
+        genreBuckets={genreBuckets}
         minEasyForEstimate={MIN_FOR_ESTIMATE}
       />
 

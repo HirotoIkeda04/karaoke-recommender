@@ -1,8 +1,10 @@
 import Link from "next/link";
 
+import type { GenreCode } from "@/lib/genres";
 import { midiToKaraoke } from "@/lib/note";
 
 import { EraDistribution } from "./era-distribution";
+import { GenreDistribution } from "./genre-distribution";
 
 interface VoiceEstimate {
   comfortable_min_midi: number | null;
@@ -16,6 +18,7 @@ interface Props {
   friendCount: number;
   voiceEstimate: VoiceEstimate | null;
   eraBuckets: Record<number, number>;
+  genreBuckets: Partial<Record<GenreCode, number>>;
   // 推定音域を表示するかの閾値判定用 (easy_count >= MIN_FOR_ESTIMATE のときのみ)
   minEasyForEstimate: number;
 }
@@ -37,6 +40,7 @@ export function ProfileHeader({
   friendCount,
   voiceEstimate,
   eraBuckets,
+  genreBuckets,
   minEasyForEstimate,
 }: Props) {
   const initial = firstGrapheme(displayName);
@@ -109,6 +113,9 @@ export function ProfileHeader({
 
       {/* 年代分布 */}
       <EraDistribution buckets={eraBuckets} />
+
+      {/* ジャンル分布 (得意 / 練習中 / 普通 を集計) */}
+      <GenreDistribution buckets={genreBuckets} />
     </section>
   );
 }
