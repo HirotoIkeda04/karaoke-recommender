@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      artists: {
+        Row: {
+          created_at: string
+          genres: string[]
+          id: string
+          name: string
+          name_norm: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          genres?: string[]
+          id?: string
+          name: string
+          name_norm: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          genres?: string[]
+          id?: string
+          name?: string
+          name_norm?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       evaluations: {
         Row: {
           created_at: string
@@ -48,6 +75,13 @@ export type Database = {
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluations_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs_with_genres"
             referencedColumns: ["id"]
           },
         ]
@@ -237,9 +271,11 @@ export type Database = {
       songs: {
         Row: {
           artist: string
+          artist_id: string | null
           created_at: string
           dam_request_no: string | null
           falsetto_max_midi: number | null
+          genres: string[] | null
           id: string
           image_url_large: string | null
           image_url_medium: string | null
@@ -258,9 +294,11 @@ export type Database = {
         }
         Insert: {
           artist: string
+          artist_id?: string | null
           created_at?: string
           dam_request_no?: string | null
           falsetto_max_midi?: number | null
+          genres?: string[] | null
           id?: string
           image_url_large?: string | null
           image_url_medium?: string | null
@@ -279,9 +317,11 @@ export type Database = {
         }
         Update: {
           artist?: string
+          artist_id?: string | null
           created_at?: string
           dam_request_no?: string | null
           falsetto_max_midi?: number | null
+          genres?: string[] | null
           id?: string
           image_url_large?: string | null
           image_url_medium?: string | null
@@ -298,7 +338,22 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "songs_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "songs_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists_with_song_count"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_known_songs: {
         Row: {
@@ -328,6 +383,13 @@ export type Database = {
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_known_songs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs_with_genres"
             referencedColumns: ["id"]
           },
         ]
@@ -373,6 +435,70 @@ export type Database = {
       }
     }
     Views: {
+      artists_with_song_count: {
+        Row: {
+          created_at: string | null
+          genres: string[] | null
+          id: string | null
+          is_labeled: boolean | null
+          name: string | null
+          name_norm: string | null
+          song_count: number | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
+      songs_with_genres: {
+        Row: {
+          artist: string | null
+          artist_id: string | null
+          artist_name_canonical: string | null
+          created_at: string | null
+          dam_request_no: string | null
+          effective_genres: string[] | null
+          falsetto_max_midi: number | null
+          genres: string[] | null
+          id: string | null
+          image_url_large: string | null
+          image_url_medium: string | null
+          image_url_small: string | null
+          is_popular: boolean | null
+          last_spotify_attempt_at: string | null
+          match_status: Database["public"]["Enums"]["song_match_status"] | null
+          range_high_midi: number | null
+          range_low_midi: number | null
+          release_year: number | null
+          source_urls: string[] | null
+          spotify_attempt_count: number | null
+          spotify_track_id: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "songs_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "songs_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists_with_song_count"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_genre_distribution: {
+        Row: {
+          genre: string | null
+          song_count: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       user_voice_estimate: {
         Row: {
           comfortable_max_midi: number | null
@@ -411,9 +537,11 @@ export type Database = {
         Args: { p_limit?: number; p_popular_only?: boolean }
         Returns: {
           artist: string
+          artist_id: string | null
           created_at: string
           dam_request_no: string | null
           falsetto_max_midi: number | null
+          genres: string[] | null
           id: string
           image_url_large: string | null
           image_url_medium: string | null
@@ -444,6 +572,10 @@ export type Database = {
           rating: Database["public"]["Enums"]["rating_type"]
         }[]
       }
+      is_room_participant: {
+        Args: { p_room_id: string; p_user_id: string }
+        Returns: boolean
+      }
       join_room_by_qr: {
         Args: {
           p_guest_name?: string
@@ -457,6 +589,7 @@ export type Database = {
           status: string
         }[]
       }
+      normalize_artist_name: { Args: { name: string }; Returns: string }
     }
     Enums: {
       rating_type: "hard" | "medium" | "easy" | "practicing"
