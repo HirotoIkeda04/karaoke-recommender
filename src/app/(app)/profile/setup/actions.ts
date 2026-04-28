@@ -26,13 +26,24 @@ export async function updateDisplayName(
     return { error: "未認証です" };
   }
 
-  const { error } = await supabase
+  // .select() を付けると RETURNING * 相当で更新行が返る → 0 件かどうか判定可能
+  const { data, error } = await supabase
     .from("profiles")
     .update({ display_name: trimmed })
-    .eq("id", user.id);
+    .eq("id", user.id)
+    .select("id");
 
   if (error) {
     return { error: error.message };
+  }
+
+  if (!data || data.length === 0) {
+    // 通常は migration 007 のトリガ + 009 のバックフィルでカバーされるが、
+    // 念のため: profile 行が無い場合は明示的にエラーを返す
+    return {
+      error:
+        "プロフィール行が見つかりませんでした。管理者にお問い合わせください。",
+    };
   }
 
   return { error: null };
