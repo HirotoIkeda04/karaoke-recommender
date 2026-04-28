@@ -104,12 +104,33 @@ _KARAOKE_TRACK_KEYWORDS: tuple[str, ...] = (
     "(piano",
     "(off vocal)",
     "オフボーカル",
+    "オフ・ボーカル",
     "(原曲歌手",   # 「(原曲歌手:tuki.)」← 歌っちゃ王系の最大の目印
     "[原曲歌手",
     "(ガイド",
     "ガイド無し",
     "ガイドなし",
-    "(instrumental)",
+    # instrumental 系 (本物の楽曲でも別 version として並列リリースされる)
+    "(instrumental",
+    "[instrumental",
+    " - instrumental",
+    "(inst.)",
+    "(inst)",
+    "(オリジナル・カラオケ)",
+    "(off-vocal)",
+    "オリジナル・カラオケ",
+    # tv-size / movie-size / short version 等の縮小版
+    "(tv size)",
+    "(tv-size)",
+    "(tv version)",
+    "(tv ver",
+    "(tvサイズ)",
+    "(tv-edit)",
+    "(short ver",
+    "(short version)",
+    "(short edit)",
+    "(movie size)",
+    "(movie ver",
 )
 
 # collectionName / album に含まれていたらカラオケ/インスト系
@@ -218,61 +239,157 @@ class ItunesClient:
             return []
         return data.get("results", [])
 
-    def best_match(self, title: str, artist: str) -> ItunesTrack | None:
-        """`{title} {artist}` で検索し、類似度上位を返す。
+    def search_and_pick(
+        self,
+        title: str,
+        artist: str,
+        expected_year: int | None = None,
+    ) -> tuple[list[dict], ItunesTrack | None]:
+        """検索 + 選定を行い (raw_results, picked_track) を返す。
 
-        カラオケ練習版/オルゴール/インスト盤/カバー盤は collection/artist/track の
-        キーワードで明示的に除外する。Apple Music JP には「歌っちゃ王」のような
-        カラオケ練習レーベルが正式に流通しており、タイトルが完全一致するため
-        本物より高スコアで選ばれてしまう (例: tuki. 「晩餐歌」が
-        「歌っちゃ王」版で取られる) のを防ぐため。
+        raw_results はキャッシュ用 (raw を持っておけば後でロジックを変えても
+        再 fetch 不要)。
         """
-        # iTunes は1度の検索結果が限定的なので、widely 検索し filter して残す
         raw = self.search(f"{title} {artist}", limit=10)
         if not raw:
             raw = self.search(artist, limit=15)
-            if not raw:
-                return None
+        track = pick_best_from_raw(raw, title, artist, expected_year)
+        return raw, track
 
-        # カラオケ/カバー/インスト/オルゴール盤を除外
-        results = [r for r in raw if not _is_karaoke_or_cover(
-            r.get("artistName"), r.get("trackName"), r.get("collectionName"),
-        )]
-        if not results:
-            logger.info("itunes: all results filtered as karaoke/cover for %r %r",
-                        title, artist)
-            return None
-
-        best: ItunesTrack | None = None
-        best_score = 0.0
-        for r in results:
-            t_sim = _similarity(title, r.get("trackName", ""))
-            a_sim = _similarity(artist, r.get("artistName", ""))
-            score = (t_sim * 0.7) + (a_sim * 0.3)
-            if score > best_score:
-                best_score = score
-                best = self._to_track(r, score)
-
-        if best is None or best_score < MIN_SIMILARITY:
-            return None
-        return best
+    def best_match(
+        self,
+        title: str,
+        artist: str,
+        expected_year: int | None = None,
+    ) -> ItunesTrack | None:
+        """既存 API 互換ラッパ (raw を捨てて picked のみ返す)。"""
+        _, track = self.search_and_pick(title, artist, expected_year)
+        return track
 
     def _to_track(self, r: dict, similarity: float) -> ItunesTrack:
-        url100 = r.get("artworkUrl100")
-        release_date = r.get("releaseDate", "")
-        year: int | None = None
-        if release_date and len(release_date) >= 4:
-            try:
-                year = int(release_date[:4])
-            except ValueError:
-                year = None
-        return ItunesTrack(
-            track_name=r.get("trackName", ""),
-            artist_name=r.get("artistName", ""),
-            artwork_url_60=r.get("artworkUrl60"),
-            artwork_url_100=url100,
-            artwork_url_600=_upgrade_artwork(url100, 600),
-            release_year=year,
-            track_view_url=r.get("trackViewUrl"),
-            similarity=similarity,
+        return _to_track(r, similarity)
+
+
+# --- raw 結果からの選定ロジック (cache-friendly) -----------------------------
+
+def _is_single(result: dict) -> bool:
+    """iTunes 結果がシングル盤かを判定する。
+
+    - collectionName が " - Single" / " - EP" 末尾はシングル系扱い
+      (本当の "EP" はシングルとは別物だが、原曲リリース時の小規模な単独
+       リリースであることが多く、アルバムよりはシングルに近い)
+    - trackCount が 1-2 ならシングル扱い (フォールバック)
+    """
+    cname = (result.get("collectionName") or "")
+    if cname.endswith(" - Single"):
+        return True
+    if cname.endswith(" - EP"):
+        return True
+    track_count = result.get("trackCount", 0)
+    if isinstance(track_count, int) and 1 <= track_count <= 2:
+        return True
+    return False
+
+
+def _release_date_str(result: dict) -> str:
+    """YYYY-MM-DD 形式の releaseDate (無ければ '9999-12-31' でソート末尾に)。"""
+    return (result.get("releaseDate") or "9999-12-31")[:10]
+
+
+def _release_year(result: dict) -> int | None:
+    s = (result.get("releaseDate") or "")[:4]
+    return int(s) if s.isdigit() else None
+
+
+def _to_track(r: dict, similarity_score: float) -> ItunesTrack:
+    url100 = r.get("artworkUrl100")
+    return ItunesTrack(
+        track_name=r.get("trackName", ""),
+        artist_name=r.get("artistName", ""),
+        artwork_url_60=r.get("artworkUrl60"),
+        artwork_url_100=url100,
+        artwork_url_600=upgrade_artwork(url100, 600),
+        release_year=_release_year(r),
+        track_view_url=r.get("trackViewUrl"),
+        similarity=similarity_score,
+    )
+
+
+# 上位スコアと見なすしきい値 (best - SCORE_TIER_TOLERANCE 以上は同等扱い)
+SCORE_TIER_TOLERANCE = 0.05
+
+
+def pick_best_from_raw(
+    raw_results: list[dict],
+    title: str,
+    artist: str,
+    expected_year: int | None = None,
+) -> ItunesTrack | None:
+    """検索結果群 (raw) から最良の 1 件を選ぶ。
+
+    優先順位:
+        1. カラオケ/カバー/インスト盤を除外
+        2. (title, artist) 類似度がしきい値以上
+        3. 上位スコア群 (best - SCORE_TIER_TOLERANCE) の中で
+           a. expected_year (= 元曲発売年) との差が小さいもの
+           b. シングル盤 (collectionName " - Single" 等) を優先
+           c. 最古の releaseDate (= 初発売)
+           d. スコア降順 (タイブレーク)
+
+    expected_year:
+        曲の本来の発売年 (karaoto から取れる場合)。未指定なら top tier の
+        最古 releaseDate を「初発売」と見なして自動推定する。
+    """
+    if not raw_results:
+        return None
+
+    # 1. カラオケ等除外
+    candidates = [
+        r for r in raw_results
+        if not _is_karaoke_or_cover(
+            r.get("artistName"), r.get("trackName"), r.get("collectionName"),
         )
+    ]
+    if not candidates:
+        logger.info("itunes: all results filtered as karaoke/cover for %r %r",
+                    title, artist)
+        return None
+
+    # 2. 類似度スコア計算
+    scored: list[tuple[float, dict]] = []
+    for r in candidates:
+        t_sim = _similarity(title, r.get("trackName", ""))
+        a_sim = _similarity(artist, r.get("artistName", ""))
+        score = t_sim * 0.7 + a_sim * 0.3
+        if score < MIN_SIMILARITY:
+            continue
+        scored.append((score, r))
+    if not scored:
+        return None
+
+    # 3. 上位スコア群を抽出
+    best_score = max(s for s, _ in scored)
+    top_tier = [(s, r) for s, r in scored if s >= best_score - SCORE_TIER_TOLERANCE]
+
+    # 3a. expected_year 自動推定 (top tier の最古年)
+    if expected_year is None:
+        years = [_release_year(r) for _, r in top_tier]
+        years = [y for y in years if y is not None]
+        if years:
+            expected_year = min(years)
+
+    def sort_key(item: tuple[float, dict]) -> tuple:
+        score, r = item
+        ryear = _release_year(r)
+        year_diff = abs(ryear - expected_year) if (ryear and expected_year) else 99
+        is_sing = _is_single(r)
+        return (
+            year_diff,                # 年の近さ (近い順)
+            0 if is_sing else 1,      # シングル優先
+            _release_date_str(r),     # 早い順 (タイブレーク)
+            -score,                   # スコア降順 (最終タイブレーク)
+        )
+
+    top_tier.sort(key=sort_key)
+    selected_score, selected_r = top_tier[0]
+    return _to_track(selected_r, selected_score)

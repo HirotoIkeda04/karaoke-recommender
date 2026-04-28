@@ -26,6 +26,7 @@ from fetch_itunes import (
     ItunesRateLimited,
     ItunesTrack,
     is_cached_track_karaoke,
+    pick_best_from_raw,
     upgrade_artwork,
 )
 from fetch_vocal_range import (
@@ -45,14 +46,23 @@ logger = logging.getLogger("scraper.dam")
 
 
 def _load_itunes_cache(path: Path) -> dict[str, dict]:
-    """request_no -> iTunes 結果(またはマッチ無しのマーカ)。
+    """request_no -> エントリ全体 (raw_results を持つ場合とレガシー含む)。
 
-    既存エントリのうち artistName/trackName がカラオケ/オルゴール/インスト系
-    キーワードを含むものは「汚染」と見なし読み込まない (= 次回 fetch で
-    refresh される)。matcher のフィルタロジック追加に追随するため。
+    キャッシュ schema (新):
+        {"request_no": "...", "raw_results": [...iTunes raw...]}
+        → 読み込み後にローカルで pick_best_from_raw を再評価する。
+        ロジック変更時に再 fetch 不要。
+
+    キャッシュ schema (旧):
+        {"request_no": "...", "track": {...選定済 ItunesTrack dict...}}
+        → raw を持たないため、新ロジックで再評価できない。skip して再 fetch。
+
+    また、artistName/trackName でカラオケ判定されるエントリも skip (ロジック
+    更新前に汚染データが入っていた場合の自動修正)。
     """
     cache: dict[str, dict] = {}
-    invalidated = 0
+    legacy_skipped = 0
+    karaoke_invalidated = 0
     if not path.exists():
         return cache
     with path.open(encoding="utf-8") as f:
@@ -61,25 +71,40 @@ def _load_itunes_cache(path: Path) -> dict[str, dict]:
             if not line:
                 continue
             entry = json.loads(line)
+            if "raw_results" not in entry:
+                # レガシー schema → 再 fetch
+                legacy_skipped += 1
+                continue
             track = entry.get("track")
             if track is not None and is_cached_track_karaoke(track):
-                invalidated += 1
-                continue  # skip → forces refetch
+                karaoke_invalidated += 1
+                continue
             cache[entry["request_no"]] = entry
-    if invalidated:
+    if legacy_skipped:
+        logger.info(
+            "itunes cache: skipped %d legacy entries (will be refetched with raw schema)",
+            legacy_skipped,
+        )
+    if karaoke_invalidated:
         logger.info(
             "itunes cache: invalidated %d entries detected as karaoke/cover",
-            invalidated,
+            karaoke_invalidated,
         )
     return cache
 
 
-def _append_itunes_cache(path: Path, request_no: str, track: ItunesTrack | None) -> None:
-    entry: dict = {"request_no": request_no}
-    if track is not None:
-        entry["track"] = dataclasses.asdict(track)
-    else:
-        entry["track"] = None
+def _append_itunes_cache(
+    path: Path,
+    request_no: str,
+    raw_results: list[dict],
+    track: ItunesTrack | None,
+) -> None:
+    """raw 結果と選定済 track を保存。schema 変更時の再 fetch を不要にする。"""
+    entry: dict = {
+        "request_no": request_no,
+        "raw_results": raw_results,
+        "track": dataclasses.asdict(track) if track else None,
+    }
     with path.open("a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False))
         f.write("\n")
@@ -333,24 +358,38 @@ def run(
         rate_limited = False
         for i, song in enumerate(songs, start=1):
             track: ItunesTrack | None = None
+            karaoto_entry = karaoto_lookup(song.title, song.artist, karaoto_index)
+            # 元曲発売年: karaoto の release_date があれば優先 (例 "2023/04/25")
+            expected_year: int | None = None
+            if karaoto_entry and karaoto_entry.source_url:
+                # karaoto は range のみ持ち release_date は別フィールド。今は未取得。
+                # 将来 karaoto から release_date を渡せるようになれば expected_year に。
+                pass
             if song.request_no in cache:
-                cached = cache[song.request_no]["track"]
-                if cached:
-                    track = ItunesTrack(**cached)
+                # 新 schema: raw_results からローカル再評価
+                cached = cache[song.request_no]
+                raw_results = cached.get("raw_results", [])
+                track = pick_best_from_raw(
+                    raw_results, song.title, song.artist, expected_year,
+                )
                 cached_used += 1
             elif rate_limited:
                 # 429 検知後はそれ以降の API call を行わない(キャッシュ無しは未取得扱い)
                 pass
             else:
                 try:
-                    track = client.best_match(song.title, song.artist)
+                    raw_results, track = client.search_and_pick(
+                        song.title, song.artist, expected_year,
+                    )
                 except ItunesRateLimited:
+                    raw_results = []
+                    track = None
                     logger.error(
                         "iTunes rate limited at %d/%d; remaining will be saved without artwork",
                         i, len(songs),
                     )
                     rate_limited = True
-                _append_itunes_cache(cache_path, song.request_no, track)
+                _append_itunes_cache(cache_path, song.request_no, raw_results, track)
 
             if track is not None:
                 hits += 1
@@ -364,8 +403,7 @@ def run(
                 )
 
             payloads.append(_build_payload(
-                song, track,
-                karaoto_lookup(song.title, song.artist, karaoto_index),
+                song, track, karaoto_entry,
                 vocal_range_lookups.get(song.request_no),
             ))
 
