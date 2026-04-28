@@ -44,7 +44,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const [estRes, evalsRes, spotifyRes] = await Promise.all([
+  const [estRes, evalsRes, spotifyRes, profileRes] = await Promise.all([
     supabase
       .from("user_voice_estimate")
       .select("*")
@@ -59,8 +59,14 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       .select("spotify_user_id, spotify_display_name, connected_at, last_synced_at")
       .eq("user_id", user.id)
       .maybeSingle(),
+    supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", user.id)
+      .maybeSingle(),
   ]);
   const spotifyConnection = spotifyRes.data ?? null;
+  const displayName = profileRes.data?.display_name ?? null;
 
   // 接続済みなら、user_known_songs の件数も取得して「聴いたことある曲数」を表示
   let knownSongsCount = 0;
@@ -115,6 +121,21 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
           ) : null}
         </div>
       ) : null}
+
+      <section className="flex items-center justify-between rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="min-w-0">
+          <p className="text-xs text-zinc-500 dark:text-zinc-500">表示名</p>
+          <p className="truncate text-base font-medium text-zinc-900 dark:text-zinc-50">
+            {displayName ?? "—"}
+          </p>
+        </div>
+        <Link
+          href="/profile/setup"
+          className="shrink-0 rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+        >
+          変更
+        </Link>
+      </section>
 
       <h1 className="text-lg font-semibold">あなたの音域</h1>
 
