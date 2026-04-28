@@ -19,8 +19,9 @@ export const dynamic = "force-dynamic";
 
 const STATE_COOKIE_NAME = "spotify_oauth_state";
 
+// 旧 /profile に戻す代わりに /library のプロフィールセクションへリダイレクト
 function redirectToProfile(req: NextRequest, params: Record<string, string>) {
-  const url = new URL("/profile", req.url);
+  const url = new URL("/library", req.url);
   for (const [k, v] of Object.entries(params)) {
     url.searchParams.set(k, v);
   }

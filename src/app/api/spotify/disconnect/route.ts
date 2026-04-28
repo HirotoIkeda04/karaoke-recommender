@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   // フォーム送信からの POST なら redirect、そうでなければ JSON
   const contentType = req.headers.get("content-type") ?? "";
   if (contentType.includes("application/x-www-form-urlencoded")) {
-    return NextResponse.redirect(new URL("/profile", req.url), { status: 303 });
+    return NextResponse.redirect(new URL("/library", req.url), { status: 303 });
   }
   return NextResponse.json({ ok: true });
 }

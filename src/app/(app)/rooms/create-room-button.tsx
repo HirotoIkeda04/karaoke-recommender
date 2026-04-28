@@ -6,7 +6,7 @@ import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 
-import { createRoom } from "@/app/(app)/rooms/actions";
+import { createRoom } from "./actions";
 
 export function CreateRoomButton() {
   const router = useRouter();

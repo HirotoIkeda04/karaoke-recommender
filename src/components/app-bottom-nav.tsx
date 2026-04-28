@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, LibraryBig, Search, User, Users } from "lucide-react";
+import { Home, LibraryBig, Mic, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -10,8 +10,7 @@ const ITEMS = [
   { href: "/", label: "評価", icon: Home },
   { href: "/songs", label: "検索", icon: Search },
   { href: "/library", label: "ライブラリ", icon: LibraryBig },
-  { href: "/friends", label: "フレンド", icon: Users },
-  { href: "/profile", label: "音域", icon: User },
+  { href: "/rooms", label: "ルーム", icon: Mic },
 ] as const;
 
 export function AppBottomNav() {
@@ -25,11 +24,11 @@ export function AppBottomNav() {
         paddingBottom: "max(0.25rem, env(safe-area-inset-bottom))",
       }}
     >
-      {/* grid grid-cols-5 で 5 タブを必ず等分。
-          ラベル長(評価/検索/ライブラリ/フレンド/音域)に依存せず、
-          各タブの中心が画面の 1/10, 3/10, 5/10, 7/10, 9/10 に常に固定される。
-          ※ フレンド追加で 4→5 タブ化。「マイライブラリ」は字数の都合で「ライブラリ」に変更。 */}
-      <ul className="mx-auto grid max-w-md grid-cols-5">
+      {/* grid grid-cols-4 で 4 タブを必ず等分。
+          各タブの中心が画面の 1/8, 3/8, 5/8, 7/8 に常に固定される。
+          ※ プロフィール (旧「音域」タブ) は /library に集約。
+            フレンド管理は /library のプロフィール内リンクから /friends へ遷移。 */}
+      <ul className="mx-auto grid max-w-md grid-cols-4">
         {ITEMS.map((item) => {
           const Icon = item.icon;
           const active =

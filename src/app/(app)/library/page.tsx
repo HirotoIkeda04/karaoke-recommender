@@ -5,7 +5,9 @@ import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
+import { ProfileHeader } from "./profile-header";
 import { SortableList, type EvaluationRow } from "./sortable-list";
+import { SpotifySection } from "./spotify-section";
 
 export const dynamic = "force-dynamic";
 
@@ -18,8 +20,18 @@ const TABS: ReadonlyArray<{ value: Rating; label: string; Icon: typeof X }> = [
   { value: "hard", label: "苦手", Icon: X },
 ];
 
+const MIN_FOR_ESTIMATE = 5; // 「得意」評価がこの件数以上で推定音域を表示
+
 interface LibraryPageProps {
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{
+    tab?: string;
+    spotify_connected?: string;
+    spotify_synced?: string;
+    spotify_error?: string;
+    matched?: string;
+    found?: string;
+    sync_detail?: string;
+  }>;
 }
 
 export default async function LibraryPage({ searchParams }: LibraryPageProps) {
@@ -28,33 +40,23 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
 
   const supabase = await createClient();
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  const userId = session?.user?.id;
-  if (!userId) {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
     return null; // middleware で防がれる想定
   }
+  const userId = user.id;
 
-  // 全タブ件数を一発で取る
-  const { data: counts } = await supabase
-    .from("evaluations")
-    .select("rating", { count: "exact" })
-    .eq("user_id", userId);
-
-  const tabCounts: Record<Rating, number> = {
-    easy: 0,
-    medium: 0,
-    hard: 0,
-    practicing: 0,
-  };
-  for (const row of counts ?? []) {
-    tabCounts[row.rating as Rating] += 1;
-  }
-
-  // active タブの曲を取得
-  // SortableList でクライアント側ソートするため LIMIT を撤廃
-  // (1 ユーザーの 1 タブに数千件入るのは現実的でないので問題なし)
-  const [evalQueryRes, knownIds] = await Promise.all([
+  // === 並列取得: 評価一覧 / プロフィール / 音域 / フレンド数 / 評価年代分布 / Spotify ===
+  const [
+    evalQueryRes,
+    knownIds,
+    profileRes,
+    voiceEstimateRes,
+    friendshipsRes,
+    yearDistRes,
+    spotifyRes,
+  ] = await Promise.all([
     supabase
       .from("evaluations")
       .select(
@@ -72,11 +74,104 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
       .eq("rating", activeTab)
       .order("updated_at", { ascending: false }),
     getUserKnownSongIds(),
+    supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", userId)
+      .maybeSingle(),
+    supabase
+      .from("user_voice_estimate")
+      .select("comfortable_min_midi, comfortable_max_midi, falsetto_max_midi, easy_count")
+      .eq("user_id", userId)
+      .maybeSingle(),
+    supabase
+      .from("friendships")
+      .select("user_a_id", { count: "exact", head: true })
+      .eq("status", "accepted")
+      .or(`user_a_id.eq.${userId},user_b_id.eq.${userId}`),
+    supabase
+      .from("evaluations")
+      .select("song:songs(release_year)")
+      .eq("user_id", userId),
+    supabase
+      .from("user_spotify_connections")
+      .select("spotify_user_id, spotify_display_name, connected_at, last_synced_at")
+      .eq("user_id", userId)
+      .maybeSingle(),
   ]);
   const { data: rows, error } = evalQueryRes;
 
+  // タブ別件数を別クエリで集計 (上のクエリは active タブだけ取ってきている)
+  const { data: counts } = await supabase
+    .from("evaluations")
+    .select("rating", { count: "exact" })
+    .eq("user_id", userId);
+  const tabCounts: Record<Rating, number> = {
+    easy: 0, medium: 0, hard: 0, practicing: 0,
+  };
+  for (const row of counts ?? []) {
+    tabCounts[row.rating as Rating] += 1;
+  }
+
+  // 年代分布: release_year を 10年単位でバケット
+  const eraBuckets: Record<number, number> = {};
+  for (const row of yearDistRes.data ?? []) {
+    const year = row.song?.release_year;
+    if (typeof year !== "number") continue;
+    const decade = Math.floor(year / 10) * 10;
+    eraBuckets[decade] = (eraBuckets[decade] ?? 0) + 1;
+  }
+
+  const displayName = profileRes.data?.display_name ?? "(未設定)";
+  const friendCount = friendshipsRes.count ?? 0;
+  const voiceEstimate = voiceEstimateRes.data ?? null;
+  const spotifyConnection = spotifyRes.data ?? null;
+
+  // Spotify 接続済みなら known songs 件数を取得
+  let knownSongsCount = 0;
+  if (spotifyConnection) {
+    const { data: distinctRows } = await supabase
+      .from("user_known_songs")
+      .select("song_id")
+      .eq("user_id", userId);
+    knownSongsCount = distinctRows
+      ? new Set(distinctRows.map((r) => r.song_id)).size
+      : 0;
+  }
+
+  // Spotify 通知系パラメータ
+  const spotifyNotice = {
+    connected: params.spotify_connected === "true",
+    syncedSummary:
+      params.spotify_synced === "true" && params.matched && params.found
+        ? {
+            matched: parseInt(params.matched, 10),
+            found: parseInt(params.found, 10),
+          }
+        : null,
+    error: params.spotify_error ?? null,
+    errorDetail: params.sync_detail ?? null,
+  };
+
   return (
     <div className="mx-auto max-w-md space-y-4 px-4 py-4">
+      {/* プロフィールヘッダー (Instagram 風) */}
+      <ProfileHeader
+        displayName={displayName}
+        friendCount={friendCount}
+        voiceEstimate={voiceEstimate}
+        eraBuckets={eraBuckets}
+        minEasyForEstimate={MIN_FOR_ESTIMATE}
+      />
+
+      {/* Spotify 連携 */}
+      <SpotifySection
+        connection={spotifyConnection}
+        knownSongsCount={knownSongsCount}
+        notice={spotifyNotice}
+      />
+
+      {/* 評価タブ + 一覧 (既存) */}
       <div className="grid grid-cols-4 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
         {TABS.map((tab) => {
           const active = tab.value === activeTab;
