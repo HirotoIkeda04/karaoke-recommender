@@ -422,7 +422,7 @@ function SongCardContent({
       {/* テキスト領域: 画像下に padding を取って配置 */}
       <div className="flex flex-1 flex-col justify-between gap-2 p-3">
         <div className="w-full">
-          <h2 className="line-clamp-1 text-base font-semibold text-zinc-900 dark:text-zinc-50">
+          <h2 className="line-clamp-1 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
             {song.title}
           </h2>
           <p className="text-xs text-zinc-600 dark:text-zinc-400">
