@@ -2,7 +2,9 @@ import type { NextRequest } from "next/server";
 
 import { updateSession } from "@/lib/supabase/middleware";
 
-const PUBLIC_PATHS = ["/login", "/auth"] as const;
+// /friend/[token] は未ログインでも開ける (招待リンク着地ページのため)
+// 「ログインしてフレンドになる」ボタンから login → callback → 戻ってきて承諾の流れ
+const PUBLIC_PATHS = ["/login", "/auth", "/friend"] as const;
 
 export async function proxy(request: NextRequest) {
   return updateSession(request, PUBLIC_PATHS);
