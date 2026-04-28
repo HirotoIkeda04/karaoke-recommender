@@ -1,0 +1,93 @@
+{
+  "songs": [
+    {
+      "id": "6f4bf748-83a4-472b-b6ff-7e86c9cc2809",
+      "title": "ROSIER 〔ロージア〕",
+      "artist": "LUNA SEA",
+      "release_year": 2026,
+      "range_low_midi": 48,
+      "range_high_midi": 70,
+      "falsetto_max_midi": null,
+      "source": "keytube",
+      "source_url": "https://keytube.net/song/detail/9590",
+      "similarity": 0.85
+    },
+    {
+      "id": "38bfd9b6-65fa-4a49-964b-922802facd53",
+      "title": "1000日間",
+      "artist": "乃紫",
+      "release_year": 2025,
+      "range_low_midi": 52,
+      "range_high_midi": 76,
+      "falsetto_max_midi": 76,
+      "source": "vocal-range",
+      "source_url": "https://vocal-range.com/archives/post-16790.html",
+      "similarity": 1.0
+    },
+    {
+      "id": "09b52731-9e2a-44b8-b7e2-e8b5963a40f6",
+      "title": "1991",
+      "artist": "米津玄師",
+      "release_year": 2025,
+      "range_low_midi": 53,
+      "range_high_midi": 67,
+      "falsetto_max_midi": 74,
+      "source": "vocal-range",
+      "source_url": "https://vocal-range.com/archives/post-17759.html",
+      "similarity": 1.0
+    },
+    {
+      "id": "77f01385-573b-4e70-95ea-7e94e18769fc",
+      "title": "Almond Chocolate",
+      "artist": "ILLIT",
+      "release_year": 2025,
+      "range_low_midi": 53,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "source": "keytube",
+      "source_url": "https://keytube.net/song/detail/128807",
+      "similarity": 1.0
+    },
+    {
+      "id": "69424659-abf9-423a-bb4f-62175c5f2e99",
+      "title": "BAD LOVE",
+      "artist": "HANA",
+      "release_year": 2025,
+      "range_low_midi": 53,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "source": "keytube",
+      "source_url": "https://keytube.net/song/detail/146845",
+      "similarity": 1.0
+    },
+    {
+      "id": "8cc8c837-2162-479e-b82a-b5bf1790f0ad",
+      "title": "BOW AND ARROW",
+      "artist": "米津玄師",
+      "release_year": 2025,
+      "range_low_midi": 50,
+      "range_high_midi": 69,
+      "falsetto_max_midi": 73,
+      "source": "vocal-range",
+      "source_url": "https://vocal-range.com/archives/post-15724.html",
+      "similarity": 1.0
+    },
+    {
+      "id": "28c4fb89-73f2-49af-9236-4c7a492d16cd",
+      "title": "breakfast",
+      "artist": "Mrs. GREEN APPLE",
+      "release_year": 2025,
+      "range_low_midi": 48,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 78,
+      "source": "vocal-range",
+      "source_url": "https://vocal-range.com/archives/post-16178.html",
+      "similarity": 1.0
+    }
+  ],
+  "metadata": {
+    "scraped_at": "2026-04-28T11:13:10.991183+00:00",
+    "applied_count": 7,
+    "tried_total": 10
+  }
+}

@@ -10,7 +10,8 @@
     "db:types": "set -a && . ./.env.local && set +a && supabase gen types typescript --project-id ewxonrgcvkjuaksybrko > src/types/database.ts",
     "seed:songs": "node --env-file=.env.local --import tsx scripts/seed-songs.ts",
     "seed:dam": "node --env-file=.env.local --import tsx scripts/seed-dam-songs.ts",
-    "refresh:karaoto-images": "node --env-file=.env.local --import tsx scripts/refresh-karaoto-images.ts"
+    "refresh:karaoto-images": "node --env-file=.env.local --import tsx scripts/refresh-karaoto-images.ts",
+    "apply:range": "node --env-file=.env.local --import tsx scripts/apply-range-data.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
