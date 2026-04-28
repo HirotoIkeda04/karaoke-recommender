@@ -25,6 +25,9 @@ export function GoogleLoginButton({ next }: GoogleLoginButtonProps) {
       provider: "google",
       options: {
         redirectTo: callback.toString(),
+        // 個人情報最小化: profile スコープを意図的に外し、本名/写真/ロケールを取得しない。
+        // email は Supabase Auth が一意キーとして扱うため残す。
+        scopes: "openid email",
       },
     });
 
