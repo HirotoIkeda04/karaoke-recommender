@@ -52,6 +52,188 @@ export type Database = {
           },
         ]
       }
+      friend_invite_links: {
+        Row: {
+          created_at: string
+          creator_id: string
+          expires_at: string
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          expires_at: string
+          token: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          expires_at?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friend_invite_links_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      friendships: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          requested_by_id: string
+          status: string
+          user_a_id: string
+          user_b_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          requested_by_id: string
+          status: string
+          user_a_id: string
+          user_b_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          requested_by_id?: string
+          status?: string
+          user_a_id?: string
+          user_b_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friendships_requested_by_id_fkey"
+            columns: ["requested_by_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "friendships_user_a_id_fkey"
+            columns: ["user_a_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "friendships_user_b_id_fkey"
+            columns: ["user_b_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      room_participants: {
+        Row: {
+          guest_name: string | null
+          guest_token: string | null
+          id: string
+          joined_at: string
+          left_at: string | null
+          room_id: string
+          user_id: string | null
+        }
+        Insert: {
+          guest_name?: string | null
+          guest_token?: string | null
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          room_id: string
+          user_id?: string | null
+        }
+        Update: {
+          guest_name?: string | null
+          guest_token?: string | null
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          room_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_participants_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          created_at: string
+          creator_id: string
+          ended_at: string | null
+          id: string
+          last_activity_at: string
+          qr_expires_at: string
+          qr_token: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          ended_at?: string | null
+          id?: string
+          last_activity_at?: string
+          qr_expires_at: string
+          qr_token: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          ended_at?: string | null
+          id?: string
+          last_activity_at?: string
+          qr_expires_at?: string
+          qr_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rooms_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       songs: {
         Row: {
           artist: string
@@ -206,6 +388,25 @@ export type Database = {
       }
     }
     Functions: {
+      accept_friend_invite: {
+        Args: { p_token: string }
+        Returns: {
+          friend_id: string
+          status: string
+        }[]
+      }
+      auto_end_idle_rooms: { Args: never; Returns: undefined }
+      cleanup_expired_invite_links: { Args: never; Returns: undefined }
+      cleanup_old_rooms: { Args: never; Returns: undefined }
+      get_friend_invite_info: {
+        Args: { p_token: string }
+        Returns: {
+          creator_id: string
+          creator_name: string
+          expires_at: string
+          is_valid: boolean
+        }[]
+      }
       get_unrated_songs: {
         Args: { p_limit?: number; p_popular_only?: boolean }
         Returns: {
@@ -241,6 +442,19 @@ export type Database = {
         Returns: {
           count: number
           rating: Database["public"]["Enums"]["rating_type"]
+        }[]
+      }
+      join_room_by_qr: {
+        Args: {
+          p_guest_name?: string
+          p_guest_token?: string
+          p_qr_token: string
+        }
+        Returns: {
+          guest_token: string
+          participant_id: string
+          room_id: string
+          status: string
         }[]
       }
     }
