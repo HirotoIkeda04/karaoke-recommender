@@ -17,7 +17,11 @@ export default async function HomePage() {
   // 未評価の代表曲を 20 件ずつデッキに積む。
   // 並行して、Spotify で聴いたことのある song_id 集合も取得 (バッジ表示用)。
   const [unratedRes, knownIds] = await Promise.all([
-    supabase.rpc("get_unrated_songs", {
+    // 020 までの get_unrated_songs では PostgREST 接続プールが旧プランを
+    // キャッシュし続け、推薦ロジック更新が反映されない問題があった。
+    // _v2 として別関数名で作り直し、強制的に新エンドポイントを叩かせる。
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase.rpc as any)("get_unrated_songs_v2", {
       p_limit: 20,
       p_popular_only: true,
     }),
