@@ -56,7 +56,7 @@ export function EraDistribution({ buckets }: Props) {
   const decades = Object.keys(buckets)
     .map(Number)
     .filter((d) => buckets[d] > 0)
-    .sort((a, b) => a - b);
+    .sort((a, b) => b - a);
 
   const total = decades.reduce((sum, d) => sum + buckets[d], 0);
 
