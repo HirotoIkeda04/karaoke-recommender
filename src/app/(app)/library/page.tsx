@@ -9,6 +9,7 @@ import type { Database } from "@/types/database";
 import { ProfileHeader } from "./profile-header";
 import { SortableList, type EvaluationRow } from "./sortable-list";
 import { SpotifySection } from "./spotify-section";
+import { SwipeTabs } from "./swipe-tabs";
 
 export const dynamic = "force-dynamic";
 
@@ -192,48 +193,63 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
         notice={spotifyNotice}
       />
 
-      {/* 評価タブ + 一覧 (既存) */}
-      <div className="grid grid-cols-4 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
-        {TABS.map((tab) => {
-          const active = tab.value === activeTab;
-          return (
-            <Link
-              key={tab.value}
-              href={`/library?tab=${tab.value}`}
-              className={`flex flex-col items-center gap-0.5 rounded-md px-2 py-2 text-xs ${
-                active
-                  ? "bg-white shadow-sm dark:bg-zinc-900"
-                  : "text-zinc-600 dark:text-zinc-400"
-              }`}
-            >
-              <span className="inline-flex items-center gap-1">
-                <tab.Icon className="size-3.5" aria-hidden />
-                {tab.label}
-              </span>
-              <span className="text-[10px] tabular-nums text-zinc-500">
-                {tabCounts[tab.value]}
-              </span>
-            </Link>
-          );
-        })}
-      </div>
+      {/* 評価タブ + 一覧 (横スワイプで切り替え可能) */}
+      {(() => {
+        const idx = TABS.findIndex((t) => t.value === activeTab);
+        const prevHref =
+          idx > 0 ? `/library?tab=${TABS[idx - 1].value}` : null;
+        const nextHref =
+          idx >= 0 && idx < TABS.length - 1
+            ? `/library?tab=${TABS[idx + 1].value}`
+            : null;
+        return (
+          <SwipeTabs prevHref={prevHref} nextHref={nextHref}>
+            <div className="grid grid-cols-4 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
+              {TABS.map((tab) => {
+                const active = tab.value === activeTab;
+                return (
+                  <Link
+                    key={tab.value}
+                    href={`/library?tab=${tab.value}`}
+                    className={`flex flex-col items-center gap-0.5 rounded-md px-2 py-2 text-xs ${
+                      active
+                        ? "bg-white shadow-sm dark:bg-zinc-900"
+                        : "text-zinc-600 dark:text-zinc-400"
+                    }`}
+                  >
+                    <span className="inline-flex items-center gap-1">
+                      <tab.Icon className="size-3.5" aria-hidden />
+                      {tab.label}
+                    </span>
+                    <span className="text-[10px] tabular-nums text-zinc-500">
+                      {tabCounts[tab.value]}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
 
-      {error ? (
-        <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
-          {error.message}
-        </div>
-      ) : null}
+            {error ? (
+              <div className="mt-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
+                {error.message}
+              </div>
+            ) : null}
 
-      {(rows ?? []).length === 0 ? (
-        <div className="rounded-lg border border-zinc-200 bg-white p-6 text-center text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-          このカテゴリの曲はまだありません
-        </div>
-      ) : (
-        <SortableList
-          evaluations={(rows ?? []) as unknown as EvaluationRow[]}
-          knownSongIds={Array.from(knownIds)}
-        />
-      )}
+            <div className="mt-4">
+              {(rows ?? []).length === 0 ? (
+                <div className="rounded-lg border border-zinc-200 bg-white p-6 text-center text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+                  このカテゴリの曲はまだありません
+                </div>
+              ) : (
+                <SortableList
+                  evaluations={(rows ?? []) as unknown as EvaluationRow[]}
+                  knownSongIds={Array.from(knownIds)}
+                />
+              )}
+            </div>
+          </SwipeTabs>
+        );
+      })()}
     </div>
   );
 }
