@@ -172,17 +172,9 @@ function HistorySection({
 }) {
   return (
     <section className="space-y-2">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-          直近のルーム履歴
-        </h2>
-        <Link
-          href="/rooms/history"
-          className="text-xs font-medium text-zinc-500 hover:underline dark:text-zinc-400"
-        >
-          すべて見る →
-        </Link>
-      </div>
+      <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+        直近のルーム履歴
+      </h2>
 
       {rooms.length === 0 ? (
         <p className="rounded-2xl border border-zinc-200 bg-white px-4 py-6 text-center text-xs text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900">

@@ -29,7 +29,7 @@ const FILTER_LABEL: Record<Filter, string> = {
 export function RepertoireList({
   repertoire,
   totalUserParticipants,
-  profileMap: _profileMap,
+  profileMap,
 }: Props) {
   const [filter, setFilter] = useState<Filter>("all");
 
@@ -100,14 +100,73 @@ export function RepertoireList({
                   {item.artist}
                 </p>
               </div>
-              <div className="shrink-0 rounded-full bg-zinc-100 px-2 py-0.5 font-mono text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                {item.singerIds.length}/{totalUserParticipants}
-              </div>
+              <SingerAvatars
+                singerIds={item.singerIds}
+                profileMap={profileMap}
+              />
             </li>
           ))}
         </ul>
       )}
     </section>
+  );
+}
+
+// 同じ user_id なら毎回同じ色になるよう簡易ハッシュで色相を決める
+const AVATAR_HUE_COUNT = 12;
+function avatarHue(id: string): number {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) {
+    h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  }
+  return Math.floor((h % AVATAR_HUE_COUNT) * (360 / AVATAR_HUE_COUNT));
+}
+
+function initialOf(name: string): string {
+  const trimmed = name.trim();
+  if (!trimmed) return "?";
+  // サロゲートペア (絵文字等) を 1 文字として扱う
+  return Array.from(trimmed)[0]?.toUpperCase() ?? "?";
+}
+
+const MAX_AVATARS = 4;
+
+function SingerAvatars({
+  singerIds,
+  profileMap,
+}: {
+  singerIds: string[];
+  profileMap: Record<string, string>;
+}) {
+  const visible = singerIds.slice(0, MAX_AVATARS);
+  const overflow = singerIds.length - visible.length;
+
+  return (
+    <div className="flex shrink-0 -space-x-1.5">
+      {visible.map((id) => {
+        const name = profileMap[id] ?? "?";
+        const hue = avatarHue(id);
+        return (
+          <div
+            key={id}
+            title={name}
+            aria-label={name}
+            className="flex size-7 items-center justify-center rounded-full border-2 border-white text-[11px] font-semibold text-white dark:border-zinc-900"
+            style={{ backgroundColor: `hsl(${hue} 60% 45%)` }}
+          >
+            {initialOf(name)}
+          </div>
+        );
+      })}
+      {overflow > 0 ? (
+        <div
+          className="flex size-7 items-center justify-center rounded-full border-2 border-white bg-zinc-400 text-[11px] font-semibold text-white dark:border-zinc-900 dark:bg-zinc-600"
+          aria-label={`他 ${overflow} 人`}
+        >
+          +{overflow}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
