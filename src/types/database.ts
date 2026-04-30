@@ -524,6 +524,18 @@ export type Database = {
       auto_end_idle_rooms: { Args: never; Returns: undefined }
       cleanup_expired_invite_links: { Args: never; Returns: undefined }
       cleanup_old_rooms: { Args: never; Returns: undefined }
+      get_friend_active_rooms: {
+        Args: never
+        Returns: {
+          room_id: string
+          creator_id: string
+          creator_name: string
+          qr_token: string
+          qr_expires_at: string
+          created_at: string
+          participant_count: number
+        }[]
+      }
       get_friend_invite_info: {
         Args: { p_token: string }
         Returns: {

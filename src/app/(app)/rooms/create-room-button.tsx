@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
@@ -46,14 +45,6 @@ export function CreateRoomButton() {
       {error ? (
         <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
       ) : null}
-      <div className="text-right">
-        <Link
-          href="/rooms/history"
-          className="text-xs font-medium text-pink-700 hover:underline dark:text-pink-300"
-        >
-          ルーム履歴を見る →
-        </Link>
-      </div>
     </section>
   );
 }
