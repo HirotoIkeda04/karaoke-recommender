@@ -27311,11 +27311,23 @@
       "source": "keytube",
       "source_url": "https://keytube.net/song/detail/45218",
       "similarity": 1.0
+    },
+    {
+      "id": "a8bd65fa-e861-440e-ae57-77c630ba4843",
+      "title": "D.D.",
+      "artist": "Snow Man",
+      "release_year": 2025,
+      "range_low_midi": 51,
+      "range_high_midi": 68,
+      "falsetto_max_midi": null,
+      "source": "blaxeason",
+      "source_url": "https://blaxeason.com/snowman-dd/",
+      "similarity": 1.0
     }
   ],
   "metadata": {
-    "scraped_at": "2026-04-29T14:39:11.090120+00:00",
-    "applied_count": 2276,
+    "scraped_at": "2026-04-30T00:48:26.787956+00:00",
+    "applied_count": 2277,
     "tried_total": 2881
   }
 }

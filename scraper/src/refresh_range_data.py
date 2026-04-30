@@ -32,6 +32,7 @@ from urllib.parse import quote
 import requests
 
 from config import PROJECT_ROOT, SCRAPER_ROOT, require
+from fetch_blaxeason import BlaxeasonClient, BlaxeasonMatch, BlaxeasonRateLimited
 from fetch_keytube import KeyTubeClient, KeyTubeMatch, KeyTubeRateLimited
 from fetch_vocal_range import VocalRangeClient, VocalRangeMatch, VocalRangeRateLimited
 
@@ -50,7 +51,10 @@ class _RangeResult:
     similarity: float
 
 
-def _to_result(m: VocalRangeMatch | KeyTubeMatch | None, source: str) -> _RangeResult | None:
+def _to_result(
+    m: VocalRangeMatch | KeyTubeMatch | BlaxeasonMatch | None,
+    source: str,
+) -> _RangeResult | None:
     if m is None:
         return None
     if m.range_high_midi is None and m.range_low_midi is None and m.falsetto_max_midi is None:
@@ -90,13 +94,21 @@ def _load_env_supabase() -> tuple[str, str]:
     return url, key
 
 
-def _fetch_null_range_songs(supabase_url: str, service_key: str) -> list[dict]:
-    """release_year DESC で range_high_midi NULL 曲を全取得。"""
+def _fetch_null_range_songs(
+    supabase_url: str,
+    service_key: str,
+    year_from: int | None = None,
+) -> list[dict]:
+    """release_year DESC で range_high_midi NULL 曲を全取得。
+
+    year_from を指定すると release_year >= year_from のみに絞る。
+    """
     headers = {
         "apikey": service_key,
         "Authorization": f"Bearer {service_key}",
         "Accept": "application/json",
     }
+    year_filter = f"&release_year=gte.{year_from}" if year_from else ""
     out: list[dict] = []
     # PostgREST のページサイズ上限 (default 1000)。逐次取得。
     page_size = 1000
@@ -106,6 +118,7 @@ def _fetch_null_range_songs(supabase_url: str, service_key: str) -> list[dict]:
             f"{supabase_url}/rest/v1/songs?"
             f"select=id,title,artist,release_year,range_low_midi,range_high_midi,falsetto_max_midi"
             f"&range_high_midi=is.null"
+            f"{year_filter}"
             f"&order=release_year.desc.nullslast,title.asc"
             f"&limit={page_size}&offset={offset}"
         )
@@ -178,10 +191,12 @@ def _try_sources(
     artist: str,
     vocal_range: VocalRangeClient,
     keytube: KeyTubeClient,
+    blaxeason: BlaxeasonClient,
     budget_sec: float,
 ) -> _RangeResult | None:
     """budget 内で各ソースを順次試行。最初のヒットを返す。"""
     start = time.monotonic()
+    fallback: _RangeResult | None = None
 
     # 1) vocal-range.com
     if time.monotonic() - start < budget_sec:
@@ -193,6 +208,8 @@ def _try_sources(
         r = _to_result(m, "vocal-range")
         if r and r.range_high_midi is not None:
             return r
+        if r and fallback is None:
+            fallback = r
 
     # 2) keytube.net
     if time.monotonic() - start < budget_sec:
@@ -204,12 +221,32 @@ def _try_sources(
         r2 = _to_result(m2, "keytube")
         if r2 and r2.range_high_midi is not None:
             return r2
+        if r2 and fallback is None:
+            fallback = r2
 
-    # 1 件目が部分ヒット (例えば low だけ取れた) なら r を返す
-    return r if 'r' in locals() and r else None
+    # 3) blaxeason.com
+    if time.monotonic() - start < budget_sec:
+        try:
+            m3 = blaxeason.best_match(title, artist)
+        except BlaxeasonRateLimited:
+            m3 = None
+            logger.warning("blaxeason rate limited")
+        r3 = _to_result(m3, "blaxeason")
+        if r3 and r3.range_high_midi is not None:
+            return r3
+        if r3 and fallback is None:
+            fallback = r3
+
+    return fallback
 
 
-def run(*, budget_sec: float = DEFAULT_BUDGET_SEC, limit: int | None = None) -> int:
+def run(
+    *,
+    budget_sec: float = DEFAULT_BUDGET_SEC,
+    limit: int | None = None,
+    year_from: int | None = None,
+    retry_misses: bool = False,
+) -> int:
     contact = require("SCRAPER_CONTACT_EMAIL")
     supabase_url, service_key = _load_env_supabase()
 
@@ -218,8 +255,9 @@ def run(*, budget_sec: float = DEFAULT_BUDGET_SEC, limit: int | None = None) -> 
     cache_path = output_dir / "range_results_cache.jsonl"
     checkpoint_path = output_dir / "range_results.json"
 
-    songs = _fetch_null_range_songs(supabase_url, service_key)
-    logger.info("DB: %d songs need range data", len(songs))
+    songs = _fetch_null_range_songs(supabase_url, service_key, year_from=year_from)
+    logger.info("DB: %d songs need range data%s",
+                len(songs), f" (release_year >= {year_from})" if year_from else "")
     if limit:
         songs = songs[:limit]
         logger.info("--limit %d 適用", limit)
@@ -227,8 +265,24 @@ def run(*, budget_sec: float = DEFAULT_BUDGET_SEC, limit: int | None = None) -> 
     cache = _load_results_cache(cache_path)
     logger.info("results cache: %d entries", len(cache))
 
+    if retry_misses:
+        # 対象曲のキャッシュ miss エントリを破棄して再試行 (新ソース投入時等)
+        target_ids = {s["id"] for s in songs}
+        before = len(cache)
+        cache = {sid: e for sid, e in cache.items()
+                 if sid not in target_ids or e.get("result") is not None}
+        dropped = before - len(cache)
+        if dropped:
+            logger.info("--retry-misses: dropped %d miss entries for re-attempt", dropped)
+            # cache を新たに書き出す (hits だけに)
+            with cache_path.open("w", encoding="utf-8") as f:
+                for e in cache.values():
+                    f.write(json.dumps(e, ensure_ascii=False))
+                    f.write("\n")
+
     vocal_range = VocalRangeClient(contact)
     keytube = KeyTubeClient()
+    blaxeason = BlaxeasonClient()
 
     scraped_at = datetime.now(timezone.utc)
     hits = misses = cached_used = 0
@@ -258,7 +312,7 @@ def run(*, budget_sec: float = DEFAULT_BUDGET_SEC, limit: int | None = None) -> 
         else:
             result = _try_sources(
                 song["title"], song["artist"],
-                vocal_range, keytube, budget_sec,
+                vocal_range, keytube, blaxeason, budget_sec,
             )
             entry = {
                 "id": sid,
@@ -302,6 +356,14 @@ def main(argv: list[str] | None = None) -> int:
         help="先頭 N 曲だけ処理 (試運転用)",
     )
     parser.add_argument(
+        "--year-from", type=int, default=None,
+        help="この release_year 以降の曲のみ処理 (例: 2022)",
+    )
+    parser.add_argument(
+        "--retry-misses", action="store_true",
+        help="対象曲のキャッシュ miss エントリを破棄して再試行 (新ソース投入時)",
+    )
+    parser.add_argument(
         "--log-level", default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
     )
@@ -311,7 +373,12 @@ def main(argv: list[str] | None = None) -> int:
         level=args.log_level,
         format="%(asctime)s %(levelname)s %(name)s - %(message)s",
     )
-    return run(budget_sec=args.budget, limit=args.limit)
+    return run(
+        budget_sec=args.budget,
+        limit=args.limit,
+        year_from=args.year_from,
+        retry_misses=args.retry_misses,
+    )
 
 
 if __name__ == "__main__":
