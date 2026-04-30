@@ -82,9 +82,19 @@ def _to_midi(text: str | None) -> int | None:
 
 
 class KeyTubeClient:
+    """KeyTube クライアント。
+
+    KeyTube は session 単位で過剰アクセスを検知すると 400 を返し、
+    その session からは復旧しないことが実測された。
+    対策として SESSION_REFRESH_EVERY 件ごとに session を作り直す。
+    """
+
+    SESSION_REFRESH_EVERY = 50
+
     def __init__(self, session: requests.Session | None = None):
         self.session = session or requests.Session()
         self._last_request_at: float = 0.0
+        self._requests_since_refresh = 0
 
     def _throttle(self) -> None:
         elapsed = time.monotonic() - self._last_request_at
@@ -93,15 +103,31 @@ class KeyTubeClient:
             time.sleep(wait)
         self._last_request_at = time.monotonic()
 
+    def _refresh_session_if_needed(self) -> None:
+        if self._requests_since_refresh >= self.SESSION_REFRESH_EVERY:
+            self.session.close()
+            self.session = requests.Session()
+            self._requests_since_refresh = 0
+            logger.info("keytube: session refreshed")
+
     def _get(self, url: str) -> str:
+        self._refresh_session_if_needed()
         self._throttle()
         try:
             resp = self.session.get(url, headers=_HDR, timeout=REQUEST_TIMEOUT_SEC)
         except (requests.Timeout, requests.ConnectionError) as e:
             logger.warning("keytube transient error %s: %s", url, e)
             return ""
+        finally:
+            self._requests_since_refresh += 1
+
         if resp.status_code == 429:
             raise KeyTubeRateLimited(url)
+        if resp.status_code == 400:
+            # 400 が連続したら session の過剰アクセス検知。次回 refresh で回復
+            logger.warning("keytube 400 for %s (will refresh session)", url)
+            self._requests_since_refresh = self.SESSION_REFRESH_EVERY  # 即時 refresh
+            return ""
         if resp.status_code != 200:
             logger.warning("keytube %d for %s", resp.status_code, url)
             return ""
