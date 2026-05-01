@@ -197,10 +197,10 @@ function HistorySection({
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1 space-y-1">
+                    <p className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                      {creatorName} のルーム
+                    </p>
                     <div className="flex items-center gap-2">
-                      <p className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">
-                        {creatorName} のルーム
-                      </p>
                       {ended ? (
                         <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
                           終了
@@ -210,16 +210,16 @@ function HistorySection({
                           進行中
                         </span>
                       )}
+                      <p className="text-xs text-zinc-500 dark:text-zinc-500">
+                        {createdAt.toLocaleString("ja-JP", {
+                          month: "numeric",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                        {" 作成"}
+                      </p>
                     </div>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-500">
-                      {createdAt.toLocaleString("ja-JP", {
-                        month: "numeric",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                      {" 作成"}
-                    </p>
                   </div>
                   <Link
                     href={`/rooms/${room.id}`}
