@@ -53,25 +53,29 @@ const RATINGS: ReadonlyArray<{
     value: "hard",
     label: "苦手",
     Icon: X,
-    color: "bg-red-500 hover:bg-red-600 active:bg-red-700",
+    color:
+      "bg-[linear-gradient(135deg,#f87171_0%,#ef4444_28%,#ef4444_72%,#b91c1c_100%)] hover:brightness-110 active:brightness-95",
   },
   {
     value: "medium",
     label: "普通",
     Icon: Minus,
-    color: "bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700",
+    color:
+      "bg-[linear-gradient(135deg,#fcd34d_0%,#eab308_28%,#eab308_72%,#a16207_100%)] hover:brightness-110 active:brightness-95",
   },
   {
     value: "easy",
     label: "得意",
     Icon: Check,
-    color: "bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700",
+    color:
+      "bg-[linear-gradient(135deg,#34d399_0%,#10b981_28%,#10b981_72%,#047857_100%)] hover:brightness-110 active:brightness-95",
   },
   {
     value: "practicing",
     label: "練習中",
     Icon: Dumbbell,
-    color: "bg-purple-500 hover:bg-purple-600 active:bg-purple-700",
+    color:
+      "bg-[linear-gradient(135deg,#c084fc_0%,#a855f7_28%,#a855f7_72%,#7e22ce_100%)] hover:brightness-110 active:brightness-95",
   },
 ];
 
