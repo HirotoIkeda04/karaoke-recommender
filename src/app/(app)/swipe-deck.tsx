@@ -419,27 +419,43 @@ function SongCardContent({
         )}
       </div>
 
-      {/* テキスト領域: 画像下に padding を取って配置 */}
-      <div className="flex flex-1 flex-col justify-between gap-2 p-3">
-        <div className="w-full">
-          <h2 className="line-clamp-1 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+      {/* テキスト領域: 画像下に padding を取って配置。背景はジャケットを上下反転＋強ブラー＋減光した画像 */}
+      <div className="relative flex flex-1 flex-col justify-between gap-2 overflow-hidden p-3">
+        {song.image_url_large ?? song.image_url_medium ? (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-0 scale-y-[-1] scale-x-110 brightness-[0.35] blur-2xl"
+          >
+            <Image
+              src={(song.image_url_large ?? song.image_url_medium)!}
+              alt=""
+              fill
+              sizes="22rem"
+              className="object-cover"
+              draggable={false}
+            />
+          </div>
+        ) : null}
+
+        <div className="relative z-10 w-full">
+          <h2 className="line-clamp-1 text-lg font-semibold text-white drop-shadow-sm">
             {song.title}
           </h2>
-          <p className="text-xs text-zinc-600 dark:text-zinc-400">
+          <p className="text-xs text-zinc-200 drop-shadow-sm">
             {song.artist}
             {song.release_year ? ` · ${song.release_year}` : ""}
           </p>
         </div>
 
         {/* 音域情報 (Plan A: 背景なし、左寄せ、grid-cols-[auto_1fr] で 2 行を縦に揃える) */}
-        <dl className="grid w-full grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[11px]">
-          <dt className="text-zinc-600 dark:text-zinc-400">地声</dt>
-          <dd className="font-mono text-zinc-700 dark:text-zinc-300">
+        <dl className="relative z-10 grid w-full grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[11px]">
+          <dt className="text-zinc-300">地声</dt>
+          <dd className="font-mono text-zinc-100">
             {midiToKaraoke(song.range_low_midi)} 〜{" "}
             {midiToKaraoke(song.range_high_midi)}
           </dd>
-          <dt className="text-zinc-600 dark:text-zinc-400">裏声</dt>
-          <dd className="font-mono text-zinc-700 dark:text-zinc-300">
+          <dt className="text-zinc-300">裏声</dt>
+          <dd className="font-mono text-zinc-100">
             {midiToKaraoke(song.falsetto_max_midi)}
           </dd>
         </dl>
