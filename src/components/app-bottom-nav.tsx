@@ -39,13 +39,14 @@ export function AppBottomNav() {
             <li key={item.href} className="min-w-0">
               <Link
                 href={item.href}
+                aria-label={item.label}
                 className={cn(
-                  "flex w-full flex-col items-center gap-0.5 px-1 py-1.5 text-[10px] whitespace-nowrap",
+                  "flex w-full items-center justify-center px-1 py-3",
                   active ? "text-white" : "text-zinc-400",
                 )}
               >
                 <Icon className="size-6" aria-hidden />
-                <span>{item.label}</span>
+                <span className="sr-only">{item.label}</span>
               </Link>
             </li>
           );
