@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, LibraryBig, Search, UsersRound } from "lucide-react";
+import { Home, LibraryBig, Search, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -10,7 +10,7 @@ const ITEMS = [
   { href: "/", label: "評価", icon: Home },
   { href: "/songs", label: "検索", icon: Search },
   { href: "/library", label: "ライブラリ", icon: LibraryBig },
-  { href: "/rooms", label: "ルーム", icon: UsersRound },
+  { href: "/rooms", label: "ルーム", icon: Users },
 ] as const;
 
 export function AppBottomNav() {
