@@ -24,22 +24,22 @@ const RATING_BADGE: Record<
 > = {
   hard: {
     label: "苦手",
-    color: "bg-red-500 dark:bg-red-400",
+    color: "bg-red-600 dark:bg-red-500",
     Icon: X,
   },
   medium: {
     label: "普通",
-    color: "bg-amber-500 dark:bg-amber-400",
+    color: "bg-amber-600 dark:bg-amber-500",
     Icon: Minus,
   },
   easy: {
     label: "得意",
-    color: "bg-emerald-500 dark:bg-emerald-400",
+    color: "bg-emerald-600 dark:bg-emerald-500",
     Icon: Check,
   },
   practicing: {
     label: "練習中",
-    color: "bg-purple-500 dark:bg-purple-400",
+    color: "bg-purple-600 dark:bg-purple-500",
     Icon: Dumbbell,
   },
 };
@@ -102,12 +102,12 @@ export function SongCard({
         <div className="flex items-center gap-1 text-xs text-zinc-600 dark:text-zinc-400">
           {badge ? (
             <span
-              className={`inline-flex size-3 shrink-0 items-center justify-center rounded-[2px] ${badge.color}`}
+              className={`inline-flex size-2.5 shrink-0 items-center justify-center rounded-[2px] ${badge.color}`}
               aria-label={badge.label}
             >
               <badge.Icon
                 className="size-2 text-white dark:text-zinc-950"
-                strokeWidth={3}
+                strokeWidth={4}
                 aria-hidden
               />
             </span>
