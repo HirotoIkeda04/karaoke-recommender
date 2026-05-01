@@ -20,7 +20,7 @@ export function EraDistribution({ buckets }: Props) {
   if (total === 0) {
     return (
       <section className="space-y-2">
-        <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+        <h3 className="text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
           楽曲の年代分布
         </h3>
         <p className="text-xs text-zinc-500 dark:text-zinc-500">
@@ -32,22 +32,25 @@ export function EraDistribution({ buckets }: Props) {
 
   return (
     <section className="space-y-2">
-      <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-        楽曲の年代分布
-      </h3>
-
-      <BarChart
-        segments={decades.map((decade, i) => {
-          const count = buckets[decade];
-          const pct = (count / total) * 100;
-          return {
-            key: String(decade),
-            value: count,
-            colorClass: redShadeColor(i),
-            title: `${decadeLabel(decade)}: ${count}曲 (${pct.toFixed(0)}%)`,
-          };
-        })}
-      />
+      <div className="flex items-center gap-3">
+        <h3 className="shrink-0 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
+          楽曲の年代分布
+        </h3>
+        <div className="min-w-0 flex-1">
+          <BarChart
+            segments={decades.map((decade, i) => {
+              const count = buckets[decade];
+              const pct = (count / total) * 100;
+              return {
+                key: String(decade),
+                value: count,
+                colorClass: redShadeColor(i),
+                title: `${decadeLabel(decade)}: ${count}曲 (${pct.toFixed(0)}%)`,
+              };
+            })}
+          />
+        </div>
+      </div>
 
       {/* 凡例 (件数 0 の年代は表示しない) */}
       <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">

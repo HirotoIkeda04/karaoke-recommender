@@ -24,7 +24,7 @@ export function GenreDistribution({ buckets }: Props) {
   if (total === 0) {
     return (
       <section className="space-y-2">
-        <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+        <h3 className="text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
           歌える曲のジャンル分布
         </h3>
         <p className="text-xs text-zinc-500 dark:text-zinc-500">
@@ -52,35 +52,38 @@ export function GenreDistribution({ buckets }: Props) {
 
   return (
     <section className="space-y-2">
-      <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-        歌える曲のジャンル分布
-      </h3>
-
-      <BarChart
-        segments={[
-          ...top.map(([code, count], i) => {
-            const pct = (count / total) * 100;
-            return {
-              key: code,
-              value: count,
-              colorClass: blueShadeColor(i),
-              title: `${GENRE_LABELS[code]}: ${count}曲 (${pct.toFixed(0)}%)`,
-            };
-          }),
-          ...(restCount > 0
-            ? [
-                {
-                  key: "rest",
-                  value: restCount,
-                  colorClass: REST_COLOR_CLASS,
-                  title: `${REST_LABEL}: ${restCount}曲 (${restPct.toFixed(0)}%) — ${rest
-                    .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
-                    .join(", ")}`,
-                },
-              ]
-            : []),
-        ]}
-      />
+      <div className="flex items-center gap-3">
+        <h3 className="shrink-0 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
+          歌える曲のジャンル分布
+        </h3>
+        <div className="min-w-0 flex-1">
+          <BarChart
+            segments={[
+              ...top.map(([code, count], i) => {
+                const pct = (count / total) * 100;
+                return {
+                  key: code,
+                  value: count,
+                  colorClass: blueShadeColor(i),
+                  title: `${GENRE_LABELS[code]}: ${count}曲 (${pct.toFixed(0)}%)`,
+                };
+              }),
+              ...(restCount > 0
+                ? [
+                    {
+                      key: "rest",
+                      value: restCount,
+                      colorClass: REST_COLOR_CLASS,
+                      title: `${REST_LABEL}: ${restCount}曲 (${restPct.toFixed(0)}%) — ${rest
+                        .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
+                        .join(", ")}`,
+                    },
+                  ]
+                : []),
+            ]}
+          />
+        </div>
+      </div>
 
       <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
         {top.map(([code, count], i) => (
