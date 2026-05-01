@@ -44,7 +44,7 @@ export function BarChart({ segments }: BarChartProps) {
   if (total === 0) return null;
 
   return (
-    <div className="relative h-3 w-full overflow-hidden rounded-sm">
+    <div className="relative h-2 w-full overflow-hidden rounded-sm">
       <div className="flex h-full">
         {segments.map((seg) => {
           if (seg.value <= 0) return null;
