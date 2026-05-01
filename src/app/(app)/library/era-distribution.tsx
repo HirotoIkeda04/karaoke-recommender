@@ -6,48 +6,19 @@ interface Props {
 }
 
 // 各 decade に対応する Tailwind 色クラス (連続した色相で並ぶよう選定)
-const DECADE_COLORS: Record<number, { bar: string; chip: string; ring: string }> = {
-  1960: {
-    bar: "bg-violet-500",
-    chip: "bg-violet-500",
-    ring: "ring-violet-500/20",
-  },
-  1970: {
-    bar: "bg-indigo-500",
-    chip: "bg-indigo-500",
-    ring: "ring-indigo-500/20",
-  },
-  1980: {
-    bar: "bg-sky-500",
-    chip: "bg-sky-500",
-    ring: "ring-sky-500/20",
-  },
-  1990: {
-    bar: "bg-emerald-500",
-    chip: "bg-emerald-500",
-    ring: "ring-emerald-500/20",
-  },
-  2000: {
-    bar: "bg-amber-500",
-    chip: "bg-amber-500",
-    ring: "ring-amber-500/20",
-  },
-  2010: {
-    bar: "bg-orange-500",
-    chip: "bg-orange-500",
-    ring: "ring-orange-500/20",
-  },
-  2020: {
-    bar: "bg-pink-500",
-    chip: "bg-pink-500",
-    ring: "ring-pink-500/20",
-  },
+const DECADE_COLORS: Record<number, { bar: string; text: string }> = {
+  1960: { bar: "bg-violet-500", text: "text-violet-500" },
+  1970: { bar: "bg-indigo-500", text: "text-indigo-500" },
+  1980: { bar: "bg-sky-500", text: "text-sky-500" },
+  1990: { bar: "bg-emerald-500", text: "text-emerald-500" },
+  2000: { bar: "bg-amber-500", text: "text-amber-500" },
+  2010: { bar: "bg-orange-500", text: "text-orange-500" },
+  2020: { bar: "bg-pink-500", text: "text-pink-500" },
 };
 
 const FALLBACK_COLOR = {
   bar: "bg-zinc-500",
-  chip: "bg-zinc-500",
-  ring: "ring-zinc-500/20",
+  text: "text-zinc-500",
 };
 
 function decadeLabel(decade: number) {
@@ -99,15 +70,11 @@ export function EraDistribution({ buckets }: Props) {
       />
 
       {/* 凡例 (件数 0 の年代は表示しない) */}
-      <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-zinc-600 dark:text-zinc-400">
+      <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
         {decades.map((decade) => {
           const color = DECADE_COLORS[decade] ?? FALLBACK_COLOR;
           return (
-            <li key={decade} className="inline-flex items-center gap-1">
-              <span
-                className={`size-2 rounded-full ${color.chip}`}
-                aria-hidden
-              />
+            <li key={decade} className={color.text}>
               {decadeLabel(decade)} ({buckets[decade]})
             </li>
           );
