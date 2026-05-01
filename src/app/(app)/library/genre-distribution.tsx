@@ -7,28 +7,28 @@ interface Props {
   buckets: Partial<Record<GenreCode, number>>;
 }
 
-// ジャンル毎の Tailwind 配色 (ドットグリッド + 凡例文字色で共有 / 淡め + 彩度高めのトーン)
+// ジャンル毎の Tailwind 配色 (ドットグリッド + 凡例文字色で共有 / 彩度を抑えた muted トーン)
 const GENRE_COLORS: Record<GenreCode, { bar: string; text: string }> = {
-  j_pop: { bar: "bg-pink-400", text: "text-pink-400" },
-  j_rock: { bar: "bg-red-400", text: "text-red-400" },
-  anison: { bar: "bg-orange-400", text: "text-orange-400" },
-  vocaloid_utaite: { bar: "bg-cyan-400", text: "text-cyan-400" },
-  idol_female: { bar: "bg-rose-400", text: "text-rose-400" },
-  idol_male: { bar: "bg-blue-400", text: "text-blue-400" },
-  rnb_soul: { bar: "bg-amber-400", text: "text-amber-400" },
-  hiphop: { bar: "bg-purple-400", text: "text-purple-400" },
-  enka_kayo: { bar: "bg-yellow-400", text: "text-yellow-400" },
-  western: { bar: "bg-emerald-400", text: "text-emerald-400" },
-  kpop: { bar: "bg-fuchsia-400", text: "text-fuchsia-400" },
-  game_bgm: { bar: "bg-indigo-400", text: "text-indigo-400" },
-  other: { bar: "bg-zinc-400", text: "text-zinc-400" },
+  j_pop: { bar: "bg-pink-400/60", text: "text-pink-400/60" },
+  j_rock: { bar: "bg-red-400/60", text: "text-red-400/60" },
+  anison: { bar: "bg-orange-400/60", text: "text-orange-400/60" },
+  vocaloid_utaite: { bar: "bg-cyan-400/60", text: "text-cyan-400/60" },
+  idol_female: { bar: "bg-rose-400/60", text: "text-rose-400/60" },
+  idol_male: { bar: "bg-blue-400/60", text: "text-blue-400/60" },
+  rnb_soul: { bar: "bg-amber-400/60", text: "text-amber-400/60" },
+  hiphop: { bar: "bg-purple-400/60", text: "text-purple-400/60" },
+  enka_kayo: { bar: "bg-yellow-400/60", text: "text-yellow-400/60" },
+  western: { bar: "bg-emerald-400/60", text: "text-emerald-400/60" },
+  kpop: { bar: "bg-fuchsia-400/60", text: "text-fuchsia-400/60" },
+  game_bgm: { bar: "bg-indigo-400/60", text: "text-indigo-400/60" },
+  other: { bar: "bg-zinc-400/60", text: "text-zinc-400/60" },
 };
 
 // 累積割合がこの閾値に達するまでをドットグリッド上で個別表示し、
 // 残りの少数派ジャンルは1つの「他のジャンル」にまとめる。
 const TOP_THRESHOLD = 0.9;
 
-const REST_COLOR = { bar: "bg-zinc-400", text: "text-zinc-400" };
+const REST_COLOR = { bar: "bg-zinc-400/60", text: "text-zinc-400/60" };
 const REST_LABEL = "他のジャンル";
 
 export function GenreDistribution({ buckets }: Props) {
