@@ -54,8 +54,8 @@ export function EraDistribution({ buckets }: Props) {
 
       <div className="relative w-fit">
         <PieChart
-          size={240}
-          innerRatio={0.85}
+          size={180}
+          innerRatio={0.88}
           segments={decades.map((decade) => {
             const count = buckets[decade];
             const pct = (count / total) * 100;
@@ -70,7 +70,7 @@ export function EraDistribution({ buckets }: Props) {
         />
 
         {/* 凡例 (件数 0 の年代は表示しない) — ドーナツ中央のホールに重ねる */}
-        <ul className="pointer-events-none absolute inset-0 m-auto grid grid-cols-2 content-center justify-items-start gap-x-3 gap-y-0.5 px-12 text-[11px]">
+        <ul className="pointer-events-none absolute inset-0 m-auto grid grid-cols-2 content-center justify-items-start gap-x-2 gap-y-0.5 px-8 text-[10px]">
           {decades.map((decade) => {
             const color = DECADE_COLORS[decade] ?? FALLBACK_COLOR;
             return (
