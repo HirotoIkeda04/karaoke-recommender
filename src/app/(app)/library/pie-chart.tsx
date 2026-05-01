@@ -69,7 +69,9 @@ export function PieChart({ segments, size = 80 }: PieChartProps) {
           <path
             key={seg.key}
             d={d}
-            className={`fill-current ${seg.colorClass}`}
+            strokeWidth={2}
+            strokeLinejoin="round"
+            className={`fill-current stroke-white dark:stroke-zinc-900 ${seg.colorClass}`}
           >
             {seg.title ? <title>{seg.title}</title> : null}
           </path>
