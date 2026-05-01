@@ -14,7 +14,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       <div className="w-full max-w-sm space-y-8">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-            カラオケ推薦アプリ
+            SetoriSetolu
           </h1>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             Google アカウントでサインインしてください
