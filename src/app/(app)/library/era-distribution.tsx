@@ -6,7 +6,7 @@ interface Props {
 }
 
 function decadeLabel(decade: number) {
-  return `${decade}s`;
+  return `'${String(decade).slice(-2)}s`;
 }
 
 export function EraDistribution({ buckets }: Props) {
@@ -21,7 +21,7 @@ export function EraDistribution({ buckets }: Props) {
     return (
       <section className="space-y-2">
         <h3 className="text-[11px] font-medium text-zinc-500 dark:text-zinc-500">
-          楽曲の年代分布
+          年代分布
         </h3>
         <p className="text-xs text-zinc-500 dark:text-zinc-500">
           評価済みの楽曲がまだありません
@@ -34,7 +34,7 @@ export function EraDistribution({ buckets }: Props) {
     <section className="space-y-2">
       <div className="flex items-center gap-3">
         <h3 className="w-28 shrink-0 text-right text-[11px] font-medium text-zinc-500 dark:text-zinc-500">
-          楽曲の年代分布
+          年代分布
         </h3>
         <div className="min-w-0 flex-1">
           <BarChart

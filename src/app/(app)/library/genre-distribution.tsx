@@ -25,7 +25,7 @@ export function GenreDistribution({ buckets }: Props) {
     return (
       <section className="space-y-2">
         <h3 className="text-[11px] font-medium text-zinc-500 dark:text-zinc-500">
-          楽曲のジャンル分布
+          ジャンル分布
         </h3>
         <p className="text-xs text-zinc-500 dark:text-zinc-500">
           「得意 / 練習中 / 普通」評価がまだありません
@@ -54,7 +54,7 @@ export function GenreDistribution({ buckets }: Props) {
     <section className="space-y-2">
       <div className="flex items-center gap-3">
         <h3 className="w-28 shrink-0 text-right text-[11px] font-medium text-zinc-500 dark:text-zinc-500">
-          楽曲のジャンル分布
+          ジャンル分布
         </h3>
         <div className="min-w-0 flex-1">
           <BarChart
