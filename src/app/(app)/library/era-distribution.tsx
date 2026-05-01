@@ -52,9 +52,10 @@ export function EraDistribution({ buckets }: Props) {
         楽曲の年代分布
       </h3>
 
-      <div className="flex items-center gap-4">
+      <div className="relative w-fit">
         <PieChart
-          size={80}
+          size={240}
+          innerRatio={0.85}
           segments={decades.map((decade) => {
             const count = buckets[decade];
             const pct = (count / total) * 100;
@@ -68,8 +69,8 @@ export function EraDistribution({ buckets }: Props) {
           })}
         />
 
-        {/* 凡例 (件数 0 の年代は表示しない) */}
-        <ul className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px]">
+        {/* 凡例 (件数 0 の年代は表示しない) — ドーナツ中央のホールに重ねる */}
+        <ul className="pointer-events-none absolute inset-0 m-auto grid grid-cols-2 content-center justify-items-start gap-x-3 gap-y-0.5 px-12 text-[11px]">
           {decades.map((decade) => {
             const color = DECADE_COLORS[decade] ?? FALLBACK_COLOR;
             return (
