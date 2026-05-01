@@ -32,7 +32,7 @@ export default function Loading() {
             key={i}
             className="flex items-center gap-3 rounded-md p-2"
           >
-            <div className="size-12 shrink-0 animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-800" />
+            <div className="size-12 shrink-0 animate-pulse rounded-sm bg-zinc-200 dark:bg-zinc-800" />
             <div className="min-w-0 flex-1 space-y-1.5">
               <div className="h-4 w-3/4 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
               <div className="h-3 w-2/3 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
