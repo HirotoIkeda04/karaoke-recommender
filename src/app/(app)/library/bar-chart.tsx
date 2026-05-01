@@ -2,28 +2,28 @@
 // 10% ごとに細い境界線を重ねる。
 
 // 同系色のシェードグラデーション。先頭(index=0)が最も濃く、後ろほど淡くなる。
-const RED_SHADES = [
-  "text-red-600",
-  "text-red-500",
-  "text-red-400",
-  "text-red-300",
-  "text-red-200",
+const ORANGE_SHADES = [
+  "text-orange-600",
+  "text-orange-500",
+  "text-orange-400",
+  "text-orange-300",
+  "text-orange-200",
 ];
 
-const BLUE_SHADES = [
-  "text-blue-600",
-  "text-blue-500",
-  "text-blue-400",
-  "text-blue-300",
-  "text-blue-200",
+const TEAL_SHADES = [
+  "text-teal-600",
+  "text-teal-500",
+  "text-teal-400",
+  "text-teal-300",
+  "text-teal-200",
 ];
 
-export function redShadeColor(index: number): string {
-  return RED_SHADES[Math.min(index, RED_SHADES.length - 1)];
+export function orangeShadeColor(index: number): string {
+  return ORANGE_SHADES[Math.min(index, ORANGE_SHADES.length - 1)];
 }
 
-export function blueShadeColor(index: number): string {
-  return BLUE_SHADES[Math.min(index, BLUE_SHADES.length - 1)];
+export function tealShadeColor(index: number): string {
+  return TEAL_SHADES[Math.min(index, TEAL_SHADES.length - 1)];
 }
 
 export interface BarSegment {

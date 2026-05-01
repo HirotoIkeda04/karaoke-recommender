@@ -1,6 +1,6 @@
 import { GENRE_LABELS, type GenreCode } from "@/lib/genres";
 
-import { BarChart, blueShadeColor } from "./bar-chart";
+import { BarChart, tealShadeColor } from "./bar-chart";
 
 interface Props {
   // genre code → 評価済み曲数 (easy + medium + practicing)
@@ -24,8 +24,8 @@ export function GenreDistribution({ buckets }: Props) {
   if (total === 0) {
     return (
       <section className="space-y-2">
-        <h3 className="text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
-          歌える曲のジャンル分布
+        <h3 className="text-[11px] font-medium text-zinc-500 dark:text-zinc-500">
+          楽曲のジャンル分布
         </h3>
         <p className="text-xs text-zinc-500 dark:text-zinc-500">
           「得意 / 練習中 / 普通」評価がまだありません
@@ -53,8 +53,8 @@ export function GenreDistribution({ buckets }: Props) {
   return (
     <section className="space-y-2">
       <div className="flex items-center gap-3">
-        <h3 className="shrink-0 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
-          歌える曲のジャンル分布
+        <h3 className="w-28 shrink-0 text-right text-[11px] font-medium text-zinc-500 dark:text-zinc-500">
+          楽曲のジャンル分布
         </h3>
         <div className="min-w-0 flex-1">
           <BarChart
@@ -64,7 +64,7 @@ export function GenreDistribution({ buckets }: Props) {
                 return {
                   key: code,
                   value: count,
-                  colorClass: blueShadeColor(i),
+                  colorClass: tealShadeColor(i),
                   title: `${GENRE_LABELS[code]}: ${count}曲 (${pct.toFixed(0)}%)`,
                 };
               }),
@@ -85,23 +85,26 @@ export function GenreDistribution({ buckets }: Props) {
         </div>
       </div>
 
-      <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
-        {top.map(([code, count], i) => (
-          <li key={code} className={blueShadeColor(i)}>
-            {GENRE_LABELS[code]} ({count})
-          </li>
-        ))}
-        {restCount > 0 && (
-          <li
-            className={REST_COLOR_CLASS}
-            title={rest
-              .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
-              .join(", ")}
-          >
-            {REST_LABEL} ({restCount})
-          </li>
-        )}
-      </ul>
+      <div className="flex gap-3">
+        <div className="w-28 shrink-0" aria-hidden />
+        <ul className="flex min-w-0 flex-1 flex-wrap gap-x-3 gap-y-1 text-[11px]">
+          {top.map(([code, count], i) => (
+            <li key={code} className={tealShadeColor(i)}>
+              {GENRE_LABELS[code]} ({count})
+            </li>
+          ))}
+          {restCount > 0 && (
+            <li
+              className={REST_COLOR_CLASS}
+              title={rest
+                .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
+                .join(", ")}
+            >
+              {REST_LABEL} ({restCount})
+            </li>
+          )}
+        </ul>
+      </div>
     </section>
   );
 }
