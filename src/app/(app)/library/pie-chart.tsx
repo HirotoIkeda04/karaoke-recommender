@@ -69,7 +69,7 @@ export function PieChart({ segments, size = 80 }: PieChartProps) {
           <path
             key={seg.key}
             d={d}
-            strokeWidth={2}
+            strokeWidth={1}
             strokeLinejoin="round"
             className={`fill-current stroke-white dark:stroke-zinc-900 ${seg.colorClass}`}
           >
