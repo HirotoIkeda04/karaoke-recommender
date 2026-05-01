@@ -1,5 +1,7 @@
 import { GENRE_LABELS, type GenreCode } from "@/lib/genres";
 
+import { allocateDots, DotGrid } from "./dot-grid";
+
 interface Props {
   // genre code → 評価済み曲数 (easy + medium + practicing)
   buckets: Partial<Record<GenreCode, number>>;
@@ -71,29 +73,33 @@ export function GenreDistribution({ buckets }: Props) {
         歌える曲のジャンル分布
       </h3>
 
-      <div className="flex h-3 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
-        {top.map(([code, count]) => {
-          const pct = (count / total) * 100;
-          const color = GENRE_COLORS[code];
-          return (
-            <div
-              key={code}
-              className={color.bar}
-              style={{ width: `${pct}%` }}
-              title={`${GENRE_LABELS[code]}: ${count}曲 (${pct.toFixed(0)}%)`}
-            />
-          );
-        })}
-        {restCount > 0 && (
-          <div
-            className={REST_COLOR.bar}
-            style={{ width: `${restPct}%` }}
-            title={`${REST_LABEL}: ${restCount}曲 (${restPct.toFixed(0)}%) — ${rest
-              .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
-              .join(", ")}`}
-          />
-        )}
-      </div>
+      {/* 10×2 のドットで割合を表現 (上段→下段の順に左から埋める) */}
+      <DotGrid
+        segments={allocateDots([
+          ...top.map(([code, count]) => {
+            const pct = (count / total) * 100;
+            const color = GENRE_COLORS[code];
+            return {
+              key: code,
+              count,
+              colorClass: color.bar,
+              title: `${GENRE_LABELS[code]}: ${count}曲 (${pct.toFixed(0)}%)`,
+            };
+          }),
+          ...(restCount > 0
+            ? [
+                {
+                  key: "rest",
+                  count: restCount,
+                  colorClass: REST_COLOR.bar,
+                  title: `${REST_LABEL}: ${restCount}曲 (${restPct.toFixed(0)}%) — ${rest
+                    .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
+                    .join(", ")}`,
+                },
+              ]
+            : []),
+        ])}
+      />
 
       <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-zinc-600 dark:text-zinc-400">
         {top.map(([code, count]) => {
