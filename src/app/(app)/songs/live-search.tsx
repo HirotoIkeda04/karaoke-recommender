@@ -1,6 +1,7 @@
 "use client";
 
-import { useDeferredValue, useMemo, useState } from "react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Check } from "lucide-react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 
 import { SongCard } from "@/components/song-card";
 import { karaokeToMidi } from "@/lib/note";
@@ -41,6 +42,35 @@ const HIGH_OPTIONS = [
   "hiF",
 ];
 
+type SortKey = "artist" | "release_year" | "range_high";
+type SortDir = "asc" | "desc";
+
+const SORT_OPTIONS: ReadonlyArray<{
+  key: SortKey;
+  label: string;
+  defaultDir: SortDir;
+}> = [
+  { key: "artist", label: "アーティスト名", defaultDir: "asc" },
+  { key: "release_year", label: "発売年", defaultDir: "desc" },
+  { key: "range_high", label: "最高音", defaultDir: "desc" },
+];
+
+/** asc 用の比較関数。dir は呼び出し側で反転 */
+function compareSong(a: Song, b: Song, key: SortKey): number {
+  switch (key) {
+    case "artist": {
+      const c = a.artist.localeCompare(b.artist, "ja");
+      return c !== 0 ? c : a.title.localeCompare(b.title, "ja");
+    }
+    case "release_year":
+      return (a.release_year ?? -Infinity) - (b.release_year ?? -Infinity);
+    case "range_high":
+      return (
+        (a.range_high_midi ?? -Infinity) - (b.range_high_midi ?? -Infinity)
+      );
+  }
+}
+
 /** 検索文字列の正規化 (大小・全半・カタカナ/ひらがな等で揺れにくく) */
 function normalize(s: string): string {
   return s.toLowerCase().normalize("NFKC");
@@ -55,12 +85,30 @@ export function LiveSearch({
   const [query, setQuery] = useState("");
   const [highMax, setHighMax] = useState("");
   const [highMin, setHighMin] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("artist");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [sortOpen, setSortOpen] = useState(false);
+  const sortMenuRef = useRef<HTMLDivElement>(null);
 
   // 入力を絶対遅らせないために、フィルタ計算側を deferred 値で動かす
   // (React 19 concurrent rendering: 高負荷フィルタ中もタイピングが詰まらない)
   const deferredQuery = useDeferredValue(query);
 
   const knownSet = useMemo(() => new Set(knownSongIds), [knownSongIds]);
+
+  useEffect(() => {
+    if (!sortOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (
+        sortMenuRef.current &&
+        !sortMenuRef.current.contains(e.target as Node)
+      ) {
+        setSortOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [sortOpen]);
 
   const filtered = useMemo(() => {
     const normalizedQ = normalize(deferredQuery.trim());
@@ -85,19 +133,24 @@ export function LiveSearch({
         (s) => s.range_high_midi !== null && s.range_high_midi >= highMinMidi,
       );
     }
-    return result;
-  }, [songs, deferredQuery, highMax, highMin]);
+    const factor = sortDir === "asc" ? 1 : -1;
+    return [...result].sort((a, b) => compareSong(a, b, sortKey) * factor);
+  }, [songs, deferredQuery, highMax, highMin, sortKey, sortDir]);
 
   // 入力中はフィルタが追従中の体感を出す(deferredQuery と query がズレている間)
   const isStale = query !== deferredQuery;
 
-  const handleClear = () => {
-    setQuery("");
-    setHighMax("");
-    setHighMin("");
-  };
+  const currentSort = SORT_OPTIONS.find((o) => o.key === sortKey)!;
 
-  const isFiltering = query.trim() !== "" || highMax !== "" || highMin !== "";
+  const handleSelectSort = (key: SortKey) => {
+    if (key === sortKey) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir(SORT_OPTIONS.find((o) => o.key === key)!.defaultDir);
+    }
+    setSortOpen(false);
+  };
 
   return (
     <div className="space-y-3">
@@ -149,15 +202,71 @@ export function LiveSearch({
           {filtered.length.toLocaleString()} 件 / 全{" "}
           {totalCount.toLocaleString()} 曲
         </span>
-        {isFiltering ? (
+        <div ref={sortMenuRef} className="relative">
           <button
             type="button"
-            onClick={handleClear}
-            className="rounded px-2 py-1 text-xs text-pink-600 hover:bg-pink-50 dark:text-pink-400 dark:hover:bg-pink-950"
+            onClick={() => setSortOpen(!sortOpen)}
+            className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            aria-haspopup="menu"
+            aria-expanded={sortOpen}
           >
-            クリア
+            <ArrowUpDown className="size-3.5" aria-hidden />
+            <span>{currentSort.label}</span>
+            {sortDir === "asc" ? (
+              <ArrowUp className="size-3" aria-hidden />
+            ) : (
+              <ArrowDown className="size-3" aria-hidden />
+            )}
           </button>
-        ) : null}
+
+          {sortOpen ? (
+            <div
+              className="absolute right-0 top-full z-20 mt-1 w-48 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
+              role="menu"
+            >
+              <ul className="py-1">
+                {SORT_OPTIONS.map((option) => {
+                  const selected = option.key === sortKey;
+                  return (
+                    <li key={option.key}>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectSort(option.key)}
+                        className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-xs text-zinc-700 transition hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                        role="menuitem"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Check
+                            className={`size-3 ${
+                              selected
+                                ? "text-pink-600 dark:text-pink-400"
+                                : "invisible"
+                            }`}
+                            aria-hidden
+                          />
+                          {option.label}
+                        </span>
+                        {selected ? (
+                          sortDir === "asc" ? (
+                            <ArrowUp
+                              className="size-3 text-pink-600 dark:text-pink-400"
+                              aria-hidden
+                            />
+                          ) : (
+                            <ArrowDown
+                              className="size-3 text-pink-600 dark:text-pink-400"
+                              aria-hidden
+                            />
+                          )
+                        ) : null}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {filtered.length === 0 ? (
