@@ -38,7 +38,8 @@ const REVERSE_NOTE_TABLE: Record<number, string> = Object.fromEntries(
 
 export function midiToKaraoke(midi: number | null | undefined): string {
   if (midi == null) return "—";
-  return REVERSE_NOTE_TABLE[midi] ?? `MIDI ${midi}`;
+  const rounded = Math.round(midi);
+  return REVERSE_NOTE_TABLE[rounded] ?? `MIDI ${rounded}`;
 }
 
 export function karaokeToMidi(notation: string): number | null {

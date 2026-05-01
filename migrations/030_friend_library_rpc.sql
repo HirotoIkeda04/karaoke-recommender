@@ -65,10 +65,12 @@ begin
        where f.status = 'accepted'
          and (f.user_a_id = p_friend_id or f.user_b_id = p_friend_id)),
     (select count(*)::int from public.evaluations e where e.user_id = p_friend_id),
-    ve.comfortable_min_midi,
-    ve.comfortable_max_midi,
-    ve.falsetto_max_midi,
-    ve.easy_count,
+    -- view 側は percentile_cont による double precision / count による bigint を返すので
+    -- returns table の int 宣言と噛み合うよう明示的にキャストする。
+    round(ve.comfortable_min_midi)::int,
+    round(ve.comfortable_max_midi)::int,
+    ve.falsetto_max_midi::int,
+    ve.easy_count::int,
     coalesce((
       select jsonb_object_agg(decade::text, cnt)
       from (
