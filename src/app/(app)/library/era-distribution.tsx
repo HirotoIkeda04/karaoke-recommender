@@ -1,4 +1,4 @@
-import { allocateDots, DotGrid } from "./dot-grid";
+import { PieChart } from "./pie-chart";
 
 interface Props {
   // decade (e.g. 1980) → count
@@ -52,34 +52,34 @@ export function EraDistribution({ buckets }: Props) {
         楽曲の年代分布
       </h3>
 
-      {/* 10×2 のドットで割合を表現 (上段→下段の順に左から埋める) */}
-      <DotGrid
-        segments={allocateDots(
-          decades.map((decade) => {
+      <div className="flex items-center gap-4">
+        <PieChart
+          size={80}
+          segments={decades.map((decade) => {
             const count = buckets[decade];
             const pct = (count / total) * 100;
             const color = DECADE_COLORS[decade] ?? FALLBACK_COLOR;
             return {
               key: String(decade),
-              count,
-              colorClass: color.bar,
+              value: count,
+              colorClass: color.text,
               title: `${decadeLabel(decade)}: ${count}曲 (${pct.toFixed(0)}%)`,
             };
-          }),
-        )}
-      />
+          })}
+        />
 
-      {/* 凡例 (件数 0 の年代は表示しない) */}
-      <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
-        {decades.map((decade) => {
-          const color = DECADE_COLORS[decade] ?? FALLBACK_COLOR;
-          return (
-            <li key={decade} className={color.text}>
-              {decadeLabel(decade)} ({buckets[decade]})
-            </li>
-          );
-        })}
-      </ul>
+        {/* 凡例 (件数 0 の年代は表示しない) */}
+        <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
+          {decades.map((decade) => {
+            const color = DECADE_COLORS[decade] ?? FALLBACK_COLOR;
+            return (
+              <li key={decade} className={color.text}>
+                {decadeLabel(decade)} ({buckets[decade]})
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </section>
   );
 }

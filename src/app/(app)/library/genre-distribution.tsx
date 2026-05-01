@@ -1,6 +1,6 @@
 import { GENRE_LABELS, type GenreCode } from "@/lib/genres";
 
-import { allocateDots, DotGrid } from "./dot-grid";
+import { PieChart } from "./pie-chart";
 
 interface Props {
   // genre code → 評価済み曲数 (easy + medium + practicing)
@@ -73,54 +73,56 @@ export function GenreDistribution({ buckets }: Props) {
         歌える曲のジャンル分布
       </h3>
 
-      {/* 10×2 のドットで割合を表現 (上段→下段の順に左から埋める) */}
-      <DotGrid
-        segments={allocateDots([
-          ...top.map(([code, count]) => {
-            const pct = (count / total) * 100;
-            const color = GENRE_COLORS[code];
-            return {
-              key: code,
-              count,
-              colorClass: color.bar,
-              title: `${GENRE_LABELS[code]}: ${count}曲 (${pct.toFixed(0)}%)`,
-            };
-          }),
-          ...(restCount > 0
-            ? [
-                {
-                  key: "rest",
-                  count: restCount,
-                  colorClass: REST_COLOR.bar,
-                  title: `${REST_LABEL}: ${restCount}曲 (${restPct.toFixed(0)}%) — ${rest
-                    .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
-                    .join(", ")}`,
-                },
-              ]
-            : []),
-        ])}
-      />
+      <div className="flex items-center gap-4">
+        <PieChart
+          size={80}
+          segments={[
+            ...top.map(([code, count]) => {
+              const pct = (count / total) * 100;
+              const color = GENRE_COLORS[code];
+              return {
+                key: code,
+                value: count,
+                colorClass: color.text,
+                title: `${GENRE_LABELS[code]}: ${count}曲 (${pct.toFixed(0)}%)`,
+              };
+            }),
+            ...(restCount > 0
+              ? [
+                  {
+                    key: "rest",
+                    value: restCount,
+                    colorClass: REST_COLOR.text,
+                    title: `${REST_LABEL}: ${restCount}曲 (${restPct.toFixed(0)}%) — ${rest
+                      .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
+                      .join(", ")}`,
+                  },
+                ]
+              : []),
+          ]}
+        />
 
-      <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
-        {top.map(([code, count]) => {
-          const color = GENRE_COLORS[code];
-          return (
-            <li key={code} className={color.text}>
-              {GENRE_LABELS[code]} ({count})
+        <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
+          {top.map(([code, count]) => {
+            const color = GENRE_COLORS[code];
+            return (
+              <li key={code} className={color.text}>
+                {GENRE_LABELS[code]} ({count})
+              </li>
+            );
+          })}
+          {restCount > 0 && (
+            <li
+              className={REST_COLOR.text}
+              title={rest
+                .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
+                .join(", ")}
+            >
+              {REST_LABEL} ({restCount})
             </li>
-          );
-        })}
-        {restCount > 0 && (
-          <li
-            className={REST_COLOR.text}
-            title={rest
-              .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
-              .join(", ")}
-          >
-            {REST_LABEL} ({restCount})
-          </li>
-        )}
-      </ul>
+          )}
+        </ul>
+      </div>
     </section>
   );
 }
