@@ -1,34 +1,17 @@
 import { GENRE_LABELS, type GenreCode } from "@/lib/genres";
 
-import { BarChart } from "./bar-chart";
+import { BarChart, blueShadeColor } from "./bar-chart";
 
 interface Props {
   // genre code → 評価済み曲数 (easy + medium + practicing)
   buckets: Partial<Record<GenreCode, number>>;
 }
 
-// ジャンル毎の Tailwind 配色 (ドットグリッド + 凡例文字色で共有 / 彩度を抑えた muted トーン)
-const GENRE_COLORS: Record<GenreCode, { bar: string; text: string }> = {
-  j_pop: { bar: "bg-pink-400/60", text: "text-pink-400/60" },
-  j_rock: { bar: "bg-red-400/60", text: "text-red-400/60" },
-  anison: { bar: "bg-orange-400/60", text: "text-orange-400/60" },
-  vocaloid_utaite: { bar: "bg-cyan-400/60", text: "text-cyan-400/60" },
-  idol_female: { bar: "bg-rose-400/60", text: "text-rose-400/60" },
-  idol_male: { bar: "bg-blue-400/60", text: "text-blue-400/60" },
-  rnb_soul: { bar: "bg-amber-400/60", text: "text-amber-400/60" },
-  hiphop: { bar: "bg-purple-400/60", text: "text-purple-400/60" },
-  enka_kayo: { bar: "bg-yellow-400/60", text: "text-yellow-400/60" },
-  western: { bar: "bg-emerald-400/60", text: "text-emerald-400/60" },
-  kpop: { bar: "bg-fuchsia-400/60", text: "text-fuchsia-400/60" },
-  game_bgm: { bar: "bg-indigo-400/60", text: "text-indigo-400/60" },
-  other: { bar: "bg-zinc-400/60", text: "text-zinc-400/60" },
-};
-
 // 累積割合がこの閾値に達するまでをドットグリッド上で個別表示し、
 // 残りの少数派ジャンルは1つの「他のジャンル」にまとめる。
 const TOP_THRESHOLD = 0.9;
 
-const REST_COLOR = { bar: "bg-zinc-400/60", text: "text-zinc-400/60" };
+const REST_COLOR_CLASS = "text-zinc-400/60";
 const REST_LABEL = "他のジャンル";
 
 export function GenreDistribution({ buckets }: Props) {
@@ -75,13 +58,12 @@ export function GenreDistribution({ buckets }: Props) {
 
       <BarChart
         segments={[
-          ...top.map(([code, count]) => {
+          ...top.map(([code, count], i) => {
             const pct = (count / total) * 100;
-            const color = GENRE_COLORS[code];
             return {
               key: code,
               value: count,
-              colorClass: color.text,
+              colorClass: blueShadeColor(i),
               title: `${GENRE_LABELS[code]}: ${count}曲 (${pct.toFixed(0)}%)`,
             };
           }),
@@ -90,7 +72,7 @@ export function GenreDistribution({ buckets }: Props) {
                 {
                   key: "rest",
                   value: restCount,
-                  colorClass: REST_COLOR.text,
+                  colorClass: REST_COLOR_CLASS,
                   title: `${REST_LABEL}: ${restCount}曲 (${restPct.toFixed(0)}%) — ${rest
                     .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
                     .join(", ")}`,
@@ -101,17 +83,14 @@ export function GenreDistribution({ buckets }: Props) {
       />
 
       <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
-        {top.map(([code, count]) => {
-          const color = GENRE_COLORS[code];
-          return (
-            <li key={code} className={color.text}>
-              {GENRE_LABELS[code]} ({count})
-            </li>
-          );
-        })}
+        {top.map(([code, count], i) => (
+          <li key={code} className={blueShadeColor(i)}>
+            {GENRE_LABELS[code]} ({count})
+          </li>
+        ))}
         {restCount > 0 && (
           <li
-            className={REST_COLOR.text}
+            className={REST_COLOR_CLASS}
             title={rest
               .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
               .join(", ")}

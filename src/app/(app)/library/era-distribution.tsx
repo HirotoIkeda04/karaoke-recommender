@@ -1,25 +1,9 @@
-import { BarChart } from "./bar-chart";
+import { BarChart, redShadeColor } from "./bar-chart";
 
 interface Props {
   // decade (e.g. 1980) → count
   buckets: Record<number, number>;
 }
-
-// 各 decade に対応する Tailwind 色クラス (彩度を抑えた muted トーン)
-const DECADE_COLORS: Record<number, { bar: string; text: string }> = {
-  1960: { bar: "bg-violet-400/60", text: "text-violet-400/60" },
-  1970: { bar: "bg-indigo-400/60", text: "text-indigo-400/60" },
-  1980: { bar: "bg-sky-400/60", text: "text-sky-400/60" },
-  1990: { bar: "bg-emerald-400/60", text: "text-emerald-400/60" },
-  2000: { bar: "bg-amber-400/60", text: "text-amber-400/60" },
-  2010: { bar: "bg-orange-400/60", text: "text-orange-400/60" },
-  2020: { bar: "bg-pink-400/60", text: "text-pink-400/60" },
-};
-
-const FALLBACK_COLOR = {
-  bar: "bg-zinc-400/60",
-  text: "text-zinc-400/60",
-};
 
 function decadeLabel(decade: number) {
   return `${decade}s`;
@@ -53,14 +37,13 @@ export function EraDistribution({ buckets }: Props) {
       </h3>
 
       <BarChart
-        segments={decades.map((decade) => {
+        segments={decades.map((decade, i) => {
           const count = buckets[decade];
           const pct = (count / total) * 100;
-          const color = DECADE_COLORS[decade] ?? FALLBACK_COLOR;
           return {
             key: String(decade),
             value: count,
-            colorClass: color.text,
+            colorClass: redShadeColor(i),
             title: `${decadeLabel(decade)}: ${count}曲 (${pct.toFixed(0)}%)`,
           };
         })}
@@ -68,14 +51,14 @@ export function EraDistribution({ buckets }: Props) {
 
       {/* 凡例 (件数 0 の年代は表示しない) */}
       <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
-        {decades.map((decade) => {
-          const color = DECADE_COLORS[decade] ?? FALLBACK_COLOR;
-          return (
-            <li key={decade} className={color.text}>
-              {decadeLabel(decade)} ({buckets[decade]})
-            </li>
-          );
-        })}
+        {decades.map((decade, i) => (
+          <li
+            key={decade}
+            className={redShadeColor(i)}
+          >
+            {decadeLabel(decade)} ({buckets[decade]})
+          </li>
+        ))}
       </ul>
     </section>
   );

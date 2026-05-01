@@ -1,6 +1,31 @@
 // 横向きの積み上げバー。色は `text-*` クラス + `bg-current` で塗る。
 // 10% ごとに細い境界線を重ねる。
 
+// 同系色のシェードグラデーション。先頭(index=0)が最も濃く、後ろほど淡くなる。
+const RED_SHADES = [
+  "text-red-600",
+  "text-red-500",
+  "text-red-400",
+  "text-red-300",
+  "text-red-200",
+];
+
+const BLUE_SHADES = [
+  "text-blue-600",
+  "text-blue-500",
+  "text-blue-400",
+  "text-blue-300",
+  "text-blue-200",
+];
+
+export function redShadeColor(index: number): string {
+  return RED_SHADES[Math.min(index, RED_SHADES.length - 1)];
+}
+
+export function blueShadeColor(index: number): string {
+  return BLUE_SHADES[Math.min(index, BLUE_SHADES.length - 1)];
+}
+
 export interface BarSegment {
   key: string;
   value: number;
