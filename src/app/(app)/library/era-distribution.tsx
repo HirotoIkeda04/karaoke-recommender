@@ -67,7 +67,7 @@ export function EraDistribution({ buckets }: Props) {
       />
 
       {/* 凡例 (件数 0 の年代は表示しない) */}
-      <ul className="grid grid-cols-1 gap-y-0.5 text-[11px]">
+      <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
         {decades.map((decade) => {
           const color = DECADE_COLORS[decade] ?? FALLBACK_COLOR;
           return (
