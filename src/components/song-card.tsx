@@ -107,7 +107,7 @@ export function SongCard({
             >
               <badge.Icon
                 className="size-2 text-white dark:text-zinc-950"
-                strokeWidth={4}
+                strokeWidth={rating === "practicing" ? 2.5 : 4}
                 aria-hidden
               />
             </span>
