@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
+  buildChromeSchemeUrl,
   detectInAppBrowser,
+  detectMobileOS,
   inAppBrowserLabel,
   type InAppBrowser,
+  type MobileOS,
 } from "@/lib/in-app-browser";
 import { createClient } from "@/lib/supabase/client";
 
@@ -18,11 +21,16 @@ export function GoogleLoginButton({ next }: GoogleLoginButtonProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [inAppKind, setInAppKind] = useState<InAppBrowser | null>(null);
+  const [os, setOs] = useState<MobileOS>("other");
   const [copied, setCopied] = useState(false);
+  // Chrome 起動を試行したがアプリ切替が起きなかった (= Chrome 未インストール) と判定された状態
+  const [chromeMissing, setChromeMissing] = useState(false);
+  const chromeAttemptRef = useRef<number | null>(null);
 
   useEffect(() => {
     const info = detectInAppBrowser(navigator.userAgent);
     if (info.inApp) setInAppKind(info.kind);
+    setOs(detectMobileOS(navigator.userAgent));
   }, []);
 
   const handleClick = async () => {
@@ -60,9 +68,41 @@ export function GoogleLoginButton({ next }: GoogleLoginButtonProps) {
     }
   };
 
+  // Chrome に直接遷移させる。Android では intent:// で Chrome 未インストール時も
+  // S.browser_fallback_url が機能するため検知不要。iOS は googlechromes:// が
+  // 失敗しても何も起きないだけなので、visibilitychange + timeout でフォールバック判定する。
+  const openInChrome = () => {
+    setChromeMissing(false);
+    const schemeUrl = buildChromeSchemeUrl(window.location.href, os);
+    if (!schemeUrl) return;
+
+    if (os === "ios") {
+      chromeAttemptRef.current = Date.now();
+      const onVis = () => {
+        if (document.hidden) {
+          // アプリ切替が起きた = Chrome 起動成功とみなして以降の判定を止める
+          chromeAttemptRef.current = null;
+          document.removeEventListener("visibilitychange", onVis);
+        }
+      };
+      document.addEventListener("visibilitychange", onVis);
+      setTimeout(() => {
+        document.removeEventListener("visibilitychange", onVis);
+        // 試行から 1.5 秒経ってもページが見えたまま = Chrome 未起動 = 未インストール想定
+        if (chromeAttemptRef.current !== null && !document.hidden) {
+          setChromeMissing(true);
+        }
+        chromeAttemptRef.current = null;
+      }, 1500);
+    }
+
+    window.location.href = schemeUrl;
+  };
+
   if (inAppKind) {
     const label = inAppBrowserLabel(inAppKind);
     const isLine = inAppKind === "line";
+    const canChromeButton = os === "ios" || os === "android";
     return (
       <div className="space-y-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100">
         <p className="font-semibold">
@@ -70,10 +110,30 @@ export function GoogleLoginButton({ next }: GoogleLoginButtonProps) {
         </p>
         <p className="text-xs leading-relaxed">
           Google のセキュリティポリシーにより、{label} 内ブラウザからのサインインはブロックされます。
-          {isLine
-            ? "右上の「⋯」メニューから「他のブラウザで開く」を選び、Safari / Chrome で開き直してください。"
-            : "右上のメニューから「ブラウザで開く」を選び、Safari / Chrome で開き直してください。"}
         </p>
+
+        {canChromeButton ? (
+          <Button onClick={openInChrome} size="lg" className="w-full">
+            Chrome で開く
+          </Button>
+        ) : null}
+
+        {chromeMissing ? (
+          <p className="text-xs leading-relaxed">
+            Chrome がインストールされていないようです。お手数ですが
+            {isLine
+              ? "右上の「⋯」メニューから「他のブラウザで開く」を選んで Safari で開き直してください。"
+              : "右上のメニューから「ブラウザで開く」を選び、Safari で開き直してください。"}
+          </p>
+        ) : (
+          <p className="text-xs leading-relaxed">
+            Chrome が無い場合は
+            {isLine
+              ? "右上の「⋯」メニューから「他のブラウザで開く」を選んで Safari で開いてください。"
+              : "右上のメニューから「ブラウザで開く」を選んで Safari で開いてください。"}
+          </p>
+        )}
+
         <Button
           onClick={copyUrl}
           variant="outline"
