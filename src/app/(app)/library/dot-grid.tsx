@@ -6,8 +6,7 @@
 //   2  4  6  ... 30
 // で、左端の列から順に上→下→次の列…と埋めていく。
 //
-// レイアウトは横幅いっぱい (両端揃い)。flex の justify-between により
-// 最左列がコンテナ左端、最右列がコンテナ右端に揃う。
+// 正方形 (微角丸) なので左寄せで配置する。
 
 const COLS = 15;
 const ROWS = 2;
@@ -102,7 +101,7 @@ export function DotGrid({ segments }: DotGridProps) {
   }
 
   return (
-    <div className="flex w-full justify-between">
+    <div className="flex w-fit gap-1">
       {columns.map((col, ci) => (
         <div key={ci} className="flex flex-col gap-1">
           {col.map((c) => (
