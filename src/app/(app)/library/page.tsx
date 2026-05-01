@@ -1,26 +1,23 @@
-import { Check, Dumbbell, Minus, X } from "lucide-react";
-import Link from "next/link";
-
 import { GENRE_CODES, type GenreCode } from "@/lib/genres";
 import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
 import { ProfileHeader } from "./profile-header";
-import { SortableList, type EvaluationRow } from "./sortable-list";
+import { RatingTabs } from "./rating-tabs";
+import { type EvaluationRow } from "./sortable-list";
 import { SpotifySection } from "./spotify-section";
-import { SwipeTabs } from "./swipe-tabs";
 
 export const dynamic = "force-dynamic";
 
 type Rating = Database["public"]["Enums"]["rating_type"];
 
-const TABS: ReadonlyArray<{ value: Rating; label: string; Icon: typeof X }> = [
-  { value: "easy", label: "得意", Icon: Check },
-  { value: "practicing", label: "練習中", Icon: Dumbbell },
-  { value: "medium", label: "普通", Icon: Minus },
-  { value: "hard", label: "苦手", Icon: X },
-];
+const VALID_RATINGS: ReadonlySet<Rating> = new Set([
+  "easy",
+  "practicing",
+  "medium",
+  "hard",
+]);
 
 const MIN_FOR_ESTIMATE = 5; // 「得意」評価がこの件数以上で推定音域を表示
 
@@ -38,7 +35,9 @@ interface LibraryPageProps {
 
 export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const params = await searchParams;
-  const activeTab = (params.tab ?? "easy") as Rating;
+  const requestedTab = params.tab as Rating | undefined;
+  const initialTab: Rating =
+    requestedTab && VALID_RATINGS.has(requestedTab) ? requestedTab : "easy";
 
   const supabase = await createClient();
   const {
@@ -76,7 +75,6 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
     `,
       )
       .eq("user_id", userId)
-      .eq("rating", activeTab)
       .order("updated_at", { ascending: false }),
     getUserKnownSongIds(),
     supabase
@@ -111,16 +109,17 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   ]);
   const { data: rows, error } = evalQueryRes;
 
-  // タブ別件数を別クエリで集計 (上のクエリは active タブだけ取ってきている)
-  const { data: counts } = await supabase
-    .from("evaluations")
-    .select("rating", { count: "exact" })
-    .eq("user_id", userId);
-  const tabCounts: Record<Rating, number> = {
-    easy: 0, medium: 0, hard: 0, practicing: 0,
+  // 全評価を rating ごとに振り分け (元の order を保持)
+  const evaluationsByRating: Record<Rating, EvaluationRow[]> = {
+    easy: [],
+    practicing: [],
+    medium: [],
+    hard: [],
   };
-  for (const row of counts ?? []) {
-    tabCounts[row.rating as Rating] += 1;
+  for (const row of (rows ?? []) as unknown as EvaluationRow[]) {
+    if (VALID_RATINGS.has(row.rating)) {
+      evaluationsByRating[row.rating].push(row);
+    }
   }
 
   // 年代分布: release_year を 10年単位でバケット
@@ -193,63 +192,17 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
         notice={spotifyNotice}
       />
 
-      {/* 評価タブ + 一覧 (横スワイプで切り替え可能) */}
-      {(() => {
-        const idx = TABS.findIndex((t) => t.value === activeTab);
-        const prevHref =
-          idx > 0 ? `/library?tab=${TABS[idx - 1].value}` : null;
-        const nextHref =
-          idx >= 0 && idx < TABS.length - 1
-            ? `/library?tab=${TABS[idx + 1].value}`
-            : null;
-        return (
-          <SwipeTabs prevHref={prevHref} nextHref={nextHref}>
-            <div className="grid grid-cols-4 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
-              {TABS.map((tab) => {
-                const active = tab.value === activeTab;
-                return (
-                  <Link
-                    key={tab.value}
-                    href={`/library?tab=${tab.value}`}
-                    className={`flex flex-col items-center gap-0.5 rounded-md px-2 py-2 text-xs ${
-                      active
-                        ? "bg-white shadow-sm dark:bg-zinc-900"
-                        : "text-zinc-600 dark:text-zinc-400"
-                    }`}
-                  >
-                    <span className="inline-flex items-center gap-1">
-                      <tab.Icon className="size-3.5" aria-hidden />
-                      {tab.label}
-                    </span>
-                    <span className="text-[10px] tabular-nums text-zinc-500">
-                      {tabCounts[tab.value]}
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
+      {error ? (
+        <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
+          {error.message}
+        </div>
+      ) : null}
 
-            {error ? (
-              <div className="mt-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
-                {error.message}
-              </div>
-            ) : null}
-
-            <div className="mt-4">
-              {(rows ?? []).length === 0 ? (
-                <div className="rounded-lg border border-zinc-200 bg-white p-6 text-center text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-                  このカテゴリの曲はまだありません
-                </div>
-              ) : (
-                <SortableList
-                  evaluations={(rows ?? []) as unknown as EvaluationRow[]}
-                  knownSongIds={Array.from(knownIds)}
-                />
-              )}
-            </div>
-          </SwipeTabs>
-        );
-      })()}
+      <RatingTabs
+        evaluationsByRating={evaluationsByRating}
+        knownSongIds={Array.from(knownIds)}
+        initialTab={initialTab}
+      />
     </div>
   );
 }
