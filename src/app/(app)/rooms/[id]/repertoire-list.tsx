@@ -70,17 +70,17 @@ export function RepertoireList({
       </div>
 
       {filtered.length === 0 ? (
-        <p className="rounded-2xl border border-zinc-200 bg-white px-4 py-8 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900">
+        <p className="px-4 py-8 text-center text-sm text-zinc-500">
           {totalUserParticipants === 0
             ? "認証ユーザーの参加がまだありません"
             : "条件に合う曲がありません"}
         </p>
       ) : (
-        <ul className="divide-y divide-zinc-200 rounded-2xl border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
+        <ul>
           {filtered.map((item) => (
             <li
               key={item.songId}
-              className="flex items-center gap-3 px-3 py-2"
+              className="flex items-center gap-3 rounded-md p-2"
             >
               {item.imageUrl ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
