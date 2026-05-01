@@ -18,7 +18,7 @@ export function AppBottomNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-10 border-t border-zinc-200 bg-white/95 px-2 pt-1 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/95"
+      className="fixed inset-x-0 bottom-0 z-10 border-t border-border bg-background/95 px-2 pt-1 backdrop-blur"
       // ホームインジケータ領域を避けつつ、最低限の bottom padding を確保
       style={{
         paddingBottom: "max(0.25rem, env(safe-area-inset-bottom))",
@@ -41,9 +41,7 @@ export function AppBottomNav() {
                 href={item.href}
                 className={cn(
                   "flex w-full flex-col items-center gap-0.5 px-1 py-1.5 text-[10px] whitespace-nowrap",
-                  active
-                    ? "text-pink-600 dark:text-pink-400"
-                    : "text-zinc-500 dark:text-zinc-400",
+                  active ? "text-primary" : "text-muted-foreground",
                 )}
               >
                 <Icon className="size-6" aria-hidden />
