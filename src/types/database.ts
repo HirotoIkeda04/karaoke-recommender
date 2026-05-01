@@ -275,6 +275,10 @@ export type Database = {
           created_at: string
           dam_request_no: string | null
           falsetto_max_midi: number | null
+          fame_article: string | null
+          fame_score: number | null
+          fame_updated_at: string | null
+          fame_views: number | null
           genres: string[] | null
           id: string
           image_url_large: string | null
@@ -298,6 +302,10 @@ export type Database = {
           created_at?: string
           dam_request_no?: string | null
           falsetto_max_midi?: number | null
+          fame_article?: string | null
+          fame_score?: number | null
+          fame_updated_at?: string | null
+          fame_views?: number | null
           genres?: string[] | null
           id?: string
           image_url_large?: string | null
@@ -321,6 +329,10 @@ export type Database = {
           created_at?: string
           dam_request_no?: string | null
           falsetto_max_midi?: number | null
+          fame_article?: string | null
+          fame_score?: number | null
+          fame_updated_at?: string | null
+          fame_views?: number | null
           genres?: string[] | null
           id?: string
           image_url_large?: string | null
@@ -527,13 +539,13 @@ export type Database = {
       get_friend_active_rooms: {
         Args: never
         Returns: {
-          room_id: string
+          created_at: string
           creator_id: string
           creator_name: string
-          qr_token: string
-          qr_expires_at: string
-          created_at: string
           participant_count: number
+          qr_expires_at: string
+          qr_token: string
+          room_id: string
         }[]
       }
       get_friend_invite_info: {
@@ -553,6 +565,46 @@ export type Database = {
           created_at: string
           dam_request_no: string | null
           falsetto_max_midi: number | null
+          fame_article: string | null
+          fame_score: number | null
+          fame_updated_at: string | null
+          fame_views: number | null
+          genres: string[] | null
+          id: string
+          image_url_large: string | null
+          image_url_medium: string | null
+          image_url_small: string | null
+          is_popular: boolean
+          last_spotify_attempt_at: string | null
+          match_status: Database["public"]["Enums"]["song_match_status"]
+          range_high_midi: number | null
+          range_low_midi: number | null
+          release_year: number | null
+          source_urls: string[] | null
+          spotify_attempt_count: number
+          spotify_track_id: string | null
+          title: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "songs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_unrated_songs_v2: {
+        Args: { p_limit?: number; p_popular_only?: boolean }
+        Returns: {
+          artist: string
+          artist_id: string | null
+          created_at: string
+          dam_request_no: string | null
+          falsetto_max_midi: number | null
+          fame_article: string | null
+          fame_score: number | null
+          fame_updated_at: string | null
+          fame_views: number | null
           genres: string[] | null
           id: string
           image_url_large: string | null
