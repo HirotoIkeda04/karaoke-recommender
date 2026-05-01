@@ -1,13 +1,13 @@
 // 20列×2行 (合計 40 個) のドットで割合を表現するための小道具。
 //
-// 充填順は画像 (上→下) ではなく「横並びの上段→下段」。
-// すなわち grid 上の番号付けが
+// 充填順は「横から敷き詰める」= 列ごとに左から右へ進める。
+// グリッド上の番号付けは
 //   1  3  5  ... 39
 //   2  4  6  ... 40
-// で、埋める順番は 1,3,...,39 → 2,4,...,40 (上段の左→右、次に下段の左→右)。
+// で、左端の列から順に上→下→次の列…と埋めていく。
 //
 // レイアウトは横幅いっぱい (両端揃い)。flex の justify-between により
-// 各行の左端ドットがコンテナ左端に、右端ドットがコンテナ右端に揃う。
+// 最左列がコンテナ左端、最右列がコンテナ右端に揃う。
 
 const COLS = 20;
 const ROWS = 2;
@@ -95,14 +95,17 @@ export function DotGrid({ segments }: DotGridProps) {
     });
   }
 
-  const top = cells.slice(0, COLS);
-  const bottom = cells.slice(COLS, TOTAL_DOTS);
+  // 列ごとに [上, 下] の 2 ドットへグルーピング (左の列から順に塗られる)
+  const columns: { key: string; colorClass: string; title?: string }[][] = [];
+  for (let c = 0; c < COLS; c++) {
+    columns.push([cells[c * ROWS], cells[c * ROWS + 1]]);
+  }
 
   return (
-    <div className="flex w-full flex-col gap-1">
-      {[top, bottom].map((row, rowIdx) => (
-        <div key={rowIdx} className="flex w-full justify-between">
-          {row.map((c) => (
+    <div className="flex w-full justify-between">
+      {columns.map((col, ci) => (
+        <div key={ci} className="flex flex-col gap-1">
+          {col.map((c) => (
             <span
               key={c.key}
               className={`size-2 rounded-full ${c.colorClass}`}
