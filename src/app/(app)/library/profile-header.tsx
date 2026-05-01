@@ -3,6 +3,8 @@ import Link from "next/link";
 import type { GenreCode } from "@/lib/genres";
 import { midiToKaraoke } from "@/lib/note";
 
+import { SignOutButton } from "@/components/sign-out-button";
+
 import { EraDistribution } from "./era-distribution";
 import { FriendStatusButton } from "./friend-status-button";
 import { GenreDistribution } from "./genre-distribution";
@@ -82,11 +84,11 @@ export function ProfileHeader({
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+          <p className="truncate pl-[5%] text-sm font-semibold text-zinc-900 dark:text-zinc-50">
             {displayName}
           </p>
 
-          <div className="flex items-start gap-6">
+          <div className="grid grid-cols-4 items-center">
             <div className="flex flex-col items-center">
               <span className="text-base font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
                 {ratedSongCount}
@@ -106,6 +108,11 @@ export function ProfileHeader({
                 フレンド
               </span>
             </Link>
+            {isSelf ? (
+              <div className="col-start-4 flex justify-center">
+                <SignOutButton />
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
