@@ -1,6 +1,6 @@
 import { GENRE_LABELS, type GenreCode } from "@/lib/genres";
 
-import { PieChart } from "./pie-chart";
+import { BarChart } from "./bar-chart";
 
 interface Props {
   // genre code → 評価済み曲数 (easy + medium + practicing)
@@ -73,58 +73,53 @@ export function GenreDistribution({ buckets }: Props) {
         歌える曲のジャンル分布
       </h3>
 
-      <div className="relative w-fit">
-        <PieChart
-          size={180}
-          innerRatio={0.88}
-          segments={[
-            ...top.map(([code, count]) => {
-              const pct = (count / total) * 100;
-              const color = GENRE_COLORS[code];
-              return {
-                key: code,
-                value: count,
-                colorClass: color.text,
-                title: `${GENRE_LABELS[code]}: ${count}曲 (${pct.toFixed(0)}%)`,
-              };
-            }),
-            ...(restCount > 0
-              ? [
-                  {
-                    key: "rest",
-                    value: restCount,
-                    colorClass: REST_COLOR.text,
-                    title: `${REST_LABEL}: ${restCount}曲 (${restPct.toFixed(0)}%) — ${rest
-                      .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
-                      .join(", ")}`,
-                  },
-                ]
-              : []),
-          ]}
-        />
-
-        {/* 凡例 — ドーナツ中央のホールに重ねる */}
-        <ul className="pointer-events-none absolute inset-0 m-auto grid grid-cols-2 content-center justify-items-start gap-x-2 gap-y-0.5 px-8 text-[10px]">
-          {top.map(([code, count]) => {
+      <BarChart
+        segments={[
+          ...top.map(([code, count]) => {
+            const pct = (count / total) * 100;
             const color = GENRE_COLORS[code];
-            return (
-              <li key={code} className={color.text}>
-                {GENRE_LABELS[code]} ({count})
-              </li>
-            );
-          })}
-          {restCount > 0 && (
-            <li
-              className={REST_COLOR.text}
-              title={rest
-                .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
-                .join(", ")}
-            >
-              {REST_LABEL} ({restCount})
+            return {
+              key: code,
+              value: count,
+              colorClass: color.text,
+              title: `${GENRE_LABELS[code]}: ${count}曲 (${pct.toFixed(0)}%)`,
+            };
+          }),
+          ...(restCount > 0
+            ? [
+                {
+                  key: "rest",
+                  value: restCount,
+                  colorClass: REST_COLOR.text,
+                  title: `${REST_LABEL}: ${restCount}曲 (${restPct.toFixed(0)}%) — ${rest
+                    .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
+                    .join(", ")}`,
+                },
+              ]
+            : []),
+        ]}
+      />
+
+      <ul className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px]">
+        {top.map(([code, count]) => {
+          const color = GENRE_COLORS[code];
+          return (
+            <li key={code} className={color.text}>
+              {GENRE_LABELS[code]} ({count})
             </li>
-          )}
-        </ul>
-      </div>
+          );
+        })}
+        {restCount > 0 && (
+          <li
+            className={REST_COLOR.text}
+            title={rest
+              .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
+              .join(", ")}
+          >
+            {REST_LABEL} ({restCount})
+          </li>
+        )}
+      </ul>
     </section>
   );
 }

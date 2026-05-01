@@ -1,4 +1,4 @@
-import { PieChart } from "./pie-chart";
+import { BarChart } from "./bar-chart";
 
 interface Props {
   // decade (e.g. 1980) → count
@@ -52,35 +52,31 @@ export function EraDistribution({ buckets }: Props) {
         楽曲の年代分布
       </h3>
 
-      <div className="relative w-fit">
-        <PieChart
-          size={180}
-          innerRatio={0.88}
-          segments={decades.map((decade) => {
-            const count = buckets[decade];
-            const pct = (count / total) * 100;
-            const color = DECADE_COLORS[decade] ?? FALLBACK_COLOR;
-            return {
-              key: String(decade),
-              value: count,
-              colorClass: color.text,
-              title: `${decadeLabel(decade)}: ${count}曲 (${pct.toFixed(0)}%)`,
-            };
-          })}
-        />
+      <BarChart
+        segments={decades.map((decade) => {
+          const count = buckets[decade];
+          const pct = (count / total) * 100;
+          const color = DECADE_COLORS[decade] ?? FALLBACK_COLOR;
+          return {
+            key: String(decade),
+            value: count,
+            colorClass: color.text,
+            title: `${decadeLabel(decade)}: ${count}曲 (${pct.toFixed(0)}%)`,
+          };
+        })}
+      />
 
-        {/* 凡例 (件数 0 の年代は表示しない) — ドーナツ中央のホールに重ねる */}
-        <ul className="pointer-events-none absolute inset-0 m-auto grid grid-cols-2 content-center justify-items-start gap-x-2 gap-y-0.5 px-8 text-[10px]">
-          {decades.map((decade) => {
-            const color = DECADE_COLORS[decade] ?? FALLBACK_COLOR;
-            return (
-              <li key={decade} className={color.text}>
-                {decadeLabel(decade)} ({buckets[decade]})
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+      {/* 凡例 (件数 0 の年代は表示しない) */}
+      <ul className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px]">
+        {decades.map((decade) => {
+          const color = DECADE_COLORS[decade] ?? FALLBACK_COLOR;
+          return (
+            <li key={decade} className={color.text}>
+              {decadeLabel(decade)} ({buckets[decade]})
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }
