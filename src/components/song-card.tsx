@@ -24,24 +24,22 @@ const RATING_BADGE: Record<
 > = {
   hard: {
     label: "苦手",
-    color: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200",
+    color: "bg-red-500 dark:bg-red-400",
     Icon: X,
   },
   medium: {
     label: "普通",
-    color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200",
+    color: "bg-amber-500 dark:bg-amber-400",
     Icon: Minus,
   },
   easy: {
     label: "得意",
-    color:
-      "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200",
+    color: "bg-emerald-500 dark:bg-emerald-400",
     Icon: Check,
   },
   practicing: {
     label: "練習中",
-    color:
-      "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-200",
+    color: "bg-purple-500 dark:bg-purple-400",
     Icon: Dumbbell,
   },
 };
@@ -98,16 +96,20 @@ export function SongCard({
       </div>
 
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-            {song.title}
-          </p>
+        <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+          {song.title}
+        </p>
+        <div className="flex items-center gap-1 text-xs text-zinc-600 dark:text-zinc-400">
           {badge ? (
             <span
-              className={`inline-flex shrink-0 items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-medium ${badge.color}`}
+              className={`inline-flex size-3 shrink-0 items-center justify-center rounded-[2px] ${badge.color}`}
+              aria-label={badge.label}
             >
-              <badge.Icon className="size-3" aria-hidden />
-              {badge.label}
+              <badge.Icon
+                className="size-2 text-white dark:text-zinc-950"
+                strokeWidth={3}
+                aria-hidden
+              />
             </span>
           ) : null}
           {isKnown ? (
@@ -116,13 +118,13 @@ export function SongCard({
               aria-label="Spotify で聴いたことがある曲"
             />
           ) : null}
+          <p className="truncate">
+            {song.artist}
+            {song.range_high_midi !== null
+              ? ` · ~ ${midiToKaraoke(song.range_high_midi)}`
+              : ""}
+          </p>
         </div>
-        <p className="truncate text-xs text-zinc-600 dark:text-zinc-400">
-          {song.artist}
-          {song.range_high_midi !== null
-            ? ` · ~ ${midiToKaraoke(song.range_high_midi)}`
-            : ""}
-        </p>
       </div>
     </Wrapper>
   );
