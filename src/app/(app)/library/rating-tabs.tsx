@@ -167,7 +167,7 @@ export function RatingTabs({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
+      <div className="grid grid-cols-4 border-t border-zinc-200 dark:border-zinc-800">
         {TABS.map((tab) => {
           const active = tab.value === activeTab;
           const count = evaluationsByRating[tab.value]?.length ?? 0;
@@ -178,17 +178,15 @@ export function RatingTabs({
               onClick={() =>
                 goToIndex(TABS.findIndex((t) => t.value === tab.value))
               }
-              className={`flex flex-col items-center gap-0.5 rounded-md px-2 py-2 text-xs ${
+              className={`-mt-px flex flex-col items-center gap-0.5 border-t py-3 transition-colors ${
                 active
-                  ? "bg-white shadow-sm dark:bg-zinc-900"
-                  : "text-zinc-600 dark:text-zinc-400"
+                  ? "border-zinc-900 text-zinc-900 dark:border-zinc-50 dark:text-zinc-50"
+                  : "border-transparent text-zinc-400 dark:text-zinc-500"
               }`}
             >
-              <span className="inline-flex items-center gap-1">
-                <tab.Icon className="size-3.5" aria-hidden />
-                {tab.label}
-              </span>
-              <span className="text-[10px] tabular-nums text-zinc-500">
+              <tab.Icon className="size-4" strokeWidth={2} aria-hidden />
+              <span className="text-[11px]">{tab.label}</span>
+              <span className="text-[10px] tabular-nums opacity-60">
                 {count}
               </span>
             </button>
