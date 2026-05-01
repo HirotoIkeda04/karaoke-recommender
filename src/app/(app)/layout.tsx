@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { AppHeader } from "@/components/app-header";
 import { AppBottomNav } from "@/components/app-bottom-nav";
+import { InstallPrompt } from "@/components/install-prompt";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AppLayout({
@@ -10,16 +11,12 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
-  // パフォーマンス最適化: 表示用ユーザー情報なら getSession で十分。
-  // 書き込み権限が必要な server action (rateSong 等) は getUser で再検証する。
-  // 詳細は src/lib/supabase/middleware.ts のコメント参照。
   const {
     data: { session },
   } = await supabase.auth.getSession();
-  const user = session?.user ?? null;
 
   // middleware で防がれる想定だが、二重防御
-  if (!user) {
+  if (!session?.user) {
     redirect("/login");
   }
 
@@ -27,12 +24,13 @@ export default async function AppLayout({
     // min-h-dvh: 動的ビューポート高 (iOS Safari の URL バー伸縮に追従、
     //   100vh のような固定値ではなく現在の表示領域を毎フレーム反映する)
     <div className="flex min-h-dvh flex-col">
-      <AppHeader user={user} />
+      <AppHeader />
       {/* main の bottom padding: BottomNav の高さ (~5rem) + ホームインジケータ safe-area */}
       <main className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))]">
         {children}
       </main>
       <AppBottomNav />
+      <InstallPrompt />
     </div>
   );
 }
