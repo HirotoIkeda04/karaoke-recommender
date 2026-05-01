@@ -1,15 +1,15 @@
-// 20列×2行 (合計 40 個) のドットで割合を表現するための小道具。
+// 15列×2行 (合計 30 個) のドットで割合を表現するための小道具。
 //
 // 充填順は「横から敷き詰める」= 列ごとに左から右へ進める。
 // グリッド上の番号付けは
-//   1  3  5  ... 39
-//   2  4  6  ... 40
+//   1  3  5  ... 29
+//   2  4  6  ... 30
 // で、左端の列から順に上→下→次の列…と埋めていく。
 //
 // レイアウトは横幅いっぱい (両端揃い)。flex の justify-between により
 // 最左列がコンテナ左端、最右列がコンテナ右端に揃う。
 
-const COLS = 20;
+const COLS = 15;
 const ROWS = 2;
 const TOTAL_DOTS = COLS * ROWS;
 
@@ -27,8 +27,8 @@ export interface DotSegment {
   title?: string;
 }
 
-// 各カテゴリの件数から 40 個の枠の取り分を整数で算出する。
-// 合計が 40 になるよう "最大剰余法" で残りを配分し、各値は整数 (= 2.5% の倍数) になる。
+// 各カテゴリの件数から 30 個の枠の取り分を整数で算出する。
+// 合計が 30 になるよう "最大剰余法" で残りを配分し、各値は整数になる (1 ドット ≈ 3.3%)。
 export function allocateDots(inputs: DotInput[]): DotSegment[] {
   const total = inputs.reduce((sum, e) => sum + e.count, 0);
   if (total === 0) {
@@ -108,7 +108,7 @@ export function DotGrid({ segments }: DotGridProps) {
           {col.map((c) => (
             <span
               key={c.key}
-              className={`size-2 rounded-full ${c.colorClass}`}
+              className={`size-2.5 rounded-full ${c.colorClass}`}
               title={c.title}
               aria-hidden
             />
