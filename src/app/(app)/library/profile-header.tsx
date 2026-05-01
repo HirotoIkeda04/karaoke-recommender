@@ -4,6 +4,7 @@ import type { GenreCode } from "@/lib/genres";
 import { midiToKaraoke } from "@/lib/note";
 
 import { EraDistribution } from "./era-distribution";
+import { FriendStatusButton } from "./friend-status-button";
 import { GenreDistribution } from "./genre-distribution";
 import { ShareProfileButton } from "./share-profile-button";
 
@@ -25,6 +26,8 @@ interface Props {
   minEasyForEstimate: number;
   // 'self' = 自分の library。'friend' = フレンド閲覧時 (編集/シェアボタン非表示)
   viewMode?: "self" | "friend";
+  // viewMode='friend' のとき必須: 表示中のフレンドの user id
+  friendUserId?: string;
 }
 
 // 表示名の頭文字を取り出す (絵文字や合字に対しても安全に 1 grapheme)
@@ -47,6 +50,7 @@ export function ProfileHeader({
   genreBuckets,
   minEasyForEstimate,
   viewMode = "self",
+  friendUserId,
 }: Props) {
   const initial = firstGrapheme(displayName);
   const showEstimate =
@@ -124,7 +128,7 @@ export function ProfileHeader({
       {/* ジャンル分布 (得意 / 練習中 / 普通 を集計) */}
       <GenreDistribution buckets={genreBuckets} />
 
-      {/* アクションボタン (自分のみ表示) */}
+      {/* アクションボタン */}
       {isSelf ? (
         <div className="flex gap-2">
           <Link
@@ -134,6 +138,13 @@ export function ProfileHeader({
             プロフィールを編集
           </Link>
           <ShareProfileButton />
+        </div>
+      ) : friendUserId ? (
+        <div className="flex gap-2">
+          <FriendStatusButton
+            friendId={friendUserId}
+            friendDisplayName={displayName}
+          />
         </div>
       ) : null}
     </section>

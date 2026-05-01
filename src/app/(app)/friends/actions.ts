@@ -91,6 +91,7 @@ async function deleteFriendship(
 
   if (error) return { error: error.message };
   revalidatePath("/friends");
+  revalidatePath("/library");
   return { error: null };
 }
 
@@ -99,5 +100,9 @@ export async function rejectFriendRequest(otherUserId: string) {
 }
 
 export async function cancelOutgoingRequest(otherUserId: string) {
+  return deleteFriendship(otherUserId);
+}
+
+export async function removeFriend(otherUserId: string) {
   return deleteFriendship(otherUserId);
 }

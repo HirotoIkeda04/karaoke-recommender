@@ -163,6 +163,7 @@ export default async function FriendLibraryPage({
         genreBuckets={genreBuckets}
         minEasyForEstimate={MIN_FOR_ESTIMATE}
         viewMode="friend"
+        friendUserId={friendId}
       />
 
       <RatingTabs
