@@ -1,10 +1,10 @@
 "use client";
 
 import { Search, X } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { ArtistRow, type ArtistRowData } from "@/components/artist-row";
 import { SongCard } from "@/components/song-card";
 import { GENRE_CODES, GENRE_LABELS, type GenreCode } from "@/lib/genres";
 import { karaokeToMidi } from "@/lib/note";
@@ -30,12 +30,8 @@ type Song = Pick<
   | "image_url_medium"
 >;
 
-interface ArtistResult {
-  id: string;
-  name: string;
+interface ArtistResult extends ArtistRowData {
   genres: string[] | null;
-  song_count: number | null;
-  image_url: string | null;
 }
 
 interface SearchResponse {
@@ -177,7 +173,7 @@ export function LiveSearch({ ratings, knownSongIds = [] }: LiveSearchProps) {
     setHistory(next);
   }, []);
 
-  const handleSelectArtist = useCallback((a: ArtistResult) => {
+  const handleSelectArtist = useCallback((a: ArtistRowData) => {
     const next = pushHistory({
       type: "artist",
       id: a.id,
@@ -293,9 +289,8 @@ export function LiveSearch({ ratings, knownSongIds = [] }: LiveSearchProps) {
 }
 
 // ============================================================================
-// Browse: ジャンルカードグリッド
+// Browse: ジャンルカードグリッド (Spotify 風)
 // ============================================================================
-// Step 2 で /songs/genre/[code] へリンクさせる予定。今は視覚的なプレースホルダ。
 function BrowseGrid() {
   return (
     <section>
@@ -305,14 +300,14 @@ function BrowseGrid() {
       <ul className="grid grid-cols-2 gap-2">
         {GENRE_CODES.map((code) => (
           <li key={code}>
-            <div
-              className={`relative flex aspect-[16/10] items-start overflow-hidden rounded-lg bg-gradient-to-br ${GENRE_GRADIENTS[code]} p-3 opacity-90`}
-              aria-label={`${GENRE_LABELS[code]} (準備中)`}
+            <Link
+              href={`/songs/genre/${code}`}
+              className={`relative flex aspect-[16/10] items-start overflow-hidden rounded-lg bg-gradient-to-br ${GENRE_GRADIENTS[code]} p-3 transition active:scale-[0.98]`}
             >
               <span className="text-sm font-bold leading-tight text-white drop-shadow">
                 {GENRE_LABELS[code]}
               </span>
-            </div>
+            </Link>
           </li>
         ))}
       </ul>
@@ -338,7 +333,7 @@ function HistoryList({
     id: string,
   ) => void;
   onSelectSong: (s: Song) => void;
-  onSelectArtist: (a: ArtistResult) => void;
+  onSelectArtist: (a: ArtistRowData) => void;
   ratings: Record<string, string>;
   knownSet: Set<string>;
 }) {
@@ -382,7 +377,6 @@ function HistoryList({
                   artist={{
                     id: item.id,
                     name: item.name,
-                    genres: null,
                     song_count: null,
                     image_url: item.image,
                   }}
@@ -424,7 +418,7 @@ function ResultsList({
   ratings: Record<string, string>;
   knownSet: Set<string>;
   onSelectSong: (s: Song) => void;
-  onSelectArtist: (a: ArtistResult) => void;
+  onSelectArtist: (a: ArtistRowData) => void;
 }) {
   if (errMsg) {
     return (
@@ -490,46 +484,3 @@ function ResultsList({
   );
 }
 
-// ============================================================================
-// ArtistRow: アーティスト一覧の 1 行 (SongCard と縦リズムを揃える)
-// ============================================================================
-function ArtistRow({
-  artist,
-  onSelect,
-}: {
-  artist: ArtistResult;
-  onSelect: (a: ArtistResult) => void;
-}) {
-  return (
-    <Link
-      href={`/artists/${artist.id}`}
-      onClick={() => onSelect(artist)}
-      className="flex items-center gap-3 rounded-md p-2 transition hover:bg-zinc-100 active:bg-zinc-100 dark:hover:bg-zinc-800/60 dark:active:bg-zinc-800/60"
-    >
-      <div className="relative size-12 shrink-0 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
-        {artist.image_url ? (
-          <Image
-            src={artist.image_url}
-            alt=""
-            fill
-            sizes="3rem"
-            className="object-cover"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-base text-zinc-500">
-            {artist.name.slice(0, 1)}
-          </div>
-        )}
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-          {artist.name}
-        </p>
-        <p className="truncate text-xs text-zinc-600 dark:text-zinc-400">
-          アーティスト
-          {artist.song_count != null ? ` · ${artist.song_count} 曲` : ""}
-        </p>
-      </div>
-    </Link>
-  );
-}
