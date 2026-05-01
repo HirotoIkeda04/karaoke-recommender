@@ -83,14 +83,14 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-/* Spotify-inspired dark palette
+/* Spotify-inspired dark palette + 紫プライマリー
  *   background  #121212  -> oklch(0.18 0 0)
  *   card        #181818  -> oklch(0.21 0 0)
  *   elevated    #282828  -> oklch(0.30 0 0)
  *   text        #FFFFFF  -> oklch(1 0 0)
  *   muted text  #B3B3B3  -> oklch(0.76 0 0)
- *   accent      #1DB954  -> oklch(0.72 0.19 148)
- *   accent hi   #1ED760  -> oklch(0.78 0.20 148)
+ *   primary     #A855F7  -> oklch(0.62 0.24 295)
+ *   primary hi  #C084FC  -> oklch(0.72 0.20 295)
  */
 .dark {
   --background: oklch(0.18 0 0);
@@ -99,8 +99,8 @@
   --card-foreground: oklch(1 0 0);
   --popover: oklch(0.24 0 0);
   --popover-foreground: oklch(1 0 0);
-  --primary: oklch(0.72 0.19 148);
-  --primary-foreground: oklch(0.15 0 0);
+  --primary: oklch(0.62 0.24 295);
+  --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.30 0 0);
   --secondary-foreground: oklch(1 0 0);
   --muted: oklch(0.24 0 0);
@@ -110,20 +110,20 @@
   --destructive: oklch(0.65 0.22 25);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.72 0.19 148);
-  --chart-1: oklch(0.72 0.19 148);
-  --chart-2: oklch(0.78 0.20 148);
-  --chart-3: oklch(0.62 0.16 148);
-  --chart-4: oklch(0.50 0.12 148);
-  --chart-5: oklch(0.40 0.10 148);
+  --ring: oklch(0.62 0.24 295);
+  --chart-1: oklch(0.62 0.24 295);
+  --chart-2: oklch(0.72 0.20 295);
+  --chart-3: oklch(0.52 0.22 295);
+  --chart-4: oklch(0.42 0.18 295);
+  --chart-5: oklch(0.34 0.14 295);
   --sidebar: oklch(0.12 0 0);
   --sidebar-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(0.72 0.19 148);
-  --sidebar-primary-foreground: oklch(0.15 0 0);
+  --sidebar-primary: oklch(0.62 0.24 295);
+  --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.24 0 0);
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.72 0.19 148);
+  --sidebar-ring: oklch(0.62 0.24 295);
 }
 
 @layer base {
