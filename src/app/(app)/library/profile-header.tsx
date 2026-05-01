@@ -67,7 +67,7 @@ export function ProfileHeader({
   const isSelf = viewMode === "self";
 
   return (
-    <section className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+    <section className="space-y-4">
       {/* 上段: アバター + 表示名 / Insta 風の縦積みスタッツ */}
       <div className="flex items-start gap-4">
         <div
