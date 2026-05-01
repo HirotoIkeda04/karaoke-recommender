@@ -6,7 +6,8 @@ import type { Database } from "@/types/database";
 import { ProfileHeader } from "./profile-header";
 import { RatingTabs } from "./rating-tabs";
 import { type EvaluationRow } from "./sortable-list";
-import { SpotifySection } from "./spotify-section";
+// Spotify セクションは UI から外したが、コードは spotify-section.tsx に保持。
+// 復活時は import を戻して下の JSX に再配置する。
 
 export const dynamic = "force-dynamic";
 
@@ -24,12 +25,6 @@ const MIN_FOR_ESTIMATE = 5; // 「得意」評価がこの件数以上で推定�
 interface LibraryPageProps {
   searchParams: Promise<{
     tab?: string;
-    spotify_connected?: string;
-    spotify_synced?: string;
-    spotify_error?: string;
-    matched?: string;
-    found?: string;
-    sync_detail?: string;
   }>;
 }
 
@@ -48,7 +43,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   }
   const userId = user.id;
 
-  // === 並列取得: 評価一覧 / プロフィール / 音域 / フレンド数 / 評価年代分布 / Spotify / ジャンル分布 ===
+  // === 並列取得: 評価一覧 / プロフィール / 音域 / フレンド数 / 評価年代分布 / ジャンル分布 ===
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sb = supabase as any;
   const [
@@ -58,7 +53,6 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
     voiceEstimateRes,
     friendshipsRes,
     yearDistRes,
-    spotifyRes,
     genreDistRes,
   ] = await Promise.all([
     supabase
@@ -96,11 +90,6 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
       .from("evaluations")
       .select("song:songs(release_year)")
       .eq("user_id", userId),
-    supabase
-      .from("user_spotify_connections")
-      .select("spotify_user_id, spotify_display_name, connected_at, last_synced_at")
-      .eq("user_id", userId)
-      .maybeSingle(),
     // ジャンル分布 (014 マイグレーションの view) — db:types 再生成までは型が乗らないので as キャスト
     sb
       .from("user_genre_distribution")
@@ -145,33 +134,6 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const displayName = profileRes.data?.display_name ?? "(未設定)";
   const friendCount = friendshipsRes.count ?? 0;
   const voiceEstimate = voiceEstimateRes.data ?? null;
-  const spotifyConnection = spotifyRes.data ?? null;
-
-  // Spotify 接続済みなら known songs 件数を取得
-  let knownSongsCount = 0;
-  if (spotifyConnection) {
-    const { data: distinctRows } = await supabase
-      .from("user_known_songs")
-      .select("song_id")
-      .eq("user_id", userId);
-    knownSongsCount = distinctRows
-      ? new Set(distinctRows.map((r) => r.song_id)).size
-      : 0;
-  }
-
-  // Spotify 通知系パラメータ
-  const spotifyNotice = {
-    connected: params.spotify_connected === "true",
-    syncedSummary:
-      params.spotify_synced === "true" && params.matched && params.found
-        ? {
-            matched: parseInt(params.matched, 10),
-            found: parseInt(params.found, 10),
-          }
-        : null,
-    error: params.spotify_error ?? null,
-    errorDetail: params.sync_detail ?? null,
-  };
 
   return (
     <div className="mx-auto max-w-md space-y-4 px-4 py-4">
@@ -190,12 +152,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
         viewMode="self"
       />
 
-      {/* Spotify 連携 */}
-      <SpotifySection
-        connection={spotifyConnection}
-        knownSongsCount={knownSongsCount}
-        notice={spotifyNotice}
-      />
+      {/* Spotify 連携セクションは UI から削除済み (コードは spotify-section.tsx に保持) */}
 
       {error ? (
         <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
