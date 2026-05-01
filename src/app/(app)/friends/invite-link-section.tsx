@@ -26,8 +26,10 @@ export function InviteLinkSection() {
         setError(result.error ?? "リンク発行に失敗しました");
         return;
       }
+      // openExternalBrowser=1 は LINE で開かれた際に OS の標準ブラウザに脱出させるための公式パラメータ。
+      // 他のブラウザでは未使用のクエリとして無視される。
       setLink({
-        url: `${window.location.origin}${result.path}`,
+        url: `${window.location.origin}${result.path}?openExternalBrowser=1`,
         expiresAt: result.expiresAt,
       });
     });

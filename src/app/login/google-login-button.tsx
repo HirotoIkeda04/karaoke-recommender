@@ -1,8 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import {
+  detectInAppBrowser,
+  inAppBrowserLabel,
+  type InAppBrowser,
+} from "@/lib/in-app-browser";
 import { createClient } from "@/lib/supabase/client";
 
 interface GoogleLoginButtonProps {
@@ -12,6 +17,13 @@ interface GoogleLoginButtonProps {
 export function GoogleLoginButton({ next }: GoogleLoginButtonProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [inAppKind, setInAppKind] = useState<InAppBrowser | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const info = detectInAppBrowser(navigator.userAgent);
+    if (info.inApp) setInAppKind(info.kind);
+  }, []);
 
   const handleClick = async () => {
     setLoading(true);
@@ -37,6 +49,42 @@ export function GoogleLoginButton({ next }: GoogleLoginButtonProps) {
     }
     // 成功時は Supabase が Google のページへ遷移させるので、ここから戻ることは無い
   };
+
+  const copyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // noop
+    }
+  };
+
+  if (inAppKind) {
+    const label = inAppBrowserLabel(inAppKind);
+    const isLine = inAppKind === "line";
+    return (
+      <div className="space-y-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100">
+        <p className="font-semibold">
+          {label} 内ブラウザでは Google ログインできません
+        </p>
+        <p className="text-xs leading-relaxed">
+          Google のセキュリティポリシーにより、{label} 内ブラウザからのサインインはブロックされます。
+          {isLine
+            ? "右上の「⋯」メニューから「他のブラウザで開く」を選び、Safari / Chrome で開き直してください。"
+            : "右上のメニューから「ブラウザで開く」を選び、Safari / Chrome で開き直してください。"}
+        </p>
+        <Button
+          onClick={copyUrl}
+          variant="outline"
+          size="lg"
+          className="w-full"
+        >
+          {copied ? "URL をコピーしました ✓" : "このページの URL をコピー"}
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2">

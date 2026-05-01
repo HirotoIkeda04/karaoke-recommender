@@ -114,7 +114,9 @@ export default async function RoomPage({ params }: PageProps) {
   const proto =
     headersList.get("x-forwarded-proto") ??
     (host.startsWith("localhost") ? "http" : "https");
-  const qrUrl = `${proto}://${host}/r/${room.qr_token}`;
+  // openExternalBrowser=1 は LINE 内ブラウザで開かれた際に OS 標準ブラウザに脱出させる公式パラメータ。
+  // 他のブラウザでは無害なクエリとして無視される。
+  const qrUrl = `${proto}://${host}/r/${room.qr_token}?openExternalBrowser=1`;
 
   // QR を SVG として生成 (margin=1 で余白最小)
   const qrSvg = await QRCode.toString(qrUrl, {
