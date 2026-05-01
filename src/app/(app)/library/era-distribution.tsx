@@ -33,7 +33,7 @@ export function EraDistribution({ buckets }: Props) {
   return (
     <section className="space-y-2">
       <div className="flex items-center gap-3">
-        <h3 className="w-28 shrink-0 text-right text-[11px] font-medium text-zinc-500 dark:text-zinc-500">
+        <h3 className="w-16 shrink-0 text-right text-[11px] font-medium text-zinc-500 dark:text-zinc-500">
           年代分布
         </h3>
         <div className="min-w-0 flex-1">
@@ -54,7 +54,7 @@ export function EraDistribution({ buckets }: Props) {
 
       {/* 凡例 (件数 0 の年代は表示しない) — バー開始位置に揃える */}
       <div className="flex gap-3">
-        <div className="w-28 shrink-0" aria-hidden />
+        <div className="w-16 shrink-0" aria-hidden />
         <ul className="flex min-w-0 flex-1 flex-wrap gap-x-3 gap-y-1 text-[11px]">
           {decades.map((decade, i) => (
             <li key={decade} className={orangeShadeColor(i)}>
