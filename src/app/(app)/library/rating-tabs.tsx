@@ -1,11 +1,25 @@
 "use client";
 
-import { Check, Dumbbell, Minus, X } from "lucide-react";
-import { useLayoutEffect, useRef, useState } from "react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Check,
+  Dumbbell,
+  Minus,
+  X,
+} from "lucide-react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import type { Database } from "@/types/database";
 
-import { SortableList, type EvaluationRow } from "./sortable-list";
+import {
+  SORT_OPTIONS,
+  SortableList,
+  type EvaluationRow,
+  type SortDir,
+  type SortKey,
+} from "./sortable-list";
 
 type Rating = Database["public"]["Enums"]["rating_type"];
 
@@ -33,6 +47,10 @@ export function RatingTabs({
   initialTab,
 }: Props) {
   const [activeTab, setActiveTab] = useState<Rating>(initialTab);
+  const [sortKey, setSortKey] = useState<SortKey>("updated");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [sortOpen, setSortOpen] = useState(false);
+  const sortMenuRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const currentIdx = useRef<number>(
     Math.max(0, TABS.findIndex((t) => t.value === initialTab)),
@@ -40,6 +58,34 @@ export function RatingTabs({
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const isDragging = useRef(false);
   const isVerticalScroll = useRef(false);
+
+  // ソートドロップダウンの click-outside 閉じる
+  useEffect(() => {
+    if (!sortOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (
+        sortMenuRef.current &&
+        !sortMenuRef.current.contains(e.target as Node)
+      ) {
+        setSortOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [sortOpen]);
+
+  const currentSort = SORT_OPTIONS.find((o) => o.key === sortKey)!;
+  const activeCount = evaluationsByRating[activeTab]?.length ?? 0;
+
+  const handleSelectSort = (key: SortKey) => {
+    if (key === sortKey) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir(SORT_OPTIONS.find((o) => o.key === key)!.defaultDir);
+    }
+    setSortOpen(false);
+  };
 
   // 初期位置 + リサイズ追従 (orientation change 対策)
   useLayoutEffect(() => {
@@ -147,6 +193,76 @@ export function RatingTabs({
         })}
       </div>
 
+      {/* ソートヘッダ: ソート (左) + 件数 (右)。横スワイプの外に置いて固定表示 */}
+      <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-500">
+        <div ref={sortMenuRef} className="relative">
+          <button
+            type="button"
+            onClick={() => setSortOpen(!sortOpen)}
+            className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            aria-haspopup="menu"
+            aria-expanded={sortOpen}
+          >
+            <ArrowUpDown className="size-3.5" aria-hidden />
+            <span>{currentSort.label}</span>
+            {sortDir === "asc" ? (
+              <ArrowUp className="size-3" aria-hidden />
+            ) : (
+              <ArrowDown className="size-3" aria-hidden />
+            )}
+          </button>
+
+          {sortOpen ? (
+            <div
+              className="absolute left-0 top-full z-20 mt-1 w-48 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
+              role="menu"
+            >
+              <ul className="py-1">
+                {SORT_OPTIONS.map((option) => {
+                  const selected = option.key === sortKey;
+                  return (
+                    <li key={option.key}>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectSort(option.key)}
+                        className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-xs text-zinc-700 transition hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                        role="menuitem"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Check
+                            className={`size-3 ${
+                              selected
+                                ? "text-primary"
+                                : "invisible"
+                            }`}
+                            aria-hidden
+                          />
+                          {option.label}
+                        </span>
+                        {selected ? (
+                          sortDir === "asc" ? (
+                            <ArrowUp
+                              className="size-3 text-primary"
+                              aria-hidden
+                            />
+                          ) : (
+                            <ArrowDown
+                              className="size-3 text-primary"
+                              aria-hidden
+                            />
+                          )
+                        ) : null}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : null}
+        </div>
+        <span>{activeCount} 曲</span>
+      </div>
+
       <div
         ref={scrollRef}
         onTouchStart={handleTouchStart}
@@ -168,6 +284,8 @@ export function RatingTabs({
                 ) : (
                   <SortableList
                     evaluations={rows}
+                    sortKey={sortKey}
+                    sortDir={sortDir}
                     knownSongIds={knownSongIds}
                   />
                 )}
