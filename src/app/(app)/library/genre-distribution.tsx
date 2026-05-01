@@ -7,28 +7,28 @@ interface Props {
   buckets: Partial<Record<GenreCode, number>>;
 }
 
-// ジャンル毎の Tailwind 配色 (ドットグリッド + 凡例文字色で共有)
+// ジャンル毎の Tailwind 配色 (ドットグリッド + 凡例文字色で共有 / 淡めのトーン)
 const GENRE_COLORS: Record<GenreCode, { bar: string; text: string }> = {
-  j_pop: { bar: "bg-pink-500", text: "text-pink-500" },
-  j_rock: { bar: "bg-red-500", text: "text-red-500" },
-  anison: { bar: "bg-orange-500", text: "text-orange-500" },
-  vocaloid_utaite: { bar: "bg-cyan-500", text: "text-cyan-500" },
-  idol_female: { bar: "bg-rose-400", text: "text-rose-400" },
-  idol_male: { bar: "bg-blue-500", text: "text-blue-500" },
-  rnb_soul: { bar: "bg-amber-500", text: "text-amber-500" },
-  hiphop: { bar: "bg-purple-500", text: "text-purple-500" },
-  enka_kayo: { bar: "bg-yellow-700", text: "text-yellow-700" },
-  western: { bar: "bg-emerald-500", text: "text-emerald-500" },
-  kpop: { bar: "bg-fuchsia-400", text: "text-fuchsia-400" },
-  game_bgm: { bar: "bg-indigo-500", text: "text-indigo-500" },
-  other: { bar: "bg-zinc-500", text: "text-zinc-500" },
+  j_pop: { bar: "bg-pink-300", text: "text-pink-300" },
+  j_rock: { bar: "bg-red-300", text: "text-red-300" },
+  anison: { bar: "bg-orange-300", text: "text-orange-300" },
+  vocaloid_utaite: { bar: "bg-cyan-300", text: "text-cyan-300" },
+  idol_female: { bar: "bg-rose-300", text: "text-rose-300" },
+  idol_male: { bar: "bg-blue-300", text: "text-blue-300" },
+  rnb_soul: { bar: "bg-amber-300", text: "text-amber-300" },
+  hiphop: { bar: "bg-purple-300", text: "text-purple-300" },
+  enka_kayo: { bar: "bg-yellow-300", text: "text-yellow-300" },
+  western: { bar: "bg-emerald-300", text: "text-emerald-300" },
+  kpop: { bar: "bg-fuchsia-300", text: "text-fuchsia-300" },
+  game_bgm: { bar: "bg-indigo-300", text: "text-indigo-300" },
+  other: { bar: "bg-zinc-300", text: "text-zinc-300" },
 };
 
 // 累積割合がこの閾値に達するまでをドットグリッド上で個別表示し、
 // 残りの少数派ジャンルは1つの「他のジャンル」にまとめる。
 const TOP_THRESHOLD = 0.9;
 
-const REST_COLOR = { bar: "bg-zinc-400", text: "text-zinc-400" };
+const REST_COLOR = { bar: "bg-zinc-300", text: "text-zinc-300" };
 const REST_LABEL = "他のジャンル";
 
 export function GenreDistribution({ buckets }: Props) {
@@ -104,10 +104,9 @@ export function GenreDistribution({ buckets }: Props) {
       <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
         {top.map(([code, count]) => {
           const color = GENRE_COLORS[code];
-          const pct = (count / total) * 100;
           return (
             <li key={code} className={color.text}>
-              {GENRE_LABELS[code]} ({count} / {pct.toFixed(0)}%)
+              {GENRE_LABELS[code]} ({count})
             </li>
           );
         })}
@@ -118,7 +117,7 @@ export function GenreDistribution({ buckets }: Props) {
               .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
               .join(", ")}
           >
-            {REST_LABEL} ({restCount} / {restPct.toFixed(0)}%)
+            {REST_LABEL} ({restCount})
           </li>
         )}
       </ul>

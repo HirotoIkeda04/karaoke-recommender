@@ -108,7 +108,7 @@ export function DotGrid({ segments }: DotGridProps) {
           {col.map((c) => (
             <span
               key={c.key}
-              className={`size-2.5 rounded-full ${c.colorClass}`}
+              className={`size-2.5 rounded-[2px] ${c.colorClass}`}
               title={c.title}
               aria-hidden
             />

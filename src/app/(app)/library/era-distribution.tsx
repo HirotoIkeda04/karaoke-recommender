@@ -5,20 +5,20 @@ interface Props {
   buckets: Record<number, number>;
 }
 
-// 各 decade に対応する Tailwind 色クラス (連続した色相で並ぶよう選定)
+// 各 decade に対応する Tailwind 色クラス (連続した色相で並ぶよう選定 / 淡めのトーン)
 const DECADE_COLORS: Record<number, { bar: string; text: string }> = {
-  1960: { bar: "bg-violet-500", text: "text-violet-500" },
-  1970: { bar: "bg-indigo-500", text: "text-indigo-500" },
-  1980: { bar: "bg-sky-500", text: "text-sky-500" },
-  1990: { bar: "bg-emerald-500", text: "text-emerald-500" },
-  2000: { bar: "bg-amber-500", text: "text-amber-500" },
-  2010: { bar: "bg-orange-500", text: "text-orange-500" },
-  2020: { bar: "bg-pink-500", text: "text-pink-500" },
+  1960: { bar: "bg-violet-300", text: "text-violet-300" },
+  1970: { bar: "bg-indigo-300", text: "text-indigo-300" },
+  1980: { bar: "bg-sky-300", text: "text-sky-300" },
+  1990: { bar: "bg-emerald-300", text: "text-emerald-300" },
+  2000: { bar: "bg-amber-300", text: "text-amber-300" },
+  2010: { bar: "bg-orange-300", text: "text-orange-300" },
+  2020: { bar: "bg-pink-300", text: "text-pink-300" },
 };
 
 const FALLBACK_COLOR = {
-  bar: "bg-zinc-500",
-  text: "text-zinc-500",
+  bar: "bg-zinc-300",
+  text: "text-zinc-300",
 };
 
 function decadeLabel(decade: number) {
