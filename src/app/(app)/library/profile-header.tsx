@@ -77,14 +77,14 @@ export function ProfileHeader({
           {initial}
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <p className="truncate text-base font-semibold text-zinc-900 dark:text-zinc-50">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-50">
             {displayName}
           </p>
 
           <div className="flex items-start gap-6">
             <div className="flex flex-col items-center">
-              <span className="text-lg font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
+              <span className="text-base font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
                 {ratedSongCount}
               </span>
               <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
@@ -95,7 +95,7 @@ export function ProfileHeader({
               href="/friends"
               className="flex flex-col items-center transition active:opacity-70"
             >
-              <span className="text-lg font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
+              <span className="text-base font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
                 {friendCount}
               </span>
               <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
