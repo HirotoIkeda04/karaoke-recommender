@@ -5,6 +5,7 @@
     uv run python src/main.py               # 代表曲 (is_featured=True) のみ
     uv run python src/main.py --all         # 全 3000+ 曲
     uv run python src/main.py --limit 20    # 20 曲だけ (動作確認用)
+    uv run python src/main.py --max-new 300 # 新規 Spotify 呼び出しを 300 曲までに抑える
 """
 
 from __future__ import annotations
@@ -32,11 +33,34 @@ warnings.filterwarnings("ignore", message="urllib3 v2 only supports OpenSSL")
 
 logger = logging.getLogger("scraper")
 
-SPOTIFY_REQUEST_INTERVAL_SEC = 0.5  # Spotify への間隔 (1 曲あたり複数 call する場合あり)
+SPOTIFY_REQUEST_INTERVAL_SEC = 1.5  # Spotify への間隔 (1 曲あたり複数 call する場合あり)
 
 
 def _match_cache_key(song: RawSong) -> str:
     return f"{song.title}\t{song.artist}"
+
+
+def _load_fame_scores(path: Path) -> dict[str, float]:
+    """fame_cache.jsonl から (title, artist) → fame_score の辞書を作る。
+
+    存在しないキーは fame_score=0 として扱われる (後段でソートする際の既定値)。
+    """
+    scores: dict[str, float] = {}
+    if not path.exists():
+        return scores
+    with path.open(encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            entry = json.loads(line)
+            title = entry.get("title")
+            artist = entry.get("artist")
+            score = entry.get("fame_score")
+            if title is None or artist is None or score is None:
+                continue
+            scores[f"{title}\t{artist}"] = float(score)
+    return scores
 
 
 def _load_match_cache(path: Path) -> dict[str, dict]:
@@ -177,6 +201,7 @@ def run(
     *,
     featured_only: bool = True,
     limit: int | None = None,
+    max_new: int | None = None,
     output_dir: Path | None = None,
     cache_dir: Path | None = None,
 ) -> int:
@@ -232,6 +257,23 @@ def run(
             "resume: loaded %d cached (matched=%d, unmatched=%d), %d to process",
             len(match_cache), len(matched), len(unmatched), len(to_process),
         )
+
+    # fame_score 降順に並び替え (有名曲から優先処理)。fame 不明は 0 として末尾へ。
+    fame_scores = _load_fame_scores(output_dir / "fame_cache.jsonl")
+    if fame_scores:
+        to_process.sort(
+            key=lambda s: fame_scores.get(_match_cache_key(s), 0.0),
+            reverse=True,
+        )
+        logger.info(
+            "sorted %d to_process by fame_score (with fame=%d)",
+            len(to_process),
+            sum(1 for s in to_process if _match_cache_key(s) in fame_scores),
+        )
+
+    if max_new is not None and len(to_process) > max_new:
+        to_process = to_process[:max_new]
+        logger.info("max_new=%d: capped to_process to %d songs", max_new, len(to_process))
 
     # 2nd pass: 未確定曲を Spotify に問い合わせる
     quota_hit = False
@@ -290,6 +332,10 @@ def main(argv: list[str] | None = None) -> int:
         help="先頭 N 曲だけ処理 (動作確認用)",
     )
     parser.add_argument(
+        "--max-new", type=int, default=None,
+        help="新規 Spotify 呼び出しを最大 N 曲に制限 (fame_score 降順で選択)",
+    )
+    parser.add_argument(
         "--log-level", default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
     )
@@ -300,7 +346,7 @@ def main(argv: list[str] | None = None) -> int:
         format="%(asctime)s %(levelname)s %(name)s - %(message)s",
     )
 
-    return run(featured_only=not args.all, limit=args.limit)
+    return run(featured_only=not args.all, limit=args.limit, max_new=args.max_new)
 
 
 if __name__ == "__main__":
