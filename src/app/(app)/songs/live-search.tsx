@@ -198,10 +198,6 @@ export function LiveSearch({
       </div>
 
       <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-500">
-        <span className={isStale ? "opacity-60" : undefined}>
-          {filtered.length.toLocaleString()} 件 / 全{" "}
-          {totalCount.toLocaleString()} 曲
-        </span>
         <div ref={sortMenuRef} className="relative">
           <button
             type="button"
@@ -221,7 +217,7 @@ export function LiveSearch({
 
           {sortOpen ? (
             <div
-              className="absolute right-0 top-full z-20 mt-1 w-48 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
+              className="absolute left-0 top-full z-20 mt-1 w-48 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
               role="menu"
             >
               <ul className="py-1">
@@ -267,6 +263,10 @@ export function LiveSearch({
             </div>
           ) : null}
         </div>
+        <span className={isStale ? "opacity-60" : undefined}>
+          {filtered.length.toLocaleString()} 件 / 全{" "}
+          {totalCount.toLocaleString()} 曲
+        </span>
       </div>
 
       {filtered.length === 0 ? (
