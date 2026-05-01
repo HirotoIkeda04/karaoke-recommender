@@ -1,4 +1,4 @@
-// SVG ベースの円グラフ。色は `text-*` クラス + `fill-current` で渡す。
+// SVG ベースのドーナツグラフ。色は `text-*` クラス + `fill-current` で渡す。
 
 export interface PieSegment {
   key: string;
@@ -10,6 +10,8 @@ export interface PieSegment {
 interface PieChartProps {
   segments: PieSegment[];
   size?: number;
+  /** ドーナツの内側の半径 (0..1, viewBox 100 ベースの r=48 に対する比率) */
+  innerRatio?: number;
 }
 
 function polar(cx: number, cy: number, r: number, angleDeg: number) {
@@ -30,11 +32,18 @@ function arcPath(
   return `M ${cx} ${cy} L ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 1 ${end.x} ${end.y} Z`;
 }
 
-export function PieChart({ segments, size = 80 }: PieChartProps) {
+export function PieChart({
+  segments,
+  size = 80,
+  innerRatio = 0.55,
+}: PieChartProps) {
   const total = segments.reduce((s, x) => s + x.value, 0);
   if (total === 0) return null;
 
-  // 単一セグメント: 円を直接描画 (パスだと閉じない)
+  const outerR = 48;
+  const innerR = outerR * innerRatio;
+
+  // 単一セグメント: ドーナツ (外円 + 中央くり抜き)
   if (segments.filter((s) => s.value > 0).length === 1) {
     const only = segments.find((s) => s.value > 0)!;
     return (
@@ -47,11 +56,17 @@ export function PieChart({ segments, size = 80 }: PieChartProps) {
         <circle
           cx="50"
           cy="50"
-          r="48"
+          r={outerR}
           className={`fill-current ${only.colorClass}`}
         >
           {only.title ? <title>{only.title}</title> : null}
         </circle>
+        <circle
+          cx="50"
+          cy="50"
+          r={innerR}
+          className="fill-white dark:fill-zinc-900"
+        />
       </svg>
     );
   }
@@ -64,7 +79,7 @@ export function PieChart({ segments, size = 80 }: PieChartProps) {
         const startAngle = (acc / total) * 360;
         acc += seg.value;
         const endAngle = (acc / total) * 360;
-        const d = arcPath(50, 50, 48, startAngle, endAngle);
+        const d = arcPath(50, 50, outerR, startAngle, endAngle);
         return (
           <path
             key={seg.key}
@@ -77,6 +92,13 @@ export function PieChart({ segments, size = 80 }: PieChartProps) {
           </path>
         );
       })}
+      {/* 中央をくり抜いてドーナツに見せる */}
+      <circle
+        cx="50"
+        cy="50"
+        r={innerR}
+        className="fill-white dark:fill-zinc-900"
+      />
     </svg>
   );
 }
