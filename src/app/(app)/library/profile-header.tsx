@@ -118,6 +118,12 @@ export function ProfileHeader({
         </p>
       ) : null}
 
+      {/* 年代分布 */}
+      <EraDistribution buckets={eraBuckets} />
+
+      {/* ジャンル分布 (得意 / 練習中 / 普通 を集計) */}
+      <GenreDistribution buckets={genreBuckets} />
+
       {/* アクションボタン (自分のみ表示) */}
       {isSelf ? (
         <div className="flex gap-2">
@@ -130,12 +136,6 @@ export function ProfileHeader({
           <ShareProfileButton />
         </div>
       ) : null}
-
-      {/* 年代分布 */}
-      <EraDistribution buckets={eraBuckets} />
-
-      {/* ジャンル分布 (得意 / 練習中 / 普通 を集計) */}
-      <GenreDistribution buckets={genreBuckets} />
     </section>
   );
 }
