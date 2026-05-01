@@ -70,7 +70,16 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
           {song.title}
         </h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          {song.artist}
+          {song.artist_id ? (
+            <Link
+              href={`/artists/${song.artist_id}`}
+              className="underline-offset-2 hover:underline"
+            >
+              {song.artist}
+            </Link>
+          ) : (
+            song.artist
+          )}
           {song.release_year ? ` · ${song.release_year}` : ""}
         </p>
       </div>

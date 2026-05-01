@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { startTransition, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -443,10 +444,28 @@ function SongCardContent({
 
         <div className="relative z-10 w-full">
           <h2 className="line-clamp-1 text-lg font-semibold text-white drop-shadow-sm">
-            {song.title}
+            <Link
+              href={`/songs/${song.id}`}
+              onPointerDown={(e) => e.stopPropagation()}
+              draggable={false}
+              className="hover:underline"
+            >
+              {song.title}
+            </Link>
           </h2>
           <p className="text-xs text-zinc-200 drop-shadow-sm">
-            {song.artist}
+            {song.artist_id ? (
+              <Link
+                href={`/artists/${song.artist_id}`}
+                onPointerDown={(e) => e.stopPropagation()}
+                draggable={false}
+                className="hover:underline"
+              >
+                {song.artist}
+              </Link>
+            ) : (
+              song.artist
+            )}
             {song.release_year ? ` · ${song.release_year}` : ""}
           </p>
         </div>
