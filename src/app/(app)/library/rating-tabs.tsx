@@ -167,7 +167,7 @@ export function RatingTabs({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 border-t border-zinc-200 dark:border-zinc-800">
+      <div className="grid grid-cols-4 border-b border-zinc-200 dark:border-zinc-800">
         {TABS.map((tab) => {
           const active = tab.value === activeTab;
           const count = evaluationsByRating[tab.value]?.length ?? 0;
@@ -178,16 +178,15 @@ export function RatingTabs({
               onClick={() =>
                 goToIndex(TABS.findIndex((t) => t.value === tab.value))
               }
-              className={`-mt-px flex flex-col items-center gap-0.5 border-t py-3 transition-colors ${
+              className={`-mb-px flex flex-col items-center gap-0.5 border-b py-3 transition-colors ${
                 active
                   ? "border-zinc-900 text-zinc-900 dark:border-zinc-50 dark:text-zinc-50"
                   : "border-transparent text-zinc-400 dark:text-zinc-500"
               }`}
             >
               <tab.Icon className="size-4" strokeWidth={2} aria-hidden />
-              <span className="text-[11px]">{tab.label}</span>
-              <span className="text-[10px] tabular-nums opacity-60">
-                {count}
+              <span className="text-[11px] tabular-nums">
+                {tab.label}({count})
               </span>
             </button>
           );
