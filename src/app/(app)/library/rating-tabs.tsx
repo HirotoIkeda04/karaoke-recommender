@@ -16,6 +16,11 @@ const TABS: ReadonlyArray<{ value: Rating; label: string; Icon: typeof X }> = [
   { value: "hard", label: "苦手", Icon: X },
 ];
 
+// このピクセルだけ横に動けばスワイプ確定 (それ未満なら元のパネルにスナップバック)
+const SWIPE_THRESHOLD_PX = 40;
+// 横ドラッグと判断する最小移動量 (縦スクロール優先のため少し緩め)
+const HORIZONTAL_INTENT_PX = 8;
+
 interface Props {
   evaluationsByRating: Record<Rating, EvaluationRow[]>;
   knownSongIds: string[];
@@ -29,34 +34,86 @@ export function RatingTabs({
 }: Props) {
   const [activeTab, setActiveTab] = useState<Rating>(initialTab);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const currentIdx = useRef<number>(
+    Math.max(0, TABS.findIndex((t) => t.value === initialTab)),
+  );
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const isDragging = useRef(false);
+  const isVerticalScroll = useRef(false);
 
-  // 初期スクロール位置 (URL の ?tab= を反映、フラッシュ防止のため layout effect)
+  // 初期位置 + リサイズ追従 (orientation change 対策)
   useLayoutEffect(() => {
-    const idx = TABS.findIndex((t) => t.value === initialTab);
-    const c = scrollRef.current;
-    if (!c || idx <= 0) return;
-    c.scrollLeft = idx * c.clientWidth;
-  }, [initialTab]);
-
-  const handleTabClick = (tab: Rating) => {
-    const idx = TABS.findIndex((t) => t.value === tab);
     const c = scrollRef.current;
     if (!c) return;
-    setActiveTab(tab);
-    c.scrollTo({ left: idx * c.clientWidth, behavior: "smooth" });
-  };
+    const sync = () => {
+      c.scrollLeft = currentIdx.current * c.clientWidth;
+    };
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(c);
+    return () => ro.disconnect();
+  }, []);
 
-  // 水平スクロール → どのパネルが中央に来ているか判定 → 状態更新 + URL replace
-  const handleScroll = () => {
+  const goToIndex = (idx: number, smooth = true) => {
     const c = scrollRef.current;
     if (!c) return;
-    const idx = Math.round(c.scrollLeft / c.clientWidth);
-    const newTab = TABS[idx]?.value;
-    if (!newTab || newTab === activeTab) return;
+    const clamped = Math.max(0, Math.min(TABS.length - 1, idx));
+    currentIdx.current = clamped;
+    c.scrollTo({
+      left: clamped * c.clientWidth,
+      behavior: smooth ? "smooth" : "auto",
+    });
+    const newTab = TABS[clamped].value;
     setActiveTab(newTab);
     const url = new URL(window.location.href);
     url.searchParams.set("tab", newTab);
     window.history.replaceState(null, "", url.toString());
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    touchStart.current = { x: t.clientX, y: t.clientY };
+    isDragging.current = false;
+    isVerticalScroll.current = false;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const start = touchStart.current;
+    if (!start || isVerticalScroll.current) return;
+    const t = e.touches[0];
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    if (!isDragging.current) {
+      if (
+        Math.abs(dx) > HORIZONTAL_INTENT_PX &&
+        Math.abs(dx) > Math.abs(dy)
+      ) {
+        isDragging.current = true;
+      } else if (Math.abs(dy) > HORIZONTAL_INTENT_PX) {
+        isVerticalScroll.current = true;
+        return;
+      } else {
+        return;
+      }
+    }
+    const c = scrollRef.current;
+    if (!c) return;
+    c.scrollLeft = currentIdx.current * c.clientWidth - dx;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const start = touchStart.current;
+    const wasDragging = isDragging.current;
+    touchStart.current = null;
+    isDragging.current = false;
+    if (!start || !wasDragging) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - start.x;
+    if (Math.abs(dx) < SWIPE_THRESHOLD_PX) {
+      goToIndex(currentIdx.current);
+      return;
+    }
+    goToIndex(dx < 0 ? currentIdx.current + 1 : currentIdx.current - 1);
   };
 
   return (
@@ -69,7 +126,9 @@ export function RatingTabs({
             <button
               key={tab.value}
               type="button"
-              onClick={() => handleTabClick(tab.value)}
+              onClick={() =>
+                goToIndex(TABS.findIndex((t) => t.value === tab.value))
+              }
               className={`flex flex-col items-center gap-0.5 rounded-md px-2 py-2 text-xs ${
                 active
                   ? "bg-white shadow-sm dark:bg-zinc-900"
@@ -90,18 +149,18 @@ export function RatingTabs({
 
       <div
         ref={scrollRef}
-        onScroll={handleScroll}
-        className="snap-x snap-mandatory overflow-x-auto overscroll-x-contain [&::-webkit-scrollbar]:hidden"
-        style={{ scrollbarWidth: "none" }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
+        className="overflow-hidden"
+        style={{ touchAction: "pan-y" }}
       >
         <div className="flex">
           {TABS.map((tab) => {
             const rows = evaluationsByRating[tab.value] ?? [];
             return (
-              <div
-                key={tab.value}
-                className="w-full shrink-0 snap-start"
-              >
+              <div key={tab.value} className="w-full shrink-0">
                 {rows.length === 0 ? (
                   <div className="rounded-lg border border-zinc-200 bg-white p-6 text-center text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
                     このカテゴリの曲はまだありません
