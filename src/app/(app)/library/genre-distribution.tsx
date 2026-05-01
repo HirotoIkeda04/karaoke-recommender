@@ -102,7 +102,7 @@ export function GenreDistribution({ buckets }: Props) {
           ]}
         />
 
-        <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
+        <ul className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px]">
           {top.map(([code, count]) => {
             const color = GENRE_COLORS[code];
             return (
