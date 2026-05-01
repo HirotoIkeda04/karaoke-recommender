@@ -51,17 +51,36 @@ interface SongCardProps {
   rating?: string | null;
   /** Spotify で聴いたことがある曲かどうか (バッジ表示用) */
   isKnown?: boolean;
+  /** false にすると曲詳細ページへのリンクを張らない (フレンドのライブラリ閲覧時など) */
+  linkable?: boolean;
 }
 
-export function SongCard({ song, rating, isKnown = false }: SongCardProps) {
+export function SongCard({
+  song,
+  rating,
+  isKnown = false,
+  linkable = true,
+}: SongCardProps) {
   const badge = rating ? RATING_BADGE[rating] : null;
   const image = song.image_url_small ?? song.image_url_medium;
 
+  const Wrapper = linkable
+    ? ({ children }: { children: React.ReactNode }) => (
+        <Link
+          href={`/songs/${song.id}`}
+          className="flex items-center gap-3 rounded-md p-2 transition hover:bg-zinc-100 active:bg-zinc-100 dark:hover:bg-zinc-800/60 dark:active:bg-zinc-800/60"
+        >
+          {children}
+        </Link>
+      )
+    : ({ children }: { children: React.ReactNode }) => (
+        <div className="flex items-center gap-3 rounded-md p-2">
+          {children}
+        </div>
+      );
+
   return (
-    <Link
-      href={`/songs/${song.id}`}
-      className="flex items-center gap-3 rounded-md p-2 transition hover:bg-zinc-100 active:bg-zinc-100 dark:hover:bg-zinc-800/60 dark:active:bg-zinc-800/60"
-    >
+    <Wrapper>
       <div className="relative size-12 shrink-0 overflow-hidden rounded-md bg-white dark:bg-zinc-900">
         {image ? (
           <Image
@@ -105,6 +124,6 @@ export function SongCard({ song, rating, isKnown = false }: SongCardProps) {
             : ""}
         </p>
       </div>
-    </Link>
+    </Wrapper>
   );
 }

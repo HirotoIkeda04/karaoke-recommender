@@ -39,12 +39,15 @@ interface Props {
   evaluationsByRating: Record<Rating, EvaluationRow[]>;
   knownSongIds: string[];
   initialTab: Rating;
+  /** false にすると曲行を曲詳細にリンクしない (フレンド閲覧モード) */
+  linkable?: boolean;
 }
 
 export function RatingTabs({
   evaluationsByRating,
   knownSongIds,
   initialTab,
+  linkable = true,
 }: Props) {
   const [activeTab, setActiveTab] = useState<Rating>(initialTab);
   const [sortKey, setSortKey] = useState<SortKey>("updated");
@@ -287,6 +290,7 @@ export function RatingTabs({
                     sortKey={sortKey}
                     sortDir={sortDir}
                     knownSongIds={knownSongIds}
+                    linkable={linkable}
                   />
                 )}
               </div>

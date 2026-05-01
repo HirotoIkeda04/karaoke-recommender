@@ -179,10 +179,15 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
       <ProfileHeader
         displayName={displayName}
         friendCount={friendCount}
+        ratedSongCount={
+          (rows ?? []).filter((r) => VALID_RATINGS.has(r.rating))
+            .length
+        }
         voiceEstimate={voiceEstimate}
         eraBuckets={eraBuckets}
         genreBuckets={genreBuckets}
         minEasyForEstimate={MIN_FOR_ESTIMATE}
+        viewMode="self"
       />
 
       {/* Spotify 連携 */}

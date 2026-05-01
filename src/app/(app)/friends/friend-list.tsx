@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -76,11 +77,15 @@ function Section({
 
 function AcceptedRow({ friend }: { friend: FriendItem }) {
   return (
-    <div className="flex items-center px-4 py-3">
+    <Link
+      href={`/u/${friend.otherId}`}
+      className="flex items-center px-4 py-3 transition active:bg-zinc-50 dark:active:bg-zinc-800"
+    >
       <span className="flex-1 truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">
         {friend.otherName}
       </span>
-    </div>
+      <span className="text-xs text-zinc-500 dark:text-zinc-500">›</span>
+    </Link>
   );
 }
 

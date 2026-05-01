@@ -46,6 +46,8 @@ interface SortableListProps {
   sortDir: SortDir;
   /** Spotify で聴いたことがある song_id リスト (バッジ表示用) */
   knownSongIds?: string[];
+  /** false にすると曲行を曲詳細ページへリンクしない (フレンド閲覧時) */
+  linkable?: boolean;
 }
 
 /** 2 行の比較結果 (asc 用)。dir は呼び出し側で反転する */
@@ -80,6 +82,7 @@ export function SortableList({
   sortKey,
   sortDir,
   knownSongIds = [],
+  linkable = true,
 }: SortableListProps) {
   const knownSet = useMemo(() => new Set(knownSongIds), [knownSongIds]);
 
@@ -99,6 +102,7 @@ export function SortableList({
               song={r.song}
               rating={r.rating}
               isKnown={knownSet.has(r.song.id)}
+              linkable={linkable}
             />
           </li>
         ) : null,
