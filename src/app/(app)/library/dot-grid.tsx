@@ -1,14 +1,17 @@
-// 10列×2行 (合計 20 個) のドットで割合を表現するための小道具。
+// 20列×2行 (合計 40 個) のドットで割合を表現するための小道具。
 //
 // 充填順は画像 (上→下) ではなく「横並びの上段→下段」。
 // すなわち grid 上の番号付けが
-//   1  3  5  7  9  11 13 15 17 19
-//   2  4  6  8  10 12 14 16 18 20
-// で、埋める順番は 1,3,...,19 → 2,4,...,20。
-// CSS Grid の auto-flow=row + grid-cols-10 grid-rows-2 とすると
-// 子要素が上段→下段の順に配置されるためこの順番と一致する。
+//   1  3  5  ... 39
+//   2  4  6  ... 40
+// で、埋める順番は 1,3,...,39 → 2,4,...,40 (上段の左→右、次に下段の左→右)。
+//
+// レイアウトは横幅いっぱい (両端揃い)。flex の justify-between により
+// 各行の左端ドットがコンテナ左端に、右端ドットがコンテナ右端に揃う。
 
-const TOTAL_DOTS = 20;
+const COLS = 20;
+const ROWS = 2;
+const TOTAL_DOTS = COLS * ROWS;
 
 export interface DotInput {
   key: string;
@@ -24,8 +27,8 @@ export interface DotSegment {
   title?: string;
 }
 
-// 各カテゴリの件数から 20 個の枠の取り分を整数で算出する。
-// 合計が 20 になるよう "最大剰余法" で残りを配分し、いずれの値も整数 (= 5% の倍数) になるようにする。
+// 各カテゴリの件数から 40 個の枠の取り分を整数で算出する。
+// 合計が 40 になるよう "最大剰余法" で残りを配分し、各値は整数 (= 2.5% の倍数) になる。
 export function allocateDots(inputs: DotInput[]): DotSegment[] {
   const total = inputs.reduce((sum, e) => sum + e.count, 0);
   if (total === 0) {
@@ -92,15 +95,22 @@ export function DotGrid({ segments }: DotGridProps) {
     });
   }
 
+  const top = cells.slice(0, COLS);
+  const bottom = cells.slice(COLS, TOTAL_DOTS);
+
   return (
-    <div className="grid w-fit grid-cols-10 grid-rows-2 gap-1">
-      {cells.map((c) => (
-        <span
-          key={c.key}
-          className={`size-2 rounded-full ${c.colorClass}`}
-          title={c.title}
-          aria-hidden
-        />
+    <div className="flex w-full flex-col gap-1">
+      {[top, bottom].map((row, rowIdx) => (
+        <div key={rowIdx} className="flex w-full justify-between">
+          {row.map((c) => (
+            <span
+              key={c.key}
+              className={`size-2 rounded-full ${c.colorClass}`}
+              title={c.title}
+              aria-hidden
+            />
+          ))}
+        </div>
       ))}
     </div>
   );
