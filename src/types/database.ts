@@ -654,6 +654,16 @@ export type Database = {
         }[]
       }
       normalize_artist_name: { Args: { name: string }; Returns: string }
+      search_songs_and_artists: {
+        Args: {
+          p_q: string
+          p_high_min_midi?: number | null
+          p_high_max_midi?: number | null
+          p_artist_limit?: number | null
+          p_song_limit?: number | null
+        }
+        Returns: Json
+      }
     }
     Enums: {
       rating_type: "hard" | "medium" | "easy" | "practicing"

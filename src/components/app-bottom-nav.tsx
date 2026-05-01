@@ -35,10 +35,19 @@ export function AppBottomNav() {
             item.href === "/"
               ? pathname === "/"
               : pathname.startsWith(item.href);
+          // 検索タブを既に開いている時は遷移ではなく、検索 input を focus させる
+          // (Spotify と同じ操作感: タブ再タップ = 検索開始)
+          const onClick = (e: React.MouseEvent) => {
+            if (item.href === "/songs" && pathname === "/songs") {
+              e.preventDefault();
+              window.dispatchEvent(new CustomEvent("app:focus-search"));
+            }
+          };
           return (
             <li key={item.href} className="min-w-0">
               <Link
                 href={item.href}
+                onClick={onClick}
                 aria-label={item.label}
                 className={cn(
                   "flex w-full items-center justify-center px-1 py-3",
