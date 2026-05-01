@@ -424,7 +424,7 @@ function SongCardContent({
         {song.image_url_large ?? song.image_url_medium ? (
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 -z-0 scale-y-[-1] scale-x-110 brightness-[0.35] blur-2xl"
+            className="pointer-events-none absolute inset-0 -z-0 scale-y-[-1] scale-x-110 brightness-[0.55] blur-2xl"
           >
             <Image
               src={(song.image_url_large ?? song.image_url_medium)!}
