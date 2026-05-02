@@ -129,7 +129,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
     )
     .eq("artist_id", id)
     .order("rank", { ascending: true })
-    .limit(15);
+    .limit(5);
 
   let rankedIds: { id: string; name: string }[] = [];
   if (curated && curated.length > 0) {
@@ -159,7 +159,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
         if (b.overlap !== a.overlap) return b.overlap - a.overlap;
         return (b.song_count ?? 0) - (a.song_count ?? 0);
       })
-      .slice(0, 15)
+      .slice(0, 5)
       .map((c) => ({ id: c.id, name: c.name }));
   }
 
