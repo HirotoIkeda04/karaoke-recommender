@@ -88,6 +88,7 @@ export function LiveSearch({ ratings, knownSongIds = [] }: LiveSearchProps) {
   const [errMsg, setErrMsg] = useState<string | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const blurTimerRef = useRef<number | null>(null);
   const supabase = useMemo(() => createClient(), []);
 
   const knownSet = useMemo(() => new Set(knownSongIds), [knownSongIds]);
@@ -205,8 +206,20 @@ export function LiveSearch({ ratings, knownSongIds = [] }: LiveSearchProps) {
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onFocus={() => {
+            if (blurTimerRef.current !== null) {
+              window.clearTimeout(blurTimerRef.current);
+              blurTimerRef.current = null;
+            }
+            setIsFocused(true);
+          }}
+          onBlur={() => {
+            // 履歴項目タップ時に Link が unmount されないよう mode 切り替えを遅延
+            blurTimerRef.current = window.setTimeout(() => {
+              setIsFocused(false);
+              blurTimerRef.current = null;
+            }, 200);
+          }}
           placeholder="楽曲・アーティストを検索"
           autoComplete="off"
           autoCapitalize="off"
@@ -355,7 +368,25 @@ function HistoryList({
             key={`${item.type}:${item.id}`}
             className="flex items-center gap-1"
           >
-            <div className="min-w-0 flex-1">
+            <div
+              className="min-w-0 flex-1"
+              onClickCapture={
+                item.type === "song"
+                  ? () =>
+                      onSelectSong({
+                        id: item.id,
+                        title: item.title,
+                        artist: item.artist,
+                        release_year: null,
+                        range_low_midi: null,
+                        range_high_midi: null,
+                        falsetto_max_midi: null,
+                        image_url_small: item.image,
+                        image_url_medium: null,
+                      })
+                  : undefined
+              }
+            >
               {item.type === "song" ? (
                 <SongCard
                   song={{
