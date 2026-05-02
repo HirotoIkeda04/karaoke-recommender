@@ -67,8 +67,8 @@ const SWIPE_EXIT_VARIANTS = {
       return { opacity: 0, transition: { duration: 0 } };
     }
     const transition = {
-      duration: 0.42,
-      times: [0, 0.45, 1],
+      duration: 0.7,
+      times: [0, 0.55, 1],
       ease: "easeIn" as const,
       // zIndex は補間させず一瞬で適用 (退場中カードを新しい current の上に維持)
       zIndex: { duration: 0 },
@@ -171,9 +171,6 @@ export function SwipeDeck({
   const [exitRating, setExitRating] = useState<ExitMode>(null);
   // undo で復活したカードを、出ていった方向から逆再生でスライドインさせる。
   const [enterFrom, setEnterFrom] = useState<Rating | null>(null);
-  // 退場アニメ中は undo を無効化する。同じ key のカードが「退場中 + 再入場」を
-  // 同時に抱えると AnimatePresence (popLayout) の状態が壊れるため。
-  const [isExiting, setIsExiting] = useState(false);
   const knownSet = useMemo(() => new Set(knownSongIds), [knownSongIds]);
 
   const current = queue[0];
@@ -187,7 +184,6 @@ export function SwipeDeck({
     const songSnapshot = current;
     setEnterFrom(null);
     setExitRating(rating);
-    setIsExiting(true);
     setQueue((q) => q.slice(1));
     setLastAction({ song: songSnapshot, rating });
     startTransition(async () => {
@@ -205,19 +201,17 @@ export function SwipeDeck({
     const songSnapshot = current;
     setEnterFrom(null);
     setExitRating(null);
-    setIsExiting(true);
     setQueue((q) => q.slice(1));
     setLastAction({ song: songSnapshot, rating: null });
   };
 
   const handleUndo = () => {
-    if (!lastAction || isExiting) return;
+    if (!lastAction) return;
     setError(null);
     const { song, rating } = lastAction;
     setLastAction(null);
     setEnterFrom(rating);
     setExitRating("instant");
-    setIsExiting(true);
     setQueue((q) => [song, ...q]);
     if (rating === null) return;
     startTransition(async () => {
@@ -288,11 +282,7 @@ export function SwipeDeck({
         ))}
 
         {/* 先頭カード (ドラッグ可能) */}
-        <AnimatePresence
-          mode="popLayout"
-          custom={exitRating}
-          onExitComplete={() => setIsExiting(false)}
-        >
+        <AnimatePresence mode="popLayout" custom={exitRating}>
           <SwipeCard
             key={current.id}
             song={current}
@@ -343,7 +333,7 @@ export function SwipeDeck({
         <button
           type="button"
           onClick={handleUndo}
-          disabled={!lastAction || isExiting}
+          disabled={!lastAction}
           className="mx-auto flex size-14 items-center justify-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-300 disabled:opacity-30 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
           aria-label="直前の評価を取り消して戻る"
         >
@@ -460,10 +450,9 @@ function SwipeCard({
         b = 247;
       }
     }
-    const blurPx = 12 + i * 60;
-    const spreadPx = i * 8;
-    const alpha = Math.min(1, 0.25 + i * 0.85);
-    return `0 0 ${blurPx}px ${spreadPx}px rgba(${r},${g},${b},${alpha})`;
+    const blurPx = i * 50;
+    const alpha = i * 0.55;
+    return `0 0 ${blurPx}px rgba(${r},${g},${b},${alpha})`;
   });
 
   const overlayOpacity = useTransform(
@@ -671,25 +660,25 @@ function SwipeOverlay({ x, y, opacity }: SwipeOverlayProps) {
     >
       <motion.div
         style={{ opacity: easyOpacity }}
-        className="absolute left-4 top-4 rounded-lg border-4 border-emerald-500 bg-emerald-500/25 px-3 py-1 text-lg font-extrabold text-emerald-700 shadow-lg shadow-emerald-500/40 dark:text-emerald-200"
+        className="absolute left-4 top-4 rounded-lg border-4 border-emerald-400 px-3 py-1 text-lg font-bold text-emerald-600"
       >
         得意
       </motion.div>
       <motion.div
         style={{ opacity: hardOpacity }}
-        className="absolute right-4 top-4 rounded-lg border-4 border-red-500 bg-red-500/25 px-3 py-1 text-lg font-extrabold text-red-700 shadow-lg shadow-red-500/40 dark:text-red-200"
+        className="absolute right-4 top-4 rounded-lg border-4 border-red-400 px-3 py-1 text-lg font-bold text-red-600"
       >
         苦手
       </motion.div>
       <motion.div
         style={{ opacity: mediumOpacity }}
-        className="absolute left-1/2 top-4 -translate-x-1/2 rounded-lg border-4 border-yellow-500 bg-yellow-500/25 px-3 py-1 text-lg font-extrabold text-yellow-700 shadow-lg shadow-yellow-500/40 dark:text-yellow-200"
+        className="absolute left-1/2 top-4 -translate-x-1/2 rounded-lg border-4 border-yellow-400 px-3 py-1 text-lg font-bold text-yellow-600"
       >
         普通
       </motion.div>
       <motion.div
         style={{ opacity: practicingOpacity }}
-        className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-lg border-4 border-purple-500 bg-purple-500/25 px-3 py-1 text-lg font-extrabold text-purple-700 shadow-lg shadow-purple-500/40 dark:text-purple-200"
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-lg border-4 border-purple-400 px-3 py-1 text-lg font-bold text-purple-600"
       >
         練習中
       </motion.div>
