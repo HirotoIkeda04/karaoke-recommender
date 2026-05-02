@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 
-import { ArtistRow, type ArtistRowData } from "@/components/artist-row";
 import { BackButton } from "@/components/back-button";
+import { SongCard } from "@/components/song-card";
 import { GENRE_LABELS, isGenreCode } from "@/lib/genres";
+import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -11,61 +12,74 @@ interface GenrePageProps {
   params: Promise<{ code: string }>;
 }
 
-// ジャンルあたりのアーティスト件数上限。
-// 一番多い J-POP でも数千程度なので、まずは 500 件で頭打ち。
-// 仮想化を入れるなら緩められるが、今は素直なリストでも十分軽い。
-const ARTIST_LIMIT = 500;
+// ジャンルあたりの楽曲件数上限。
+// is_popular な曲を優先し、その後リリース年の新しい順で並べるため、
+// まずは 500 件で頭打ち。仮想化を入れるなら緩められる。
+const SONG_LIMIT = 500;
 
-export default async function GenreArtistsPage({ params }: GenrePageProps) {
+export default async function GenreSongsPage({ params }: GenrePageProps) {
   const { code } = await params;
   if (!isGenreCode(code)) notFound();
 
   const supabase = await createClient();
 
-  // artists_with_song_count: id, name, genres, song_count
-  // 「曲数 0 のアーティスト」は実質ゴミなのでフィルタ
+  // songs_with_genres: artists 由来の genres とソング独自タグを合成した
+  // effective_genres を持つビュー。is_popular = DAM 由来の有名曲フラグ。
   const { data: rows, error } = await supabase
-    .from("artists_with_song_count")
-    .select("id, name, song_count")
-    .contains("genres", [code])
-    .gt("song_count", 0)
-    .order("song_count", { ascending: false })
-    .order("name", { ascending: true })
-    .limit(ARTIST_LIMIT);
-
-  // 各アーティストのジャケット画像 (検索結果と同様、最新リリース 1 枚)。
-  // RPC を作るほどでもないので、id 配列で一括引いてから client 側で合流する。
-  const ids = (rows ?? []).map((r) => r.id).filter((id): id is string => !!id);
-  const imageMap = new Map<string, string | null>();
-  if (ids.length > 0) {
-    // songs を release_year desc で order すると重いので、
-    // 必要列だけ・artist_id in (...) でまとめて取り、JS 側で先頭を採用する
-    const { data: songRows } = await supabase
-      .from("songs")
-      .select("artist_id, image_url_small, image_url_medium, release_year")
-      .in("artist_id", ids)
-      .or("image_url_small.not.is.null,image_url_medium.not.is.null")
-      .order("release_year", { ascending: false, nullsFirst: false });
-    for (const s of songRows ?? []) {
-      if (!s.artist_id) continue;
-      if (imageMap.has(s.artist_id)) continue;
-      imageMap.set(
-        s.artist_id,
-        s.image_url_small ?? s.image_url_medium ?? null,
-      );
-    }
-  }
-
-  const artists: ArtistRowData[] = (rows ?? [])
-    .filter((r): r is { id: string; name: string; song_count: number | null } =>
-      Boolean(r.id && r.name),
+    .from("songs_with_genres")
+    .select(
+      "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, is_popular",
     )
-    .map((r) => ({
-      id: r.id,
-      name: r.name,
-      song_count: r.song_count,
-      image_url: imageMap.get(r.id) ?? null,
-    }));
+    .contains("effective_genres", [code])
+    .order("is_popular", { ascending: false, nullsFirst: false })
+    .order("release_year", { ascending: false, nullsFirst: false })
+    .order("title", { ascending: true })
+    .limit(SONG_LIMIT);
+
+  // SongCard 用に型を満たす行だけ抽出
+  const songs = (rows ?? []).flatMap((r) =>
+    r.id && r.title && r.artist
+      ? [
+          {
+            id: r.id,
+            title: r.title,
+            artist: r.artist,
+            release_year: r.release_year,
+            range_low_midi: r.range_low_midi,
+            range_high_midi: r.range_high_midi,
+            falsetto_max_midi: r.falsetto_max_midi,
+            image_url_small: r.image_url_small,
+            image_url_medium: r.image_url_medium,
+          },
+        ]
+      : [],
+  );
+
+  // 自分のレーティングと Spotify 既知曲を ID 集合で取得して
+  // SongCard のバッジ表示に使う
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const userId = session?.user?.id;
+
+  const songIds = songs.map((s) => s.id);
+  const [knownIds, evalsRes] = await Promise.all([
+    getUserKnownSongIds(),
+    userId && songIds.length > 0
+      ? supabase
+          .from("evaluations")
+          .select("song_id,rating")
+          .eq("user_id", userId)
+          .in("song_id", songIds)
+      : Promise.resolve({
+          data: [] as Array<{ song_id: string; rating: string }>,
+        }),
+  ]);
+
+  const ratings: Record<string, string> = {};
+  for (const ev of evalsRes.data ?? []) {
+    ratings[ev.song_id] = ev.rating;
+  }
 
   return (
     <div className="mx-auto max-w-md space-y-4 px-4 py-4">
@@ -75,8 +89,8 @@ export default async function GenreArtistsPage({ params }: GenrePageProps) {
           {GENRE_LABELS[code]}
         </h1>
         <span className="ml-auto text-xs text-zinc-500 dark:text-zinc-400">
-          {artists.length.toLocaleString()} 組
-          {artists.length === ARTIST_LIMIT ? "+" : ""}
+          {songs.length.toLocaleString()} 曲
+          {songs.length === SONG_LIMIT ? "+" : ""}
         </span>
       </div>
 
@@ -84,15 +98,19 @@ export default async function GenreArtistsPage({ params }: GenrePageProps) {
         <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
           {error.message}
         </div>
-      ) : artists.length === 0 ? (
+      ) : songs.length === 0 ? (
         <p className="px-2 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
-          このジャンルのアーティストはまだ登録されていません
+          このジャンルの楽曲はまだ登録されていません
         </p>
       ) : (
         <ul>
-          {artists.map((a) => (
-            <li key={a.id}>
-              <ArtistRow artist={a} />
+          {songs.map((s) => (
+            <li key={s.id}>
+              <SongCard
+                song={s}
+                rating={ratings[s.id] ?? null}
+                isKnown={knownIds.has(s.id)}
+              />
             </li>
           ))}
         </ul>

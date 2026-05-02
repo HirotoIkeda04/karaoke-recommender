@@ -1,6 +1,6 @@
 /**
  * /songs/genre/[code] 遷移時の skeleton。
- * ヘッダー (戻る + タイトル) + アーティスト行 8 件。
+ * ヘッダー (戻る + タイトル) + 楽曲行 8 件。
  */
 export default function Loading() {
   return (
@@ -18,7 +18,7 @@ export default function Loading() {
       <ul>
         {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
           <li key={i} className="flex items-center gap-3 rounded-md p-2">
-            <div className="size-12 shrink-0 animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800" />
+            <div className="size-12 shrink-0 animate-pulse rounded-sm bg-zinc-200 dark:bg-zinc-800" />
             <div className="min-w-0 flex-1 space-y-1.5">
               <div className="h-4 w-32 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
               <div className="h-3 w-20 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
