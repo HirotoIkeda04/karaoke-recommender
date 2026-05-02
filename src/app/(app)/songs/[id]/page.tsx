@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { BackButton } from "@/components/back-button";
 import { buttonVariants } from "@/components/ui/button";
 import { midiToKaraoke } from "@/lib/note";
 import { createClient } from "@/lib/supabase/server";
@@ -48,6 +49,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
 
   return (
     <div className="mx-auto max-w-md space-y-5 px-4 py-4">
+      <BackButton fallbackHref="/songs" />
       <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-zinc-200 dark:bg-zinc-800">
         {image ? (
           <Image

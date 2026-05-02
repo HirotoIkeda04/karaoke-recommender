@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import QRCode from "qrcode";
 
+import { BackButton } from "@/components/back-button";
 import { createClient } from "@/lib/supabase/server";
 
 import { QrSection } from "./qr-section";
@@ -131,7 +132,10 @@ export default async function RoomPage({ params }: PageProps) {
 
   return (
     <div className="mx-auto max-w-md space-y-5 px-4 py-4">
-      <h1 className="text-lg font-semibold">カラオケルーム</h1>
+      <div className="flex items-center gap-2">
+        <BackButton href="/rooms" label="ルーム一覧に戻る" />
+        <h1 className="text-lg font-semibold">カラオケルーム</h1>
+      </div>
 
       <QrSection
         url={qrUrl}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { BackButton } from "@/components/back-button";
 import { Button } from "@/components/ui/button";
 import { GENRE_CODES, type GenreCode } from "@/lib/genres";
 import { createClient } from "@/lib/supabase/server";
@@ -149,6 +150,7 @@ export default async function FriendLibraryPage({
 
   return (
     <div className="mx-auto max-w-md space-y-4 px-4 py-4">
+      <BackButton fallbackHref="/library" />
       <ProfileHeader
         displayName={profile.display_name}
         friendCount={profile.friend_count}

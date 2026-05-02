@@ -1,8 +1,7 @@
-import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ArtistRow, type ArtistRowData } from "@/components/artist-row";
+import { BackButton } from "@/components/back-button";
 import { GENRE_LABELS, isGenreCode } from "@/lib/genres";
 import { createClient } from "@/lib/supabase/server";
 
@@ -71,13 +70,7 @@ export default async function GenreArtistsPage({ params }: GenrePageProps) {
   return (
     <div className="mx-auto max-w-md space-y-4 px-4 py-4">
       <div className="flex items-center gap-2">
-        <Link
-          href="/songs"
-          aria-label="検索に戻る"
-          className="-ml-2 grid size-9 place-items-center rounded-full text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
-        >
-          <ChevronLeft className="size-5" aria-hidden />
-        </Link>
+        <BackButton href="/songs" label="検索に戻る" />
         <h1 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
           {GENRE_LABELS[code]}
         </h1>

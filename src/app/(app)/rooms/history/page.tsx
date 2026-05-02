@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { BackButton } from "@/components/back-button";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -73,7 +74,10 @@ export default async function RoomHistoryPage() {
 
   return (
     <div className="mx-auto max-w-md space-y-5 px-4 py-4">
-      <h1 className="text-lg font-semibold">ルーム履歴</h1>
+      <div className="flex items-center gap-2">
+        <BackButton href="/rooms" label="ルーム一覧に戻る" />
+        <h1 className="text-lg font-semibold">ルーム履歴</h1>
+      </div>
       <p className="text-xs text-zinc-500 dark:text-zinc-500">
         直近 {HISTORY_LIMIT} 件のみ表示。古いルームは順次自動削除されます
       </p>

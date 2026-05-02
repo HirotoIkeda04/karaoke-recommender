@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
+import { BackButton } from "@/components/back-button";
 import { SongCard } from "@/components/song-card";
 import { GENRE_LABELS, type GenreCode } from "@/lib/genres";
 import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
@@ -124,6 +125,9 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/20 to-black/85" />
+        <div className="absolute left-3 top-3 sm:left-4 sm:top-4">
+          <BackButton variant="overlay" fallbackHref="/songs" />
+        </div>
         <div className="absolute inset-x-0 bottom-0 px-4 pb-5 sm:px-6">
           <h1 className="text-3xl font-bold leading-tight text-white drop-shadow-md sm:text-4xl">
             {artist.name}

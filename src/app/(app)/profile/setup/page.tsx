@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { BackButton } from "@/components/back-button";
 import { createClient } from "@/lib/supabase/server";
 
 import { DisplayNameForm } from "./display-name-form";
@@ -36,6 +37,9 @@ export default async function ProfileSetupPage({
 
   return (
     <div className="mx-auto max-w-md p-6">
+      <div className="mb-4">
+        <BackButton fallbackHref={next} />
+      </div>
       <div className="mb-6 space-y-2">
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
           表示名の設定
