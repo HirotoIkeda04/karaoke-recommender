@@ -23,37 +23,58 @@ export default async function GenreSongsPage({ params }: GenrePageProps) {
 
   const supabase = await createClient();
 
-  // songs_with_genres: artists 由来の genres とソング独自タグを合成した
-  // effective_genres を持つビュー。is_popular = DAM 由来の有名曲フラグ。
-  const { data: rows, error } = await supabase
-    .from("songs_with_genres")
-    .select(
-      "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, is_popular",
-    )
-    .contains("effective_genres", [code])
-    .order("is_popular", { ascending: false, nullsFirst: false })
-    .order("release_year", { ascending: false, nullsFirst: false })
-    .order("title", { ascending: true })
-    .limit(SONG_LIMIT);
+  // songs_with_genres ビューには SELECT 権限が無いので、
+  // 旧アーティスト一覧と同じ artists_with_song_count を経由する。
+  // 1) このジャンルに属するアーティスト ID を取得
+  // 2) songs を artist_id IN (...) でフィルタ
+  // 3) 楽曲側の genres にも直接タグが付いているケースを別クエリで救済
+  const { data: artistRows } = await supabase
+    .from("artists_with_song_count")
+    .select("id")
+    .contains("genres", [code]);
+  const artistIds = (artistRows ?? [])
+    .map((r) => r.id)
+    .filter((id): id is string => !!id);
 
-  // SongCard 用に型を満たす行だけ抽出
-  const songs = (rows ?? []).flatMap((r) =>
-    r.id && r.title && r.artist
-      ? [
-          {
-            id: r.id,
-            title: r.title,
-            artist: r.artist,
-            release_year: r.release_year,
-            range_low_midi: r.range_low_midi,
-            range_high_midi: r.range_high_midi,
-            falsetto_max_midi: r.falsetto_max_midi,
-            image_url_small: r.image_url_small,
-            image_url_medium: r.image_url_medium,
-          },
-        ]
-      : [],
-  );
+  const songSelect =
+    "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, is_popular";
+
+  const [byArtistRes, byTagRes] = await Promise.all([
+    artistIds.length > 0
+      ? supabase
+          .from("songs")
+          .select(songSelect)
+          .in("artist_id", artistIds)
+          .order("is_popular", { ascending: false })
+          .order("release_year", { ascending: false, nullsFirst: false })
+          .order("title", { ascending: true })
+          .limit(SONG_LIMIT)
+      : Promise.resolve({ data: [], error: null }),
+    supabase
+      .from("songs")
+      .select(songSelect)
+      .contains("genres", [code])
+      .order("is_popular", { ascending: false })
+      .order("release_year", { ascending: false, nullsFirst: false })
+      .order("title", { ascending: true })
+      .limit(SONG_LIMIT),
+  ]);
+
+  const error = byArtistRes.error ?? byTagRes.error;
+  // id で dedupe して、is_popular → release_year desc → title の順で並べ直す
+  type Row = NonNullable<typeof byTagRes.data>[number];
+  const merged = new Map<string, Row>();
+  for (const r of byArtistRes.data ?? []) merged.set(r.id, r);
+  for (const r of byTagRes.data ?? []) merged.set(r.id, r);
+  const songs = Array.from(merged.values())
+    .sort((a, b) => {
+      if (a.is_popular !== b.is_popular) return a.is_popular ? -1 : 1;
+      const ay = a.release_year ?? -Infinity;
+      const by = b.release_year ?? -Infinity;
+      if (ay !== by) return by - ay;
+      return a.title.localeCompare(b.title);
+    })
+    .slice(0, SONG_LIMIT);
 
   // 自分のレーティングと Spotify 既知曲を ID 集合で取得して
   // SongCard のバッジ表示に使う
