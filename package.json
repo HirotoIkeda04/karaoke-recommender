@@ -18,6 +18,7 @@
     "expand:vocaloid": "node --env-file=.env.local --import tsx scripts/expand-vocaloid-songs.ts",
     "seed:vocaloid-dam": "node --env-file=.env.local --import tsx scripts/seed-vocaloid-dam.ts",
     "backfill:artist-id": "node --env-file=.env.local --import tsx scripts/backfill-artist-id.ts",
+    "backfill:spotify-images": "node --env-file=.env.local --import tsx scripts/backfill-spotify-images.ts",
     "dump:top-artists": "node --env-file=.env.local --import tsx scripts/dump-top-artists.ts",
     "ingest:related-artists": "node --env-file=.env.local --import tsx scripts/ingest-related-artists.ts"
   },

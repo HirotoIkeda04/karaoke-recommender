@@ -303,13 +303,13 @@ async function main() {
     }
 
     if (bestRaw && bestSim >= SIMILARITY_THRESHOLD) {
-      const album = bestRaw.album ?? {};
-      const images = (album.images ?? []) as { url: string; height?: number }[];
+      // searchTrack() は album.images / album.release_date をトップレベルに展開して返す
+      const images = (bestRaw.images ?? []) as { url: string; height?: number }[];
       const sortedImgs = [...images].sort((a, b) => (b.height ?? 0) - (a.height ?? 0));
       const large = sortedImgs.find((i) => (i.height ?? 0) >= 500) ?? sortedImgs[0];
       const medium = sortedImgs.find((i) => (i.height ?? 0) >= 200 && (i.height ?? 0) < 500) ?? sortedImgs[Math.floor(sortedImgs.length / 2)];
       const small = [...sortedImgs].reverse().find((i) => (i.height ?? 0) <= 200) ?? sortedImgs[sortedImgs.length - 1];
-      const releaseYear = album.release_date ? parseInt(album.release_date.slice(0, 4), 10) : null;
+      const releaseYear = bestRaw.release_date ? parseInt(bestRaw.release_date.slice(0, 4), 10) : null;
 
       const { error } = await sb
         .from("songs")
