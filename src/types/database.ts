@@ -318,6 +318,57 @@ export type Database = {
           },
         ]
       }
+      song_logs: {
+        Row: {
+          body: string | null
+          created_at: string
+          equipment: string | null
+          id: string
+          key_shift: number | null
+          logged_at: string
+          song_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          equipment?: string | null
+          id?: string
+          key_shift?: number | null
+          logged_at?: string
+          song_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          equipment?: string | null
+          id?: string
+          key_shift?: number | null
+          logged_at?: string
+          song_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "song_logs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "song_logs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs_with_genres"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       songs: {
         Row: {
           artist: string

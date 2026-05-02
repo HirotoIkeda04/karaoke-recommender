@@ -8,6 +8,7 @@ import { midiToKaraoke } from "@/lib/note";
 import { createClient } from "@/lib/supabase/server";
 
 import { RatingControls } from "./rating-controls";
+import { SongLogs } from "./song-logs";
 
 export const dynamic = "force-dynamic";
 
@@ -32,14 +33,21 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const [songRes, evalRes] = await Promise.all([
+  const [songRes, evalRes, logsRes] = await Promise.all([
     supabase.from("songs").select("*").eq("id", id).maybeSingle(),
     supabase
       .from("evaluations")
-      .select("rating, memo, key_shift")
+      .select("rating")
       .eq("user_id", user.id)
       .eq("song_id", id)
       .maybeSingle(),
+    supabase
+      .from("song_logs")
+      .select("id, logged_at, equipment, key_shift, body")
+      .eq("user_id", user.id)
+      .eq("song_id", id)
+      .order("logged_at", { ascending: false })
+      .order("created_at", { ascending: false }),
   ]);
 
   if (songRes.error) {
@@ -53,6 +61,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
 
   const song = songRes.data;
   const evaluation = evalRes.data ?? null;
+  const logs = logsRes.data ?? [];
   const image = song.image_url_large ?? song.image_url_medium;
 
   return (
@@ -108,8 +117,9 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
       <RatingControls
         songId={song.id}
         initialRating={evaluation?.rating ?? null}
-        initialMemo={evaluation?.memo ?? ""}
       />
+
+      <SongLogs songId={song.id} initialLogs={logs} />
 
       {song.spotify_track_id ? (
         <Link

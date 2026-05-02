@@ -29,18 +29,12 @@ const RATING_LABELS: Record<Rating, string> = RATINGS.reduce(
 interface RatingControlsProps {
   songId: string;
   initialRating: Rating | null;
-  initialMemo: string;
 }
 
 type Toast = { id: number; message: string };
 
-export function RatingControls({
-  songId,
-  initialRating,
-  initialMemo,
-}: RatingControlsProps) {
+export function RatingControls({ songId, initialRating }: RatingControlsProps) {
   const [rating, setRating] = useState<Rating | null>(initialRating);
-  const [memo, setMemo] = useState(initialMemo);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
@@ -51,11 +45,11 @@ export function RatingControls({
     return () => clearTimeout(timer);
   }, [toast]);
 
-  const persist = (nextRating: Rating | null, nextMemo: string, message: string) => {
+  const persist = (nextRating: Rating | null, message: string) => {
     setError(null);
     startTransition(async () => {
       const res = nextRating
-        ? await rateSong({ songId, rating: nextRating, memo: nextMemo })
+        ? await rateSong({ songId, rating: nextRating })
         : await unrateSong(songId);
       if (!res.ok) {
         setError(res.error ?? "保存に失敗しました");
@@ -68,16 +62,11 @@ export function RatingControls({
   const handleRate = (next: Rating) => {
     if (rating === next) {
       setRating(null);
-      setMemo("");
-      persist(null, "", "評価を取り消しました");
+      persist(null, "評価を取り消しました");
     } else {
       setRating(next);
-      persist(next, memo, `評価を「${RATING_LABELS[next]}」に変更しました`);
+      persist(next, `評価を「${RATING_LABELS[next]}」に変更しました`);
     }
-  };
-
-  const handleMemoBlur = () => {
-    if (rating) persist(rating, memo, "メモを保存しました");
   };
 
   return (
@@ -104,16 +93,6 @@ export function RatingControls({
           );
         })}
       </div>
-
-      <textarea
-        value={memo}
-        onChange={(e) => setMemo(e.target.value)}
-        onBlur={handleMemoBlur}
-        placeholder="メモ (歌い方のコツ・キー調整など)"
-        rows={3}
-        disabled={!rating || isPending}
-        className="w-full resize-none rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm placeholder:text-zinc-400 focus:border-pink-500 focus:outline-none disabled:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:disabled:bg-zinc-950"
-      />
 
       {error ? (
         <p className="text-xs text-red-600 dark:text-red-400">{error}</p>

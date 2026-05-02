@@ -10,8 +10,6 @@ type Rating = Database["public"]["Enums"]["rating_type"];
 export interface RateSongInput {
   songId: string;
   rating: Rating;
-  memo?: string;
-  keyShift?: number | null;
 }
 
 export interface RateSongResult {
@@ -36,8 +34,6 @@ export async function rateSong(input: RateSongInput): Promise<RateSongResult> {
       user_id: user.id,
       song_id: input.songId,
       rating: input.rating,
-      memo: input.memo ?? null,
-      key_shift: input.keyShift ?? null,
     },
     { onConflict: "user_id,song_id" },
   );
