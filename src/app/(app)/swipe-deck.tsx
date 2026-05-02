@@ -614,7 +614,7 @@ function SongCardContent({
           rel="noopener noreferrer"
           onPointerDown={(e) => e.stopPropagation()}
           draggable={false}
-          className="absolute bottom-3 right-3 flex size-10 items-center justify-center rounded-full border-2 border-emerald-500 bg-white text-emerald-600 transition hover:bg-emerald-50 active:bg-emerald-100 dark:bg-zinc-900 dark:text-emerald-400 dark:hover:bg-emerald-950 dark:active:bg-emerald-900"
+          className="absolute bottom-3 right-3 z-20 flex size-10 items-center justify-center rounded-full border-2 border-emerald-500 bg-white text-emerald-600 transition hover:bg-emerald-50 active:bg-emerald-100 dark:bg-zinc-900 dark:text-emerald-400 dark:hover:bg-emerald-950 dark:active:bg-emerald-900"
           aria-label={`${song.title} を Spotify で再生(新しいタブで開きます)`}
         >
           <Play className="size-4 fill-current" />
