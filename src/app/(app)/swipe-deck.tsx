@@ -2,6 +2,7 @@
 
 import {
   AnimatePresence,
+  animate,
   motion,
   type PanInfo,
   useMotionValue,
@@ -13,12 +14,12 @@ import {
   Headphones,
   Minus,
   Play,
-  RotateCcw,
+  Undo2,
   X,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { startTransition, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { midiToKaraoke } from "@/lib/note";
@@ -43,6 +44,83 @@ interface SwipeDeckProps {
 }
 
 const SWIPE_THRESHOLD = 110;
+
+// halo / ラベルが peak になる距離 (~150px)。一旦そこまでゆっくり移動し
+// 色を見せる中継点として使う。
+const SWIPE_HOLD_DISTANCE = 180;
+const SWIPE_OUT_DISTANCE = 700;
+
+// AnimatePresence の custom 経由で受け取った rating に応じ、退場方向を変える。
+// 既存の boxShadow / SwipeOverlay は x,y の motion value に追従しているため、
+// 飛んでいく途中で自動的に方向に応じた色のハロー＋ラベルが表示される。
+//
+// 2 段階アニメーション:
+//   1) 0 → SWIPE_HOLD_DISTANCE (~55%): ゆっくり移動して色 halo + ラベルを見せる
+//   2) → SWIPE_OUT_DISTANCE (残り 45%): 画面外へ排出 + フェードアウト
+// undo 時の sentinel。元 current は AnimatePresence から押し出されて exit が
+// 必ず通るが、同時に upcoming 側でも描画されるため、瞬時に消して被りだけで済ませる。
+type ExitMode = Rating | "instant" | null;
+
+const SWIPE_EXIT_VARIANTS = {
+  exit: (rating: ExitMode | undefined) => {
+    if (rating === "instant") {
+      return { opacity: 0, transition: { duration: 0 } };
+    }
+    const transition = {
+      duration: 0.7,
+      times: [0, 0.55, 1],
+      ease: "easeIn" as const,
+      // zIndex は補間させず一瞬で適用 (退場中カードを新しい current の上に維持)
+      zIndex: { duration: 0 },
+    };
+    const opacity = [1, 1, 0];
+    const zIndex = 10;
+    switch (rating) {
+      case "hard":
+        return {
+          x: [0, -SWIPE_HOLD_DISTANCE, -SWIPE_OUT_DISTANCE],
+          opacity,
+          zIndex,
+          transition,
+        };
+      case "easy":
+        return {
+          x: [0, SWIPE_HOLD_DISTANCE, SWIPE_OUT_DISTANCE],
+          opacity,
+          zIndex,
+          transition,
+        };
+      case "medium":
+        return {
+          y: [0, -SWIPE_HOLD_DISTANCE, -SWIPE_OUT_DISTANCE],
+          opacity,
+          zIndex,
+          transition,
+        };
+      case "practicing":
+        return {
+          y: [0, SWIPE_HOLD_DISTANCE, SWIPE_OUT_DISTANCE],
+          opacity,
+          zIndex,
+          transition,
+        };
+      default:
+        return {
+          scale: 0.9,
+          opacity: 0,
+          zIndex,
+          transition: { duration: 0.15, zIndex: { duration: 0 } },
+        };
+    }
+  },
+};
+
+function triggerHaptic() {
+  if (typeof navigator === "undefined") return;
+  if (typeof navigator.vibrate !== "function") return;
+  // iOS Safari は Vibration API 非対応で何も起きない。Android のみ動作。
+  navigator.vibrate(15);
+}
 
 const RATINGS: ReadonlyArray<{
   value: Rating;
@@ -87,6 +165,12 @@ export function SwipeDeck({
   const [queue, setQueue] = useState(initialSongs);
   const [lastAction, setLastAction] = useState<LastAction | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // 直前に発火させた exit の方向。AnimatePresence の custom 経由で
+  // 退場中のカードに伝え、評価ごとに異なる方向へ飛んでいかせる。
+  // undo 時は "instant" を立てて、元 current の exit を 0 秒で済ませる。
+  const [exitRating, setExitRating] = useState<ExitMode>(null);
+  // undo で復活したカードを、出ていった方向から逆再生でスライドインさせる。
+  const [enterFrom, setEnterFrom] = useState<Rating | null>(null);
   const knownSet = useMemo(() => new Set(knownSongIds), [knownSongIds]);
 
   const current = queue[0];
@@ -94,9 +178,12 @@ export function SwipeDeck({
 
   const handleRate = (rating: Rating) => {
     if (!current) return;
+    triggerHaptic();
     setError(null);
     const songId = current.id;
     const songSnapshot = current;
+    setEnterFrom(null);
+    setExitRating(rating);
     setQueue((q) => q.slice(1));
     setLastAction({ song: songSnapshot, rating });
     startTransition(async () => {
@@ -112,6 +199,8 @@ export function SwipeDeck({
     if (!current) return;
     setError(null);
     const songSnapshot = current;
+    setEnterFrom(null);
+    setExitRating(null);
     setQueue((q) => q.slice(1));
     setLastAction({ song: songSnapshot, rating: null });
   };
@@ -121,6 +210,8 @@ export function SwipeDeck({
     setError(null);
     const { song, rating } = lastAction;
     setLastAction(null);
+    setEnterFrom(rating);
+    setExitRating("instant");
     setQueue((q) => [song, ...q]);
     if (rating === null) return;
     startTransition(async () => {
@@ -191,11 +282,12 @@ export function SwipeDeck({
         ))}
 
         {/* 先頭カード (ドラッグ可能) */}
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence mode="popLayout" custom={exitRating}>
           <SwipeCard
             key={current.id}
             song={current}
             isKnown={knownSet.has(current.id)}
+            enterFrom={enterFrom}
             onSwipeLeft={() => handleRate("hard")}
             onSwipeRight={() => handleRate("easy")}
             onSwipeUp={() => handleRate("medium")}
@@ -245,7 +337,7 @@ export function SwipeDeck({
           className="mx-auto flex size-14 items-center justify-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-300 disabled:opacity-30 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
           aria-label="直前の評価を取り消して戻る"
         >
-          <RotateCcw className="size-5" />
+          <Undo2 className="size-5" />
         </button>
       </div>
     </div>
@@ -255,6 +347,8 @@ export function SwipeDeck({
 interface SwipeCardProps {
   song: Song;
   isKnown?: boolean;
+  /** undo で復活した時の出発方向 (前回 exit した方向) */
+  enterFrom?: Rating | null;
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
   onSwipeUp: () => void;
@@ -264,13 +358,40 @@ interface SwipeCardProps {
 function SwipeCard({
   song,
   isKnown = false,
+  enterFrom = null,
   onSwipeLeft,
   onSwipeRight,
   onSwipeUp,
   onSwipeDown,
 }: SwipeCardProps) {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
+  // enterFrom が指定されていれば、その方向の画面外位置で初期化し
+  // マウント直後に 0 へアニメーションして「逆再生スライドイン」を実現。
+  const initialX =
+    enterFrom === "hard"
+      ? -SWIPE_OUT_DISTANCE
+      : enterFrom === "easy"
+        ? SWIPE_OUT_DISTANCE
+        : 0;
+  const initialY =
+    enterFrom === "medium"
+      ? -SWIPE_OUT_DISTANCE
+      : enterFrom === "practicing"
+        ? SWIPE_OUT_DISTANCE
+        : 0;
+  const x = useMotionValue(initialX);
+  const y = useMotionValue(initialY);
+
+  useEffect(() => {
+    if (initialX === 0 && initialY === 0) return;
+    const t = { duration: 0.45, ease: [0.16, 1, 0.3, 1] as const };
+    const ax = animate(x, 0, t);
+    const ay = animate(y, 0, t);
+    return () => {
+      ax.stop();
+      ay.stop();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const rotate = useTransform(x, [-200, 0, 200], [-15, 0, 15]);
 
   // スワイプ強度 (0〜1)。x/y が SWIPE_THRESHOLD に近づくほど 1 に
@@ -371,7 +492,8 @@ function SwipeCard({
       onDragEnd={handleDragEnd}
       initial={{ scale: 0.95, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0.9, opacity: 0, transition: { duration: 0.15 } }}
+      variants={SWIPE_EXIT_VARIANTS}
+      exit="exit"
       whileTap={{ cursor: "grabbing" }}
       className="absolute inset-0 cursor-grab touch-none select-none overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
     >
