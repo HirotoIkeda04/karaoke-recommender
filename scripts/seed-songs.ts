@@ -70,6 +70,59 @@ async function main() {
       is_popular: true,
     }));
 
+  // 既存行が (title, artist) 同一・spotify_track_id=NULL の場合、
+  // upsert(onConflict: spotify_track_id) では衝突しないので
+  // 先にその行へ track_id を埋め込んでから upsert する。
+  // PostgREST の 1000 行制限を回避するためページングで全件取得。
+  const PAGE = 1000;
+  const nullRowsAll: Array<{ id: string; title: string; artist: string }> = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from("songs")
+      .select("id, title, artist")
+      .is("spotify_track_id", null)
+      .order("id", { ascending: true })
+      .range(from, from + PAGE - 1);
+    if (error) {
+      console.error("failed to fetch null-track rows:", error);
+      process.exit(1);
+    }
+    if (!data || data.length === 0) break;
+    nullRowsAll.push(...data);
+    if (data.length < PAGE) break;
+  }
+  const nullByKey = new Map<string, string>(
+    nullRowsAll.map((r) => [`${r.title}\t${r.artist}`, r.id]),
+  );
+  let preMerged = 0;
+  for (const row of rows) {
+    const id = nullByKey.get(`${row.title}\t${row.artist}`);
+    if (!id) continue;
+    const { error } = await supabase
+      .from("songs")
+      .update({
+        spotify_track_id: row.spotify_track_id,
+        release_year: row.release_year,
+        range_low_midi: row.range_low_midi,
+        range_high_midi: row.range_high_midi,
+        falsetto_max_midi: row.falsetto_max_midi,
+        image_url_large: row.image_url_large,
+        image_url_medium: row.image_url_medium,
+        image_url_small: row.image_url_small,
+        source_urls: row.source_urls,
+        is_popular: true,
+      })
+      .eq("id", id);
+    if (error) {
+      console.error(`pre-merge failed for ${row.title} / ${row.artist}:`, error);
+      process.exit(1);
+    }
+    preMerged++;
+  }
+  if (preMerged > 0) {
+    console.log(`pre-merged ${preMerged} rows into existing NULL-track entries`);
+  }
+
   console.log(`upserting ${rows.length} rows in batches of ${BATCH_SIZE}...`);
 
   let inserted = 0;
