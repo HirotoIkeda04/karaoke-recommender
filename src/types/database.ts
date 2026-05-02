@@ -185,6 +185,56 @@ export type Database = {
         }
         Relationships: []
       }
+      related_artists: {
+        Row: {
+          artist_id: string
+          created_at: string
+          rank: number
+          related_artist_id: string
+        }
+        Insert: {
+          artist_id: string
+          created_at?: string
+          rank: number
+          related_artist_id: string
+        }
+        Update: {
+          artist_id?: string
+          created_at?: string
+          rank?: number
+          related_artist_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "related_artists_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "related_artists_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists_with_song_count"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "related_artists_related_artist_id_fkey"
+            columns: ["related_artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "related_artists_related_artist_id_fkey"
+            columns: ["related_artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists_with_song_count"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       room_participants: {
         Row: {
           guest_name: string | null

@@ -71,6 +71,9 @@ async function main() {
       continue;
     }
     const missing: string[] = [];
+    // 表記ゆれ ("MISIA" と "Misia" など) で同じ artist_id に潰れた場合、
+    // 重複は最初に出てきた rank で残す。
+    const seen = new Set<string>();
     let rank = 1;
     for (const relName of relList) {
       const relId = idByNorm.get(normalize(relName));
@@ -79,6 +82,8 @@ async function main() {
         continue;
       }
       if (relId === sourceId) continue; // 自己参照は skip
+      if (seen.has(relId)) continue;
+      seen.add(relId);
       pairs.push({ artist_id: sourceId, related_artist_id: relId, rank });
       rank += 1;
     }

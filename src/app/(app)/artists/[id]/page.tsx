@@ -107,7 +107,10 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
   const songCount = artist.song_count ?? songs.length;
   const genres = (artist.genres ?? []) as string[];
 
-  // 関連アーティスト: ジャンル overlap が多い順 → song_count desc。Top 15。
+  // 関連アーティスト:
+  //   1. related_artists テーブルに rank 付きエントリがあればそれを優先 (Top200 のみ手動キュレーション済み)
+  //   2. 無ければジャンル overlap で簡易フォールバック
+  //   どちらも各アーティストの代表ジャケ (fame_score 最上位の曲) を併せて引く。
   type RelatedArtist = {
     id: string;
     name: string;
@@ -115,7 +118,27 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
     image_url: string | null;
   };
   let relatedArtists: RelatedArtist[] = [];
-  if (genres.length > 0) {
+
+  // (1) キュレーション済み related_artists を rank 順で取得
+  //     related_artist_id は artists / artists_with_song_count の双方に FK を持つので
+  //     関係名を artists!related_artist_id_fkey で明示。
+  const { data: curated } = await supabase
+    .from("related_artists")
+    .select(
+      "rank, related:artists!related_artists_related_artist_id_fkey (id, name)",
+    )
+    .eq("artist_id", id)
+    .order("rank", { ascending: true })
+    .limit(15);
+
+  let rankedIds: { id: string; name: string }[] = [];
+  if (curated && curated.length > 0) {
+    rankedIds = curated.flatMap((row) => {
+      const rel = row.related as { id: string; name: string } | null;
+      return rel ? [{ id: rel.id, name: rel.name }] : [];
+    });
+  } else if (genres.length > 0) {
+    // (2) フォールバック: ジャンル overlap 多い順
     const { data: candidates } = await supabase
       .from("artists_with_song_count")
       .select("id, name, genres, song_count")
@@ -123,7 +146,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
       .neq("id", id)
       .limit(60);
 
-    const ranked = (candidates ?? [])
+    rankedIds = (candidates ?? [])
       .filter(
         (c): c is { id: string; name: string; genres: string[]; song_count: number | null } =>
           c.id !== null && c.name !== null,
@@ -136,36 +159,37 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
         if (b.overlap !== a.overlap) return b.overlap - a.overlap;
         return (b.song_count ?? 0) - (a.song_count ?? 0);
       })
-      .slice(0, 15);
+      .slice(0, 15)
+      .map((c) => ({ id: c.id, name: c.name }));
+  }
 
-    if (ranked.length > 0) {
-      // 各アーティストにつき fame_score 最上位の曲ジャケを 1 枚拾う
-      const { data: imgRows } = await supabase
-        .from("songs")
-        .select("artist_id, image_url_small, image_url_medium")
-        .in(
-          "artist_id",
-          ranked.map((r) => r.id),
-        )
-        .not("image_url_small", "is", null)
-        .order("fame_score", { ascending: false, nullsFirst: false })
-        .limit(1000);
+  if (rankedIds.length > 0) {
+    // 代表ジャケ (fame_score 最上位の曲) を 1 枚拾う
+    const { data: imgRows } = await supabase
+      .from("songs")
+      .select("artist_id, image_url_small, image_url_medium")
+      .in(
+        "artist_id",
+        rankedIds.map((r) => r.id),
+      )
+      .not("image_url_small", "is", null)
+      .order("fame_score", { ascending: false, nullsFirst: false })
+      .limit(1000);
 
-      const imageByArtist = new Map<string, string>();
-      for (const row of imgRows ?? []) {
-        if (!row.artist_id) continue;
-        if (imageByArtist.has(row.artist_id)) continue;
-        const url = row.image_url_small ?? row.image_url_medium;
-        if (url) imageByArtist.set(row.artist_id, url);
-      }
-
-      relatedArtists = ranked.map((r) => ({
-        id: r.id,
-        name: r.name,
-        song_count: r.song_count,
-        image_url: imageByArtist.get(r.id) ?? null,
-      }));
+    const imageByArtist = new Map<string, string>();
+    for (const row of imgRows ?? []) {
+      if (!row.artist_id) continue;
+      if (imageByArtist.has(row.artist_id)) continue;
+      const url = row.image_url_small ?? row.image_url_medium;
+      if (url) imageByArtist.set(row.artist_id, url);
     }
+
+    relatedArtists = rankedIds.map((r) => ({
+      id: r.id,
+      name: r.name,
+      song_count: null,
+      image_url: imageByArtist.get(r.id) ?? null,
+    }));
   }
 
   return (
