@@ -36,4 +36,8 @@ class EnrichedSong:
     image_url_medium: str | None
     image_url_small: str | None
     duration_ms: int | None  # Spotify の duration_ms。曲の長さ (ms)
+    spotify_popularity: int | None  # Spotify popularity 0-100
+    spotify_preview_url: str | None  # 30 秒試聴 mp3 URL
+    spotify_explicit: bool | None  # 露骨な歌詞フラグ
+    spotify_isrc: str | None  # external_ids.isrc
     source_urls: list[str] = field(default_factory=list)

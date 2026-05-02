@@ -28,6 +28,10 @@ interface SeedRow {
   image_url_medium: string | null;
   image_url_small: string | null;
   duration_ms: number | null;
+  spotify_popularity: number | null;
+  spotify_preview_url: string | null;
+  spotify_explicit: boolean | null;
+  spotify_isrc: string | null;
   source_urls: string[];
 }
 
@@ -68,6 +72,10 @@ async function main() {
       image_url_medium: s.image_url_medium,
       image_url_small: s.image_url_small,
       duration_ms: s.duration_ms,
+      spotify_popularity: s.spotify_popularity,
+      spotify_preview_url: s.spotify_preview_url,
+      spotify_explicit: s.spotify_explicit,
+      spotify_isrc: s.spotify_isrc,
       source_urls: s.source_urls,
       is_popular: true,
     }));
@@ -112,6 +120,10 @@ async function main() {
         image_url_medium: row.image_url_medium,
         image_url_small: row.image_url_small,
         duration_ms: row.duration_ms,
+        spotify_popularity: row.spotify_popularity,
+        spotify_preview_url: row.spotify_preview_url,
+        spotify_explicit: row.spotify_explicit,
+        spotify_isrc: row.spotify_isrc,
         source_urls: row.source_urls,
         is_popular: true,
       })

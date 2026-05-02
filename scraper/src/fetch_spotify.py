@@ -47,6 +47,10 @@ class SpotifyTrack:
     image_url_medium: str | None  # ~300 px
     image_url_small: str | None  # ≤ 200 px
     duration_ms: int | None = None  # 曲の長さ (ms)
+    popularity: int | None = None  # Spotify popularity 0-100
+    preview_url: str | None = None  # 30 秒試聴 mp3 URL (権利上 null も多い)
+    explicit: bool | None = None  # 露骨な歌詞フラグ
+    isrc: str | None = None  # external_ids.isrc
 
     @property
     def artists_joined(self) -> str:
@@ -93,6 +97,13 @@ def _track_from_api(item: dict[str, Any]) -> SpotifyTrack:
     large, medium, small = _pick_images(album.get("images") or [])
     duration_ms_raw = item.get("duration_ms")
     duration_ms = int(duration_ms_raw) if isinstance(duration_ms_raw, (int, float)) else None
+    popularity_raw = item.get("popularity")
+    popularity = int(popularity_raw) if isinstance(popularity_raw, (int, float)) else None
+    explicit_raw = item.get("explicit")
+    explicit = bool(explicit_raw) if isinstance(explicit_raw, bool) else None
+    preview_url = item.get("preview_url") or None
+    external_ids = item.get("external_ids") or {}
+    isrc = external_ids.get("isrc") or None
     return SpotifyTrack(
         id=item["id"],
         title=item.get("name", ""),
@@ -102,6 +113,10 @@ def _track_from_api(item: dict[str, Any]) -> SpotifyTrack:
         image_url_medium=medium,
         image_url_small=small,
         duration_ms=duration_ms,
+        popularity=popularity,
+        preview_url=preview_url,
+        explicit=explicit,
+        isrc=isrc,
     )
 
 

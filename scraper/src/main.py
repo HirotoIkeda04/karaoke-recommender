@@ -127,6 +127,10 @@ def _build_enriched(result: MatchResult) -> EnrichedSong:
         image_url_medium=track.image_url_medium,
         image_url_small=track.image_url_small,
         duration_ms=track.duration_ms,
+        spotify_popularity=track.popularity,
+        spotify_preview_url=track.preview_url,
+        spotify_explicit=track.explicit,
+        spotify_isrc=track.isrc,
         source_urls=[
             song.source_url,
             f"https://open.spotify.com/track/{track.id}",

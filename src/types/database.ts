@@ -293,6 +293,10 @@ export type Database = {
           release_year: number | null
           source_urls: string[] | null
           spotify_attempt_count: number
+          spotify_explicit: boolean | null
+          spotify_isrc: string | null
+          spotify_popularity: number | null
+          spotify_preview_url: string | null
           spotify_track_id: string | null
           title: string
           updated_at: string
@@ -321,6 +325,10 @@ export type Database = {
           release_year?: number | null
           source_urls?: string[] | null
           spotify_attempt_count?: number
+          spotify_explicit?: boolean | null
+          spotify_isrc?: string | null
+          spotify_popularity?: number | null
+          spotify_preview_url?: string | null
           spotify_track_id?: string | null
           title: string
           updated_at?: string
@@ -349,6 +357,10 @@ export type Database = {
           release_year?: number | null
           source_urls?: string[] | null
           spotify_attempt_count?: number
+          spotify_explicit?: boolean | null
+          spotify_isrc?: string | null
+          spotify_popularity?: number | null
+          spotify_preview_url?: string | null
           spotify_track_id?: string | null
           title?: string
           updated_at?: string
