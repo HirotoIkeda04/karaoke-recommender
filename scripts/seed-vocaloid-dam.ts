@@ -36,12 +36,12 @@ interface SeedFile {
   metadata: { source_html: string; source_pages: string[]; total_count: number };
 }
 
+// migrations/033_strict_normalize_artist_name.sql と同等
 function normalizeArtistName(name: string): string {
   return name
     .normalize("NFKC")
     .toLowerCase()
-    .trim()
-    .replace(/\s+/g, " ");
+    .replace(/[\s\.\-_,'"!?·•・/\\()\[\]{}（）「」『』【】]+/g, "");
 }
 
 function damSourceUrl(requestNo: string): string {
