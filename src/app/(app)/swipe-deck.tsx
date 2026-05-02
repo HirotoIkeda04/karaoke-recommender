@@ -133,7 +133,7 @@ export function SwipeDeck({
 
   if (!current) {
     return (
-      <div className="mx-auto flex max-w-md flex-col items-center gap-4 p-8 text-center">
+      <div className="mx-auto flex min-h-[70dvh] max-w-md flex-col items-center justify-center gap-4 p-8 text-center">
         <h1 className="text-xl font-semibold">このデッキは終了しました 🎉</h1>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
           ページを再読込すると次の 20 曲が表示されます。
