@@ -119,12 +119,17 @@ export function ProfileHeader({
 
       {/* bio: 推定音域 */}
       {rangeLabel ? (
-        <p className="font-mono text-xs text-zinc-600 dark:text-zinc-400">
-          推定音域 {rangeLabel}
-          {falsettoLabel ? ` ・ ${falsettoLabel}` : ""}
-        </p>
+        <div className="flex items-center gap-1.5">
+          <h3 className="w-16 shrink-0 whitespace-nowrap text-right text-[11px] font-medium text-zinc-500 dark:text-zinc-500">
+            推定音域
+          </h3>
+          <p className="min-w-0 flex-1 font-mono text-[11px] text-zinc-600 dark:text-zinc-400">
+            {rangeLabel}
+            {falsettoLabel ? ` ・ ${falsettoLabel}` : ""}
+          </p>
+        </div>
       ) : isSelf ? (
-        <p className="text-xs text-zinc-500 dark:text-zinc-500">
+        <p className="text-[11px] text-zinc-500 dark:text-zinc-500">
           「得意」評価が {minEasyForEstimate} 件以上で推定音域を表示します
         </p>
       ) : null}
