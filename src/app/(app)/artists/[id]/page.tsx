@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BackButton } from "@/components/back-button";
@@ -106,6 +107,67 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
   const songCount = artist.song_count ?? songs.length;
   const genres = (artist.genres ?? []) as string[];
 
+  // 関連アーティスト: ジャンル overlap が多い順 → song_count desc。Top 15。
+  type RelatedArtist = {
+    id: string;
+    name: string;
+    song_count: number | null;
+    image_url: string | null;
+  };
+  let relatedArtists: RelatedArtist[] = [];
+  if (genres.length > 0) {
+    const { data: candidates } = await supabase
+      .from("artists_with_song_count")
+      .select("id, name, genres, song_count")
+      .overlaps("genres", genres)
+      .neq("id", id)
+      .limit(60);
+
+    const ranked = (candidates ?? [])
+      .filter(
+        (c): c is { id: string; name: string; genres: string[]; song_count: number | null } =>
+          c.id !== null && c.name !== null,
+      )
+      .map((c) => {
+        const overlap = (c.genres ?? []).filter((g) => genres.includes(g)).length;
+        return { ...c, overlap };
+      })
+      .sort((a, b) => {
+        if (b.overlap !== a.overlap) return b.overlap - a.overlap;
+        return (b.song_count ?? 0) - (a.song_count ?? 0);
+      })
+      .slice(0, 15);
+
+    if (ranked.length > 0) {
+      // 各アーティストにつき fame_score 最上位の曲ジャケを 1 枚拾う
+      const { data: imgRows } = await supabase
+        .from("songs")
+        .select("artist_id, image_url_small, image_url_medium")
+        .in(
+          "artist_id",
+          ranked.map((r) => r.id),
+        )
+        .not("image_url_small", "is", null)
+        .order("fame_score", { ascending: false, nullsFirst: false })
+        .limit(1000);
+
+      const imageByArtist = new Map<string, string>();
+      for (const row of imgRows ?? []) {
+        if (!row.artist_id) continue;
+        if (imageByArtist.has(row.artist_id)) continue;
+        const url = row.image_url_small ?? row.image_url_medium;
+        if (url) imageByArtist.set(row.artist_id, url);
+      }
+
+      relatedArtists = ranked.map((r) => ({
+        id: r.id,
+        name: r.name,
+        song_count: r.song_count,
+        image_url: imageByArtist.get(r.id) ?? null,
+      }));
+    }
+  }
+
   return (
     <div className="pb-8">
       {/* Spotify 風ヒーロー: 画像フルブリード + 下端に名前オーバーレイ */}
@@ -194,6 +256,43 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
             </ul>
           )}
         </section>
+
+        {relatedArtists.length > 0 ? (
+          <section>
+            <h2 className="mb-3 text-base font-bold text-zinc-900 dark:text-zinc-50">
+              関連するアーティスト
+            </h2>
+            <ul className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {relatedArtists.map((a) => (
+                <li key={a.id} className="w-28 shrink-0">
+                  <Link
+                    href={`/artists/${a.id}`}
+                    className="block focus:outline-none"
+                  >
+                    <div className="relative size-28 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+                      {a.image_url ? (
+                        <Image
+                          src={a.image_url}
+                          alt=""
+                          fill
+                          sizes="7rem"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-3xl text-zinc-500">
+                          {a.name.slice(0, 1)}
+                        </div>
+                      )}
+                    </div>
+                    <p className="mt-2 line-clamp-2 text-center text-xs font-medium text-zinc-900 dark:text-zinc-50">
+                      {a.name}
+                    </p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
       </div>
     </div>
   );
