@@ -1,0 +1,1682 @@
+{
+  "generated_at": "2026-05-02T15:07:18.151Z",
+  "limit": 200,
+  "artists": [
+    {
+      "id": "1834b581-1105-46fe-9795-7ed797d7400a",
+      "name": "嵐",
+      "genres": [
+        "idol_male",
+        "j_pop"
+      ],
+      "song_count": 61
+    },
+    {
+      "id": "85ed86f0-9d90-4f92-a641-96299a9f37d9",
+      "name": "B'z",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 53
+    },
+    {
+      "id": "4b1476a0-11a1-4ad1-bc14-a965b7cfd0bf",
+      "name": "浜崎あゆみ",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 50
+    },
+    {
+      "id": "46f2b091-df76-4e18-858d-fb9061b6d140",
+      "name": "中島みゆき",
+      "genres": [
+        "j_pop",
+        "enka_kayo"
+      ],
+      "song_count": 49
+    },
+    {
+      "id": "f819249a-68bc-4d98-aeb6-e2f1a1f096e6",
+      "name": "Mr.Children",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 47
+    },
+    {
+      "id": "5e160682-9ddc-460a-9781-c5df76b117fe",
+      "name": "ポルノグラフィティ",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 45
+    },
+    {
+      "id": "874130d0-3372-445e-a9d9-3b12be982a37",
+      "name": "GLAY",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 43
+    },
+    {
+      "id": "fcdfa1a1-6fcd-409d-9e9f-764982c0dd1b",
+      "name": "スピッツ",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 43
+    },
+    {
+      "id": "2a35a95e-b3de-4aab-aecb-629f88ebb964",
+      "name": "BUMP OF CHICKEN",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 37
+    },
+    {
+      "id": "58c179f1-b968-4e3c-830c-db3e7e55b9a2",
+      "name": "SMAP",
+      "genres": [
+        "idol_male"
+      ],
+      "song_count": 37
+    },
+    {
+      "id": "b68faeb7-164d-4adc-b3e0-c01606193aa2",
+      "name": "AKB48",
+      "genres": [
+        "idol_female"
+      ],
+      "song_count": 36
+    },
+    {
+      "id": "2ae0dbb1-9a54-4403-a453-f84489eccfc1",
+      "name": "福山雅治",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 34
+    },
+    {
+      "id": "0f2cb110-74a8-46a0-b528-24243a3c8868",
+      "name": "KinKi Kids",
+      "genres": [
+        "idol_male"
+      ],
+      "song_count": 33
+    },
+    {
+      "id": "4fd309f7-85da-4c69-84cf-bc8c91ef3b09",
+      "name": "ゆず",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 33
+    },
+    {
+      "id": "72b7184c-51f7-451d-a52b-93f5c1b64658",
+      "name": "L'Arc-en-Ciel",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 32
+    },
+    {
+      "id": "87fad1e7-eb98-435b-b3cd-615b067d7dd4",
+      "name": "EXILE",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 31
+    },
+    {
+      "id": "d006b838-4479-4f09-b873-f962d9817983",
+      "name": "サザンオールスターズ",
+      "genres": [
+        "j_pop",
+        "j_rock"
+      ],
+      "song_count": 31
+    },
+    {
+      "id": "78130f13-b6c1-48fc-8a1f-f49e4b67a698",
+      "name": "SUPER EIGHT",
+      "genres": [
+        "idol_male"
+      ],
+      "song_count": 31
+    },
+    {
+      "id": "85d2e599-cd81-4f8a-92f2-bb4f381010e0",
+      "name": "Every Little Thing",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 31
+    },
+    {
+      "id": "9fabb314-3a15-44c5-89e6-0a3148ef1b50",
+      "name": "安室奈美恵",
+      "genres": [
+        "j_pop",
+        "rnb_soul"
+      ],
+      "song_count": 31
+    },
+    {
+      "id": "23d3d346-08f0-42e9-a95a-0f0c75f2dbbe",
+      "name": "Mrs. GREEN APPLE",
+      "genres": [
+        "j_pop",
+        "j_rock"
+      ],
+      "song_count": 30
+    },
+    {
+      "id": "3c6af6bd-3275-45be-99c6-c65345cb644f",
+      "name": "CHEMISTRY",
+      "genres": [
+        "rnb_soul",
+        "j_pop"
+      ],
+      "song_count": 30
+    },
+    {
+      "id": "e4adb171-60db-4e11-a88f-652c3e73b268",
+      "name": "back number",
+      "genres": [
+        "j_pop",
+        "j_rock"
+      ],
+      "song_count": 28
+    },
+    {
+      "id": "872526ae-1ac0-4690-ab52-839deb0fe426",
+      "name": "米津玄師",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 27
+    },
+    {
+      "id": "528d9d2c-c6b1-4f07-9a99-ff846687b6f3",
+      "name": "氷川きよし",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 26
+    },
+    {
+      "id": "552d8133-2190-47e6-bb23-e7170ae325f7",
+      "name": "乃木坂46",
+      "genres": [
+        "idol_female"
+      ],
+      "song_count": 25
+    },
+    {
+      "id": "ec451c78-fb31-4d4d-91b0-14af47e9224b",
+      "name": "平井堅",
+      "genres": [
+        "j_pop",
+        "rnb_soul"
+      ],
+      "song_count": 24
+    },
+    {
+      "id": "7ce9e1dd-231b-4b20-a3e2-1014be0b06c1",
+      "name": "Official髭男dism",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 24
+    },
+    {
+      "id": "b85748f7-4c36-42dd-a62b-8e8303f78a93",
+      "name": "DREAMS COME TRUE",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 23
+    },
+    {
+      "id": "6c2cbc4d-deb5-4168-9a4b-c8d9aeb212e4",
+      "name": "宇多田ヒカル",
+      "genres": [
+        "j_pop",
+        "rnb_soul"
+      ],
+      "song_count": 22
+    },
+    {
+      "id": "ad8f44b9-2e42-4081-ab84-0c6c6a4c3a31",
+      "name": "Ado",
+      "genres": [
+        "vocaloid_utaite",
+        "j_pop"
+      ],
+      "song_count": 21
+    },
+    {
+      "id": "d4d1952a-a138-4b1b-a4c8-932c00a1b7f9",
+      "name": "ASIAN KUNG-FU GENERATION",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 21
+    },
+    {
+      "id": "a1e1b387-d15e-422b-ba64-e483169684c5",
+      "name": "西野カナ",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 21
+    },
+    {
+      "id": "d4f8cacf-fbbc-46e3-8108-7c21ad8b3713",
+      "name": "Hey! Say! JUMP",
+      "genres": [
+        "idol_male"
+      ],
+      "song_count": 20
+    },
+    {
+      "id": "c3c826e5-8876-4558-be88-36ca9bd7afc9",
+      "name": "倖田來未",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 20
+    },
+    {
+      "id": "f23ab77d-dc5e-4ff8-8861-a86234336bd2",
+      "name": "モーニング娘。",
+      "genres": [
+        "idol_female"
+      ],
+      "song_count": 20
+    },
+    {
+      "id": "313ffd6c-31dc-4d6e-b89a-0049191f79ac",
+      "name": "NEWS",
+      "genres": [
+        "idol_male"
+      ],
+      "song_count": 19
+    },
+    {
+      "id": "a45f5dad-7c47-4352-9871-05cafebb9492",
+      "name": "あいみょん",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 19
+    },
+    {
+      "id": "ed1f3cf2-d5e0-4549-a7f9-5df9cf202fed",
+      "name": "NMB48",
+      "genres": [
+        "idol_female"
+      ],
+      "song_count": 19
+    },
+    {
+      "id": "32c2aa18-7a11-47bf-9886-708595b1ec10",
+      "name": "水森かおり",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 18
+    },
+    {
+      "id": "bc5bcce8-7828-47f0-be88-69ee443ad7cc",
+      "name": "五木ひろし",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 18
+    },
+    {
+      "id": "a1acb151-f3bf-450d-adfd-640eda78532a",
+      "name": "JUDY AND MARY",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 18
+    },
+    {
+      "id": "63324bdd-93f2-41ee-9c09-daeea82fd861",
+      "name": "Kis-My-Ft2",
+      "genres": [
+        "idol_male"
+      ],
+      "song_count": 18
+    },
+    {
+      "id": "22e5322c-0226-4411-88d5-821a6065bf6d",
+      "name": "三代目 J SOUL BROTHERS from EXILE TRIBE",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 17
+    },
+    {
+      "id": "f7415ed6-0b7e-4018-875d-fb8db7d0f2a0",
+      "name": "V6",
+      "genres": [
+        "idol_male",
+        "j_pop"
+      ],
+      "song_count": 17
+    },
+    {
+      "id": "ba0ffc0a-84ca-4490-a31a-a547aca1d02c",
+      "name": "SKE48",
+      "genres": [
+        "idol_female",
+        "j_pop"
+      ],
+      "song_count": 17
+    },
+    {
+      "id": "baf0f0d7-9697-493b-82d2-4d6d2c6bc2f4",
+      "name": "香西かおり",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 17
+    },
+    {
+      "id": "00c6aa2a-f50e-46e3-a681-e18c4a4a0b93",
+      "name": "RADWIMPS",
+      "genres": [
+        "j_rock",
+        "anison"
+      ],
+      "song_count": 16
+    },
+    {
+      "id": "8dfcd0ab-12e8-49e2-8fb9-bf0f0a209938",
+      "name": "TUBE(チューブ)",
+      "genres": [
+        "j_pop",
+        "j_rock"
+      ],
+      "song_count": 16
+    },
+    {
+      "id": "94bd3dae-e91c-4129-8538-7037a2d7860a",
+      "name": "aiko",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 16
+    },
+    {
+      "id": "0b889a63-d3ef-4de6-9c28-755dfa5f29db",
+      "name": "大月みやこ",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 16
+    },
+    {
+      "id": "6d265d13-dc25-4416-971f-05a2c7727f91",
+      "name": "桑田佳祐",
+      "genres": [
+        "j_pop",
+        "j_rock"
+      ],
+      "song_count": 15
+    },
+    {
+      "id": "5ccd8b09-be22-43ca-97cc-ae98918400bf",
+      "name": "DA PUMP",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 15
+    },
+    {
+      "id": "24a4ad11-e6f2-45b3-949d-3a3546854fed",
+      "name": "いきものがかり",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 15
+    },
+    {
+      "id": "684f610a-2477-4521-bca0-bfd0020d55a8",
+      "name": "KAT-TUN",
+      "genres": [
+        "idol_male",
+        "j_pop"
+      ],
+      "song_count": 15
+    },
+    {
+      "id": "56b73510-0820-413c-aa28-467c0eba8847",
+      "name": "DEEN",
+      "genres": [
+        "j_pop",
+        "j_rock"
+      ],
+      "song_count": 15
+    },
+    {
+      "id": "44322d92-9dc0-4399-b362-34b3f4fb2cab",
+      "name": "キム・ヨンジャ",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 15
+    },
+    {
+      "id": "9f4f05dd-f417-4b65-91d9-ce7811757bd6",
+      "name": "TOKIO",
+      "genres": [
+        "idol_male",
+        "j_pop"
+      ],
+      "song_count": 15
+    },
+    {
+      "id": "2accb077-b2c9-47a5-83e0-9296def92073",
+      "name": "コブクロ",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 14
+    },
+    {
+      "id": "79901247-e7a7-4998-ba18-5a13a2f47402",
+      "name": "天童よしみ",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 14
+    },
+    {
+      "id": "ce08a790-441a-4eda-96a4-7bbdcbd7a9e1",
+      "name": "King Gnu",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 14
+    },
+    {
+      "id": "170aebd5-6b2c-4738-bd06-418045ad9e7a",
+      "name": "大塚 愛",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 14
+    },
+    {
+      "id": "69545038-1c76-4e24-869e-29431aa9d180",
+      "name": "globe",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 14
+    },
+    {
+      "id": "12669f64-f27f-4527-a574-9520e057f5fd",
+      "name": "ウルフルズ",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 14
+    },
+    {
+      "id": "c01906d4-497d-49ad-b618-0a4477530ede",
+      "name": "原田悠里",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 14
+    },
+    {
+      "id": "49a37364-a619-4dc5-8276-b45a0c1ac579",
+      "name": "Vaundy",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 14
+    },
+    {
+      "id": "c2033991-9ec9-4193-beb0-bf28fd1ffea3",
+      "name": "ORANGE RANGE",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 14
+    },
+    {
+      "id": "a9991716-d9dc-4000-95d7-f33e3b2cb1ce",
+      "name": "神野美伽",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 13
+    },
+    {
+      "id": "38f4064d-19f8-46b2-8975-069a4cdf2087",
+      "name": "SEKAI NO OWARI",
+      "genres": [
+        "j_pop",
+        "j_rock"
+      ],
+      "song_count": 13
+    },
+    {
+      "id": "72dd8fa6-628d-437a-a23f-6e4a02ea2336",
+      "name": "エレファントカシマシ",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 13
+    },
+    {
+      "id": "8fbfe5cc-fe5d-4537-9a26-dff71d01f754",
+      "name": "中村美律子",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 13
+    },
+    {
+      "id": "47b580bf-6d02-4e81-893d-2d7a72debddc",
+      "name": "坂本冬美",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 12
+    },
+    {
+      "id": "48ef34ca-458c-48d0-bf5c-2d0276721938",
+      "name": "GReeeeN",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 12
+    },
+    {
+      "id": "1b8ac1a4-0f5d-46ff-ae95-051caf6eb939",
+      "name": "大黒摩季",
+      "genres": [
+        "j_pop",
+        "j_rock"
+      ],
+      "song_count": 12
+    },
+    {
+      "id": "e6f1e067-9e85-436f-9e10-64aa52c6a207",
+      "name": "THE YELLOW MONKEY",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 12
+    },
+    {
+      "id": "5a41e8e1-9caf-4deb-8455-58fc7ddb4829",
+      "name": "工藤静香",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 12
+    },
+    {
+      "id": "11e2c09f-c082-4a5d-b8df-ac5bc3a77a67",
+      "name": "YOASOBI",
+      "genres": [
+        "vocaloid_utaite",
+        "j_pop"
+      ],
+      "song_count": 12
+    },
+    {
+      "id": "5c389aa5-31ac-4edd-be8b-b17079101dc5",
+      "name": "ZARD",
+      "genres": [
+        "j_pop",
+        "j_rock"
+      ],
+      "song_count": 12
+    },
+    {
+      "id": "0f3ecdb0-a7a6-4925-a8c5-ecb87e813e22",
+      "name": "三山ひろし",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 12
+    },
+    {
+      "id": "113f304c-bed1-43d5-9290-41ee9c73d778",
+      "name": "東方神起",
+      "genres": [
+        "kpop"
+      ],
+      "song_count": 11
+    },
+    {
+      "id": "6d5c873d-0bf4-4249-ae4e-6e4231178ba6",
+      "name": "SPEED",
+      "genres": [
+        "j_pop",
+        "idol_female"
+      ],
+      "song_count": 11
+    },
+    {
+      "id": "2831660e-666c-44d3-938e-83870c16dfb8",
+      "name": "岩本公水",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 11
+    },
+    {
+      "id": "14cde1a9-ada2-4113-b9e5-5faa6701a220",
+      "name": "倉木麻衣",
+      "genres": [
+        "j_pop",
+        "anison"
+      ],
+      "song_count": 11
+    },
+    {
+      "id": "2ca10999-ffd7-4b5a-9f3e-ce74a043d2b6",
+      "name": "DECO*27",
+      "genres": [
+        "vocaloid_utaite"
+      ],
+      "song_count": 11
+    },
+    {
+      "id": "a714ec9f-5682-4787-83d7-eff232d34395",
+      "name": "ケツメイシ",
+      "genres": [
+        "hiphop",
+        "j_pop"
+      ],
+      "song_count": 11
+    },
+    {
+      "id": "75b774a8-41e2-4c6f-9a97-6c6cf5eb2cda",
+      "name": "中島美嘉",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 11
+    },
+    {
+      "id": "087d28c9-3630-4409-ad58-7f688ed0482f",
+      "name": "YUI",
+      "genres": [
+        "j_pop",
+        "j_rock"
+      ],
+      "song_count": 11
+    },
+    {
+      "id": "51312423-1ae2-4e06-bc94-152920524010",
+      "name": "秋元順子",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 11
+    },
+    {
+      "id": "08d66607-01cd-44ca-bac0-ab1c929bf144",
+      "name": "BoA",
+      "genres": [
+        "kpop",
+        "j_pop"
+      ],
+      "song_count": 10
+    },
+    {
+      "id": "59e680ba-aa2f-44e1-aa90-c2aca3fb5d92",
+      "name": "川野夏美",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 10
+    },
+    {
+      "id": "9f93fccf-84ed-4dff-ab25-089d5336c26d",
+      "name": "SEKAI NO OWARI(世界の終わり)",
+      "genres": [
+        "j_pop",
+        "j_rock"
+      ],
+      "song_count": 10
+    },
+    {
+      "id": "3007b6fa-55ab-47c1-841f-da591b51881a",
+      "name": "シャ乱Q",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 10
+    },
+    {
+      "id": "a02b9ee0-cdb6-4b5c-b293-b5755ccd740d",
+      "name": "欅坂46",
+      "genres": [
+        "idol_female",
+        "j_pop"
+      ],
+      "song_count": 10
+    },
+    {
+      "id": "91097ffd-14eb-46d9-9b16-4c5f66e0e598",
+      "name": "BTS",
+      "genres": [
+        "kpop"
+      ],
+      "song_count": 10
+    },
+    {
+      "id": "aa4f0b89-782b-473f-b2ae-2453651aca08",
+      "name": "Misia",
+      "genres": [
+        "rnb_soul",
+        "j_pop"
+      ],
+      "song_count": 10
+    },
+    {
+      "id": "b4dfd71d-a129-475f-a18a-c221fdef8539",
+      "name": "スキマスイッチ",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 10
+    },
+    {
+      "id": "2d4df8ff-5ef7-41f7-adba-2c89eca428e5",
+      "name": "Perfume",
+      "genres": [
+        "idol_female",
+        "j_pop"
+      ],
+      "song_count": 10
+    },
+    {
+      "id": "2d4a6074-0076-49ae-aa45-cc7403dd776e",
+      "name": "市川由紀乃",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 10
+    },
+    {
+      "id": "e58341a5-3b56-4a45-af62-5459f550f040",
+      "name": "Sexy Zone",
+      "genres": [
+        "idol_male",
+        "j_pop"
+      ],
+      "song_count": 10
+    },
+    {
+      "id": "2e4fa113-8bbf-49b1-8320-4f05b9874f74",
+      "name": "JUJU",
+      "genres": [
+        "rnb_soul",
+        "j_pop"
+      ],
+      "song_count": 10
+    },
+    {
+      "id": "bfda57d1-2c47-46f1-a4f9-2d0463dc4824",
+      "name": "尾崎豊",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 10
+    },
+    {
+      "id": "98d098fa-a42b-4107-8590-89cea915093e",
+      "name": "椎名林檎",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 10
+    },
+    {
+      "id": "6c2a9de6-992a-4d7c-911c-413340295017",
+      "name": "長渕剛",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 9
+    },
+    {
+      "id": "7f89dff3-18b3-4d01-98aa-c4d253b461ac",
+      "name": "北島三郎",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 9
+    },
+    {
+      "id": "5834ced9-8c15-4d3a-a281-d0ef074b85ff",
+      "name": "角川博",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 9
+    },
+    {
+      "id": "28ff3433-5445-4882-a0a2-28b162f5cad4",
+      "name": "LiSA",
+      "genres": [
+        "anison",
+        "j_rock"
+      ],
+      "song_count": 9
+    },
+    {
+      "id": "2da98bc9-414f-4633-94b7-65948bac7bb6",
+      "name": "LUNA SEA",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 9
+    },
+    {
+      "id": "dd954fda-fde0-4c5f-a996-729109ed0734",
+      "name": "FLOW",
+      "genres": [
+        "anison",
+        "j_rock"
+      ],
+      "song_count": 9
+    },
+    {
+      "id": "9d7484f5-5d5e-4fd8-bd0d-1760f1012b97",
+      "name": "T-BOLAN",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 9
+    },
+    {
+      "id": "b3de109d-e64e-435f-8bce-0d8d173f44ac",
+      "name": "秦基博",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 9
+    },
+    {
+      "id": "132d3c59-0962-4657-adbb-03260e839444",
+      "name": "trf",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 9
+    },
+    {
+      "id": "90a256be-eb30-4f0e-9c8f-65779b30698d",
+      "name": "きゃりーぱみゅぱみゅ",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 9
+    },
+    {
+      "id": "98263c84-b737-47a7-83b1-fb5f374d7bc1",
+      "name": "Do As Infinity",
+      "genres": [
+        "j_pop",
+        "j_rock",
+        "anison"
+      ],
+      "song_count": 9
+    },
+    {
+      "id": "4b3c49e2-40c9-416a-a009-c99d4d0051f1",
+      "name": "優里",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 9
+    },
+    {
+      "id": "9eda517c-d321-4533-a80f-defcd71319ef",
+      "name": "AAA(トリプル・エー)",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "dc7e3624-1926-4fab-b27c-0f967a55a73f",
+      "name": "UVERworld",
+      "genres": [
+        "j_rock",
+        "anison"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "cfcf831c-aa2d-4084-b499-82a3e9927d56",
+      "name": "SIAM SHADE",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "30ba9030-570b-4255-8083-86b021bff514",
+      "name": "黒夢",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "39a8ae5b-cf89-4e04-bca2-dacf5ad14970",
+      "name": "服部浩子",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "1a63e323-389d-4a87-8b62-1842bd6f5739",
+      "name": "広瀬香美",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "a1b12edb-684d-495f-ac1e-e074d8bc1a92",
+      "name": "Uru",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "8dcdafad-315d-44d4-bae0-a87b7d6d2e67",
+      "name": "森高千里",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "45660e54-4f5c-4b8d-be3e-7fb9fa5c7100",
+      "name": "UNISON SQUARE GARDEN",
+      "genres": [
+        "j_rock",
+        "anison"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "f34e5328-ccb2-495d-9996-386e62f6943b",
+      "name": "Snow Man",
+      "genres": [
+        "idol_male",
+        "j_pop"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "725f7982-e5c2-4eeb-be07-b7550cbbfbcd",
+      "name": "WANDS",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "64514bee-5469-4c05-a6d9-4b9b9c7dbc09",
+      "name": "藤井 風",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "ca65e4a6-477b-43ce-9931-7dd6a56e1f38",
+      "name": "Dragon Ash",
+      "genres": [
+        "j_rock",
+        "hiphop"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "2666bf79-2304-4b90-97ef-1384e532177f",
+      "name": "鈴木亜美(鈴木あみ)",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "1d9dd4b5-db4b-4d30-8129-19eb38323234",
+      "name": "WANIMA",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "52fb6482-20e5-49f5-81bc-f8643d39fdfd",
+      "name": "川中美幸",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "9ce51bae-8d01-4d49-bb5c-dc4e63df8d5e",
+      "name": "Superfly",
+      "genres": [
+        "j_pop",
+        "j_rock"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "4f9492b8-4e24-4407-a6d6-0bf641cd4d55",
+      "name": "サカナクション",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "83406d78-8a03-46de-a097-2f8f636e9211",
+      "name": "鳥羽一郎",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "514b9a90-82d4-4729-a20a-8ff785c66084",
+      "name": "レミオロメン",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "ab45b00c-0cad-4101-aafc-a9ed71e74a83",
+      "name": "TWICE",
+      "genres": [
+        "kpop"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "6ac2b660-45e3-4a54-a4bd-35195d6a16de",
+      "name": "島谷ひとみ",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 8
+    },
+    {
+      "id": "bd8bc62e-33d9-453b-956e-9c3ad9c1fef4",
+      "name": "槇原敬之(Makihara)",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "0db2816c-4ddd-48a4-a769-3d65423a32c4",
+      "name": "KARA",
+      "genres": [
+        "kpop"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "07edcb11-2805-4ea9-9b30-4dbf9c28ffae",
+      "name": "田川寿美",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "dd494daf-0896-4baf-9516-6ed97b6c9980",
+      "name": "SunSet Swish",
+      "genres": [
+        "j_rock",
+        "anison"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "6aacccb6-1bd9-4ea7-ad49-9321dbdfdc68",
+      "name": "タッキー&翼",
+      "genres": [
+        "idol_male",
+        "j_pop"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "e2a942e9-8e08-4d3a-aa6f-c085722b204f",
+      "name": "福田こうへい",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "b5e6badd-6549-4c36-92ce-d2526cf3f15d",
+      "name": "HKT48",
+      "genres": [
+        "idol_female",
+        "j_pop"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "4de90da3-0d2a-4c65-8810-3a0cd46f2520",
+      "name": "伍代夏子",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "27c55ed1-335b-43f1-8172-a8dd7b47bdb2",
+      "name": "水田竜子",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "b616d263-eb3e-4de6-8134-580666677df8",
+      "name": "星野 源",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "00263f34-61fe-4d3b-9bd8-44c2fe49e495",
+      "name": "長保有紀",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "148bd792-5f7c-42fd-8ca0-a81aaf23b347",
+      "name": "布袋寅泰",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "6b0f0b9e-4f11-449d-92ff-497dc295101e",
+      "name": "AAA",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "8297c6f9-76e8-4a78-bb71-625b64c4a9ab",
+      "name": "T.M.Revolution",
+      "genres": [
+        "j_pop",
+        "anison"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "996504fa-0bb3-4f13-b091-0e1d62465be1",
+      "name": "菅田将暉",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "89a5adc1-6726-4699-974b-a4bdf5b1b4a2",
+      "name": "HANA",
+      "genres": [
+        "other"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "fc389471-c5f1-45da-8b95-99b7314d4bd5",
+      "name": "桂銀淑",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 7
+    },
+    {
+      "id": "c7afbdb9-6db3-408d-9ca7-b322bb45d461",
+      "name": "ヨルシカ",
+      "genres": [
+        "vocaloid_utaite"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "a31488b6-b7ff-4239-bc2a-8fbe1b338455",
+      "name": "竹内まりや",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "e77caa36-478e-4e68-b44d-448ee71b9107",
+      "name": "杜このみ",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "49fe6a5c-e662-4c1c-a163-5934df24b975",
+      "name": "flumpool",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "f688c2f5-21d3-494f-afe5-3e3b43422046",
+      "name": "Lady Gaga",
+      "genres": [
+        "western"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "72e7a9e4-cc38-450b-96c5-fe176b6c2a8a",
+      "name": "華原朋美",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "dd874fcc-a3f8-405c-b961-7c1d9a5eb49d",
+      "name": "長山洋子",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "dbdb631f-5f0c-416c-bc8e-b217dde97b54",
+      "name": "King & Prince",
+      "genres": [
+        "idol_male",
+        "j_pop"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "274079cc-624a-49ff-a98b-a61631fe780a",
+      "name": "山内惠介",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "beb30d39-4d3c-4f3a-b77e-5db7aa300d11",
+      "name": "HY",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "6e0ba30d-11e9-4beb-8e58-ee84c2c808d6",
+      "name": "hitomi",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "8fa2106e-d068-45c5-aab3-b27e3f14e42f",
+      "name": "松原のぶえ",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "7870e4e8-b693-4000-a5fb-42d291662791",
+      "name": "AI",
+      "genres": [
+        "rnb_soul",
+        "j_pop"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "4d56ae54-304c-4a05-bcd7-d97e241b82ff",
+      "name": "SOPHIA",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "975d8ec2-9735-429f-ac04-0f7f41b74a19",
+      "name": "X JAPAN",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "11970225-8f2c-44dd-87de-35f32c85d452",
+      "name": "清水翔太",
+      "genres": [
+        "rnb_soul",
+        "j_pop"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "5b82b186-41eb-4418-a712-4a4403c04473",
+      "name": "GACKT(Gackt)",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "182c0de0-cf6a-4853-935d-a5b2e442a891",
+      "name": "真木ことみ",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "b8316e33-0863-4ccf-951a-76812480a8e7",
+      "name": "松田聖子",
+      "genres": [
+        "idol_female",
+        "j_pop"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "932dd675-8242-4af9-a0c6-605dc37703cb",
+      "name": "One Direction",
+      "genres": [
+        "western"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "280b5168-f46c-4a79-a750-65b27d04170e",
+      "name": "ONE OK ROCK",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "de07b786-c78a-44bb-9b63-6cf3d63b2b81",
+      "name": "19",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "ca6ebddf-72f5-49cd-88ab-d827eaed3fc8",
+      "name": "RIP SLYME",
+      "genres": [
+        "hiphop"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "b498256c-0830-4967-812b-47dd81f2ffc7",
+      "name": "GENERATIONS from EXILE TRIBE",
+      "genres": [
+        "idol_male",
+        "j_pop"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "1271eb90-df29-4bd2-a40c-50580347dc49",
+      "name": "hide",
+      "genres": [
+        "j_rock"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "0de4d622-22a1-4812-831d-e6f5e8fc993f",
+      "name": "家入レオ",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "a33e7a6a-eff7-4dc5-b223-dbe736b5c568",
+      "name": "松浦亜弥",
+      "genres": [
+        "idol_female",
+        "j_pop"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "26c2fc48-0537-4151-b644-f335e023008b",
+      "name": "松たか子",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 6
+    },
+    {
+      "id": "b9b5b828-f6ca-4b82-abee-2def5e655aed",
+      "name": "CHAGE & ASKA",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "010a6dc0-a45e-4f75-b00a-2459591ae42b",
+      "name": "多岐川舞子",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "e5eec851-7040-475d-bc76-cea9c17f3244",
+      "name": "矢井田瞳",
+      "genres": [
+        "j_pop",
+        "j_rock"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "9cad498b-85b1-46b1-839a-977d556b4ca3",
+      "name": "森山愛子",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "b39b0025-d7aa-4682-82c4-6ef744434b2e",
+      "name": "郷ひろみ",
+      "genres": [
+        "j_pop",
+        "idol_male"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "4b0bedc8-fec8-4805-a094-9b932ade817c",
+      "name": "MY LITTLE LOVER",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "e3db36a0-4894-415b-b8af-53c8cd966307",
+      "name": "真木柚布子(真木由布子)",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "f02fc9f8-a48b-4c48-a8f5-d2383acb5b83",
+      "name": "hiro",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "2300cecc-8074-4e32-aabe-2221743ac56a",
+      "name": "今井美樹",
+      "genres": [
+        "j_pop"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "7faeb357-c043-48ef-b89d-17eafd366dbb",
+      "name": "奥田民生",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "2eb41d4b-3bfb-48be-a690-55030dea1024",
+      "name": "Justin Bieber",
+      "genres": [
+        "western"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "ebcbc2fe-c845-44a2-825d-01e94b02d6cd",
+      "name": "the brilliant green",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "1f2f87c0-a7ce-4635-8ae8-7ad7e846a36e",
+      "name": "SixTONES",
+      "genres": [
+        "idol_male",
+        "j_pop"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "4b450399-ffea-48d4-a997-e41d371b4097",
+      "name": "FRUITS ZIPPER",
+      "genres": [
+        "idol_female",
+        "j_pop"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "500c1820-69f3-44ed-9597-6d4dc9293a4f",
+      "name": "東京事変",
+      "genres": [
+        "j_rock",
+        "j_pop"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "c8551706-1e99-4408-9d99-1afe9a56c1fc",
+      "name": "日向坂46",
+      "genres": [
+        "idol_female",
+        "j_pop"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "99b34628-8583-483d-8917-84854996e57c",
+      "name": "岡ゆう子",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "58dda2f1-3e8f-4d4c-acf8-a177998a8ea9",
+      "name": "E-girls",
+      "genres": [
+        "j_pop",
+        "idol_female"
+      ],
+      "song_count": 5
+    },
+    {
+      "id": "2eadf72a-62df-4195-b889-5213176e455d",
+      "name": "島津亜矢",
+      "genres": [
+        "enka_kayo"
+      ],
+      "song_count": 5
+    }
+  ]
+}
