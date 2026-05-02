@@ -27,6 +27,7 @@ interface SeedRow {
   image_url_large: string | null;
   image_url_medium: string | null;
   image_url_small: string | null;
+  duration_ms: number | null;
   source_urls: string[];
 }
 
@@ -66,6 +67,7 @@ async function main() {
       image_url_large: s.image_url_large,
       image_url_medium: s.image_url_medium,
       image_url_small: s.image_url_small,
+      duration_ms: s.duration_ms,
       source_urls: s.source_urls,
       is_popular: true,
     }));
@@ -109,6 +111,7 @@ async function main() {
         image_url_large: row.image_url_large,
         image_url_medium: row.image_url_medium,
         image_url_small: row.image_url_small,
+        duration_ms: row.duration_ms,
         source_urls: row.source_urls,
         is_popular: true,
       })

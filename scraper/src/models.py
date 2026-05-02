@@ -35,4 +35,5 @@ class EnrichedSong:
     image_url_large: str | None
     image_url_medium: str | None
     image_url_small: str | None
+    duration_ms: int | None  # Spotify の duration_ms。曲の長さ (ms)
     source_urls: list[str] = field(default_factory=list)

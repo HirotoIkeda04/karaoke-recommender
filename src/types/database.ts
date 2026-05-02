@@ -274,6 +274,7 @@ export type Database = {
           artist_id: string | null
           created_at: string
           dam_request_no: string | null
+          duration_ms: number | null
           falsetto_max_midi: number | null
           fame_article: string | null
           fame_score: number | null
@@ -301,6 +302,7 @@ export type Database = {
           artist_id?: string | null
           created_at?: string
           dam_request_no?: string | null
+          duration_ms?: number | null
           falsetto_max_midi?: number | null
           fame_article?: string | null
           fame_score?: number | null
@@ -328,6 +330,7 @@ export type Database = {
           artist_id?: string | null
           created_at?: string
           dam_request_no?: string | null
+          duration_ms?: number | null
           falsetto_max_midi?: number | null
           fame_article?: string | null
           fame_score?: number | null

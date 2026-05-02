@@ -11,6 +11,14 @@ import { RatingControls } from "./rating-controls";
 
 export const dynamic = "force-dynamic";
 
+function formatDuration(durationMs: number | null | undefined): string {
+  if (durationMs == null) return "—";
+  const totalSec = Math.round(durationMs / 1000);
+  const min = Math.floor(totalSec / 60);
+  const sec = totalSec % 60;
+  return `${min}:${sec.toString().padStart(2, "0")}`;
+}
+
 interface SongDetailProps {
   params: Promise<{ id: string }>;
 }
@@ -93,6 +101,8 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         <dd className="text-right font-mono">{midiToKaraoke(song.range_high_midi)}</dd>
         <dt className="text-zinc-600 dark:text-zinc-400">裏声 最高</dt>
         <dd className="text-right font-mono">{midiToKaraoke(song.falsetto_max_midi)}</dd>
+        <dt className="text-zinc-600 dark:text-zinc-400">長さ</dt>
+        <dd className="text-right font-mono">{formatDuration(song.duration_ms)}</dd>
       </dl>
 
       <RatingControls

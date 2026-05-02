@@ -46,6 +46,7 @@ class SpotifyTrack:
     image_url_large: str | None  # ≥ 600 px
     image_url_medium: str | None  # ~300 px
     image_url_small: str | None  # ≤ 200 px
+    duration_ms: int | None = None  # 曲の長さ (ms)
 
     @property
     def artists_joined(self) -> str:
@@ -90,6 +91,8 @@ def _pick_images(
 def _track_from_api(item: dict[str, Any]) -> SpotifyTrack:
     album = item.get("album") or {}
     large, medium, small = _pick_images(album.get("images") or [])
+    duration_ms_raw = item.get("duration_ms")
+    duration_ms = int(duration_ms_raw) if isinstance(duration_ms_raw, (int, float)) else None
     return SpotifyTrack(
         id=item["id"],
         title=item.get("name", ""),
@@ -98,6 +101,7 @@ def _track_from_api(item: dict[str, Any]) -> SpotifyTrack:
         image_url_large=large,
         image_url_medium=medium,
         image_url_small=small,
+        duration_ms=duration_ms,
     )
 
 
