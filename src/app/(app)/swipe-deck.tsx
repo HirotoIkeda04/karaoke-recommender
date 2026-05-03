@@ -122,24 +122,10 @@ function triggerHaptic() {
   navigator.vibrate(15);
 }
 
-// Web Audio でガラスが割れるような爽快感のある効果音を合成。
-// 4 つの評価ボタンそれぞれに別バリエーションを当てて A/B 比較できる
-// ようにする。共通要素は (a) 低域の「ドン」、(b) ハイパス通しノイズ
-// の「シャラッ」、(c) 高音域のサイン部分音「キラキラ」の 3 層構成。
-// AudioContext と乱数ノイズバッファはタップ初回に遅延生成して使い回す。
+// Web Audio で「練習中」音 (Cmaj7 ハープ + 低域ドン + 高域シマー) を
+// ベースに、4 つの評価ボタンで和音 voicing と細部だけ変えて A/B 比較
+// できるようにする。AudioContext はタップ初回に遅延生成して使い回す。
 let audioCtx: AudioContext | null = null;
-let noiseBuffer: AudioBuffer | null = null;
-function getNoiseBuffer(ctx: AudioContext) {
-  if (noiseBuffer && noiseBuffer.sampleRate === ctx.sampleRate) {
-    return noiseBuffer;
-  }
-  const len = Math.floor(ctx.sampleRate * 0.5);
-  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
-  noiseBuffer = buf;
-  return buf;
-}
 function playLowThump(
   ctx: AudioContext,
   now: number,
@@ -159,28 +145,6 @@ function playLowThump(
   osc.connect(g).connect(ctx.destination);
   osc.start(now);
   osc.stop(now + dur + 0.02);
-}
-function playNoiseBurst(
-  ctx: AudioContext,
-  now: number,
-  hpStart: number,
-  hpEnd: number,
-  dur: number,
-  peak: number,
-) {
-  const noise = ctx.createBufferSource();
-  noise.buffer = getNoiseBuffer(ctx);
-  const hp = ctx.createBiquadFilter();
-  hp.type = "highpass";
-  hp.frequency.setValueAtTime(hpStart, now);
-  hp.frequency.exponentialRampToValueAtTime(hpEnd, now + dur);
-  const g = ctx.createGain();
-  g.gain.setValueAtTime(0.0001, now);
-  g.gain.exponentialRampToValueAtTime(peak, now + 0.005);
-  g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
-  noise.connect(hp).connect(g).connect(ctx.destination);
-  noise.start(now);
-  noise.stop(now + dur + 0.05);
 }
 function playPartial(
   ctx: AudioContext,
@@ -215,61 +179,41 @@ function triggerClickSound(rating: Rating) {
     const ctx = audioCtx;
     const now = ctx.currentTime;
 
-    // どれも「明るい低域 + ハイパスノイズ + 上に和音アルペジオ + 超高域
-    // キラキラ」の "easy" 系テンプレート。違いはアルペジオの voicing と
-    // 細部 (低域の沈み込み・スタッガー・デチューン) の微調整のみ。
-    const sharedNoise = () => playNoiseBurst(ctx, now, 3500, 7500, 0.3, 0.28);
-    const sharedSparkle = (detune = 0.03) => {
+    // 共通: 低域ドン + 高域デチューンシマー (ガラス音は廃止)。
+    playLowThump(ctx, now, 260, 130, 0.18, 0.28);
+    const playShimmer = (detunes: ReadonlyArray<number>) => {
       for (const base of [4500, 6500, 8500, 11000]) {
-        const delay = Math.random() * 0.05;
-        const dur = 0.22 + Math.random() * 0.18;
-        playPartial(ctx, now + delay, base * (1 + (Math.random() - 0.5) * detune), dur, 0.07, 0.9);
+        for (const d of detunes) {
+          const delay = Math.random() * 0.06;
+          const dur = 0.28 + Math.random() * 0.18;
+          playPartial(ctx, now + delay, base * d, dur, 0.05, 0.92);
+        }
       }
     };
 
-    if (rating === "hard") {
-      // パワー和音 (C6/G6/C7) の開いた完全 5 度で、骨太に響かせる。
-      playLowThump(ctx, now, 240, 100, 0.18, 0.34);
-      sharedNoise();
-      playPartial(ctx, now + 0.0, 1046.5, 0.26, 0.1, 1); // C6
-      playPartial(ctx, now + 0.03, 1568.0, 0.3, 0.1, 1); // G6
-      playPartial(ctx, now + 0.06, 2093.0, 0.34, 0.1, 1); // C7
-      sharedSparkle();
-    } else if (rating === "medium") {
-      // 4 音メジャー (C6/E6/G6/C7) で広がり感。スタッガーをやや詰める。
-      playLowThump(ctx, now, 260, 130, 0.16, 0.3);
-      sharedNoise();
-      playPartial(ctx, now + 0.0, 1046.5, 0.25, 0.09, 1); // C6
-      playPartial(ctx, now + 0.025, 1318.5, 0.27, 0.09, 1); // E6
-      playPartial(ctx, now + 0.05, 1568.0, 0.3, 0.09, 1); // G6
-      playPartial(ctx, now + 0.075, 2093.0, 0.34, 0.09, 1); // C7
-      sharedSparkle();
-    } else if (rating === "easy") {
-      // 基本形: メジャー三和音 (C6/E6/G6) で短く弾む。
-      playLowThump(ctx, now, 260, 130, 0.16, 0.3);
-      sharedNoise();
-      playPartial(ctx, now + 0.0, 1046.5, 0.25, 0.1, 1); // C6
-      playPartial(ctx, now + 0.03, 1318.5, 0.28, 0.1, 1); // E6
-      playPartial(ctx, now + 0.06, 1568.0, 0.32, 0.1, 1); // G6
-      sharedSparkle();
-    } else {
-      // practicing: Cmaj7 (C6/E6/G6/B6) でドリーミーに。スタッガー長め
-      // + 部分音にデチューン重ねでシマーを乗せる。
-      playLowThump(ctx, now, 260, 130, 0.18, 0.28);
-      playNoiseBurst(ctx, now, 3500, 7500, 0.4, 0.28);
-      const harpStagger = 0.045;
-      const notes = [1046.5, 1318.5, 1568.0, 1975.53]; // C6 E6 G6 B6
+    // 違いは上に乗せるハープアルペジオの voicing / スタッガー / シマー量。
+    const harp = (notes: ReadonlyArray<number>, stagger: number, peak = 0.085) => {
       notes.forEach((f, i) => {
-        playPartial(ctx, now + i * harpStagger, f, 0.32 + i * 0.03, 0.085, 1);
+        playPartial(ctx, now + i * stagger, f, 0.32 + i * 0.03, peak, 1);
       });
-      // デチューン二重ねでシマー。
-      for (const base of [4500, 6500, 8500, 11000]) {
-        for (const detune of [0.992, 1.01]) {
-          const delay = Math.random() * 0.06;
-          const dur = 0.28 + Math.random() * 0.18;
-          playPartial(ctx, now + delay, base * detune, dur, 0.05, 0.92);
-        }
-      }
+    };
+
+    if (rating === "hard") {
+      // 1 オクターブ下げた Cmaj7 (C5/E5/G5/B5)。同じ手触りでより温かい響き。
+      harp([523.25, 659.25, 783.99, 987.77], 0.045);
+      playShimmer([0.992, 1.01]);
+    } else if (rating === "medium") {
+      // 練習中と同じ Cmaj7 (C6/E6/G6/B6) を、スタッガー詰めて素早く決める。
+      harp([1046.5, 1318.5, 1568.0, 1975.53], 0.025);
+      playShimmer([0.992, 1.01]);
+    } else if (rating === "easy") {
+      // Cmaj9 (C6/E6/G6/B6/D7)。9 度を載せて一段華やかに。
+      harp([1046.5, 1318.5, 1568.0, 1975.53, 2349.32], 0.045, 0.08);
+      playShimmer([0.992, 1.01]);
+    } else {
+      // practicing (基準): Cmaj7 (C6/E6/G6/B6) スタッガー長め + シマー三重ね。
+      harp([1046.5, 1318.5, 1568.0, 1975.53], 0.045);
+      playShimmer([0.988, 1.0, 1.012]);
     }
   } catch {
     // 音が出せなくても評価操作自体は止めない。
