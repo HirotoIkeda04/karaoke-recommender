@@ -91,20 +91,21 @@ const SWIPE_EXIT_VARIANTS = {
           transition,
         };
       case "medium":
-        // 真上に直進すると不自然なので右に軽くドリフト。x→rotate の
-        // useTransform 経由でカードもわずかに傾く。
+        // 横ドリフトはせず、カードを上向き (rotate 0) に保ったまま真上へ。
         return {
-          x: [0, SWIPE_HOLD_DISTANCE * 0.015, SWIPE_OUT_DISTANCE * 0.018],
+          x: 0,
           y: [0, -SWIPE_HOLD_DISTANCE, -SWIPE_OUT_DISTANCE],
+          rotate: 0,
           opacity,
           zIndex,
           transition,
         };
       case "practicing":
-        // practicing は逆に左へドリフト。
+        // 同上。横ドリフト無しでカードは上向きのまま真下へ。
         return {
-          x: [0, -SWIPE_HOLD_DISTANCE * 0.015, -SWIPE_OUT_DISTANCE * 0.018],
+          x: 0,
           y: [0, SWIPE_HOLD_DISTANCE, SWIPE_OUT_DISTANCE],
+          rotate: 0,
           opacity,
           zIndex,
           transition,
