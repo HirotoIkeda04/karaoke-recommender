@@ -110,7 +110,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         <dd className="text-right font-mono">{midiToKaraoke(song.range_high_midi)}</dd>
         <dt className="text-zinc-600 dark:text-zinc-400">裏声 最高</dt>
         <dd className="text-right font-mono">{midiToKaraoke(song.falsetto_max_midi)}</dd>
-        <dt className="text-zinc-600 dark:text-zinc-400">長さ</dt>
+        <dt className="text-zinc-600 dark:text-zinc-400">曲の長さ</dt>
         <dd className="text-right font-mono">{formatDuration(song.duration_ms)}</dd>
       </dl>
 
