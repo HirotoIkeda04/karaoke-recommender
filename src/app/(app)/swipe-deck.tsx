@@ -215,47 +215,58 @@ function triggerClickSound(rating: Rating) {
     const ctx = audioCtx;
     const now = ctx.currentTime;
 
-    if (rating === "hard") {
-      // 重い破壊。低域を強めに、ノイズはやや暗め、部分音は中域中心。
-      playLowThump(ctx, now, 110, 45, 0.28, 0.5);
-      playNoiseBurst(ctx, now, 1500, 3500, 0.4, 0.4);
-      for (const base of [2400, 3200, 4200, 5500]) {
-        const delay = Math.random() * 0.05;
-        const dur = 0.22 + Math.random() * 0.18;
-        playPartial(ctx, now + delay, base * (1 + (Math.random() - 0.5) * 0.04), dur, 0.09, 0.8);
-      }
-    } else if (rating === "medium") {
-      // バランス型。中域の太さがある「カシャン」。
-      playLowThump(ctx, now, 180, 80, 0.18, 0.32);
-      playNoiseBurst(ctx, now, 2500, 5000, 0.32, 0.32);
-      for (const base of [3200, 4400, 5800, 7200, 9000]) {
-        const delay = Math.random() * 0.04;
-        const dur = 0.18 + Math.random() * 0.15;
-        playPartial(ctx, now + delay, base * (1 + (Math.random() - 0.5) * 0.04), dur, 0.08);
-      }
-    } else if (rating === "easy") {
-      // 明るく上行。低域は弾むように、上に長三和音 (C5/E5/G5) を重ねる。
-      playLowThump(ctx, now, 260, 130, 0.16, 0.3);
-      playNoiseBurst(ctx, now, 3500, 7500, 0.3, 0.28);
-      // メジャーアルペジオで爽快感。
-      playPartial(ctx, now + 0.0, 1046.5, 0.25, 0.1, 1); // C6
-      playPartial(ctx, now + 0.03, 1318.5, 0.28, 0.1, 1); // E6
-      playPartial(ctx, now + 0.06, 1568.0, 0.32, 0.1, 1); // G6
-      // 上のキラキラ。
+    // どれも「明るい低域 + ハイパスノイズ + 上に和音アルペジオ + 超高域
+    // キラキラ」の "easy" 系テンプレート。違いはアルペジオの voicing と
+    // 細部 (低域の沈み込み・スタッガー・デチューン) の微調整のみ。
+    const sharedNoise = () => playNoiseBurst(ctx, now, 3500, 7500, 0.3, 0.28);
+    const sharedSparkle = (detune = 0.03) => {
       for (const base of [4500, 6500, 8500, 11000]) {
         const delay = Math.random() * 0.05;
         const dur = 0.22 + Math.random() * 0.18;
-        playPartial(ctx, now + delay, base * (1 + (Math.random() - 0.5) * 0.03), dur, 0.07, 0.9);
+        playPartial(ctx, now + delay, base * (1 + (Math.random() - 0.5) * detune), dur, 0.07, 0.9);
       }
+    };
+
+    if (rating === "hard") {
+      // パワー和音 (C6/G6/C7) の開いた完全 5 度で、骨太に響かせる。
+      playLowThump(ctx, now, 240, 100, 0.18, 0.34);
+      sharedNoise();
+      playPartial(ctx, now + 0.0, 1046.5, 0.26, 0.1, 1); // C6
+      playPartial(ctx, now + 0.03, 1568.0, 0.3, 0.1, 1); // G6
+      playPartial(ctx, now + 0.06, 2093.0, 0.34, 0.1, 1); // C7
+      sharedSparkle();
+    } else if (rating === "medium") {
+      // 4 音メジャー (C6/E6/G6/C7) で広がり感。スタッガーをやや詰める。
+      playLowThump(ctx, now, 260, 130, 0.16, 0.3);
+      sharedNoise();
+      playPartial(ctx, now + 0.0, 1046.5, 0.25, 0.09, 1); // C6
+      playPartial(ctx, now + 0.025, 1318.5, 0.27, 0.09, 1); // E6
+      playPartial(ctx, now + 0.05, 1568.0, 0.3, 0.09, 1); // G6
+      playPartial(ctx, now + 0.075, 2093.0, 0.34, 0.09, 1); // C7
+      sharedSparkle();
+    } else if (rating === "easy") {
+      // 基本形: メジャー三和音 (C6/E6/G6) で短く弾む。
+      playLowThump(ctx, now, 260, 130, 0.16, 0.3);
+      sharedNoise();
+      playPartial(ctx, now + 0.0, 1046.5, 0.25, 0.1, 1); // C6
+      playPartial(ctx, now + 0.03, 1318.5, 0.28, 0.1, 1); // E6
+      playPartial(ctx, now + 0.06, 1568.0, 0.32, 0.1, 1); // G6
+      sharedSparkle();
     } else {
-      // practicing: 魔法じみたシマー。低域は控えめ、部分音をデチューン重ね。
-      playLowThump(ctx, now, 150, 90, 0.2, 0.25);
-      playNoiseBurst(ctx, now, 3000, 6000, 0.45, 0.3);
-      for (const base of [3500, 5000, 7000, 9500]) {
-        // 同じ周波数を 2 つわずかにデチューンして揺らぎを作る。
-        for (const detune of [0.99, 1.012]) {
-          const delay = Math.random() * 0.07;
-          const dur = 0.3 + Math.random() * 0.2;
+      // practicing: Cmaj7 (C6/E6/G6/B6) でドリーミーに。スタッガー長め
+      // + 部分音にデチューン重ねでシマーを乗せる。
+      playLowThump(ctx, now, 260, 130, 0.18, 0.28);
+      playNoiseBurst(ctx, now, 3500, 7500, 0.4, 0.28);
+      const harpStagger = 0.045;
+      const notes = [1046.5, 1318.5, 1568.0, 1975.53]; // C6 E6 G6 B6
+      notes.forEach((f, i) => {
+        playPartial(ctx, now + i * harpStagger, f, 0.32 + i * 0.03, 0.085, 1);
+      });
+      // デチューン二重ねでシマー。
+      for (const base of [4500, 6500, 8500, 11000]) {
+        for (const detune of [0.992, 1.01]) {
+          const delay = Math.random() * 0.06;
+          const dur = 0.28 + Math.random() * 0.18;
           playPartial(ctx, now + delay, base * detune, dur, 0.05, 0.92);
         }
       }
