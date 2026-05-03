@@ -67,8 +67,8 @@ const SWIPE_EXIT_VARIANTS = {
       return { opacity: 0, transition: { duration: 0 } };
     }
     const transition = {
-      duration: 0.7,
-      times: [0, 0.55, 1],
+      duration: 0.38,
+      times: [0, 0.5, 1],
       ease: "easeIn" as const,
       // zIndex は補間させず一瞬で適用 (退場中カードを新しい current の上に維持)
       zIndex: { duration: 0 },
@@ -467,7 +467,7 @@ function SwipeCard({
 
   useEffect(() => {
     if (initialX === 0 && initialY === 0) return;
-    const t = { duration: 0.45, ease: [0.16, 1, 0.3, 1] as const };
+    const t = { duration: 0.25, ease: [0.16, 1, 0.3, 1] as const };
     const ax = animate(x, 0, t);
     const ay = animate(y, 0, t);
     return () => {
