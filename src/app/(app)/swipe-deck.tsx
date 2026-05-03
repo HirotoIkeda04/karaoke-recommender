@@ -123,9 +123,10 @@ function triggerHaptic() {
 }
 
 // Web Audio でガラスが割れるような爽快感のある効果音を合成。
-// (1) 高域ホワイトノイズのバースト = 砕け散るシャラッ
-// (2) 高音域にバラついて出る複数のサイン部分音 = 破片のキラキラ
-// AudioContext はタップ初回に遅延生成して使い回す。
+// 4 つの評価ボタンそれぞれに別バリエーションを当てて A/B 比較できる
+// ようにする。共通要素は (a) 低域の「ドン」、(b) ハイパス通しノイズ
+// の「シャラッ」、(c) 高音域のサイン部分音「キラキラ」の 3 層構成。
+// AudioContext と乱数ノイズバッファはタップ初回に遅延生成して使い回す。
 let audioCtx: AudioContext | null = null;
 let noiseBuffer: AudioBuffer | null = null;
 function getNoiseBuffer(ctx: AudioContext) {
@@ -139,7 +140,69 @@ function getNoiseBuffer(ctx: AudioContext) {
   noiseBuffer = buf;
   return buf;
 }
-function triggerClickSound() {
+function playLowThump(
+  ctx: AudioContext,
+  now: number,
+  freqStart: number,
+  freqEnd: number,
+  dur: number,
+  peak: number,
+) {
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(freqStart, now);
+  osc.frequency.exponentialRampToValueAtTime(Math.max(20, freqEnd), now + dur);
+  g.gain.setValueAtTime(0.0001, now);
+  g.gain.exponentialRampToValueAtTime(peak, now + 0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+  osc.connect(g).connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + dur + 0.02);
+}
+function playNoiseBurst(
+  ctx: AudioContext,
+  now: number,
+  hpStart: number,
+  hpEnd: number,
+  dur: number,
+  peak: number,
+) {
+  const noise = ctx.createBufferSource();
+  noise.buffer = getNoiseBuffer(ctx);
+  const hp = ctx.createBiquadFilter();
+  hp.type = "highpass";
+  hp.frequency.setValueAtTime(hpStart, now);
+  hp.frequency.exponentialRampToValueAtTime(hpEnd, now + dur);
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, now);
+  g.gain.exponentialRampToValueAtTime(peak, now + 0.005);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+  noise.connect(hp).connect(g).connect(ctx.destination);
+  noise.start(now);
+  noise.stop(now + dur + 0.05);
+}
+function playPartial(
+  ctx: AudioContext,
+  start: number,
+  freq: number,
+  dur: number,
+  peak: number,
+  endRatio = 0.85,
+) {
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(freq, start);
+  osc.frequency.exponentialRampToValueAtTime(freq * endRatio, start + dur);
+  g.gain.setValueAtTime(0.0001, start);
+  g.gain.exponentialRampToValueAtTime(peak, start + 0.005);
+  g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+  osc.connect(g).connect(ctx.destination);
+  osc.start(start);
+  osc.stop(start + dur + 0.02);
+}
+function triggerClickSound(rating: Rating) {
   if (typeof window === "undefined") return;
   const Ctor =
     window.AudioContext ??
@@ -152,39 +215,50 @@ function triggerClickSound() {
     const ctx = audioCtx;
     const now = ctx.currentTime;
 
-    // (1) ハイパス通したノイズで「シャラッ」という破砕音を作る。
-    const noise = ctx.createBufferSource();
-    noise.buffer = getNoiseBuffer(ctx);
-    const hp = ctx.createBiquadFilter();
-    hp.type = "highpass";
-    hp.frequency.setValueAtTime(2500, now);
-    hp.frequency.exponentialRampToValueAtTime(5000, now + 0.25);
-    const noiseGain = ctx.createGain();
-    noiseGain.gain.setValueAtTime(0.0001, now);
-    noiseGain.gain.exponentialRampToValueAtTime(0.35, now + 0.005);
-    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
-    noise.connect(hp).connect(noiseGain).connect(ctx.destination);
-    noise.start(now);
-    noise.stop(now + 0.4);
-
-    // (2) 高音のサイン部分音を複数バラつかせて「キラキラ」を載せる。
-    const partials = [3200, 4400, 5800, 7200, 9000];
-    for (const base of partials) {
-      const delay = Math.random() * 0.04;
-      const dur = 0.18 + Math.random() * 0.15;
-      const start = now + delay;
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
-      osc.type = "sine";
-      // ほんの少しピッチダウンして余韻を作る。
-      osc.frequency.setValueAtTime(base * (1 + (Math.random() - 0.5) * 0.04), start);
-      osc.frequency.exponentialRampToValueAtTime(base * 0.85, start + dur);
-      g.gain.setValueAtTime(0.0001, start);
-      g.gain.exponentialRampToValueAtTime(0.08, start + 0.005);
-      g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
-      osc.connect(g).connect(ctx.destination);
-      osc.start(start);
-      osc.stop(start + dur + 0.02);
+    if (rating === "hard") {
+      // 重い破壊。低域を強めに、ノイズはやや暗め、部分音は中域中心。
+      playLowThump(ctx, now, 110, 45, 0.28, 0.5);
+      playNoiseBurst(ctx, now, 1500, 3500, 0.4, 0.4);
+      for (const base of [2400, 3200, 4200, 5500]) {
+        const delay = Math.random() * 0.05;
+        const dur = 0.22 + Math.random() * 0.18;
+        playPartial(ctx, now + delay, base * (1 + (Math.random() - 0.5) * 0.04), dur, 0.09, 0.8);
+      }
+    } else if (rating === "medium") {
+      // バランス型。中域の太さがある「カシャン」。
+      playLowThump(ctx, now, 180, 80, 0.18, 0.32);
+      playNoiseBurst(ctx, now, 2500, 5000, 0.32, 0.32);
+      for (const base of [3200, 4400, 5800, 7200, 9000]) {
+        const delay = Math.random() * 0.04;
+        const dur = 0.18 + Math.random() * 0.15;
+        playPartial(ctx, now + delay, base * (1 + (Math.random() - 0.5) * 0.04), dur, 0.08);
+      }
+    } else if (rating === "easy") {
+      // 明るく上行。低域は弾むように、上に長三和音 (C5/E5/G5) を重ねる。
+      playLowThump(ctx, now, 260, 130, 0.16, 0.3);
+      playNoiseBurst(ctx, now, 3500, 7500, 0.3, 0.28);
+      // メジャーアルペジオで爽快感。
+      playPartial(ctx, now + 0.0, 1046.5, 0.25, 0.1, 1); // C6
+      playPartial(ctx, now + 0.03, 1318.5, 0.28, 0.1, 1); // E6
+      playPartial(ctx, now + 0.06, 1568.0, 0.32, 0.1, 1); // G6
+      // 上のキラキラ。
+      for (const base of [4500, 6500, 8500, 11000]) {
+        const delay = Math.random() * 0.05;
+        const dur = 0.22 + Math.random() * 0.18;
+        playPartial(ctx, now + delay, base * (1 + (Math.random() - 0.5) * 0.03), dur, 0.07, 0.9);
+      }
+    } else {
+      // practicing: 魔法じみたシマー。低域は控えめ、部分音をデチューン重ね。
+      playLowThump(ctx, now, 150, 90, 0.2, 0.25);
+      playNoiseBurst(ctx, now, 3000, 6000, 0.45, 0.3);
+      for (const base of [3500, 5000, 7000, 9500]) {
+        // 同じ周波数を 2 つわずかにデチューンして揺らぎを作る。
+        for (const detune of [0.99, 1.012]) {
+          const delay = Math.random() * 0.07;
+          const dur = 0.3 + Math.random() * 0.2;
+          playPartial(ctx, now + delay, base * detune, dur, 0.05, 0.92);
+        }
+      }
     }
   } catch {
     // 音が出せなくても評価操作自体は止めない。
@@ -248,7 +322,7 @@ export function SwipeDeck({
   const handleRate = (rating: Rating) => {
     if (!current) return;
     triggerHaptic();
-    triggerClickSound();
+    triggerClickSound(rating);
     setError(null);
     const songId = current.id;
     const songSnapshot = current;
