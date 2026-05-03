@@ -91,9 +91,9 @@ const SWIPE_EXIT_VARIANTS = {
           transition,
         };
       case "medium":
-        // 横ドリフトはせず、カードを上向き (rotate 0) に保ったまま真上へ。
+        // 上辺は上向き固定 (rotate 0) のまま、わずかに右へオフセット。
         return {
-          x: 0,
+          x: [0, SWIPE_HOLD_DISTANCE * 0.02, SWIPE_OUT_DISTANCE * 0.025],
           y: [0, -SWIPE_HOLD_DISTANCE, -SWIPE_OUT_DISTANCE],
           rotate: 0,
           opacity,
@@ -101,9 +101,9 @@ const SWIPE_EXIT_VARIANTS = {
           transition,
         };
       case "practicing":
-        // 同上。横ドリフト無しでカードは上向きのまま真下へ。
+        // 同上。上辺は上向きのまま、わずかに左へオフセット。
         return {
-          x: 0,
+          x: [0, -SWIPE_HOLD_DISTANCE * 0.02, -SWIPE_OUT_DISTANCE * 0.025],
           y: [0, SWIPE_HOLD_DISTANCE, SWIPE_OUT_DISTANCE],
           rotate: 0,
           opacity,
