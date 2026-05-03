@@ -326,6 +326,7 @@ export type Database = {
           id: string
           key_shift: number | null
           logged_at: string
+          score: number | null
           song_id: string
           updated_at: string
           user_id: string
@@ -337,6 +338,7 @@ export type Database = {
           id?: string
           key_shift?: number | null
           logged_at?: string
+          score?: number | null
           song_id: string
           updated_at?: string
           user_id: string
@@ -348,6 +350,7 @@ export type Database = {
           id?: string
           key_shift?: number | null
           logged_at?: string
+          score?: number | null
           song_id?: string
           updated_at?: string
           user_id?: string

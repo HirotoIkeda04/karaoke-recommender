@@ -11,6 +11,7 @@ export interface SongLogInput {
   loggedAt: string;
   equipment: Equipment | null;
   keyShift: number | null;
+  score: number | null;
   body: string;
 }
 
@@ -26,8 +27,9 @@ function validate(input: SongLogInput): string | null {
   const hasContent =
     input.equipment !== null ||
     input.keyShift !== null ||
+    input.score !== null ||
     input.body.trim().length > 0;
-  if (!hasContent) return "機材・キー・本文のいずれかを入力してください";
+  if (!hasContent) return "機材・キー・点数・本文のいずれかを入力してください";
 
   if (
     input.keyShift !== null &&
@@ -36,6 +38,12 @@ function validate(input: SongLogInput): string | null {
       input.keyShift > 12)
   ) {
     return "キー調整は -12 〜 +12 の整数で指定してください";
+  }
+  if (
+    input.score !== null &&
+    (!Number.isFinite(input.score) || input.score < 0 || input.score > 100)
+  ) {
+    return "点数は 0 〜 100 で指定してください";
   }
   return null;
 }
@@ -56,6 +64,7 @@ export async function createSongLog(input: SongLogInput): Promise<SongLogResult>
     logged_at: input.loggedAt,
     equipment: input.equipment,
     key_shift: input.keyShift,
+    score: input.score,
     body: input.body.trim() ? input.body.trim() : null,
   });
 
@@ -87,6 +96,7 @@ export async function updateSongLog(
       logged_at: input.loggedAt,
       equipment: input.equipment,
       key_shift: input.keyShift,
+      score: input.score,
       body: input.body.trim() ? input.body.trim() : null,
     })
     .eq("id", input.id)

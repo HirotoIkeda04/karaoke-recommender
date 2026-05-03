@@ -15,6 +15,7 @@ export interface SongLog {
   logged_at: string;
   equipment: string | null;
   key_shift: number | null;
+  score: number | null;
   body: string | null;
 }
 
@@ -27,6 +28,7 @@ interface FormState {
   loggedAt: string;
   equipment: "" | Equipment;
   keyShift: string;
+  score: string;
   body: string;
 }
 
@@ -44,7 +46,13 @@ function todayIso(): string {
 }
 
 function emptyForm(): FormState {
-  return { loggedAt: todayIso(), equipment: "", keyShift: "", body: "" };
+  return {
+    loggedAt: todayIso(),
+    equipment: "",
+    keyShift: "",
+    score: "",
+    body: "",
+  };
 }
 
 function fromLog(log: SongLog): FormState {
@@ -52,6 +60,7 @@ function fromLog(log: SongLog): FormState {
     loggedAt: log.logged_at,
     equipment: (log.equipment as Equipment | null) ?? "",
     keyShift: log.key_shift !== null ? String(log.key_shift) : "",
+    score: log.score !== null ? String(log.score) : "",
     body: log.body ?? "",
   };
 }
@@ -66,13 +75,21 @@ function formatKeyShift(n: number): string {
   return `${n > 0 ? "+" : ""}${n}`;
 }
 
+function formatScore(n: number): string {
+  const fixed = n.toFixed(3);
+  return fixed.replace(/\.?0+$/, "") || "0";
+}
+
 function parseFormToInput(form: FormState) {
   const trimmedKey = form.keyShift.trim();
   const keyShift = trimmedKey === "" ? null : Number.parseInt(trimmedKey, 10);
+  const trimmedScore = form.score.trim();
+  const score = trimmedScore === "" ? null : Number.parseFloat(trimmedScore);
   return {
     loggedAt: form.loggedAt,
     equipment: form.equipment === "" ? null : form.equipment,
     keyShift: Number.isNaN(keyShift as number) ? null : keyShift,
+    score: score === null || Number.isNaN(score) ? null : score,
     body: form.body,
   };
 }
@@ -212,6 +229,11 @@ export function SongLogs({ songId, initialLogs }: SongLogsProps) {
                       {formatKeyShift(log.key_shift)}
                     </span>
                   ) : null}
+                  {log.score !== null ? (
+                    <span className="rounded-full bg-pink-100 px-2 py-0.5 font-mono font-semibold text-pink-700 dark:bg-pink-950/50 dark:text-pink-300">
+                      {formatScore(log.score)}点
+                    </span>
+                  ) : null}
                 </div>
                 <div className="flex items-center gap-1">
                   <button
@@ -290,7 +312,7 @@ function LogForm({
         onSubmit();
       }}
     >
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2">
         <label className="space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
           <span>記録日</span>
           <input
@@ -318,6 +340,21 @@ function LogForm({
             <option value="dam">DAM</option>
             <option value="joysound">JOYSOUND</option>
           </select>
+        </label>
+        <label className="space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
+          <span>点数</span>
+          <input
+            type="number"
+            inputMode="decimal"
+            min={0}
+            max={100}
+            step={0.001}
+            placeholder="—"
+            value={form.score}
+            onChange={(e) => onChange({ ...form, score: e.target.value })}
+            disabled={disabled}
+            className={`${inputCls} w-full font-mono`}
+          />
         </label>
         <label className="space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
           <span>キー調整</span>

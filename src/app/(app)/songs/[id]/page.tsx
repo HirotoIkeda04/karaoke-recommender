@@ -43,7 +43,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
       .maybeSingle(),
     supabase
       .from("song_logs")
-      .select("id, logged_at, equipment, key_shift, body")
+      .select("id, logged_at, equipment, key_shift, score, body")
       .eq("user_id", user.id)
       .eq("song_id", id)
       .order("logged_at", { ascending: false })
