@@ -4,6 +4,7 @@ import { Home, LibraryBig, Search, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { triggerHaptic } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
@@ -38,6 +39,7 @@ export function AppBottomNav() {
           // 検索タブを既に開いている時は遷移ではなく、検索 input を focus させる
           // (Spotify と同じ操作感: タブ再タップ = 検索開始)
           const onClick = (e: React.MouseEvent) => {
+            triggerHaptic();
             if (item.href === "/songs" && pathname === "/songs") {
               e.preventDefault();
               window.dispatchEvent(new CustomEvent("app:focus-search"));

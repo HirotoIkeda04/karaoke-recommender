@@ -22,20 +22,21 @@ import Link from "next/link";
 import { startTransition, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { triggerHaptic } from "@/lib/haptics";
 import { midiToKaraoke } from "@/lib/note";
 import type { Database } from "@/types/database";
 
-import { rateSong, unrateSong } from "./actions";
+import { markSkipped, rateSong, unrateSong } from "./actions";
 
 type Song = Database["public"]["Tables"]["songs"]["Row"];
 type Rating = Database["public"]["Enums"]["rating_type"];
 
 /**
  * 直前のアクション。「戻る」で取り消すために保持する。
- * - rating !== null: rateSong を実行済み → unrateSong で取り消し
- * - rating === null: スキップ(DB書き込みなし)→ queue に戻すだけ
+ * rating: 'easy'/'medium'/'practicing'/'hard' は通常評価、'skip' はスキップ。
+ * いずれも DB 行が存在するので、戻る時は unrateSong (= DELETE) で消す。
  */
-type LastAction = { song: Song; rating: Rating | null };
+type LastAction = { song: Song; rating: Rating };
 
 interface SwipeDeckProps {
   initialSongs: Song[];
@@ -120,13 +121,6 @@ const SWIPE_EXIT_VARIANTS = {
     }
   },
 };
-
-function triggerHaptic() {
-  if (typeof navigator === "undefined") return;
-  if (typeof navigator.vibrate !== "function") return;
-  // iOS Safari は Vibration API 非対応で何も起きない。Android のみ動作。
-  navigator.vibrate(15);
-}
 
 // Web Audio で「練習中」音 (Cmaj7 ハープ + 低域ドン + 高域シマー) を
 // ベースに、4 つの評価ボタンで和音 voicing と細部だけ変えて A/B 比較
@@ -287,12 +281,21 @@ export function SwipeDeck({
 
   const handleSkip = () => {
     if (!current) return;
+    triggerHaptic();
     setError(null);
+    const songId = current.id;
     const songSnapshot = current;
     setEnterFrom(null);
     setExitRating(null);
     setQueue((q) => q.slice(1));
-    setLastAction({ song: songSnapshot, rating: null });
+    setLastAction({ song: songSnapshot, rating: "skip" });
+    startTransition(async () => {
+      const result = await markSkipped(songId);
+      if (!result.ok) {
+        setError(result.error ?? "スキップの保存に失敗しました");
+        setLastAction(null);
+      }
+    });
   };
 
   const handleUndo = () => {
@@ -303,7 +306,6 @@ export function SwipeDeck({
     setEnterFrom(rating);
     setExitRating("instant");
     setQueue((q) => [song, ...q]);
-    if (rating === null) return;
     startTransition(async () => {
       const result = await unrateSong(song.id);
       if (!result.ok) {
