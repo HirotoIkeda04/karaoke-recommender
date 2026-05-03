@@ -312,8 +312,8 @@ function LogForm({
         onSubmit();
       }}
     >
-      <div className="grid grid-cols-2 gap-2">
-        <label className="space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
+      <div className="grid grid-cols-4 gap-2">
+        <label className="col-span-2 space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
           <span>記録日</span>
           <input
             type="date"
@@ -323,7 +323,8 @@ function LogForm({
             className={`${inputCls} w-full`}
           />
         </label>
-        <label className="space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
+        <div className="col-span-2" />
+        <label className="col-span-2 space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
           <span>機材</span>
           <select
             value={form.equipment}
