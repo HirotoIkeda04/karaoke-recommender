@@ -122,9 +122,9 @@ function triggerHaptic() {
   navigator.vibrate(15);
 }
 
-// Web Audio で短いクリック音を生成。アセット不要、iOS でも
-// ユーザー操作起点なら鳴る。AudioContext はタップ初回に遅延生成して
-// 使い回す（複数 new するとブラウザに上限がある）。
+// Web Audio で「ピコン」と聞こえる二音チャイムを生成。アセット不要、
+// iOS でもユーザー操作起点なら鳴る。AudioContext はタップ初回に遅延
+// 生成して使い回す（複数 new するとブラウザに上限がある）。
 let audioCtx: AudioContext | null = null;
 function triggerClickSound() {
   if (typeof window === "undefined") return;
@@ -138,17 +138,21 @@ function triggerClickSound() {
     if (audioCtx.state === "suspended") void audioCtx.resume();
     const ctx = audioCtx;
     const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "triangle";
-    osc.frequency.setValueAtTime(880, now);
-    osc.frequency.exponentialRampToValueAtTime(440, now + 0.08);
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.18, now + 0.005);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
-    osc.connect(gain).connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.12);
+    // ピ (G6 ≈ 1568Hz) → コン (C7 ≈ 2093Hz) で上行する。
+    const playTone = (freq: number, start: number, dur: number, peak: number) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, start);
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(peak, start + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + dur + 0.02);
+    };
+    playTone(1568, now, 0.09, 0.18);
+    playTone(2093, now + 0.07, 0.18, 0.2);
   } catch {
     // 音が出せなくても評価操作自体は止めない。
   }
