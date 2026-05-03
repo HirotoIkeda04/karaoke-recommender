@@ -94,7 +94,7 @@ const SWIPE_EXIT_VARIANTS = {
         // 真上に直進すると不自然なので右に軽くドリフト。x→rotate の
         // useTransform 経由でカードもわずかに傾く。
         return {
-          x: [0, SWIPE_HOLD_DISTANCE * 0.06, SWIPE_OUT_DISTANCE * 0.1],
+          x: [0, SWIPE_HOLD_DISTANCE * 0.03, SWIPE_OUT_DISTANCE * 0.04],
           y: [0, -SWIPE_HOLD_DISTANCE, -SWIPE_OUT_DISTANCE],
           opacity,
           zIndex,
@@ -103,7 +103,7 @@ const SWIPE_EXIT_VARIANTS = {
       case "practicing":
         // practicing は逆に左へドリフト。
         return {
-          x: [0, -SWIPE_HOLD_DISTANCE * 0.06, -SWIPE_OUT_DISTANCE * 0.1],
+          x: [0, -SWIPE_HOLD_DISTANCE * 0.03, -SWIPE_OUT_DISTANCE * 0.04],
           y: [0, SWIPE_HOLD_DISTANCE, SWIPE_OUT_DISTANCE],
           opacity,
           zIndex,
