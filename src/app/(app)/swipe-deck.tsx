@@ -122,10 +122,23 @@ function triggerHaptic() {
   navigator.vibrate(15);
 }
 
-// Web Audio で「ピコン」と聞こえる二音チャイムを生成。アセット不要、
-// iOS でもユーザー操作起点なら鳴る。AudioContext はタップ初回に遅延
-// 生成して使い回す（複数 new するとブラウザに上限がある）。
+// Web Audio でガラスが割れるような爽快感のある効果音を合成。
+// (1) 高域ホワイトノイズのバースト = 砕け散るシャラッ
+// (2) 高音域にバラついて出る複数のサイン部分音 = 破片のキラキラ
+// AudioContext はタップ初回に遅延生成して使い回す。
 let audioCtx: AudioContext | null = null;
+let noiseBuffer: AudioBuffer | null = null;
+function getNoiseBuffer(ctx: AudioContext) {
+  if (noiseBuffer && noiseBuffer.sampleRate === ctx.sampleRate) {
+    return noiseBuffer;
+  }
+  const len = Math.floor(ctx.sampleRate * 0.5);
+  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+  noiseBuffer = buf;
+  return buf;
+}
 function triggerClickSound() {
   if (typeof window === "undefined") return;
   const Ctor =
@@ -138,21 +151,41 @@ function triggerClickSound() {
     if (audioCtx.state === "suspended") void audioCtx.resume();
     const ctx = audioCtx;
     const now = ctx.currentTime;
-    // ピ (G6 ≈ 1568Hz) → コン (C7 ≈ 2093Hz) で上行する。
-    const playTone = (freq: number, start: number, dur: number, peak: number) => {
+
+    // (1) ハイパス通したノイズで「シャラッ」という破砕音を作る。
+    const noise = ctx.createBufferSource();
+    noise.buffer = getNoiseBuffer(ctx);
+    const hp = ctx.createBiquadFilter();
+    hp.type = "highpass";
+    hp.frequency.setValueAtTime(2500, now);
+    hp.frequency.exponentialRampToValueAtTime(5000, now + 0.25);
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.0001, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.35, now + 0.005);
+    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+    noise.connect(hp).connect(noiseGain).connect(ctx.destination);
+    noise.start(now);
+    noise.stop(now + 0.4);
+
+    // (2) 高音のサイン部分音を複数バラつかせて「キラキラ」を載せる。
+    const partials = [3200, 4400, 5800, 7200, 9000];
+    for (const base of partials) {
+      const delay = Math.random() * 0.04;
+      const dur = 0.18 + Math.random() * 0.15;
+      const start = now + delay;
       const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+      const g = ctx.createGain();
       osc.type = "sine";
-      osc.frequency.setValueAtTime(freq, start);
-      gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(peak, start + 0.008);
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
-      osc.connect(gain).connect(ctx.destination);
+      // ほんの少しピッチダウンして余韻を作る。
+      osc.frequency.setValueAtTime(base * (1 + (Math.random() - 0.5) * 0.04), start);
+      osc.frequency.exponentialRampToValueAtTime(base * 0.85, start + dur);
+      g.gain.setValueAtTime(0.0001, start);
+      g.gain.exponentialRampToValueAtTime(0.08, start + 0.005);
+      g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+      osc.connect(g).connect(ctx.destination);
       osc.start(start);
       osc.stop(start + dur + 0.02);
-    };
-    playTone(1568, now, 0.09, 0.18);
-    playTone(2093, now + 0.07, 0.18, 0.2);
+    }
   } catch {
     // 音が出せなくても評価操作自体は止めない。
   }
