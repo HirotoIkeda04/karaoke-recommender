@@ -13,8 +13,10 @@ import { type EvaluationRow } from "../../library/sortable-list";
 export const dynamic = "force-dynamic";
 
 type Rating = Database["public"]["Enums"]["rating_type"];
+// プロフィール画面に表示するのは positive/negative の 4 段階のみ。skip は除外。
+type DisplayRating = Exclude<Rating, "skip">;
 
-const VALID_RATINGS: ReadonlySet<Rating> = new Set([
+const VALID_RATINGS: ReadonlySet<DisplayRating> = new Set([
   "easy",
   "practicing",
   "medium",
@@ -60,8 +62,8 @@ export default async function FriendLibraryPage({
 }: PageProps) {
   const { userId: friendId } = await params;
   const { tab } = await searchParams;
-  const requestedTab = tab as Rating | undefined;
-  const initialTab: Rating =
+  const requestedTab = tab as DisplayRating | undefined;
+  const initialTab: DisplayRating =
     requestedTab && VALID_RATINGS.has(requestedTab) ? requestedTab : "easy";
 
   const supabase = await createClient();
@@ -123,14 +125,14 @@ export default async function FriendLibraryPage({
   }
 
   // RPC 行 → EvaluationRow へ整形
-  const evaluationsByRating: Record<Rating, EvaluationRow[]> = {
+  const evaluationsByRating: Record<DisplayRating, EvaluationRow[]> = {
     easy: [],
     practicing: [],
     medium: [],
     hard: [],
   };
   for (const row of (evaluationsRes.data ?? []) as FriendEvaluationRow[]) {
-    if (!VALID_RATINGS.has(row.rating)) continue;
+    if (row.rating === "skip" || !VALID_RATINGS.has(row.rating)) continue;
     evaluationsByRating[row.rating].push({
       rating: row.rating,
       updated_at: row.updated_at,

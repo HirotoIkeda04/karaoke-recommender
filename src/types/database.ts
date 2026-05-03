@@ -785,7 +785,7 @@ export type Database = {
       }
     }
     Enums: {
-      rating_type: "hard" | "medium" | "easy" | "practicing"
+      rating_type: "hard" | "medium" | "easy" | "practicing" | "skip"
       song_match_status:
         | "pending"
         | "matched"
@@ -919,7 +919,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      rating_type: ["hard", "medium", "easy", "practicing"],
+      rating_type: ["hard", "medium", "easy", "practicing", "skip"],
       song_match_status: [
         "pending",
         "matched",

@@ -12,8 +12,10 @@ import { type EvaluationRow } from "./sortable-list";
 export const dynamic = "force-dynamic";
 
 type Rating = Database["public"]["Enums"]["rating_type"];
+// library に表示するのは positive/negative の 4 段階のみ。skip は除外。
+type DisplayRating = Exclude<Rating, "skip">;
 
-const VALID_RATINGS: ReadonlySet<Rating> = new Set([
+const VALID_RATINGS: ReadonlySet<DisplayRating> = new Set([
   "easy",
   "practicing",
   "medium",
@@ -30,8 +32,8 @@ interface LibraryPageProps {
 
 export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const params = await searchParams;
-  const requestedTab = params.tab as Rating | undefined;
-  const initialTab: Rating =
+  const requestedTab = params.tab as DisplayRating | undefined;
+  const initialTab: DisplayRating =
     requestedTab && VALID_RATINGS.has(requestedTab) ? requestedTab : "easy";
 
   const supabase = await createClient();
@@ -99,14 +101,14 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const { data: rows, error } = evalQueryRes;
 
   // 全評価を rating ごとに振り分け (元の order を保持)
-  const evaluationsByRating: Record<Rating, EvaluationRow[]> = {
+  const evaluationsByRating: Record<DisplayRating, EvaluationRow[]> = {
     easy: [],
     practicing: [],
     medium: [],
     hard: [],
   };
   for (const row of (rows ?? []) as unknown as EvaluationRow[]) {
-    if (VALID_RATINGS.has(row.rating)) {
+    if (row.rating !== "skip" && VALID_RATINGS.has(row.rating)) {
       evaluationsByRating[row.rating].push(row);
     }
   }
@@ -142,8 +144,10 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
         displayName={displayName}
         friendCount={friendCount}
         ratedSongCount={
-          (rows ?? []).filter((r) => VALID_RATINGS.has(r.rating))
-            .length
+          (rows ?? []).filter(
+            (r) =>
+              r.rating !== "skip" && VALID_RATINGS.has(r.rating),
+          ).length
         }
         voiceEstimate={voiceEstimate}
         eraBuckets={eraBuckets}

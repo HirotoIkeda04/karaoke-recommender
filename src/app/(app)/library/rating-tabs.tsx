@@ -22,8 +22,10 @@ import {
 } from "./sortable-list";
 
 type Rating = Database["public"]["Enums"]["rating_type"];
+// library に表示するのは positive/negative の 4 段階のみ。skip は除外。
+type DisplayRating = Exclude<Rating, "skip">;
 
-const TABS: ReadonlyArray<{ value: Rating; label: string; Icon: typeof X }> = [
+const TABS: ReadonlyArray<{ value: DisplayRating; label: string; Icon: typeof X }> = [
   { value: "easy", label: "得意", Icon: Check },
   { value: "practicing", label: "練習中", Icon: Dumbbell },
   { value: "medium", label: "普通", Icon: Minus },
@@ -36,9 +38,9 @@ const SWIPE_THRESHOLD_PX = 40;
 const HORIZONTAL_INTENT_PX = 8;
 
 interface Props {
-  evaluationsByRating: Record<Rating, EvaluationRow[]>;
+  evaluationsByRating: Record<DisplayRating, EvaluationRow[]>;
   knownSongIds: string[];
-  initialTab: Rating;
+  initialTab: DisplayRating;
   /** false にすると曲行を曲詳細にリンクしない (フレンド閲覧モード) */
   linkable?: boolean;
 }
@@ -49,7 +51,7 @@ export function RatingTabs({
   initialTab,
   linkable = true,
 }: Props) {
-  const [activeTab, setActiveTab] = useState<Rating>(initialTab);
+  const [activeTab, setActiveTab] = useState<DisplayRating>(initialTab);
   const [sortKey, setSortKey] = useState<SortKey>("updated");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [sortOpen, setSortOpen] = useState(false);
