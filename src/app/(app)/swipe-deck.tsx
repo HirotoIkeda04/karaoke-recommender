@@ -756,13 +756,13 @@ function SwipeOverlay({ x, y, opacity }: SwipeOverlayProps) {
       </motion.div>
       <motion.div
         style={{ opacity: mediumOpacity }}
-        className="absolute left-1/2 top-4 -translate-x-1/2 rounded-lg border-4 border-yellow-400 px-3 py-1 text-lg font-bold text-yellow-600"
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-lg border-4 border-yellow-400 px-3 py-1 text-lg font-bold text-yellow-600"
       >
         普通
       </motion.div>
       <motion.div
         style={{ opacity: practicingOpacity }}
-        className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-lg border-4 border-purple-400 px-3 py-1 text-lg font-bold text-purple-600"
+        className="absolute left-1/2 top-4 -translate-x-1/2 rounded-lg border-4 border-purple-400 px-3 py-1 text-lg font-bold text-purple-600"
       >
         練習中
       </motion.div>
