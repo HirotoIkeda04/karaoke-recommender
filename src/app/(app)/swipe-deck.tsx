@@ -122,6 +122,38 @@ function triggerHaptic() {
   navigator.vibrate(15);
 }
 
+// Web Audio で短いクリック音を生成。アセット不要、iOS でも
+// ユーザー操作起点なら鳴る。AudioContext はタップ初回に遅延生成して
+// 使い回す（複数 new するとブラウザに上限がある）。
+let audioCtx: AudioContext | null = null;
+function triggerClickSound() {
+  if (typeof window === "undefined") return;
+  const Ctor =
+    window.AudioContext ??
+    (window as unknown as { webkitAudioContext?: typeof AudioContext })
+      .webkitAudioContext;
+  if (!Ctor) return;
+  try {
+    if (!audioCtx) audioCtx = new Ctor();
+    if (audioCtx.state === "suspended") void audioCtx.resume();
+    const ctx = audioCtx;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(880, now);
+    osc.frequency.exponentialRampToValueAtTime(440, now + 0.08);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.18, now + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.12);
+  } catch {
+    // 音が出せなくても評価操作自体は止めない。
+  }
+}
+
 const RATINGS: ReadonlyArray<{
   value: Rating;
   label: string;
@@ -179,6 +211,7 @@ export function SwipeDeck({
   const handleRate = (rating: Rating) => {
     if (!current) return;
     triggerHaptic();
+    triggerClickSound();
     setError(null);
     const songId = current.id;
     const songSnapshot = current;
