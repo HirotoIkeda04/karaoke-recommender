@@ -179,19 +179,8 @@ function triggerClickSound(rating: Rating) {
     const ctx = audioCtx;
     const now = ctx.currentTime;
 
-    // 共通: 低域ドン + 高域デチューンシマー (ガラス音は廃止)。
+    // 共通: 低域ドン + 上にハープアルペジオのみ (高域シマー / ガラス音は廃止)。
     playLowThump(ctx, now, 260, 130, 0.18, 0.28);
-    const playShimmer = (detunes: ReadonlyArray<number>) => {
-      for (const base of [4500, 6500, 8500, 11000]) {
-        for (const d of detunes) {
-          const delay = Math.random() * 0.06;
-          const dur = 0.28 + Math.random() * 0.18;
-          playPartial(ctx, now + delay, base * d, dur, 0.05, 0.92);
-        }
-      }
-    };
-
-    // 違いは上に乗せるハープアルペジオの voicing / スタッガー / シマー量。
     const harp = (notes: ReadonlyArray<number>, stagger: number, peak = 0.085) => {
       notes.forEach((f, i) => {
         playPartial(ctx, now + i * stagger, f, 0.32 + i * 0.03, peak, 1);
@@ -199,21 +188,17 @@ function triggerClickSound(rating: Rating) {
     };
 
     if (rating === "hard") {
-      // 1 オクターブ下げた Cmaj7 (C5/E5/G5/B5)。同じ手触りでより温かい響き。
+      // 1 オクターブ下げた Cmaj7 (C5/E5/G5/B5)。温かい響き。
       harp([523.25, 659.25, 783.99, 987.77], 0.045);
-      playShimmer([0.992, 1.01]);
     } else if (rating === "medium") {
-      // 練習中と同じ Cmaj7 (C6/E6/G6/B6) を、スタッガー詰めて素早く決める。
+      // Cmaj7 (C6 系) スタッガー詰め (0.025s) で素早く決まる。
       harp([1046.5, 1318.5, 1568.0, 1975.53], 0.025);
-      playShimmer([0.992, 1.01]);
     } else if (rating === "easy") {
-      // Cmaj9 (C6/E6/G6/B6/D7)。9 度を載せて一段華やかに。
+      // Cmaj9 (D7 追加)。9 度を載せて一段華やか。
       harp([1046.5, 1318.5, 1568.0, 1975.53, 2349.32], 0.045, 0.08);
-      playShimmer([0.992, 1.01]);
     } else {
-      // practicing (基準): Cmaj7 (C6/E6/G6/B6) スタッガー長め + シマー三重ね。
+      // practicing (基準): Cmaj7 (C6/E6/G6/B6) スタッガー長め。
       harp([1046.5, 1318.5, 1568.0, 1975.53], 0.045);
-      playShimmer([0.988, 1.0, 1.012]);
     }
   } catch {
     // 音が出せなくても評価操作自体は止めない。
