@@ -256,6 +256,15 @@ export function SwipeDeck({
   const [enterFrom, setEnterFrom] = useState<Rating | null>(null);
   const knownSet = useMemo(() => new Set(knownSongIds), [knownSongIds]);
 
+  // 評価タブにいる間は body スクロールをロック (カード操作中の誤スクロール防止)。
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
   const current = queue[0];
   const upcoming = queue.slice(1, 3);
 
