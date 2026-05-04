@@ -170,7 +170,7 @@ export function SongLogs({ songId, initialLogs }: SongLogsProps) {
 
   return (
     <section className="space-y-3">
-      <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+      <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
         歌った記録
       </h2>
 

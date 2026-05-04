@@ -105,7 +105,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         </div>
       </div>
 
-      <div className="text-center">
+      <div>
         <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
           {song.title}
         </h1>
@@ -126,36 +126,48 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
       </div>
 
       {song.spotify_track_id ? (
-        <Link
-          href={`https://open.spotify.com/track/${song.spotify_track_id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mx-auto flex w-fit items-center gap-2 rounded-full bg-[#1DB954] px-7 py-2.5 text-sm font-semibold text-white shadow-md transition hover:scale-105 hover:bg-[#1ed760]"
-        >
-          <Play className="size-4 fill-current" aria-hidden />
-          Spotify で聴く
-        </Link>
+        <div className="flex items-center justify-end">
+          <Link
+            href={`https://open.spotify.com/track/${song.spotify_track_id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Spotify で聴く"
+            className="grid size-14 place-items-center rounded-full bg-[#1DB954] text-black shadow-lg transition hover:scale-105 hover:bg-[#1ed760]"
+          >
+            <Play className="ml-0.5 size-6 fill-current" aria-hidden />
+          </Link>
+        </div>
       ) : null}
 
-      <dl className="divide-y divide-zinc-200 rounded-xl bg-zinc-100 px-4 dark:divide-zinc-700/60 dark:bg-zinc-800/60">
-        <div className="flex items-baseline justify-between py-3 text-sm">
-          <dt className="text-zinc-600 dark:text-zinc-400">地声</dt>
-          <dd className="font-mono">
-            {song.range_low_midi == null && song.range_high_midi == null
-              ? "—"
-              : `${midiToKaraoke(song.range_low_midi)} — ${midiToKaraoke(song.range_high_midi)}`}
-          </dd>
-        </div>
-        <div className="flex items-baseline justify-between py-3 text-sm">
-          <dt className="text-zinc-600 dark:text-zinc-400">裏声</dt>
-          <dd className="font-mono">{midiToKaraoke(song.falsetto_max_midi)}</dd>
-        </div>
-      </dl>
+      <section className="space-y-2">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+          音域
+        </h2>
+        <dl className="divide-y divide-zinc-200/70 text-sm dark:divide-white/10">
+          <div className="flex items-baseline justify-between py-3">
+            <dt className="text-zinc-600 dark:text-zinc-400">地声</dt>
+            <dd className="font-mono">
+              {song.range_low_midi == null && song.range_high_midi == null
+                ? "—"
+                : `${midiToKaraoke(song.range_low_midi)} — ${midiToKaraoke(song.range_high_midi)}`}
+            </dd>
+          </div>
+          <div className="flex items-baseline justify-between py-3">
+            <dt className="text-zinc-600 dark:text-zinc-400">裏声</dt>
+            <dd className="font-mono">{midiToKaraoke(song.falsetto_max_midi)}</dd>
+          </div>
+        </dl>
+      </section>
 
-      <RatingControls
-        songId={song.id}
-        initialRating={evaluation?.rating ?? null}
-      />
+      <section className="space-y-2">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+          評価
+        </h2>
+        <RatingControls
+          songId={song.id}
+          initialRating={evaluation?.rating ?? null}
+        />
+      </section>
 
       <SongLogs songId={song.id} initialLogs={logs} />
       </div>
