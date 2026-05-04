@@ -117,7 +117,7 @@ export function RatingControls({ songId, initialRating }: RatingControlsProps) {
         onClick={() => setIsOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
-        className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition disabled:opacity-50 ${
+        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition disabled:opacity-50 ${
           activeRating
             ? activeRating.subtle
             : "border border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
@@ -125,7 +125,7 @@ export function RatingControls({ songId, initialRating }: RatingControlsProps) {
       >
         {activeRating ? (
           <>
-            <activeRating.Icon className="size-4" aria-hidden />
+            <activeRating.Icon className="size-3.5" aria-hidden />
             {activeRating.label}
           </>
         ) : (
