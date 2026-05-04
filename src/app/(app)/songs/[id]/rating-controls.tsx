@@ -38,12 +38,22 @@ export function RatingControls({ songId, initialRating }: RatingControlsProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     if (!toast) return;
     const timer = setTimeout(() => setToast(null), 2200);
     return () => clearTimeout(timer);
   }, [toast]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen]);
 
   const persist = (nextRating: Rating | null, message: string) => {
     setError(null);
@@ -59,43 +69,111 @@ export function RatingControls({ songId, initialRating }: RatingControlsProps) {
     });
   };
 
-  const handleRate = (next: Rating) => {
-    if (rating === next) {
-      setRating(null);
-      persist(null, "評価を取り消しました");
-    } else {
-      setRating(next);
-      persist(next, `評価を「${RATING_LABELS[next]}」に変更しました`);
-    }
+  const handleSelect = (next: Rating) => {
+    setIsOpen(false);
+    if (rating === next) return;
+    setRating(next);
+    persist(next, `評価を「${RATING_LABELS[next]}」に変更しました`);
   };
 
+  const handleClear = () => {
+    setIsOpen(false);
+    setRating(null);
+    persist(null, "評価を取り消しました");
+  };
+
+  const activeRating = RATINGS.find((r) => r.value === rating);
+
   return (
-    <div className="relative space-y-3">
-      <div className="flex gap-1 rounded-full bg-zinc-200/80 p-1 dark:bg-zinc-800/80">
-        {RATINGS.map((r) => {
-          const active = rating === r.value;
-          return (
-            <button
-              key={r.value}
-              type="button"
-              disabled={isPending}
-              onClick={() => handleRate(r.value)}
-              aria-pressed={active}
-              className={`flex flex-1 items-center justify-center gap-1 rounded-full px-2 py-2 text-xs font-medium transition disabled:opacity-50 ${
-                active
-                  ? `${r.color} shadow-sm`
-                  : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-              }`}
-            >
-              <r.Icon className="size-3.5" aria-hidden />
-              {r.label}
-            </button>
-          );
-        })}
-      </div>
+    <div className="relative">
+      <button
+        type="button"
+        disabled={isPending}
+        onClick={() => setIsOpen(true)}
+        aria-haspopup="dialog"
+        aria-expanded={isOpen}
+        className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition disabled:opacity-50 ${
+          activeRating
+            ? `${activeRating.color} shadow-sm`
+            : "border border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+        }`}
+      >
+        {activeRating ? (
+          <>
+            <activeRating.Icon className="size-4" aria-hidden />
+            {activeRating.label}
+          </>
+        ) : (
+          "評価を追加"
+        )}
+      </button>
 
       {error ? (
-        <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
+        <p className="mt-2 text-xs text-red-600 dark:text-red-400">{error}</p>
+      ) : null}
+
+      {isOpen ? (
+        <div
+          className="fixed inset-0 z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-label="評価を選択"
+        >
+          <button
+            type="button"
+            aria-label="閉じる"
+            onClick={() => setIsOpen(false)}
+            className="absolute inset-0 animate-in fade-in bg-black/60"
+          />
+          <div className="absolute inset-x-0 bottom-0 animate-in slide-in-from-bottom rounded-t-3xl bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl dark:bg-zinc-900">
+            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+            <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+              評価を選択
+            </h3>
+            <ul className="space-y-1">
+              {RATINGS.map((r) => {
+                const active = rating === r.value;
+                return (
+                  <li key={r.value}>
+                    <button
+                      type="button"
+                      onClick={() => handleSelect(r.value)}
+                      disabled={isPending}
+                      aria-pressed={active}
+                      className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition disabled:opacity-50 ${
+                        active
+                          ? "bg-zinc-100 dark:bg-zinc-800"
+                          : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                      }`}
+                    >
+                      <span
+                        className={`grid size-8 place-items-center rounded-full ${r.color}`}
+                      >
+                        <r.Icon className="size-4" aria-hidden />
+                      </span>
+                      <span className="flex-1 text-left">{r.label}</span>
+                    </button>
+                  </li>
+                );
+              })}
+              {rating ? (
+                <li className="mt-2 border-t border-zinc-200 pt-2 dark:border-zinc-800">
+                  <button
+                    type="button"
+                    onClick={handleClear}
+                    disabled={isPending}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/30"
+                  >
+                    <span className="grid size-8 place-items-center rounded-full bg-red-100 text-red-600 dark:bg-red-950/50 dark:text-red-400">
+                      <X className="size-4" aria-hidden />
+                    </span>
+                    <span className="flex-1 text-left">評価を取り消す</span>
+                  </button>
+                </li>
+              ) : null}
+            </ul>
+          </div>
+        </div>
       ) : null}
 
       {toast ? (
