@@ -397,7 +397,7 @@ function LogForm({
         <button
           type="submit"
           disabled={disabled}
-          className="rounded-lg bg-pink-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-pink-600 disabled:opacity-50"
+          className="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
         >
           {submitLabel}
         </button>

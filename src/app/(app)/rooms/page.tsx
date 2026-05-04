@@ -115,7 +115,7 @@ function FriendRoomsSection({ rooms }: { rooms: FriendRoom[] }) {
                 ) : (
                   <Link
                     href={`/r/${r.qr_token}`}
-                    className="shrink-0 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                    className="shrink-0 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90"
                   >
                     参加
                   </Link>
