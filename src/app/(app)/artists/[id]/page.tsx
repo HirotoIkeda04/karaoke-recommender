@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { BackButton } from "@/components/back-button";
 import { SongCard } from "@/components/song-card";
 import { JacketImage } from "@/components/ui/jacket-image";
+import { PopularList } from "./popular-list";
 import { GENRE_LABELS, type GenreCode } from "@/lib/genres";
 import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
 import { createClient } from "@/lib/supabase/server";
@@ -94,12 +95,13 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
   // 人気の楽曲: fame_score を主、cert_score (RIAJ 認定) を null フォールバックとして
   // max() で合成。fame パイプラインが追いついていない曲でも、認定されている定番曲は
   // 拾えるようにする (例: 夜に駆ける は cert=5 だが fame は cache 同期遅延で null)。
+  // 上位 10 件まで保持し、UI 側で 5 件 + もっと見る に展開する。
   const popularityScore = (s: Song) =>
     Math.max(s.fame_score ?? 0, s.cert_score ?? 0);
   const popular = songs
     .filter((s) => popularityScore(s) > 0)
     .sort((a, b) => popularityScore(b) - popularityScore(a))
-    .slice(0, 5);
+    .slice(0, 10);
 
   // 全楽曲: 発売年 desc → タイトル asc
   const all = [...songs].sort((a, b) => {
@@ -248,22 +250,11 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
             <h2 className="mb-2 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
               人気の楽曲
             </h2>
-            <ul>
-              {popular.map((s, idx) => (
-                <li key={s.id} className="flex items-center">
-                  <span className="w-4 shrink-0 text-xs tabular-nums text-zinc-600 dark:text-zinc-100">
-                    {idx + 1}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <SongCard
-                      song={s}
-                      rating={ratings[s.id] ?? null}
-                      isKnown={knownIds.has(s.id)}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <PopularList
+              songs={popular}
+              ratings={ratings}
+              knownIds={[...knownIds]}
+            />
           </section>
         ) : null}
 
