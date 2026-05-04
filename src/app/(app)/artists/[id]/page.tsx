@@ -24,6 +24,7 @@ type Song = Pick<
   | "image_url_medium"
   | "image_url_large"
   | "fame_score"
+  | "cert_score"
 >;
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -51,7 +52,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
     supabase
       .from("songs")
       .select(
-        "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, image_url_large, fame_score",
+        "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, image_url_large, fame_score, cert_score",
       )
       .eq("artist_id", id),
     getUserKnownSongIds(),
@@ -90,10 +91,14 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
   const heroImage =
     heroSong?.image_url_large ?? heroSong?.image_url_medium ?? null;
 
-  // 人気の楽曲: fame_score 降順 Top 5
+  // 人気の楽曲: fame_score を主、cert_score (RIAJ 認定) を null フォールバックとして
+  // max() で合成。fame パイプラインが追いついていない曲でも、認定されている定番曲は
+  // 拾えるようにする (例: 夜に駆ける は cert=5 だが fame は cache 同期遅延で null)。
+  const popularityScore = (s: Song) =>
+    Math.max(s.fame_score ?? 0, s.cert_score ?? 0);
   const popular = songs
-    .filter((s) => s.fame_score !== null)
-    .sort((a, b) => (b.fame_score ?? 0) - (a.fame_score ?? 0))
+    .filter((s) => popularityScore(s) > 0)
+    .sort((a, b) => popularityScore(b) - popularityScore(a))
     .slice(0, 5);
 
   // 全楽曲: 発売年 desc → タイトル asc
