@@ -83,14 +83,14 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-/* Spotify-inspired dark palette + 紫プライマリー
+/* Spotify-inspired dark palette + 白プライマリー
  *   background  #121212  -> oklch(0.18 0 0)
  *   card        #181818  -> oklch(0.21 0 0)
  *   elevated    #282828  -> oklch(0.30 0 0)
  *   text        #FFFFFF  -> oklch(1 0 0)
  *   muted text  #B3B3B3  -> oklch(0.76 0 0)
- *   primary     #A855F7  -> oklch(0.62 0.24 295)
- *   primary hi  #C084FC  -> oklch(0.72 0.20 295)
+ *   primary     #FFFFFF  -> oklch(1 0 0)        (白ボタン)
+ *   primary fg  #121212  -> oklch(0.18 0 0)     (白の上の文字)
  */
 .dark {
   --background: oklch(0.18 0 0);
@@ -99,8 +99,8 @@
   --card-foreground: oklch(1 0 0);
   --popover: oklch(0.24 0 0);
   --popover-foreground: oklch(1 0 0);
-  --primary: oklch(0.62 0.24 295);
-  --primary-foreground: oklch(1 0 0);
+  --primary: oklch(1 0 0); /* white */
+  --primary-foreground: oklch(0.18 0 0);
   --secondary: oklch(0.30 0 0);
   --secondary-foreground: oklch(1 0 0);
   --muted: oklch(0.24 0 0);
