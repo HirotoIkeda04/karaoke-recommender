@@ -66,9 +66,12 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
 
   return (
     <div className="mx-auto max-w-md space-y-5 px-4 py-4">
-      <div className="flex items-start gap-3">
-        <BackButton fallbackHref="/songs" />
-        <div className="relative aspect-square flex-1 overflow-hidden rounded-2xl bg-zinc-200 dark:bg-zinc-800">
+      <div className="relative">
+        <BackButton
+          fallbackHref="/songs"
+          className="absolute left-0 top-1 z-10 !ml-0"
+        />
+        <div className="relative mx-auto aspect-square w-3/4 max-w-[18rem] overflow-hidden rounded-2xl bg-zinc-200 dark:bg-zinc-800">
           {image ? (
             <JacketImage
               src={image}
