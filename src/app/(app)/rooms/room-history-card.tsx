@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronRight, Star } from "lucide-react";
 
 import { resolveIconColor } from "@/lib/icon-color";
+import { RoomDateLabel } from "./room-date-label";
 
 export interface HistoryCardParticipant {
   userId: string | null;
@@ -20,8 +21,6 @@ export interface HistoryCardProps {
   participants: HistoryCardParticipant[];
 }
 
-const WEEKDAYS_JA = ["日", "月", "火", "水", "木", "金", "土"];
-
 function firstGrapheme(name: string): string {
   if (!name) return "?";
   if (typeof Intl !== "undefined" && "Segmenter" in Intl) {
@@ -30,28 +29,6 @@ function firstGrapheme(name: string): string {
     if (first?.segment) return first.segment.toUpperCase();
   }
   return name.charAt(0).toUpperCase();
-}
-
-function formatRoomDate(date: Date): string {
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
-  const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-
-  const time = `${date.getHours().toString().padStart(2, "0")}:${date
-    .getMinutes()
-    .toString()
-    .padStart(2, "0")}`;
-
-  if (day.getTime() === today.getTime()) return `今日 ${time}`;
-  if (day.getTime() === yesterday.getTime()) return `昨日 ${time}`;
-
-  const wd = WEEKDAYS_JA[date.getDay()];
-  const md = `${date.getMonth() + 1}/${date.getDate()}`;
-  if (date.getFullYear() === now.getFullYear()) {
-    return `${md} (${wd}) ${time}`;
-  }
-  return `${date.getFullYear()}/${md} (${wd}) ${time}`;
 }
 
 function AvatarStack({
@@ -99,8 +76,6 @@ export function RoomHistoryCard({
   participantCount,
   participants,
 }: HistoryCardProps) {
-  const dateLabel = formatRoomDate(new Date(createdAt));
-
   return (
     <Link
       href={`/rooms/${roomId}`}
@@ -129,7 +104,7 @@ export function RoomHistoryCard({
               />
             ) : null}
             <p className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">
-              {dateLabel}
+              <RoomDateLabel createdAt={createdAt} />
             </p>
           </div>
           <p className="text-xs text-zinc-500 dark:text-zinc-500">
