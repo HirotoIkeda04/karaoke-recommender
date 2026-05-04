@@ -65,12 +65,28 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
   const image = song.image_url_large ?? song.image_url_medium;
 
   return (
-    <div className="mx-auto max-w-md space-y-5 px-4 py-4">
-      <div className="relative">
-        <BackButton
-          fallbackHref="/songs"
-          className="absolute left-0 -top-2 z-10 !ml-0"
-        />
+    <div className="relative">
+      {image ? (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[28rem] overflow-hidden"
+        >
+          <div
+            className="absolute inset-0 scale-125 bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${image})`,
+              filter: "blur(64px) saturate(1.3)",
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/60 to-background" />
+        </div>
+      ) : null}
+      <div className="relative mx-auto max-w-md space-y-5 px-4 py-4">
+        <div className="relative">
+          <BackButton
+            fallbackHref="/songs"
+            className="absolute left-0 -top-2 z-10 !ml-0"
+          />
         <div className="relative mx-auto mt-2 aspect-square w-3/5 max-w-[14rem] overflow-hidden rounded-sm bg-zinc-200 dark:bg-zinc-800">
           {image ? (
             <JacketImage
@@ -136,6 +152,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
           Spotify で聴く
         </Link>
       ) : null}
+      </div>
     </div>
   );
 }
