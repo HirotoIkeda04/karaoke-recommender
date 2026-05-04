@@ -122,7 +122,6 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
               song.artist
             )}
             {song.release_year ? ` · ${song.release_year}` : ""}
-            {song.duration_ms ? ` · ${formatDuration(song.duration_ms)}` : ""}
           </p>
         </div>
 
@@ -141,9 +140,9 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
 
       <section className="space-y-2">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-          音域
+          楽曲情報
         </h2>
-        <dl className="divide-y divide-zinc-200/70 text-sm dark:divide-white/10">
+        <dl className="divide-y divide-zinc-200 rounded-xl bg-zinc-100 px-4 text-sm dark:divide-zinc-700/60 dark:bg-zinc-800/60">
           <div className="flex items-baseline justify-between py-3">
             <dt className="text-zinc-600 dark:text-zinc-400">地声</dt>
             <dd className="font-mono">
@@ -155,6 +154,10 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
           <div className="flex items-baseline justify-between py-3">
             <dt className="text-zinc-600 dark:text-zinc-400">裏声</dt>
             <dd className="font-mono">{midiToKaraoke(song.falsetto_max_midi)}</dd>
+          </div>
+          <div className="flex items-baseline justify-between py-3">
+            <dt className="text-zinc-600 dark:text-zinc-400">長さ</dt>
+            <dd className="font-mono">{formatDuration(song.duration_ms)}</dd>
           </div>
         </dl>
       </section>
