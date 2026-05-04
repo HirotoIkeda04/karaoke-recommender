@@ -130,9 +130,9 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Spotify で聴く"
-            className="grid size-12 shrink-0 place-items-center rounded-full bg-white text-black shadow-lg transition hover:scale-105 hover:bg-zinc-100"
+            className="grid size-10 shrink-0 place-items-center rounded-full bg-white text-black shadow-lg transition hover:scale-105 hover:bg-zinc-100"
           >
-            <Play className="ml-0.5 size-5 fill-current" aria-hidden />
+            <Play className="ml-0.5 size-4 fill-current" aria-hidden />
           </Link>
         ) : null}
       </div>
