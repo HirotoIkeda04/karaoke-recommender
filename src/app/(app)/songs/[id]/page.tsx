@@ -105,6 +105,24 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         </div>
       </div>
 
+      <div className="flex items-center justify-center gap-4">
+        <RatingControls
+          songId={song.id}
+          initialRating={evaluation?.rating ?? null}
+        />
+        {song.spotify_track_id ? (
+          <Link
+            href={`https://open.spotify.com/track/${song.spotify_track_id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Spotify で聴く"
+            className="grid size-10 shrink-0 place-items-center rounded-full bg-white text-black shadow-lg transition hover:scale-105 hover:bg-zinc-100"
+          >
+            <Play className="ml-0.5 size-4 fill-current" aria-hidden />
+          </Link>
+        ) : null}
+      </div>
+
       <div className="min-w-0">
         <h1 className="truncate text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
           {song.title}
@@ -122,24 +140,6 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
           )}
           {song.release_year ? ` · ${song.release_year}` : ""}
         </p>
-      </div>
-
-      <div className="flex items-center justify-center gap-4">
-        <RatingControls
-          songId={song.id}
-          initialRating={evaluation?.rating ?? null}
-        />
-        {song.spotify_track_id ? (
-          <Link
-            href={`https://open.spotify.com/track/${song.spotify_track_id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Spotify で聴く"
-            className="grid size-10 shrink-0 place-items-center rounded-full bg-white text-black shadow-lg transition hover:scale-105 hover:bg-zinc-100"
-          >
-            <Play className="ml-0.5 size-4 fill-current" aria-hidden />
-          </Link>
-        ) : null}
       </div>
 
       <section className="space-y-2">
