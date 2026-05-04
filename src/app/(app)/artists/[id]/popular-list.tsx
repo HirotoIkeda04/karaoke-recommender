@@ -27,38 +27,52 @@ interface Props {
   knownIds: string[];
 }
 
+// Spotify 風の覗き見:
+//   折りたたみ時は 6 番目 (idx=5) を mask gradient でフェードさせ、
+//   「もっと見る」のヒントにする。展開時はマスクを外して全件表示。
+const PEEK_INDEX = 5;
+const PEEK_MASK =
+  "[mask-image:linear-gradient(to_bottom,black_10%,transparent)] [-webkit-mask-image:linear-gradient(to_bottom,black_10%,transparent)]";
+
 export function PopularList({ songs, ratings, knownIds }: Props) {
   const [expanded, setExpanded] = useState(false);
   const knownSet = useMemo(() => new Set(knownIds), [knownIds]);
-  const visible = expanded ? songs : songs.slice(0, 5);
   const hasMore = songs.length > 5;
 
   return (
     <>
       <ul>
-        {visible.map((s, idx) => (
-          <li key={s.id} className="flex items-center">
-            <span className="w-4 shrink-0 text-xs tabular-nums text-zinc-600 dark:text-zinc-100">
-              {idx + 1}
-            </span>
-            <div className="min-w-0 flex-1">
-              <SongCard
-                song={s}
-                rating={ratings[s.id] ?? null}
-                isKnown={knownSet.has(s.id)}
-              />
-            </div>
-          </li>
-        ))}
+        {songs.map((s, idx) => {
+          const hidden = !expanded && idx > PEEK_INDEX;
+          const peek = !expanded && idx === PEEK_INDEX;
+          if (hidden) return null;
+          return (
+            <li
+              key={s.id}
+              className={`flex items-center ${peek ? PEEK_MASK : ""}`}
+            >
+              <span className="w-4 shrink-0 text-xs tabular-nums text-zinc-600 dark:text-zinc-100">
+                {idx + 1}
+              </span>
+              <div className="min-w-0 flex-1">
+                <SongCard
+                  song={s}
+                  rating={ratings[s.id] ?? null}
+                  isKnown={knownSet.has(s.id)}
+                />
+              </div>
+            </li>
+          );
+        })}
       </ul>
       {hasMore ? (
         <div className="mt-2 flex justify-center">
           <button
             type="button"
             onClick={() => setExpanded((v) => !v)}
-            className="rounded-full border border-zinc-300 px-4 py-1.5 text-xs font-semibold text-zinc-700 transition hover:border-zinc-400 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-500"
+            className="rounded-full border border-zinc-300 px-4 py-1.5 text-xs font-semibold text-zinc-700 transition-transform duration-100 hover:border-zinc-400 active:scale-90 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-500"
           >
-            {expanded ? "閉じる" : "もっと見る"}
+            {expanded ? "表示を減らす" : "もっと見る"}
           </button>
         </div>
       ) : null}
