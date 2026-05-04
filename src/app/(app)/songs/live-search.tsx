@@ -194,7 +194,26 @@ export function LiveSearch({ ratings, knownSongIds = [] }: LiveSearchProps) {
   );
 
   return (
-    <div className="space-y-4">
+    <div
+      className="space-y-4"
+      // input → select 間の focus 移動で mode が browse に戻り
+      // ネイティブピッカーごとフィルタ UI が unmount されるのを防ぐため
+      // focus-within をラッパーで受ける (React の onFocus/onBlur は bubble する)
+      onFocus={() => {
+        if (blurTimerRef.current !== null) {
+          window.clearTimeout(blurTimerRef.current);
+          blurTimerRef.current = null;
+        }
+        setIsFocused(true);
+      }}
+      onBlur={() => {
+        // 履歴項目タップ時に Link が unmount されないよう mode 切り替えを遅延
+        blurTimerRef.current = window.setTimeout(() => {
+          setIsFocused(false);
+          blurTimerRef.current = null;
+        }, 200);
+      }}
+    >
       {/* 検索バー本体: 右側に検索アイコン or クリアボタン */}
       <div className="relative">
         <Search
@@ -206,20 +225,6 @@ export function LiveSearch({ ratings, knownSongIds = [] }: LiveSearchProps) {
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => {
-            if (blurTimerRef.current !== null) {
-              window.clearTimeout(blurTimerRef.current);
-              blurTimerRef.current = null;
-            }
-            setIsFocused(true);
-          }}
-          onBlur={() => {
-            // 履歴項目タップ時に Link が unmount されないよう mode 切り替えを遅延
-            blurTimerRef.current = window.setTimeout(() => {
-              setIsFocused(false);
-              blurTimerRef.current = null;
-            }, 200);
-          }}
           placeholder="楽曲・アーティストを検索"
           autoComplete="off"
           autoCapitalize="off"
@@ -242,8 +247,9 @@ export function LiveSearch({ ratings, knownSongIds = [] }: LiveSearchProps) {
         ) : null}
       </div>
 
-      {/* 高音域フィルタ: results / history どちらの状態でも有効 (browse 時は隠す) */}
-      {mode !== "browse" ? (
+      {/* 高音域フィルタ: results / history どちらの状態でも有効。
+          値が設定されているときは browse でも表示し続ける (解除導線確保) */}
+      {mode !== "browse" || highMin || highMax ? (
         <div className="flex items-center gap-2 text-sm">
           <select
             value={highMin}
