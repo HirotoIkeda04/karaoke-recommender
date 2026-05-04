@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { deterministicIconColor, resolveIconColor } from "@/lib/icon-color";
+
 export interface RepertoireItem {
   songId: string;
   title: string;
@@ -11,11 +13,16 @@ export interface RepertoireItem {
   singerIds: string[];
 }
 
+export interface ProfileSummary {
+  name: string;
+  iconColor: string | null;
+}
+
 interface Props {
   repertoire: RepertoireItem[];
   totalUserParticipants: number;
-  // user_id → display_name のマップ (singer 詳細表示用、現状は未使用だが将来の拡張用)
-  profileMap: Record<string, string>;
+  // user_id → 表示名 + 選択色 のマップ
+  profileMap: Record<string, ProfileSummary>;
 }
 
 type Filter = "all" | "majority" | "everyone";
@@ -112,16 +119,6 @@ export function RepertoireList({
   );
 }
 
-// 同じ user_id なら毎回同じ色になるよう簡易ハッシュで色相を決める
-const AVATAR_HUE_COUNT = 12;
-function avatarHue(id: string): number {
-  let h = 0;
-  for (let i = 0; i < id.length; i++) {
-    h = (h * 31 + id.charCodeAt(i)) >>> 0;
-  }
-  return Math.floor((h % AVATAR_HUE_COUNT) * (360 / AVATAR_HUE_COUNT));
-}
-
 function initialOf(name: string): string {
   const trimmed = name.trim();
   if (!trimmed) return "?";
@@ -136,7 +133,7 @@ function SingerAvatars({
   profileMap,
 }: {
   singerIds: string[];
-  profileMap: Record<string, string>;
+  profileMap: Record<string, ProfileSummary>;
 }) {
   const visible = singerIds.slice(0, MAX_AVATARS);
   const overflow = singerIds.length - visible.length;
@@ -144,15 +141,19 @@ function SingerAvatars({
   return (
     <div className="flex shrink-0 -space-x-1.5">
       {visible.map((id) => {
-        const name = profileMap[id] ?? "?";
-        const hue = avatarHue(id);
+        const profile = profileMap[id];
+        const name = profile?.name ?? "?";
+        // ユーザー選択色を優先。未設定なら user_id ハッシュで自動色を決定
+        const bg = profile?.iconColor
+          ? resolveIconColor(profile.iconColor)
+          : deterministicIconColor(id);
         return (
           <div
             key={id}
             title={name}
             aria-label={name}
             className="flex size-7 items-center justify-center rounded-full border-2 border-white text-[11px] font-semibold text-white dark:border-zinc-900"
-            style={{ backgroundColor: `hsl(${hue} 60% 45%)` }}
+            style={{ backgroundColor: bg }}
           >
             {initialOf(name)}
           </div>

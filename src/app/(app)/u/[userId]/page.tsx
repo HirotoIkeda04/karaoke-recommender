@@ -32,6 +32,7 @@ interface PageProps {
 
 interface FriendProfileRow {
   display_name: string;
+  icon_color: string | null;
   friend_count: number;
   rated_song_count: number;
   voice_comfortable_min_midi: number | null;
@@ -155,6 +156,7 @@ export default async function FriendLibraryPage({
       <BackButton fallbackHref="/library" />
       <ProfileHeader
         displayName={profile.display_name}
+        iconColor={profile.icon_color}
         friendCount={profile.friend_count}
         ratedSongCount={profile.rated_song_count}
         voiceEstimate={{

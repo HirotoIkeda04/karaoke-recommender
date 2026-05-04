@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { BackButton } from "@/components/back-button";
 import { createClient } from "@/lib/supabase/server";
 
-import { DisplayNameForm } from "./display-name-form";
+import { ProfileForm } from "./profile-form";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +15,9 @@ export default async function ProfileSetupPage({
   searchParams,
 }: SetupPageProps) {
   const params = await searchParams;
-  const next = params.next ?? "/";
+  // デフォルトはライブラリ。プロフィール編集導線がライブラリ起点なため。
+  // OAuth コールバック等から ?next= が明示されていればそれを優先。
+  const next = params.next ?? "/library";
 
   const supabase = await createClient();
   const {
@@ -25,7 +27,7 @@ export default async function ProfileSetupPage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name")
+    .select("display_name, icon_color")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -42,14 +44,18 @@ export default async function ProfileSetupPage({
       </div>
       <div className="mb-6 space-y-2">
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-          表示名の設定
+          ユーザーネームの設定
         </h1>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
           フレンドやカラオケルームの参加者に表示される名前です。あとから変更できます。
         </p>
       </div>
 
-      <DisplayNameForm initialName={initialName} next={next} />
+      <ProfileForm
+        initialName={initialName}
+        initialColor={profile?.icon_color ?? null}
+        next={next}
+      />
     </div>
   );
 }

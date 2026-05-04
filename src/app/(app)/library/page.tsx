@@ -75,7 +75,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
     getUserKnownSongIds(),
     supabase
       .from("profiles")
-      .select("display_name")
+      .select("display_name, icon_color")
       .eq("id", userId)
       .maybeSingle(),
     supabase
@@ -134,6 +134,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   }
 
   const displayName = profileRes.data?.display_name ?? "(未設定)";
+  const iconColor = profileRes.data?.icon_color ?? null;
   const friendCount = friendshipsRes.count ?? 0;
   const voiceEstimate = voiceEstimateRes.data ?? null;
 
@@ -142,6 +143,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
       {/* プロフィールヘッダー (Instagram 風) */}
       <ProfileHeader
         displayName={displayName}
+        iconColor={iconColor}
         friendCount={friendCount}
         ratedSongCount={
           (rows ?? []).filter(

@@ -1,20 +1,32 @@
 "use server";
 
+import { redirect } from "next/navigation";
+
+import { isIconColor } from "@/lib/icon-color";
 import { createClient } from "@/lib/supabase/server";
 
-export interface UpdateDisplayNameResult {
+export interface UpdateProfileResult {
   error: string | null;
 }
 
-export async function updateDisplayName(
+// ユーザーネーム + アイコン色をまとめて保存して `next` に redirect する。
+// upsert を使うのは、何らかの理由で profiles 行が存在しないユーザー
+// (古いアカウント、trigger 失敗など) でも初回保存できるようにするため。
+// 成功時は redirect(next) が NEXT_REDIRECT を throw するので以降は実行されない。
+export async function updateProfile(
   name: string,
-): Promise<UpdateDisplayNameResult> {
+  iconColor: string,
+  next: string,
+): Promise<UpdateProfileResult> {
   const trimmed = name.trim();
   if (!trimmed) {
-    return { error: "表示名を入力してください" };
+    return { error: "ユーザーネームを入力してください" };
   }
   if (trimmed.length > 32) {
     return { error: "32文字以内で入力してください" };
+  }
+  if (!isIconColor(iconColor)) {
+    return { error: "無効なアイコン色が選択されています" };
   }
 
   const supabase = await createClient();
@@ -26,25 +38,16 @@ export async function updateDisplayName(
     return { error: "未認証です" };
   }
 
-  // .select() を付けると RETURNING * 相当で更新行が返る → 0 件かどうか判定可能
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("profiles")
-    .update({ display_name: trimmed })
-    .eq("id", user.id)
-    .select("id");
+    .upsert(
+      { id: user.id, display_name: trimmed, icon_color: iconColor },
+      { onConflict: "id" },
+    );
 
   if (error) {
     return { error: error.message };
   }
 
-  if (!data || data.length === 0) {
-    // 通常は migration 007 のトリガ + 009 のバックフィルでカバーされるが、
-    // 念のため: profile 行が無い場合は明示的にエラーを返す
-    return {
-      error:
-        "プロフィール行が見つかりませんでした。管理者にお問い合わせください。",
-    };
-  }
-
-  return { error: null };
+  redirect(next);
 }

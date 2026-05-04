@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import type { GenreCode } from "@/lib/genres";
+import { resolveIconColor } from "@/lib/icon-color";
 import { midiToKaraoke } from "@/lib/note";
 
 import { SignOutButton } from "@/components/sign-out-button";
@@ -19,6 +20,7 @@ interface VoiceEstimate {
 
 interface Props {
   displayName: string;
+  iconColor: string | null;
   friendCount: number;
   ratedSongCount: number;
   voiceEstimate: VoiceEstimate | null;
@@ -45,6 +47,7 @@ function firstGrapheme(name: string): string {
 
 export function ProfileHeader({
   displayName,
+  iconColor,
   friendCount,
   ratedSongCount,
   voiceEstimate,
@@ -55,6 +58,7 @@ export function ProfileHeader({
   friendUserId,
 }: Props) {
   const initial = firstGrapheme(displayName);
+  const avatarBg = resolveIconColor(iconColor);
   const showEstimate =
     voiceEstimate &&
     (voiceEstimate.easy_count ?? 0) >= minEasyForEstimate &&
@@ -77,7 +81,8 @@ export function ProfileHeader({
       {/* 上段: アバター + 表示名 / Insta 風の縦積みスタッツ */}
       <div className="flex items-start gap-4">
         <div
-          className="flex size-20 shrink-0 items-center justify-center rounded-full bg-pink-500 text-3xl font-semibold text-white"
+          className="flex size-20 shrink-0 items-center justify-center rounded-full text-3xl font-semibold text-white"
+          style={{ backgroundColor: avatarBg }}
           aria-label={`${displayName} のアイコン`}
         >
           {initial}

@@ -52,21 +52,24 @@ export default async function RoomPage({ params }: PageProps) {
     .map((p) => p.user_id)
     .filter((u): u is string => u !== null);
 
-  const profileMap = new Map<string, string>();
+  const profileMap = new Map<
+    string,
+    { name: string; iconColor: string | null }
+  >();
   if (userIds.length > 0) {
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("id, display_name")
+      .select("id, display_name, icon_color")
       .in("id", userIds);
     for (const p of profiles ?? []) {
-      profileMap.set(p.id, p.display_name);
+      profileMap.set(p.id, { name: p.display_name, iconColor: p.icon_color });
     }
   }
 
   const participants: ParticipantView[] = (participantsRaw ?? []).map((p) => ({
     participantId: p.id,
     name: p.user_id
-      ? (profileMap.get(p.user_id) ?? "(不明なユーザー)")
+      ? (profileMap.get(p.user_id)?.name ?? "(不明なユーザー)")
       : (p.guest_name ?? "ゲスト"),
     isUser: p.user_id !== null,
     isCreator: p.user_id === room.creator_id,
