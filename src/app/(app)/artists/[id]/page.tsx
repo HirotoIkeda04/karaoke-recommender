@@ -250,8 +250,8 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
             </h2>
             <ul>
               {popular.map((s, idx) => (
-                <li key={s.id} className="flex items-center gap-1">
-                  <span className="w-6 shrink-0 text-center text-sm tabular-nums text-zinc-500 dark:text-zinc-400">
+                <li key={s.id} className="flex items-center">
+                  <span className="w-4 shrink-0 text-xs tabular-nums text-zinc-600 dark:text-zinc-100">
                     {idx + 1}
                   </span>
                   <div className="min-w-0 flex-1">
