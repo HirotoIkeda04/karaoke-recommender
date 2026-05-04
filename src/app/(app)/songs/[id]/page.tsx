@@ -105,39 +105,39 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         </div>
       </div>
 
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-          {song.title}
-        </h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          {song.artist_id ? (
-            <Link
-              href={`/artists/${song.artist_id}`}
-              className="underline-offset-2 hover:underline"
-            >
-              {song.artist}
-            </Link>
-          ) : (
-            song.artist
-          )}
-          {song.release_year ? ` · ${song.release_year}` : ""}
-          {song.duration_ms ? ` · ${formatDuration(song.duration_ms)}` : ""}
-        </p>
-      </div>
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            {song.title}
+          </h1>
+          <p className="mt-1 truncate text-sm text-zinc-600 dark:text-zinc-400">
+            {song.artist_id ? (
+              <Link
+                href={`/artists/${song.artist_id}`}
+                className="underline-offset-2 hover:underline"
+              >
+                {song.artist}
+              </Link>
+            ) : (
+              song.artist
+            )}
+            {song.release_year ? ` · ${song.release_year}` : ""}
+            {song.duration_ms ? ` · ${formatDuration(song.duration_ms)}` : ""}
+          </p>
+        </div>
 
-      {song.spotify_track_id ? (
-        <div className="flex items-center justify-end">
+        {song.spotify_track_id ? (
           <Link
             href={`https://open.spotify.com/track/${song.spotify_track_id}`}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Spotify で聴く"
-            className="grid size-14 place-items-center rounded-full bg-[#1DB954] text-black shadow-lg transition hover:scale-105 hover:bg-[#1ed760]"
+            className="grid size-12 shrink-0 place-items-center rounded-full bg-[#1DB954] text-black shadow-lg transition hover:scale-105 hover:bg-[#1ed760]"
           >
-            <Play className="ml-0.5 size-6 fill-current" aria-hidden />
+            <Play className="ml-0.5 size-5 fill-current" aria-hidden />
           </Link>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
 
       <section className="space-y-2">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
