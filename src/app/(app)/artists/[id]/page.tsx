@@ -249,13 +249,18 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
               人気の楽曲
             </h2>
             <ul>
-              {popular.map((s) => (
-                <li key={s.id}>
-                  <SongCard
-                    song={s}
-                    rating={ratings[s.id] ?? null}
-                    isKnown={knownIds.has(s.id)}
-                  />
+              {popular.map((s, idx) => (
+                <li key={s.id} className="flex items-center gap-1">
+                  <span className="w-6 shrink-0 text-center text-sm tabular-nums text-zinc-500 dark:text-zinc-400">
+                    {idx + 1}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <SongCard
+                      song={s}
+                      rating={ratings[s.id] ?? null}
+                      isKnown={knownIds.has(s.id)}
+                    />
+                  </div>
                 </li>
               ))}
             </ul>
