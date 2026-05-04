@@ -78,7 +78,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
               filter: "blur(64px) saturate(1.3)",
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background via-30% to-background to-55%" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background via-30% to-background to-55%" />
         </div>
       ) : null}
       <div className="relative mx-auto max-w-md space-y-5 px-4 py-4">
