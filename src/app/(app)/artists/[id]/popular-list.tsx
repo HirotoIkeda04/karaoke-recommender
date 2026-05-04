@@ -81,7 +81,7 @@ export function PopularList({ songs, ratings, knownIds }: Props) {
           <button
             type="button"
             onClick={handleToggle}
-            className={`rounded-full border border-zinc-300 px-4 py-1.5 text-xs font-semibold text-zinc-700 transition-transform duration-[20ms] hover:border-zinc-400 active:scale-90 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-500 ${pressed ? "scale-90" : ""}`}
+            className={`rounded-full border border-zinc-300 px-4 py-1.5 text-xs font-semibold text-zinc-700 transition-transform duration-[10ms] hover:border-zinc-400 active:scale-90 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-500 ${pressed ? "scale-90" : ""}`}
           >
             {expanded ? "表示を減らす" : "もっと見る"}
           </button>
