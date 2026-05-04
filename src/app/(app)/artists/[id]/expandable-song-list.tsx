@@ -27,6 +27,8 @@ interface Props {
   knownIds: string[];
   /** 各行の左にランキング番号 (1, 2, 3...) を表示する */
   showRank?: boolean;
+  /** 折りたたみ時のボタンラベル (デフォルト: "もっと見る") */
+  expandLabel?: string;
 }
 
 // Spotify 風の覗き見:
@@ -41,6 +43,7 @@ export function ExpandableSongList({
   ratings,
   knownIds,
   showRank = false,
+  expandLabel = "もっと見る",
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [pressed, setPressed] = useState(false);
@@ -92,7 +95,7 @@ export function ExpandableSongList({
             onClick={handleToggle}
             className={`rounded-full border border-zinc-300 px-4 py-1.5 text-xs font-semibold text-zinc-700 transition-transform duration-[10ms] hover:border-zinc-400 active:scale-90 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-500 ${pressed ? "scale-90" : ""}`}
           >
-            {expanded ? "表示を減らす" : "すべて見る"}
+            {expanded ? "表示を減らす" : expandLabel}
           </button>
         </div>
       ) : null}

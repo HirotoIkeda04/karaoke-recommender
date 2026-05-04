@@ -272,6 +272,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
               songs={all}
               ratings={ratings}
               knownIds={[...knownIds]}
+              expandLabel="すべて見る"
             />
           )}
         </section>
