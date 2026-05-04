@@ -330,7 +330,13 @@ export function SwipeDeck({
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
           ページを再読込すると次の 20 曲が表示されます。
         </p>
-        <Button onClick={() => window.location.reload()}>次のデッキへ</Button>
+        <Button
+          onClick={() => window.location.reload()}
+          size="lg"
+          className="h-14 px-8 text-lg font-bold"
+        >
+          次のデッキへ
+        </Button>
       </div>
     );
   }
