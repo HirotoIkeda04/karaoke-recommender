@@ -736,12 +736,13 @@ function SongCardContent({
 }
 
 /**
- * カード内側 2px のリングだけを backdrop-filter で明るく+強くぼかして
+ * カード内側 3px のリングだけを backdrop-filter で明るく+強くぼかして
  * ガラス風の枠線に見せる。
  *
- * 実装: 全面に backdrop-filter を当てた要素 (Layer 2) の上に、2px だけ内側に
- * 入った rounded-[14px] の同じ中身 (children) を重ねて中央を覆い隠す
- * (Layer 3)。結果として 2px の rounded リングだけがガラスとして残る。
+ * 実装: 全面に backdrop-filter を当てた要素 (Layer 2) の上に、3px だけ内側に
+ * 入った rounded-[13px] の同じ中身 (children) を重ねて中央を覆い隠す
+ * (Layer 3)。結果として 3px の rounded リングだけがガラスとして残る。
+ * 親が rounded-2xl (16px) なので 16 - 3 = 13 で curve が同心円になる。
  *
  * 単一要素 + mask-composite はもっと素直だが iOS Safari の transform 中に
  * 破綻するので採用しない。4 本のストリップ方式は親の rounded-2xl の
@@ -763,14 +764,14 @@ function GlassFrame({
         aria-hidden
         className="pointer-events-none absolute inset-0 rounded-2xl"
         style={{
-          background: "rgba(255,255,255,0.18)",
-          backdropFilter: "blur(20px) brightness(1.25) saturate(1.4)",
-          WebkitBackdropFilter: "blur(20px) brightness(1.25) saturate(1.4)",
+          background: "rgba(255,255,255,0.28)",
+          backdropFilter: "blur(20px) brightness(1.4) saturate(1.5)",
+          WebkitBackdropFilter: "blur(20px) brightness(1.4) saturate(1.5)",
         }}
       />
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute inset-[2px] overflow-hidden rounded-[14px]"
+        className="pointer-events-none absolute inset-[3px] overflow-hidden rounded-[13px]"
         style={innerFilter ? { filter: innerFilter } : undefined}
       >
         {children}
