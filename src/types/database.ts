@@ -332,6 +332,7 @@ export type Database = {
           id: string
           key_shift: number | null
           logged_at: string
+          score: number | null
           song_id: string
           updated_at: string
           user_id: string
@@ -343,6 +344,7 @@ export type Database = {
           id?: string
           key_shift?: number | null
           logged_at?: string
+          score?: number | null
           song_id: string
           updated_at?: string
           user_id: string
@@ -354,6 +356,7 @@ export type Database = {
           id?: string
           key_shift?: number | null
           logged_at?: string
+          score?: number | null
           song_id?: string
           updated_at?: string
           user_id?: string
@@ -820,8 +823,8 @@ export type Database = {
       search_songs_and_artists: {
         Args: {
           p_artist_limit?: number
-          p_high_max_midi?: number
-          p_high_min_midi?: number
+          p_high_max_midi?: number | null
+          p_high_min_midi?: number | null
           p_q: string
           p_song_limit?: number
         }
