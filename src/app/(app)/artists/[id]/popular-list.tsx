@@ -36,8 +36,19 @@ const PEEK_MASK =
 
 export function PopularList({ songs, ratings, knownIds }: Props) {
   const [expanded, setExpanded] = useState(false);
+  const [pressed, setPressed] = useState(false);
   const knownSet = useMemo(() => new Set(knownIds), [knownIds]);
   const hasMore = songs.length > 5;
+
+  // 押下アニメ → 少し遅れて展開、の順にしたいので setTimeout で間を空ける。
+  const handleToggle = () => {
+    if (pressed) return;
+    setPressed(true);
+    setTimeout(() => {
+      setExpanded((v) => !v);
+      setPressed(false);
+    }, 150);
+  };
 
   return (
     <>
@@ -69,8 +80,8 @@ export function PopularList({ songs, ratings, knownIds }: Props) {
         <div className="mt-2 flex justify-center">
           <button
             type="button"
-            onClick={() => setExpanded((v) => !v)}
-            className="rounded-full border border-zinc-300 px-4 py-1.5 text-xs font-semibold text-zinc-700 transition-transform duration-100 hover:border-zinc-400 active:scale-90 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-500"
+            onClick={handleToggle}
+            className={`rounded-full border border-zinc-300 px-4 py-1.5 text-xs font-semibold text-zinc-700 transition-transform duration-100 hover:border-zinc-400 active:scale-90 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-500 ${pressed ? "scale-90" : ""}`}
           >
             {expanded ? "表示を減らす" : "もっと見る"}
           </button>
