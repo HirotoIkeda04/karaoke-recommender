@@ -421,7 +421,8 @@ export function SwipeDeck({
           type="button"
           onClick={handleSkip}
           disabled={!current}
-          className="col-span-3 h-14 rounded-full bg-zinc-100 px-4 text-sm font-medium text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-300 disabled:opacity-30 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+          // 視覚的に上段の 3 円と同じ幅に見えるよう、-mx-1 で左右 4px ずつ拡張。
+          className="col-span-3 -mx-1 h-14 rounded-full bg-zinc-100 px-4 text-sm font-medium text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-300 disabled:opacity-30 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
         >
           知らない / スキップ
         </button>
