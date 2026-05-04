@@ -693,7 +693,13 @@ function SongCardContent({
         ) : null}
 
         <div className="relative z-10 w-full">
-          <h2 className="line-clamp-1 text-xl font-semibold text-white drop-shadow-sm">
+          <h2
+            className="line-clamp-1 text-xl font-semibold text-white drop-shadow-sm"
+            style={{
+              fontFamily:
+                '"LatinUpscale", var(--font-geist-sans), system-ui, sans-serif',
+            }}
+          >
             <Link
               href={`/songs/${song.id}`}
               onPointerDown={(e) => e.stopPropagation()}

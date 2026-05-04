@@ -137,3 +137,14 @@
     @apply font-sans;
   }
 }
+
+/* ラテン文字だけ size-adjust で拡大する仮想 font-family。
+   日本語と並べた時に英字が小さく見える問題の補正用 (例: スワイプカードの曲名)。
+   font-family の先頭にこれを置けば、unicode-range にマッチする英字だけ
+   この face で描画され、それ以外は次のフォールバックに回る。 */
+@font-face {
+  font-family: "LatinUpscale";
+  src: local("Helvetica Neue"), local("Helvetica"), local("Arial");
+  unicode-range: U+0020-024F, U+1E00-1EFF, U+2000-206F;
+  size-adjust: 120%;
+}
