@@ -388,8 +388,11 @@ export function SwipeDeck({
         </AnimatePresence>
       </div>
 
-      {/* 4 評価ボタン (丸いアイコンボタン + ラベル) */}
-      <div className="grid w-full grid-cols-4 gap-2">
+      {/* 4 評価ボタン (丸いアイコンボタン + ラベル)
+          トラック幅は size-14 の円幅 (3.5rem) ぴったりに合わせ、余白は
+          justify-between で円と円の間に分配する。これにより下段
+          col-span-3 のスキップが「苦手の左端〜得意の右端」と完全一致する。 */}
+      <div className="grid w-full grid-cols-[repeat(4,3.5rem)] justify-between">
         {RATINGS.map((r) => (
           <button
             key={r.value}
@@ -412,8 +415,8 @@ export function SwipeDeck({
       </div>
 
       {/* 知らない/スキップ (col-span-3, 苦手〜得意の列幅) + 戻る (col-span-1, 練習中の列) */}
-      {/* 上の評価ボタン行と同じ grid-cols-4/gap-2 で列を揃える */}
-      <div className="grid w-full grid-cols-4 gap-2">
+      {/* 上段と同じ grid (3.5rem ×4 + justify-between) で円位置に揃える */}
+      <div className="grid w-full grid-cols-[repeat(4,3.5rem)] justify-between">
         <button
           type="button"
           onClick={handleSkip}
