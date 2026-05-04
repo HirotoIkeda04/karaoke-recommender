@@ -736,20 +736,24 @@ function SongCardContent({
 }
 
 /**
- * カード内側 3px のリングだけを backdrop-filter で明るく+強くぼかして
+ * カード内側 2px のリングだけを backdrop-filter で明るく+強くぼかして
  * ガラス風の枠線に見せる。
  *
- * 実装: 全面に backdrop-filter を当てた要素 (Layer 2) の上に、3px だけ内側に
- * 入った rounded-[13px] の同じ中身 (children) を重ねて中央を覆い隠す
- * (Layer 3)。結果として 3px の rounded リングだけがガラスとして残る。
- * 親が rounded-2xl (16px) なので 16 - 3 = 13 で curve が同心円になる。
+ * 実装: 全面に backdrop-filter を当てた要素 (Layer 2) の上に、2px だけ内側に
+ * 入った rounded curve で同じ中身 (children) を重ねて中央を覆い隠す
+ * (Layer 3)。結果として 2px の rounded リングだけがガラスとして残る。
+ * 親が rounded-2xl (16px) なので 16 - 2 = 14 で curve が同心円になる。
  *
- * 単一要素 + mask-composite はもっと素直だが iOS Safari の transform 中に
- * 破綻するので採用しない。4 本のストリップ方式は親の rounded-2xl の
- * curve に角が沿わない (直角の集合なので) ため不採用。
+ * 角の精度のため Layer 3 は `clip-path: inset(2px round 14px)` で 1 パスの
+ * クリッピングに統一。`overflow-hidden + rounded` + `inset-[2px]` 方式だと
+ * iOS Safari でサブピクセル合成の段で curve が滲むことがあるため。
+ *
+ * 単一要素 + mask-composite は素直だが iOS Safari の transform 中に破綻、
+ * 4 本ストリップは親の rounded curve に沿わないため不採用。
  *
  * Layer 3 (中央の覆い) には Layer 1 と同じ filter を渡してスワイプ時の
- * 見え方を一致させる。
+ * 見え方を一致させる。filter が無い後ろのカードでは素の div で描画して
+ * framer-motion の余計な合成層を避ける。
  */
 function GlassFrame({
   children,
@@ -758,24 +762,38 @@ function GlassFrame({
   children: React.ReactNode;
   innerFilter?: ReturnType<typeof useTransform<number, string>>;
 }) {
+  const innerStyle = {
+    clipPath: "inset(2px round 14px)",
+    WebkitClipPath: "inset(2px round 14px)",
+  } as const;
   return (
     <>
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 rounded-2xl"
         style={{
-          background: "rgba(255,255,255,0.28)",
-          backdropFilter: "blur(20px) brightness(1.4) saturate(1.5)",
-          WebkitBackdropFilter: "blur(20px) brightness(1.4) saturate(1.5)",
+          background: "rgba(255,255,255,0.18)",
+          backdropFilter: "blur(20px) brightness(1.25) saturate(1.4)",
+          WebkitBackdropFilter: "blur(20px) brightness(1.25) saturate(1.4)",
         }}
       />
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute inset-[3px] overflow-hidden rounded-[13px]"
-        style={innerFilter ? { filter: innerFilter } : undefined}
-      >
-        {children}
-      </motion.div>
+      {innerFilter ? (
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{ ...innerStyle, filter: innerFilter }}
+        >
+          {children}
+        </motion.div>
+      ) : (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={innerStyle}
+        >
+          {children}
+        </div>
+      )}
     </>
   );
 }
