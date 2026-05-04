@@ -332,7 +332,6 @@ export type Database = {
           id: string
           key_shift: number | null
           logged_at: string
-          score: number | null
           song_id: string
           updated_at: string
           user_id: string
@@ -344,7 +343,6 @@ export type Database = {
           id?: string
           key_shift?: number | null
           logged_at?: string
-          score?: number | null
           song_id: string
           updated_at?: string
           user_id: string
@@ -356,7 +354,6 @@ export type Database = {
           id?: string
           key_shift?: number | null
           logged_at?: string
-          score?: number | null
           song_id?: string
           updated_at?: string
           user_id?: string
@@ -382,6 +379,9 @@ export type Database = {
         Row: {
           artist: string
           artist_id: string | null
+          cert_label: string | null
+          cert_score: number | null
+          cert_updated_at: string | null
           created_at: string
           dam_request_no: string | null
           duration_ms: number | null
@@ -414,6 +414,9 @@ export type Database = {
         Insert: {
           artist: string
           artist_id?: string | null
+          cert_label?: string | null
+          cert_score?: number | null
+          cert_updated_at?: string | null
           created_at?: string
           dam_request_no?: string | null
           duration_ms?: number | null
@@ -446,6 +449,9 @@ export type Database = {
         Update: {
           artist?: string
           artist_id?: string | null
+          cert_label?: string | null
+          cert_score?: number | null
+          cert_updated_at?: string | null
           created_at?: string
           dam_request_no?: string | null
           duration_ms?: number | null
@@ -718,6 +724,9 @@ export type Database = {
         Returns: {
           artist: string
           artist_id: string | null
+          cert_label: string | null
+          cert_score: number | null
+          cert_updated_at: string | null
           created_at: string
           dam_request_no: string | null
           duration_ms: number | null
@@ -759,6 +768,9 @@ export type Database = {
         Returns: {
           artist: string
           artist_id: string | null
+          cert_label: string | null
+          cert_score: number | null
+          cert_updated_at: string | null
           created_at: string
           dam_request_no: string | null
           duration_ms: number | null
@@ -823,8 +835,8 @@ export type Database = {
       search_songs_and_artists: {
         Args: {
           p_artist_limit?: number
-          p_high_max_midi?: number | null
-          p_high_min_midi?: number | null
+          p_high_max_midi?: number
+          p_high_min_midi?: number
           p_q: string
           p_song_limit?: number
         }
