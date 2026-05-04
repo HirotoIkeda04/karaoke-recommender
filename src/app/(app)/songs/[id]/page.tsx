@@ -66,22 +66,24 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
 
   return (
     <div className="mx-auto max-w-md space-y-5 px-4 py-4">
-      <BackButton fallbackHref="/songs" />
-      <div className="relative mx-auto !mt-2 aspect-square w-2/3 max-w-[16rem] overflow-hidden rounded-2xl bg-zinc-200 dark:bg-zinc-800">
-        {image ? (
-          <JacketImage
-            src={image}
-            alt={`${song.title} のジャケット`}
-            fill
-            sizes="16rem"
-            priority
-            className="object-cover"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-5xl text-zinc-400">
-            ♪
-          </div>
-        )}
+      <div className="flex items-start gap-3">
+        <BackButton fallbackHref="/songs" />
+        <div className="relative aspect-square flex-1 overflow-hidden rounded-2xl bg-zinc-200 dark:bg-zinc-800">
+          {image ? (
+            <JacketImage
+              src={image}
+              alt={`${song.title} のジャケット`}
+              fill
+              sizes="18rem"
+              priority
+              className="object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-5xl text-zinc-400">
+              ♪
+            </div>
+          )}
+        </div>
       </div>
 
       <div>
