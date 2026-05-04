@@ -674,19 +674,23 @@ function SongCardContent({
         )}
       </div>
 
-      {/* テキスト領域: 画像下に padding を取って配置。背景はジャケットを上下反転＋強ブラー＋減光した画像 */}
+      {/* テキスト領域: 画像下に padding を取って配置。
+          背景は「ジャケットをこの領域の縦幅に縦方向だけ圧縮し、上下反転して
+          減光+強ブラー」したもの。object-fill で正方形画像を薄く潰すことで、
+          flip 後の上端 (= 元画像の下端) が上のジャケット下端と同色になり、
+          境目で色が連続する。 */}
       <div className="relative flex flex-1 flex-col justify-between gap-2 overflow-hidden p-3">
         {song.image_url_large ?? song.image_url_medium ? (
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 -z-0 scale-y-[-1] scale-x-110 brightness-[0.55] blur-2xl"
+            className="pointer-events-none absolute inset-0 -z-0 scale-y-[-1] brightness-[0.55] blur-2xl"
           >
             <Image
               src={(song.image_url_large ?? song.image_url_medium)!}
               alt=""
               fill
               sizes="22rem"
-              className="object-cover"
+              className="object-fill"
               draggable={false}
             />
           </div>
