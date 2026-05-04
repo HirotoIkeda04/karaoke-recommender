@@ -193,27 +193,33 @@ export function LiveSearch({ ratings, knownSongIds = [] }: LiveSearchProps) {
     [],
   );
 
+  // input ↔ filter 間で focus が移動しても browse に戻らないよう
+  // 同じスコープ内の onFocus/onBlur で扱う (React の focus は bubble する)。
+  // BrowseGrid のジャンル <Link> はこのスコープ外に置くことで、
+  // Link が focus を取った瞬間に mode="history" へ遷移して unmount される
+  // ことを防ぐ。
+  const onFilterFocus = () => {
+    if (blurTimerRef.current !== null) {
+      window.clearTimeout(blurTimerRef.current);
+      blurTimerRef.current = null;
+    }
+    setIsFocused(true);
+  };
+  const onFilterBlur = () => {
+    // 履歴項目タップ時に Link が unmount されないよう mode 切り替えを遅延
+    blurTimerRef.current = window.setTimeout(() => {
+      setIsFocused(false);
+      blurTimerRef.current = null;
+    }, 200);
+  };
+
   return (
-    <div
-      className="space-y-4"
-      // input → select 間の focus 移動で mode が browse に戻り
-      // ネイティブピッカーごとフィルタ UI が unmount されるのを防ぐため
-      // focus-within をラッパーで受ける (React の onFocus/onBlur は bubble する)
-      onFocus={() => {
-        if (blurTimerRef.current !== null) {
-          window.clearTimeout(blurTimerRef.current);
-          blurTimerRef.current = null;
-        }
-        setIsFocused(true);
-      }}
-      onBlur={() => {
-        // 履歴項目タップ時に Link が unmount されないよう mode 切り替えを遅延
-        blurTimerRef.current = window.setTimeout(() => {
-          setIsFocused(false);
-          blurTimerRef.current = null;
-        }, 200);
-      }}
-    >
+    <div className="space-y-4">
+      <div
+        className="space-y-4"
+        onFocus={onFilterFocus}
+        onBlur={onFilterBlur}
+      >
       {/* 検索バー本体: 右側に検索アイコン or クリアボタン */}
       <div className="relative">
         <Search
@@ -280,6 +286,7 @@ export function LiveSearch({ ratings, knownSongIds = [] }: LiveSearchProps) {
           </select>
         </div>
       ) : null}
+      </div>
 
       {mode === "browse" ? (
         <BrowseGrid />
