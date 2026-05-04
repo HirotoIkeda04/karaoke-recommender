@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BackButton } from "@/components/back-button";
 import { SongCard } from "@/components/song-card";
+import { JacketImage } from "@/components/ui/jacket-image";
 import { GENRE_LABELS, type GenreCode } from "@/lib/genres";
 import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
 import { createClient } from "@/lib/supabase/server";
@@ -197,7 +197,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
       {/* Spotify 風ヒーロー: 画像フルブリード + 下端に名前オーバーレイ */}
       <div className="relative aspect-square w-full overflow-hidden bg-gradient-to-br from-pink-500/40 to-zinc-900">
         {heroImage ? (
-          <Image
+          <JacketImage
             src={heroImage}
             alt=""
             fill
@@ -295,7 +295,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
                   >
                     <div className="relative size-28 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
                       {a.image_url ? (
-                        <Image
+                        <JacketImage
                           src={a.image_url}
                           alt=""
                           fill

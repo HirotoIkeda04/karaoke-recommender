@@ -17,11 +17,11 @@ import {
   Undo2,
   X,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { startTransition, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { JacketImage } from "@/components/ui/jacket-image";
 import { triggerHaptic } from "@/lib/haptics";
 import { midiToKaraoke } from "@/lib/note";
 import type { Database } from "@/types/database";
@@ -658,7 +658,7 @@ function SongCardContent({
       {/* ジャケット: カード上部に edge-to-edge で配置 (余白なし) */}
       <div className="relative aspect-square w-full shrink-0 bg-zinc-200 dark:bg-zinc-800">
         {song.image_url_large ?? song.image_url_medium ? (
-          <Image
+          <JacketImage
             src={(song.image_url_large ?? song.image_url_medium)!}
             alt={`${song.title} のジャケット`}
             fill
@@ -685,7 +685,7 @@ function SongCardContent({
             aria-hidden
             className="pointer-events-none absolute inset-0 -z-0 scale-y-[-1] brightness-[0.55] blur-2xl"
           >
-            <Image
+            <JacketImage
               src={(song.image_url_large ?? song.image_url_medium)!}
               alt=""
               fill

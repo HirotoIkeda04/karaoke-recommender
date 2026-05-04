@@ -1,7 +1,7 @@
 import { Check, Dumbbell, Headphones, Minus, X } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
+import { JacketImage } from "@/components/ui/jacket-image";
 import { midiToKaraoke } from "@/lib/note";
 import type { Database } from "@/types/database";
 
@@ -81,7 +81,7 @@ export function SongCard({
     <Wrapper>
       <div className="relative size-12 shrink-0 overflow-hidden rounded-sm bg-white dark:bg-zinc-900">
         {image ? (
-          <Image
+          <JacketImage
             src={image}
             alt=""
             fill

@@ -1,5 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
+
+import { JacketImage } from "@/components/ui/jacket-image";
 
 export interface ArtistRowData {
   id: string;
@@ -23,7 +24,7 @@ export function ArtistRow({ artist, onSelect }: ArtistRowProps) {
     >
       <div className="relative size-12 shrink-0 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
         {artist.image_url ? (
-          <Image
+          <JacketImage
             src={artist.image_url}
             alt=""
             fill
