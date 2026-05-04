@@ -371,7 +371,7 @@ export function SwipeDeck({
         {upcoming.map((song, idx) => (
           <div
             key={song.id}
-            className="absolute inset-0 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+            className="absolute inset-0 overflow-hidden rounded-2xl bg-white shadow-sm dark:bg-zinc-900"
             style={{
               transform: `translateY(${(idx + 1) * 8}px) scale(${1 - (idx + 1) * 0.04})`,
               zIndex: -idx - 1,
@@ -379,6 +379,7 @@ export function SwipeDeck({
             }}
           >
             <SongCardContent song={song} isKnown={knownSet.has(song.id)} />
+            <GlassFrame />
           </div>
         ))}
 
@@ -600,13 +601,14 @@ function SwipeCard({
       variants={SWIPE_EXIT_VARIANTS}
       exit="exit"
       whileTap={{ cursor: "grabbing" }}
-      className="absolute inset-0 cursor-grab touch-none select-none overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
+      className="absolute inset-0 cursor-grab touch-none select-none overflow-hidden rounded-2xl bg-white dark:bg-zinc-900"
     >
       {/* filter はカード背面 (画像 + テキスト) のみに適用。
           SwipeOverlay (ラベル) はこの外側に置いて影響を受けないようにする */}
       <motion.div className="absolute inset-0" style={{ filter }}>
         <SongCardContent song={song} isKnown={isKnown} />
       </motion.div>
+      <GlassFrame />
       <SwipeOverlay x={x} y={y} opacity={overlayOpacity} />
     </motion.div>
   );
@@ -726,6 +728,31 @@ function SongCardContent({
         </a>
       ) : null}
     </div>
+  );
+}
+
+/**
+ * カード内側 4px のリングだけを backdrop-filter で明るく+強くぼかして
+ * ガラス風の枠線に見せる。mask の content-box 除外で「中身は素通し、
+ * リング部分のみ加工」を実現している。
+ */
+function GlassFrame() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-0 z-10 rounded-2xl"
+      style={{
+        padding: "4px",
+        background: "rgba(255,255,255,0.22)",
+        backdropFilter: "blur(28px) brightness(1.35) saturate(1.6)",
+        WebkitBackdropFilter: "blur(28px) brightness(1.35) saturate(1.6)",
+        WebkitMask:
+          "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+        WebkitMaskComposite: "xor",
+        mask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+        maskComposite: "exclude",
+      }}
+    />
   );
 }
 
