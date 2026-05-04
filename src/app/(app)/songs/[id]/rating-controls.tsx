@@ -71,7 +71,7 @@ export function RatingControls({ songId, initialRating }: RatingControlsProps) {
 
   return (
     <div className="relative space-y-3">
-      <div className="grid grid-cols-2 gap-2">
+      <div className="flex gap-1 rounded-full bg-zinc-200/80 p-1 dark:bg-zinc-800/80">
         {RATINGS.map((r) => {
           const active = rating === r.value;
           return (
@@ -81,13 +81,13 @@ export function RatingControls({ songId, initialRating }: RatingControlsProps) {
               disabled={isPending}
               onClick={() => handleRate(r.value)}
               aria-pressed={active}
-              className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition disabled:opacity-50 ${
+              className={`flex flex-1 items-center justify-center gap-1 rounded-full px-2 py-2 text-xs font-medium transition disabled:opacity-50 ${
                 active
-                  ? r.color
-                  : "bg-zinc-200 text-zinc-700 hover:bg-zinc-300 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                  ? `${r.color} shadow-sm`
+                  : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
               }`}
             >
-              <r.Icon className="size-4" aria-hidden />
+              <r.Icon className="size-3.5" aria-hidden />
               {r.label}
             </button>
           );

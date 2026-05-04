@@ -1,8 +1,8 @@
+import { Play } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BackButton } from "@/components/back-button";
-import { buttonVariants } from "@/components/ui/button";
 import { JacketImage } from "@/components/ui/jacket-image";
 import { midiToKaraoke } from "@/lib/note";
 import { createClient } from "@/lib/supabase/server";
@@ -105,8 +105,8 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         </div>
       </div>
 
-      <div>
-        <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
           {song.title}
         </h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
@@ -121,18 +121,35 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
             song.artist
           )}
           {song.release_year ? ` · ${song.release_year}` : ""}
+          {song.duration_ms ? ` · ${formatDuration(song.duration_ms)}` : ""}
         </p>
       </div>
 
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-xl bg-zinc-100 p-4 text-sm dark:bg-zinc-800">
-        <dt className="text-zinc-600 dark:text-zinc-400">地声 最低</dt>
-        <dd className="text-right font-mono">{midiToKaraoke(song.range_low_midi)}</dd>
-        <dt className="text-zinc-600 dark:text-zinc-400">地声 最高</dt>
-        <dd className="text-right font-mono">{midiToKaraoke(song.range_high_midi)}</dd>
-        <dt className="text-zinc-600 dark:text-zinc-400">裏声 最高</dt>
-        <dd className="text-right font-mono">{midiToKaraoke(song.falsetto_max_midi)}</dd>
-        <dt className="text-zinc-600 dark:text-zinc-400">曲の長さ</dt>
-        <dd className="text-right font-mono">{formatDuration(song.duration_ms)}</dd>
+      {song.spotify_track_id ? (
+        <Link
+          href={`https://open.spotify.com/track/${song.spotify_track_id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mx-auto flex w-fit items-center gap-2 rounded-full bg-[#1DB954] px-7 py-2.5 text-sm font-semibold text-white shadow-md transition hover:scale-105 hover:bg-[#1ed760]"
+        >
+          <Play className="size-4 fill-current" aria-hidden />
+          Spotify で聴く
+        </Link>
+      ) : null}
+
+      <dl className="divide-y divide-zinc-200 rounded-xl bg-zinc-100 px-4 dark:divide-zinc-700/60 dark:bg-zinc-800/60">
+        <div className="flex items-baseline justify-between py-3 text-sm">
+          <dt className="text-zinc-600 dark:text-zinc-400">地声</dt>
+          <dd className="font-mono">
+            {song.range_low_midi == null && song.range_high_midi == null
+              ? "—"
+              : `${midiToKaraoke(song.range_low_midi)} — ${midiToKaraoke(song.range_high_midi)}`}
+          </dd>
+        </div>
+        <div className="flex items-baseline justify-between py-3 text-sm">
+          <dt className="text-zinc-600 dark:text-zinc-400">裏声</dt>
+          <dd className="font-mono">{midiToKaraoke(song.falsetto_max_midi)}</dd>
+        </div>
       </dl>
 
       <RatingControls
@@ -141,17 +158,6 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
       />
 
       <SongLogs songId={song.id} initialLogs={logs} />
-
-      {song.spotify_track_id ? (
-        <Link
-          href={`https://open.spotify.com/track/${song.spotify_track_id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonVariants({ variant: "outline", size: "lg" }) + " w-full"}
-        >
-          Spotify で聴く
-        </Link>
-      ) : null}
       </div>
     </div>
   );
