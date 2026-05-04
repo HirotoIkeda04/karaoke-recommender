@@ -420,7 +420,7 @@ function LogForm({
             type="button"
             onClick={onCancel}
             disabled={disabled}
-            className="rounded-lg px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-200/60 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            className="rounded-lg px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-200/60 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-zinc-800"
           >
             キャンセル
           </button>
@@ -428,7 +428,7 @@ function LogForm({
         <button
           type="submit"
           disabled={disabled}
-          className="rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
+          className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
         >
           {submitLabel}
         </button>
