@@ -25,25 +25,22 @@ export function CreateRoomButton() {
   };
 
   return (
-    <section className="space-y-2 rounded-2xl border border-pink-200 bg-pink-50 p-4 dark:border-pink-900 dark:bg-pink-950/30">
-      <div className="space-y-1">
-        <h2 className="text-sm font-semibold text-pink-900 dark:text-pink-200">
-          🎤 カラオケに行く
-        </h2>
-        <p className="text-xs text-pink-800/80 dark:text-pink-300/80">
-          ルームを作成すると、QR を読み込んだ人と歌える曲を共有できます
-        </p>
-      </div>
+    <section className="space-y-2">
       <Button
         onClick={handleClick}
         disabled={pending}
         size="lg"
         className="w-full"
       >
-        {pending ? "作成中..." : "ルームを作成"}
+        {pending ? "作成中..." : "＋ ルームを作成"}
       </Button>
+      <p className="text-center text-xs text-zinc-500 dark:text-zinc-500">
+        QR を読み込んだ人と歌える曲を共有できます
+      </p>
       {error ? (
-        <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
+        <p className="text-center text-xs text-red-600 dark:text-red-400">
+          {error}
+        </p>
       ) : null}
     </section>
   );

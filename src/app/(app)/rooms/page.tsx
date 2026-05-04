@@ -1,13 +1,17 @@
 import Link from "next/link";
+import { Star } from "lucide-react";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 
 import { CreateRoomButton } from "./create-room-button";
+import { fetchRoomHistoryCards } from "./history-data";
+import { RoomHistoryCard, type HistoryCardProps } from "./room-history-card";
 
 export const dynamic = "force-dynamic";
 
-const HISTORY_INLINE_LIMIT = 3;
+// インラインに見せる件数。これより多くあれば「もっと見る」を表示。
+const HISTORY_INLINE_LIMIT = 5;
 
 export default async function RoomsIndexPage() {
   const supabase = await createClient();
@@ -38,47 +42,18 @@ export default async function RoomsIndexPage() {
   );
   const friendRooms = friendRoomsData ?? [];
 
-  // ===== 3. 直近のルーム履歴 (自分が過去に参加したルーム) =====
-  const { data: historyParts } = await supabase
-    .from("room_participants")
-    .select("room_id, joined_at")
-    .eq("user_id", user.id)
-    .order("joined_at", { ascending: false })
-    .limit(HISTORY_INLINE_LIMIT);
-
-  const historyRoomIds = (historyParts ?? []).map((p) => p.room_id);
-
-  const { data: historyRooms } =
-    historyRoomIds.length > 0
-      ? await supabase
-          .from("rooms")
-          .select("id, creator_id, ended_at, created_at")
-          .in("id", historyRoomIds)
-      : { data: [] };
-
-  const historyCreatorIds = Array.from(
-    new Set((historyRooms ?? []).map((r) => r.creator_id)),
+  // ===== 3. 直近のルーム履歴 =====
+  // 多めに取得し、いつもの / 直近 に分割。直近側で +1 余分に判定して
+  // 「もっと見る」の表示有無に使う。
+  const allHistoryCards = await fetchRoomHistoryCards(
+    supabase,
+    user.id,
+    HISTORY_INLINE_LIMIT + 6, // 余裕枠 (いつものルームを含む可能性)
   );
-  const historyProfileMap = new Map<string, string>();
-  if (historyCreatorIds.length > 0) {
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("id, display_name")
-      .in("id", historyCreatorIds);
-    for (const p of profiles ?? []) {
-      historyProfileMap.set(p.id, p.display_name);
-    }
-  }
-
-  // joined_at 降順で並び替え
-  const historyOrder = new Map(
-    (historyParts ?? []).map((p, index) => [p.room_id, index]),
-  );
-  const sortedHistory = (historyRooms ?? []).slice().sort(
-    (a, b) =>
-      (historyOrder.get(a.id) ?? Number.POSITIVE_INFINITY) -
-      (historyOrder.get(b.id) ?? Number.POSITIVE_INFINITY),
-  );
+  const recurringCards = allHistoryCards.filter((c) => c.isRecurring);
+  const regularCards = allHistoryCards.filter((c) => !c.isRecurring);
+  const hasMore = regularCards.length > HISTORY_INLINE_LIMIT;
+  const visibleRegular = regularCards.slice(0, HISTORY_INLINE_LIMIT);
 
   return (
     <div className="mx-auto max-w-md space-y-5 px-4 py-4">
@@ -90,11 +65,11 @@ export default async function RoomsIndexPage() {
 
       <CreateRoomButton />
 
-      <HistorySection
-        rooms={sortedHistory}
-        currentUserId={user.id}
-        profileMap={historyProfileMap}
-      />
+      {recurringCards.length > 0 ? (
+        <RecurringSection cards={recurringCards} />
+      ) : null}
+
+      <HistorySection cards={visibleRegular} hasMore={hasMore} />
     </div>
   );
 }
@@ -154,88 +129,64 @@ function FriendRoomsSection({ rooms }: { rooms: FriendRoom[] }) {
   );
 }
 
-interface HistoryRoom {
-  id: string;
-  creator_id: string;
-  ended_at: string | null;
-  created_at: string;
+function RecurringSection({ cards }: { cards: HistoryCardProps[] }) {
+  return (
+    <section className="space-y-2">
+      <h2 className="flex items-center gap-1.5 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+        <Star
+          className="size-4 fill-amber-500 text-amber-500"
+          aria-hidden
+        />
+        いつものルーム
+      </h2>
+      <ul className="space-y-2">
+        {cards.map((card) => (
+          <li key={card.roomId}>
+            <RoomHistoryCard {...card} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }
 
 function HistorySection({
-  rooms,
-  currentUserId,
-  profileMap,
+  cards,
+  hasMore,
 }: {
-  rooms: HistoryRoom[];
-  currentUserId: string;
-  profileMap: Map<string, string>;
+  cards: HistoryCardProps[];
+  hasMore: boolean;
 }) {
   return (
     <section className="space-y-2">
       <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-        直近のルーム履歴
+        直近のルーム
       </h2>
 
-      {rooms.length === 0 ? (
+      {cards.length === 0 ? (
         <p className="rounded-2xl border border-zinc-200 bg-white px-4 py-6 text-center text-xs text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900">
           まだ参加したルームがありません
         </p>
       ) : (
-        <ul className="space-y-2">
-          {rooms.map((room) => {
-            const isMine = room.creator_id === currentUserId;
-            const ended = room.ended_at !== null;
-            const creatorName = isMine
-              ? "あなた"
-              : (profileMap.get(room.creator_id) ?? "(不明)");
-            const createdAt = new Date(room.created_at);
-
-            return (
-              <li
-                key={room.id}
-                className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <p className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">
-                      {creatorName} のルーム
-                    </p>
-                    <div className="flex items-center gap-2">
-                      {ended ? (
-                        <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
-                          終了
-                        </span>
-                      ) : (
-                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
-                          進行中
-                        </span>
-                      )}
-                      <p className="text-xs text-zinc-500 dark:text-zinc-500">
-                        {createdAt.toLocaleString("ja-JP", {
-                          month: "numeric",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                        {" 作成"}
-                      </p>
-                    </div>
-                  </div>
-                  <Link
-                    href={`/rooms/${room.id}`}
-                    className={
-                      ended
-                        ? "shrink-0 rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                        : "shrink-0 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
-                    }
-                  >
-                    {ended ? "確認" : "開く"}
-                  </Link>
-                </div>
+        <>
+          <ul className="space-y-2">
+            {cards.map((card) => (
+              <li key={card.roomId}>
+                <RoomHistoryCard {...card} />
               </li>
-            );
-          })}
-        </ul>
+            ))}
+          </ul>
+          {hasMore ? (
+            <div className="pt-1 text-center">
+              <Link
+                href="/rooms/history"
+                className="text-xs font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              >
+                もっと見る ›
+              </Link>
+            </div>
+          ) : null}
+        </>
       )}
     </section>
   );

@@ -55,3 +55,26 @@ export async function endRoom(roomId: string): Promise<MutateRoomResult> {
   revalidatePath(`/rooms/${roomId}`);
   return { error: null };
 }
+
+export async function setRoomRecurring(
+  roomId: string,
+  isRecurring: boolean,
+): Promise<MutateRoomResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "未認証です" };
+
+  // RLS が creator のみに UPDATE を許可するので追加チェック不要
+  const { error } = await supabase
+    .from("rooms")
+    .update({ is_recurring: isRecurring })
+    .eq("id", roomId);
+
+  if (error) return { error: error.message };
+  revalidatePath(`/rooms/${roomId}`);
+  revalidatePath(`/rooms`);
+  revalidatePath(`/rooms/history`);
+  return { error: null };
+}

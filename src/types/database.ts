@@ -289,6 +289,7 @@ export type Database = {
           creator_id: string
           ended_at: string | null
           id: string
+          is_recurring: boolean
           last_activity_at: string
           qr_expires_at: string
           qr_token: string
@@ -298,6 +299,7 @@ export type Database = {
           creator_id: string
           ended_at?: string | null
           id?: string
+          is_recurring?: boolean
           last_activity_at?: string
           qr_expires_at: string
           qr_token: string
@@ -307,6 +309,7 @@ export type Database = {
           creator_id?: string
           ended_at?: string | null
           id?: string
+          is_recurring?: boolean
           last_activity_at?: string
           qr_expires_at?: string
           qr_token?: string
@@ -329,7 +332,6 @@ export type Database = {
           id: string
           key_shift: number | null
           logged_at: string
-          score: number | null
           song_id: string
           updated_at: string
           user_id: string
@@ -341,7 +343,6 @@ export type Database = {
           id?: string
           key_shift?: number | null
           logged_at?: string
-          score?: number | null
           song_id: string
           updated_at?: string
           user_id: string
@@ -353,7 +354,6 @@ export type Database = {
           id?: string
           key_shift?: number | null
           logged_at?: string
-          score?: number | null
           song_id?: string
           updated_at?: string
           user_id?: string
@@ -679,6 +679,37 @@ export type Database = {
           is_valid: boolean
         }[]
       }
+      get_friend_library_evaluations: {
+        Args: { p_friend_id: string }
+        Returns: {
+          rating: Database["public"]["Enums"]["rating_type"]
+          song_artist: string
+          song_falsetto_max_midi: number
+          song_id: string
+          song_image_url_medium: string
+          song_image_url_small: string
+          song_range_high_midi: number
+          song_range_low_midi: number
+          song_release_year: number
+          song_title: string
+          updated_at: string
+        }[]
+      }
+      get_friend_library_profile: {
+        Args: { p_friend_id: string }
+        Returns: {
+          display_name: string
+          era_buckets: Json
+          friend_count: number
+          genre_buckets: Json
+          icon_color: string
+          rated_song_count: number
+          voice_comfortable_max_midi: number
+          voice_comfortable_min_midi: number
+          voice_easy_count: number
+          voice_falsetto_max_midi: number
+        }[]
+      }
       get_unrated_songs: {
         Args: { p_limit?: number; p_popular_only?: boolean }
         Returns: {
@@ -686,6 +717,7 @@ export type Database = {
           artist_id: string | null
           created_at: string
           dam_request_no: string | null
+          duration_ms: number | null
           falsetto_max_midi: number | null
           fame_article: string | null
           fame_score: number | null
@@ -704,6 +736,10 @@ export type Database = {
           release_year: number | null
           source_urls: string[] | null
           spotify_attempt_count: number
+          spotify_explicit: boolean | null
+          spotify_isrc: string | null
+          spotify_popularity: number | null
+          spotify_preview_url: string | null
           spotify_track_id: string | null
           title: string
           updated_at: string
@@ -722,6 +758,7 @@ export type Database = {
           artist_id: string | null
           created_at: string
           dam_request_no: string | null
+          duration_ms: number | null
           falsetto_max_midi: number | null
           fame_article: string | null
           fame_score: number | null
@@ -740,6 +777,10 @@ export type Database = {
           release_year: number | null
           source_urls: string[] | null
           spotify_attempt_count: number
+          spotify_explicit: boolean | null
+          spotify_isrc: string | null
+          spotify_popularity: number | null
+          spotify_preview_url: string | null
           spotify_track_id: string | null
           title: string
           updated_at: string
@@ -778,14 +819,16 @@ export type Database = {
       normalize_artist_name: { Args: { name: string }; Returns: string }
       search_songs_and_artists: {
         Args: {
+          p_artist_limit?: number
+          p_high_max_midi?: number
+          p_high_min_midi?: number
           p_q: string
-          p_high_min_midi?: number | null
-          p_high_max_midi?: number | null
-          p_artist_limit?: number | null
-          p_song_limit?: number | null
+          p_song_limit?: number
         }
         Returns: Json
       }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       rating_type: "hard" | "medium" | "easy" | "practicing" | "skip"

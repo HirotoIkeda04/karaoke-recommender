@@ -6,6 +6,7 @@ import { BackButton } from "@/components/back-button";
 import { createClient } from "@/lib/supabase/server";
 
 import { QrSection } from "./qr-section";
+import { RecurringToggle } from "./recurring-toggle";
 import {
   RepertoireList,
   type RepertoireItem,
@@ -35,7 +36,9 @@ export default async function RoomPage({ params }: PageProps) {
   // ルーム取得 (RLS で参加者・creator のみ閲覧可)
   const { data: room } = await supabase
     .from("rooms")
-    .select("id, creator_id, qr_token, qr_expires_at, ended_at, created_at")
+    .select(
+      "id, creator_id, qr_token, qr_expires_at, ended_at, created_at, is_recurring",
+    )
     .eq("id", id)
     .maybeSingle();
 
@@ -148,6 +151,13 @@ export default async function RoomPage({ params }: PageProps) {
         isCreator={isCreator}
         ended={room.ended_at !== null}
       />
+
+      {isCreator ? (
+        <RecurringToggle
+          roomId={room.id}
+          isRecurring={room.is_recurring}
+        />
+      ) : null}
 
       <ParticipantsSection participants={participants} />
 
