@@ -1,6 +1,6 @@
 "use client";
 
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 
 import {
@@ -104,6 +104,7 @@ export function SongLogs({ songId, initialLogs }: SongLogsProps) {
     null,
   );
   const [isPending, startTransition] = useTransition();
+  const [isAdding, setIsAdding] = useState(false);
 
   useEffect(() => {
     if (!toast) return;
@@ -135,8 +136,15 @@ export function SongLogs({ songId, initialLogs }: SongLogsProps) {
         return;
       }
       setForm(emptyForm());
+      setIsAdding(false);
       setToast({ id: Date.now(), message: "記録を追加しました" });
     });
+  };
+
+  const handleCancelAdd = () => {
+    setIsAdding(false);
+    setForm(emptyForm());
+    setError(null);
   };
 
   const handleUpdate = () => {
@@ -170,35 +178,48 @@ export function SongLogs({ songId, initialLogs }: SongLogsProps) {
 
   return (
     <section className="space-y-3">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-        歌った記録
-      </h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+          歌った記録
+        </h2>
+        {!isAdding ? (
+          <button
+            type="button"
+            onClick={() => setIsAdding(true)}
+            disabled={isPending}
+            className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium text-zinc-700 transition hover:bg-zinc-100 disabled:opacity-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          >
+            <Plus className="size-3.5" aria-hidden />
+            記録を追加
+          </button>
+        ) : null}
+      </div>
 
-      <LogForm
-        form={form}
-        onChange={setForm}
-        disabled={isPending}
-        submitLabel="記録する"
-        onSubmit={handleCreate}
-      />
+      {isAdding ? (
+        <LogForm
+          form={form}
+          onChange={setForm}
+          disabled={isPending}
+          submitLabel="記録する"
+          onSubmit={handleCreate}
+          onCancel={handleCancelAdd}
+        />
+      ) : null}
 
       {error ? (
         <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
       ) : null}
 
-      <ul className="space-y-3">
-        {sortedLogs.length === 0 ? (
-          <li className="rounded-xl border border-dashed border-zinc-300 px-3 py-4 text-center text-xs text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+      <ul className="space-y-2">
+        {sortedLogs.length === 0 && !isAdding ? (
+          <li className="py-6 text-center text-xs text-zinc-500 dark:text-zinc-400">
             まだ記録がありません
           </li>
         ) : null}
 
         {sortedLogs.map((log) =>
           editing?.id === log.id ? (
-            <li
-              key={log.id}
-              className="rounded-xl border border-pink-300 bg-pink-50/50 p-3 dark:border-pink-700/60 dark:bg-pink-950/20"
-            >
+            <li key={log.id} className="rounded-xl bg-zinc-100/60 p-3 dark:bg-zinc-900/60">
               <LogForm
                 form={editing.form}
                 onChange={(next) => setEditing({ id: log.id, form: next })}
@@ -211,31 +232,45 @@ export function SongLogs({ songId, initialLogs }: SongLogsProps) {
           ) : (
             <li
               key={log.id}
-              className="space-y-2 rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900"
+              className="rounded-xl bg-zinc-100/60 px-4 py-3 dark:bg-zinc-900/60"
             >
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex flex-wrap items-center gap-1.5 text-xs">
-                  <span className="font-mono text-zinc-700 dark:text-zinc-300">
-                    {formatDate(log.logged_at)}
-                  </span>
-                  {log.equipment ? (
-                    <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                      {EQUIPMENT_LABELS[log.equipment as Equipment] ??
-                        log.equipment}
-                    </span>
-                  ) : null}
-                  {log.key_shift !== null ? (
-                    <span className="rounded-full bg-zinc-100 px-2 py-0.5 font-mono text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                      {formatKeyShift(log.key_shift)}
-                    </span>
-                  ) : null}
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                    <span className="font-mono">{formatDate(log.logged_at)}</span>
+                    {log.equipment ? (
+                      <>
+                        <span aria-hidden>·</span>
+                        <span>
+                          {EQUIPMENT_LABELS[log.equipment as Equipment] ??
+                            log.equipment}
+                        </span>
+                      </>
+                    ) : null}
+                    {log.key_shift !== null ? (
+                      <>
+                        <span aria-hidden>·</span>
+                        <span className="font-mono">
+                          {formatKeyShift(log.key_shift)}
+                        </span>
+                      </>
+                    ) : null}
+                  </div>
                   {log.score !== null ? (
-                    <span className="rounded-full bg-pink-100 px-2 py-0.5 font-mono font-semibold text-pink-700 dark:bg-pink-950/50 dark:text-pink-300">
-                      {formatScore(log.score)}点
-                    </span>
+                    <div className="font-mono text-2xl font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
+                      {formatScore(log.score)}
+                      <span className="ml-1 text-sm font-normal text-zinc-500 dark:text-zinc-400">
+                        点
+                      </span>
+                    </div>
+                  ) : null}
+                  {log.body ? (
+                    <p className="whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
+                      {log.body}
+                    </p>
                   ) : null}
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex shrink-0 items-center gap-0.5">
                   <button
                     type="button"
                     onClick={() =>
@@ -243,7 +278,7 @@ export function SongLogs({ songId, initialLogs }: SongLogsProps) {
                     }
                     disabled={isPending}
                     aria-label="編集"
-                    className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                    className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-200/60 hover:text-zinc-700 disabled:opacity-50 dark:text-zinc-500 dark:hover:bg-zinc-800/80 dark:hover:text-zinc-200"
                   >
                     <Pencil className="size-3.5" />
                   </button>
@@ -252,17 +287,12 @@ export function SongLogs({ songId, initialLogs }: SongLogsProps) {
                     onClick={() => handleDelete(log.id)}
                     disabled={isPending}
                     aria-label="削除"
-                    className="rounded-md p-1.5 text-zinc-500 hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-red-950/40 dark:hover:text-red-400"
+                    className="rounded-md p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:text-zinc-500 dark:hover:bg-red-950/40 dark:hover:text-red-400"
                   >
                     <Trash2 className="size-3.5" />
                   </button>
                 </div>
               </div>
-              {log.body ? (
-                <p className="text-sm whitespace-pre-wrap text-zinc-800 dark:text-zinc-200">
-                  {log.body}
-                </p>
-              ) : null}
             </li>
           ),
         )}
@@ -302,29 +332,30 @@ function LogForm({
   onCancel,
 }: LogFormProps) {
   const inputCls =
-    "rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-sm focus:border-pink-500 focus:outline-none disabled:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:disabled:bg-zinc-950";
+    "w-full rounded-lg border-0 bg-zinc-200/60 px-3 py-2 text-sm transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 dark:bg-zinc-800/70 dark:focus:bg-zinc-900";
+  const labelCls = "space-y-1 text-xs text-zinc-600 dark:text-zinc-400";
 
   return (
     <form
-      className="space-y-2 rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900"
+      className="space-y-3 rounded-xl bg-zinc-100/60 p-4 dark:bg-zinc-900/60"
       onSubmit={(e) => {
         e.preventDefault();
         onSubmit();
       }}
     >
       <div className="grid grid-cols-4 gap-2">
-        <label className="col-span-2 space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
+        <label className={`col-span-2 ${labelCls}`}>
           <span>記録日</span>
           <input
             type="date"
             value={form.loggedAt}
             onChange={(e) => onChange({ ...form, loggedAt: e.target.value })}
             disabled={disabled}
-            className={`${inputCls} w-full`}
+            className={inputCls}
           />
         </label>
         <div className="col-span-2" />
-        <label className="col-span-2 space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
+        <label className={`col-span-2 ${labelCls}`}>
           <span>機材</span>
           <select
             value={form.equipment}
@@ -335,14 +366,14 @@ function LogForm({
               })
             }
             disabled={disabled}
-            className={`${inputCls} w-full`}
+            className={inputCls}
           >
             <option value="">—</option>
             <option value="dam">DAM</option>
             <option value="joysound">JOYSOUND</option>
           </select>
         </label>
-        <label className="space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
+        <label className={labelCls}>
           <span>点数</span>
           <input
             type="number"
@@ -354,10 +385,10 @@ function LogForm({
             value={form.score}
             onChange={(e) => onChange({ ...form, score: e.target.value })}
             disabled={disabled}
-            className={`${inputCls} w-full font-mono`}
+            className={`${inputCls} font-mono`}
           />
         </label>
-        <label className="space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
+        <label className={labelCls}>
           <span>キー調整</span>
           <input
             type="number"
@@ -369,7 +400,7 @@ function LogForm({
             value={form.keyShift}
             onChange={(e) => onChange({ ...form, keyShift: e.target.value })}
             disabled={disabled}
-            className={`${inputCls} w-full font-mono`}
+            className={`${inputCls} font-mono`}
           />
         </label>
       </div>
@@ -380,7 +411,7 @@ function LogForm({
         disabled={disabled}
         placeholder="気づいたこと、歌った感想など"
         rows={3}
-        className={`${inputCls} w-full resize-none placeholder:text-zinc-400`}
+        className={`${inputCls} resize-none placeholder:text-zinc-400`}
       />
 
       <div className="flex justify-end gap-2">
@@ -389,7 +420,7 @@ function LogForm({
             type="button"
             onClick={onCancel}
             disabled={disabled}
-            className="rounded-lg px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            className="rounded-lg px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-200/60 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-zinc-800"
           >
             キャンセル
           </button>
@@ -397,7 +428,7 @@ function LogForm({
         <button
           type="submit"
           disabled={disabled}
-          className="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+          className="rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
         >
           {submitLabel}
         </button>
