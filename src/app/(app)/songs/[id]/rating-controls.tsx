@@ -14,11 +14,36 @@ const RATINGS: ReadonlyArray<{
   label: string;
   Icon: typeof X;
   color: string;
+  subtle: string;
 }> = [
-  { value: "hard", label: "苦手", Icon: X, color: "bg-red-500 text-white" },
-  { value: "medium", label: "普通", Icon: Minus, color: "bg-yellow-500 text-white" },
-  { value: "easy", label: "得意", Icon: Check, color: "bg-emerald-500 text-white" },
-  { value: "practicing", label: "練習中", Icon: Dumbbell, color: "bg-purple-500 text-white" },
+  {
+    value: "hard",
+    label: "苦手",
+    Icon: X,
+    color: "bg-red-500 text-white",
+    subtle: "bg-red-500/15 text-red-700 dark:text-red-300",
+  },
+  {
+    value: "medium",
+    label: "普通",
+    Icon: Minus,
+    color: "bg-yellow-500 text-white",
+    subtle: "bg-yellow-500/15 text-yellow-700 dark:text-yellow-300",
+  },
+  {
+    value: "easy",
+    label: "得意",
+    Icon: Check,
+    color: "bg-emerald-500 text-white",
+    subtle: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+  },
+  {
+    value: "practicing",
+    label: "練習中",
+    Icon: Dumbbell,
+    color: "bg-purple-500 text-white",
+    subtle: "bg-purple-500/15 text-purple-700 dark:text-purple-300",
+  },
 ];
 
 const RATING_LABELS: Record<Rating, string> = RATINGS.reduce(
@@ -94,7 +119,7 @@ export function RatingControls({ songId, initialRating }: RatingControlsProps) {
         aria-expanded={isOpen}
         className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition disabled:opacity-50 ${
           activeRating
-            ? `${activeRating.color} shadow-sm`
+            ? activeRating.subtle
             : "border border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
         }`}
       >
