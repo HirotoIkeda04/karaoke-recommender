@@ -508,12 +508,15 @@ function SwipeCard({
     ),
   );
 
-  // スワイプ中はカード背面をわずかに減光してラベル文字のコントラストを稼ぐ。
-  // 以前は blur+saturate も掛けていたが、ガラス枠 (GlassFrame) と視覚的にかぶって
-  // 「枠の効果がカード全体に掛かったように」見えてしまったため brightness のみに縮小。
+  // スワイプ中はカード背面 (ジャケ画像 + テキスト) を
+  //   - 明るく (brightness 1.00 → 1.35)
+  //   - 彩度を少しだけ下げ (saturate 1.00 → 0.85)
+  //   - ぼかす (blur 0 → 3px)
+  // ことで、上に重なる「苦手」「得意」等のラベル文字のコントラストを稼ぐ。
+  // この filter は SwipeOverlay には掛けない (ラベル自体がボケては本末転倒なため)。
   const filter = useTransform(intensity, (i) => {
     const t = i as number;
-    return `brightness(${1 - t * 0.1})`;
+    return `brightness(${1 + t * 0.35}) saturate(${1 - t * 0.15}) blur(${t * 3}px)`;
   });
 
   // box-shadow: スワイプ方向に応じた色のハロー (blur が広がる) を演出
@@ -730,26 +733,29 @@ function SongCardContent({
 
 /**
  * カード内側 4px のリングだけを backdrop-filter で明るく+強くぼかして
- * ガラス風の枠線に見せる。mask の content-box 除外で「中身は素通し、
- * リング部分のみ加工」を実現している。
+ * ガラス風の枠線に見せる。
+ *
+ * 当初は単一要素 + mask-composite でリング状にしていたが、iOS Safari の
+ * `mask-composite` が transform (スワイプ中) で破綻し、結果として枠の
+ * effect がカード全体に広がる症状が出たため、4 本のストリップに分解した。
+ * 角の丸みは親側の `rounded-2xl + overflow-hidden` で自動的にクリップされる。
  */
 function GlassFrame() {
+  const stripStyle = {
+    background: "rgba(255,255,255,0.22)",
+    backdropFilter: "blur(28px) brightness(1.35) saturate(1.6)",
+    WebkitBackdropFilter: "blur(28px) brightness(1.35) saturate(1.6)",
+  } as const;
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-0 z-10 rounded-2xl"
-      style={{
-        padding: "4px",
-        background: "rgba(255,255,255,0.22)",
-        backdropFilter: "blur(28px) brightness(1.35) saturate(1.6)",
-        WebkitBackdropFilter: "blur(28px) brightness(1.35) saturate(1.6)",
-        WebkitMask:
-          "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
-        WebkitMaskComposite: "xor",
-        mask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
-        maskComposite: "exclude",
-      }}
-    />
+      className="pointer-events-none absolute inset-0 z-10"
+    >
+      <div className="absolute left-0 right-0 top-0 h-1" style={stripStyle} />
+      <div className="absolute bottom-0 left-0 right-0 h-1" style={stripStyle} />
+      <div className="absolute bottom-1 left-0 top-1 w-1" style={stripStyle} />
+      <div className="absolute bottom-1 right-0 top-1 w-1" style={stripStyle} />
+    </div>
   );
 }
 
