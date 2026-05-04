@@ -379,7 +379,9 @@ export function SwipeDeck({
             }}
           >
             <SongCardContent song={song} isKnown={knownSet.has(song.id)} />
-            <GlassFrame />
+            <GlassFrame>
+              <SongCardContent song={song} isKnown={knownSet.has(song.id)} />
+            </GlassFrame>
           </div>
         ))}
 
@@ -608,7 +610,9 @@ function SwipeCard({
       <motion.div className="absolute inset-0" style={{ filter }}>
         <SongCardContent song={song} isKnown={isKnown} />
       </motion.div>
-      <GlassFrame />
+      <GlassFrame innerFilter={filter}>
+        <SongCardContent song={song} isKnown={isKnown} />
+      </GlassFrame>
       <SwipeOverlay x={x} y={y} opacity={overlayOpacity} />
     </motion.div>
   );
@@ -732,30 +736,46 @@ function SongCardContent({
 }
 
 /**
- * カード内側 4px のリングだけを backdrop-filter で明るく+強くぼかして
+ * カード内側 2px のリングだけを backdrop-filter で明るく+強くぼかして
  * ガラス風の枠線に見せる。
  *
- * 当初は単一要素 + mask-composite でリング状にしていたが、iOS Safari の
- * `mask-composite` が transform (スワイプ中) で破綻し、結果として枠の
- * effect がカード全体に広がる症状が出たため、4 本のストリップに分解した。
- * 角の丸みは親側の `rounded-2xl + overflow-hidden` で自動的にクリップされる。
+ * 実装: 全面に backdrop-filter を当てた要素 (Layer 2) の上に、2px だけ内側に
+ * 入った rounded-[14px] の同じ中身 (children) を重ねて中央を覆い隠す
+ * (Layer 3)。結果として 2px の rounded リングだけがガラスとして残る。
+ *
+ * 単一要素 + mask-composite はもっと素直だが iOS Safari の transform 中に
+ * 破綻するので採用しない。4 本のストリップ方式は親の rounded-2xl の
+ * curve に角が沿わない (直角の集合なので) ため不採用。
+ *
+ * Layer 3 (中央の覆い) には Layer 1 と同じ filter を渡してスワイプ時の
+ * 見え方を一致させる。
  */
-function GlassFrame() {
-  const stripStyle = {
-    background: "rgba(255,255,255,0.22)",
-    backdropFilter: "blur(28px) brightness(1.35) saturate(1.6)",
-    WebkitBackdropFilter: "blur(28px) brightness(1.35) saturate(1.6)",
-  } as const;
+function GlassFrame({
+  children,
+  innerFilter,
+}: {
+  children: React.ReactNode;
+  innerFilter?: ReturnType<typeof useTransform<number, string>>;
+}) {
   return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute inset-0 z-10"
-    >
-      <div className="absolute left-0 right-0 top-0 h-1" style={stripStyle} />
-      <div className="absolute bottom-0 left-0 right-0 h-1" style={stripStyle} />
-      <div className="absolute bottom-1 left-0 top-1 w-1" style={stripStyle} />
-      <div className="absolute bottom-1 right-0 top-1 w-1" style={stripStyle} />
-    </div>
+    <>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 rounded-2xl"
+        style={{
+          background: "rgba(255,255,255,0.18)",
+          backdropFilter: "blur(20px) brightness(1.25) saturate(1.4)",
+          WebkitBackdropFilter: "blur(20px) brightness(1.25) saturate(1.4)",
+        }}
+      />
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute inset-[2px] overflow-hidden rounded-[14px]"
+        style={innerFilter ? { filter: innerFilter } : undefined}
+      >
+        {children}
+      </motion.div>
+    </>
   );
 }
 
