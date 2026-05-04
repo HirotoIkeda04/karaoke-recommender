@@ -71,13 +71,17 @@ async function main() {
     }
 
     const ids = rows.map((r) => r.id);
+    // migration 043 を DB に適用 + `pnpm db:types` で再生成するまでは
+    // cert_score / cert_label / cert_updated_at が生成型に存在しないため、
+    // 型キャストで通す。マイグレーション適用後はこのキャストを外せる。
+    const updatePayload = {
+      cert_score: entry.cert_score,
+      cert_label: entry.cert_label || null,
+      cert_updated_at: now,
+    } as never;
     const { error: updErr } = await supabase
       .from("songs")
-      .update({
-        cert_score: entry.cert_score,
-        cert_label: entry.cert_label || null,
-        cert_updated_at: now,
-      })
+      .update(updatePayload)
       .in("id", ids);
 
     if (updErr) {
