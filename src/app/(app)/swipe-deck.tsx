@@ -371,11 +371,13 @@ export function SwipeDeck({
         {upcoming.map((song, idx) => (
           <div
             key={song.id}
-            className="absolute inset-0 overflow-hidden rounded-2xl bg-white shadow-sm dark:bg-zinc-900"
+            className="absolute inset-0 bg-white shadow-sm dark:bg-zinc-900"
             style={{
               transform: `translateY(${(idx + 1) * 8}px) scale(${1 - (idx + 1) * 0.04})`,
               zIndex: -idx - 1,
               opacity: 1 - (idx + 1) * 0.15,
+              clipPath: "inset(0 round 16px)",
+              WebkitClipPath: "inset(0 round 16px)",
             }}
           >
             <SongCardContent song={song} isKnown={knownSet.has(song.id)} />
@@ -593,7 +595,16 @@ function SwipeCard({
 
   return (
     <motion.div
-      style={{ x, y, rotate, boxShadow }}
+      style={{
+        x,
+        y,
+        rotate,
+        boxShadow,
+        // 外側 curve と GlassFrame 内側 curve を同一の clip-path エンジンで
+        // 描画させて、サブピクセル合成で生じる微妙なズレを無くす。
+        clipPath: "inset(0 round 16px)",
+        WebkitClipPath: "inset(0 round 16px)",
+      }}
       drag
       dragElastic={0.6}
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
@@ -603,7 +614,7 @@ function SwipeCard({
       variants={SWIPE_EXIT_VARIANTS}
       exit="exit"
       whileTap={{ cursor: "grabbing" }}
-      className="absolute inset-0 cursor-grab touch-none select-none overflow-hidden rounded-2xl bg-white dark:bg-zinc-900"
+      className="absolute inset-0 cursor-grab touch-none select-none bg-white dark:bg-zinc-900"
     >
       {/* filter はカード背面 (画像 + テキスト) のみに適用。
           SwipeOverlay (ラベル) はこの外側に置いて影響を受けないようにする */}
@@ -744,9 +755,11 @@ function SongCardContent({
  * (Layer 3)。結果として 2px の rounded リングだけがガラスとして残る。
  * 親が rounded-2xl (16px) なので 16 - 2 = 14 で curve が同心円になる。
  *
- * 角の精度のため Layer 3 は `clip-path: inset(2px round 14px)` で 1 パスの
- * クリッピングに統一。`overflow-hidden + rounded` + `inset-[2px]` 方式だと
- * iOS Safari でサブピクセル合成の段で curve が滲むことがあるため。
+ * 角の精度のため、親側 (外側 curve) も `clip-path: inset(0 round 16px)` に
+ * 統一し、Layer 3 (内側 curve) は `clip-path: inset(2px round 14px)`。
+ * 両 curve を同一の clip-path エンジンで描画させることで、`overflow-hidden +
+ * border-radius` と `clip-path` を混在させた場合に生じる、サブピクセル合成
+ * 起因の curve のズレ・滲みを排除している。
  *
  * 単一要素 + mask-composite は素直だが iOS Safari の transform 中に破綻、
  * 4 本ストリップは親の rounded curve に沿わないため不採用。
@@ -770,7 +783,7 @@ function GlassFrame({
     <>
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-2xl"
+        className="pointer-events-none absolute inset-0"
         style={{
           background: "rgba(255,255,255,0.18)",
           backdropFilter: "blur(20px) brightness(1.25) saturate(1.4)",
