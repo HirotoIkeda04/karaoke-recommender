@@ -2,9 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BackButton } from "@/components/back-button";
-import { SongCard } from "@/components/song-card";
 import { JacketImage } from "@/components/ui/jacket-image";
-import { PopularList } from "./popular-list";
+import { ExpandableSongList } from "./expandable-song-list";
 import { GENRE_LABELS, type GenreCode } from "@/lib/genres";
 import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
 import { createClient } from "@/lib/supabase/server";
@@ -250,10 +249,11 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
             <h2 className="mb-2 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
               人気の楽曲
             </h2>
-            <PopularList
+            <ExpandableSongList
               songs={popular}
               ratings={ratings}
               knownIds={[...knownIds]}
+              showRank
             />
           </section>
         ) : null}
@@ -268,17 +268,11 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
           {all.length === 0 ? (
             <p className="text-sm text-zinc-500">楽曲がありません</p>
           ) : (
-            <ul>
-              {all.map((s) => (
-                <li key={s.id}>
-                  <SongCard
-                    song={s}
-                    rating={ratings[s.id] ?? null}
-                    isKnown={knownIds.has(s.id)}
-                  />
-                </li>
-              ))}
-            </ul>
+            <ExpandableSongList
+              songs={all}
+              ratings={ratings}
+              knownIds={[...knownIds]}
+            />
           )}
         </section>
 

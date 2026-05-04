@@ -25,6 +25,8 @@ interface Props {
   songs: Song[];
   ratings: Record<string, string>;
   knownIds: string[];
+  /** 各行の左にランキング番号 (1, 2, 3...) を表示する */
+  showRank?: boolean;
 }
 
 // Spotify 風の覗き見:
@@ -34,7 +36,12 @@ const PEEK_INDEX = 5;
 const PEEK_MASK =
   "[mask-image:linear-gradient(to_bottom,black_10%,transparent)] [-webkit-mask-image:linear-gradient(to_bottom,black_10%,transparent)]";
 
-export function PopularList({ songs, ratings, knownIds }: Props) {
+export function ExpandableSongList({
+  songs,
+  ratings,
+  knownIds,
+  showRank = false,
+}: Props) {
   const [expanded, setExpanded] = useState(false);
   const [pressed, setPressed] = useState(false);
   const knownSet = useMemo(() => new Set(knownIds), [knownIds]);
@@ -62,9 +69,11 @@ export function PopularList({ songs, ratings, knownIds }: Props) {
               key={s.id}
               className={`flex items-center ${peek ? PEEK_MASK : ""}`}
             >
-              <span className="w-4 shrink-0 text-xs tabular-nums text-zinc-600 dark:text-zinc-100">
-                {idx + 1}
-              </span>
+              {showRank ? (
+                <span className="w-4 shrink-0 text-xs tabular-nums text-zinc-600 dark:text-zinc-100">
+                  {idx + 1}
+                </span>
+              ) : null}
               <div className="min-w-0 flex-1">
                 <SongCard
                   song={s}
