@@ -13,6 +13,7 @@
     "refresh:karaoto-images": "node --env-file=.env.local --import tsx scripts/refresh-karaoto-images.ts",
     "apply:range": "node --env-file=.env.local --import tsx scripts/apply-range-data.ts",
     "apply:fame": "node --env-file=.env.local --import tsx scripts/apply-fame-scores.ts",
+    "apply:cert": "node --env-file=.env.local --import tsx scripts/apply-cert-scores.ts",
     "match:dam": "node --env-file=.env.local --import tsx scripts/match-dam-songs.ts",
     "bulk:label-artists": "node --env-file=.env.local --import tsx scripts/bulk-label-artists.ts",
     "expand:vocaloid": "node --env-file=.env.local --import tsx scripts/expand-vocaloid-songs.ts",
