@@ -675,10 +675,10 @@ function SongCardContent({
       </div>
 
       {/* テキスト領域: 画像下に padding を取って配置。
-          背景は「ジャケットをこの領域の縦幅に縦方向だけ圧縮し、上下反転して
-          減光+強ブラー」したもの。object-fill で正方形画像を薄く潰すことで、
-          flip 後の上端 (= 元画像の下端) が上のジャケット下端と同色になり、
-          境目で色が連続する。 */}
+          背景は「ジャケットの下部分を切り抜いて上下反転」した鏡像。
+          object-cover + object-bottom で正方形画像の下端を残してクロップし、
+          scale-y-[-1] で flip すると、テキスト上端 = 元画像の下端 となって
+          上のジャケット下端と色が連続し、水面の鏡映のように見える。 */}
       <div className="relative flex flex-1 flex-col justify-between gap-2 overflow-hidden p-3">
         {song.image_url_large ?? song.image_url_medium ? (
           <div
@@ -690,7 +690,7 @@ function SongCardContent({
               alt=""
               fill
               sizes="22rem"
-              className="object-fill"
+              className="object-cover object-bottom"
               draggable={false}
             />
           </div>
