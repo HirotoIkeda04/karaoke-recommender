@@ -392,7 +392,7 @@ export function SwipeDeck({
           トラック幅は size-14 の円幅 (3.5rem) ぴったりに合わせ、余白は
           justify-between で円と円の間に分配する。これにより下段
           col-span-3 のスキップが「苦手の左端〜得意の右端」と完全一致する。 */}
-      <div className="grid w-full grid-cols-[repeat(4,3.5rem)] justify-between">
+      <div className="grid w-full grid-cols-[repeat(4,3.5rem)] justify-around">
         {RATINGS.map((r) => (
           <button
             key={r.value}
@@ -416,7 +416,7 @@ export function SwipeDeck({
 
       {/* 知らない/スキップ (col-span-3, 苦手〜得意の列幅) + 戻る (col-span-1, 練習中の列) */}
       {/* 上段と同じ grid (3.5rem ×4 + justify-between) で円位置に揃える */}
-      <div className="grid w-full grid-cols-[repeat(4,3.5rem)] justify-between">
+      <div className="grid w-full grid-cols-[repeat(4,3.5rem)] justify-around">
         <button
           type="button"
           onClick={handleSkip}
