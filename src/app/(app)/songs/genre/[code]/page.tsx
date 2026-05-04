@@ -13,7 +13,7 @@ interface GenrePageProps {
 }
 
 // ジャンルあたりの楽曲件数上限。
-// is_popular な曲を優先し、その後リリース年の新しい順で並べるため、
+// fame_score (Wikipedia pageviews 由来の人気度) を主キーに並べるため、
 // まずは 500 件で頭打ち。仮想化を入れるなら緩められる。
 const SONG_LIMIT = 500;
 
@@ -37,7 +37,7 @@ export default async function GenreSongsPage({ params }: GenrePageProps) {
     .filter((id): id is string => !!id);
 
   const songSelect =
-    "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, is_popular";
+    "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, fame_score, spotify_popularity";
 
   const [byArtistRes, byTagRes] = await Promise.all([
     artistIds.length > 0
@@ -45,7 +45,8 @@ export default async function GenreSongsPage({ params }: GenrePageProps) {
           .from("songs")
           .select(songSelect)
           .in("artist_id", artistIds)
-          .order("is_popular", { ascending: false })
+          .order("fame_score", { ascending: false, nullsFirst: false })
+          .order("spotify_popularity", { ascending: false, nullsFirst: false })
           .order("release_year", { ascending: false, nullsFirst: false })
           .order("title", { ascending: true })
           .limit(SONG_LIMIT)
@@ -54,21 +55,28 @@ export default async function GenreSongsPage({ params }: GenrePageProps) {
       .from("songs")
       .select(songSelect)
       .contains("genres", [code])
-      .order("is_popular", { ascending: false })
+      .order("fame_score", { ascending: false, nullsFirst: false })
+      .order("spotify_popularity", { ascending: false, nullsFirst: false })
       .order("release_year", { ascending: false, nullsFirst: false })
       .order("title", { ascending: true })
       .limit(SONG_LIMIT),
   ]);
 
   const error = byArtistRes.error ?? byTagRes.error;
-  // id で dedupe して、is_popular → release_year desc → title の順で並べ直す
+  // id で dedupe して、人気順 (fame_score → spotify_popularity → year → title)
+  // で並べ直す。NULL は最後に押しやる。
   type Row = NonNullable<typeof byTagRes.data>[number];
   const merged = new Map<string, Row>();
   for (const r of byArtistRes.data ?? []) merged.set(r.id, r);
   for (const r of byTagRes.data ?? []) merged.set(r.id, r);
   const songs = Array.from(merged.values())
     .sort((a, b) => {
-      if (a.is_popular !== b.is_popular) return a.is_popular ? -1 : 1;
+      const af = a.fame_score ?? -Infinity;
+      const bf = b.fame_score ?? -Infinity;
+      if (af !== bf) return bf - af;
+      const ap = a.spotify_popularity ?? -Infinity;
+      const bp = b.spotify_popularity ?? -Infinity;
+      if (ap !== bp) return bp - ap;
       const ay = a.release_year ?? -Infinity;
       const by = b.release_year ?? -Infinity;
       if (ay !== by) return by - ay;
