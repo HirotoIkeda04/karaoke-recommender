@@ -14,36 +14,11 @@ const RATINGS: ReadonlyArray<{
   label: string;
   Icon: typeof X;
   color: string;
-  iconColor: string;
 }> = [
-  {
-    value: "hard",
-    label: "苦手",
-    Icon: X,
-    color: "bg-red-500 text-white",
-    iconColor: "text-red-600 dark:text-red-400",
-  },
-  {
-    value: "medium",
-    label: "普通",
-    Icon: Minus,
-    color: "bg-yellow-500 text-white",
-    iconColor: "text-yellow-600 dark:text-yellow-400",
-  },
-  {
-    value: "easy",
-    label: "得意",
-    Icon: Check,
-    color: "bg-emerald-500 text-white",
-    iconColor: "text-emerald-600 dark:text-emerald-400",
-  },
-  {
-    value: "practicing",
-    label: "練習中",
-    Icon: Dumbbell,
-    color: "bg-purple-500 text-white",
-    iconColor: "text-purple-600 dark:text-purple-400",
-  },
+  { value: "hard", label: "苦手", Icon: X, color: "bg-red-500 text-white" },
+  { value: "medium", label: "普通", Icon: Minus, color: "bg-yellow-500 text-white" },
+  { value: "easy", label: "得意", Icon: Check, color: "bg-emerald-500 text-white" },
+  { value: "practicing", label: "練習中", Icon: Dumbbell, color: "bg-purple-500 text-white" },
 ];
 
 const RATING_LABELS: Record<Rating, string> = RATINGS.reduce(
@@ -119,7 +94,7 @@ export function RatingControls({ songId, initialRating }: RatingControlsProps) {
         aria-expanded={isOpen}
         className={`inline-flex h-10 items-center gap-2 rounded-full px-6 text-sm font-medium transition disabled:opacity-50 ${
           activeRating
-            ? `bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 ${activeRating.iconColor}`
+            ? `${activeRating.color} shadow-sm`
             : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
         }`}
       >
