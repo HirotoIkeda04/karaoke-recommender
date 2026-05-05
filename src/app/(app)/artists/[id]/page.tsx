@@ -201,7 +201,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
   return (
     <div className="pb-8">
       {/* Spotify 風ヒーロー: 画像フルブリード + 下端に名前オーバーレイ */}
-      <div className="relative aspect-square w-full overflow-hidden bg-gradient-to-br from-pink-500/40 to-zinc-900">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-gradient-to-br from-pink-500/40 to-zinc-900">
         {heroImage ? (
           <JacketImage
             src={heroImage}
