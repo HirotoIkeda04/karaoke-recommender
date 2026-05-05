@@ -85,7 +85,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         <div className="relative">
           <BackButton
             fallbackHref="/songs"
-            className="absolute left-0 -top-2 z-10 !ml-0"
+            className="absolute left-0 -top-2 z-10 ml-0!"
           />
         <div className="relative mx-auto mt-2 aspect-square w-3/5 max-w-[14rem] overflow-hidden rounded-sm bg-zinc-200 dark:bg-zinc-800">
           {image ? (
@@ -105,7 +105,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         </div>
       </div>
 
-      <div className="min-w-0 !mt-1 text-center">
+      <div className="min-w-0 mt-1! text-center">
         <h1 className="truncate text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
           {song.title}
         </h1>
