@@ -64,22 +64,22 @@ const HIGH_OPTIONS = [
 // 各ジャンルカードに被せる暗色グラデーション。
 // ジャンル識別性を保ちつつ、カラオケ向けに眩しすぎないよう *-950 系の
 // 深い色で from を作り、to は黒に向けて薄れさせてジャケ写を覗かせる。
-// 明度を下げるため from/via/to の不透明度を全体的に強めにしている。
-// Tailwind の JIT が拾えるよう必ず完全なクラス名で書く。
+// 暗くしすぎるとジャケが潰れるので、from/via/to はジャケが透ける程度の
+// 中間不透明度に。Tailwind の JIT が拾えるよう必ず完全なクラス名で書く。
 const GENRE_OVERLAY: Record<GenreCode, string> = {
-  j_pop: "from-pink-950/92 via-rose-950/72 to-black/55",
-  j_rock: "from-orange-950/92 via-red-950/72 to-black/55",
-  anison: "from-sky-950/92 via-indigo-950/72 to-black/55",
-  vocaloid_utaite: "from-cyan-950/92 via-teal-950/72 to-black/55",
-  idol_female: "from-fuchsia-950/92 via-pink-950/72 to-black/55",
-  idol_male: "from-blue-950/92 via-indigo-950/72 to-black/55",
-  rnb_soul: "from-amber-950/92 via-yellow-950/72 to-black/55",
-  hiphop: "from-zinc-900/94 via-zinc-950/78 to-black/55",
-  enka_kayo: "from-red-950/92 via-rose-950/72 to-black/55",
-  western: "from-emerald-950/92 via-green-950/72 to-black/55",
-  kpop: "from-purple-950/92 via-violet-950/72 to-black/55",
-  game_bgm: "from-lime-950/92 via-emerald-950/72 to-black/55",
-  other: "from-slate-900/94 via-slate-950/78 to-black/55",
+  j_pop: "from-pink-950/75 via-rose-950/45 to-black/25",
+  j_rock: "from-orange-950/75 via-red-950/45 to-black/25",
+  anison: "from-sky-950/75 via-indigo-950/45 to-black/25",
+  vocaloid_utaite: "from-cyan-950/75 via-teal-950/45 to-black/25",
+  idol_female: "from-fuchsia-950/75 via-pink-950/45 to-black/25",
+  idol_male: "from-blue-950/75 via-indigo-950/45 to-black/25",
+  rnb_soul: "from-amber-950/75 via-yellow-950/45 to-black/25",
+  hiphop: "from-zinc-900/82 via-zinc-950/55 to-black/25",
+  enka_kayo: "from-red-950/75 via-rose-950/45 to-black/25",
+  western: "from-emerald-950/75 via-green-950/45 to-black/25",
+  kpop: "from-purple-950/75 via-violet-950/45 to-black/25",
+  game_bgm: "from-lime-950/75 via-emerald-950/45 to-black/25",
+  other: "from-slate-900/82 via-slate-950/55 to-black/25",
 };
 
 const DEBOUNCE_MS = 200;
@@ -356,7 +356,7 @@ function BrowseGrid({
                   // ため scale-110 で僅かにはみ出させて overflow-hidden で
                   // クリップする。
                   <div
-                    className="absolute inset-0 grid scale-110 grid-cols-2 grid-rows-2 blur-xl"
+                    className="absolute inset-0 grid scale-110 grid-cols-2 grid-rows-2 blur-md"
                     aria-hidden
                   >
                     {[0, 1, 2, 3].map((i) => {
