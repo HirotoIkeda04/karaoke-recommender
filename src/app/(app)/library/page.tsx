@@ -91,7 +91,8 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
     supabase
       .from("evaluations")
       .select("song:songs(release_year)")
-      .eq("user_id", userId),
+      .eq("user_id", userId)
+      .in("rating", ["easy", "practicing", "medium", "hard"]),
     // ジャンル分布 (014 マイグレーションの view) — db:types 再生成までは型が乗らないので as キャスト
     sb
       .from("user_genre_distribution")
