@@ -10,23 +10,45 @@ type SupabaseServer = Awaited<ReturnType<typeof createClient>>;
 
 // 各ジャンルの fame_score 上位曲のジャケット画像 URL を 4 件まで取得。
 // BrowseGrid のカード背景 (2x2 モザイク) に使う。
+//
+// 実装メモ: ジャンルは songs.genres ではなくほぼ全て artists.genres 側に
+// 入っているため (migration 011 参照)、artists_with_song_count を経由して
+// アーティスト ID を引いてから songs を絞る。songs_with_genres VIEW は
+// anon/auth に SELECT 権限が無いため使えない。
 async function getGenreCovers(
   supabase: SupabaseServer,
 ): Promise<Partial<Record<GenreCode, string[]>>> {
   const out: Partial<Record<GenreCode, string[]>> = {};
   await Promise.all(
     GENRE_CODES.map(async (code) => {
+      const { data: artistRows } = await supabase
+        .from("artists_with_song_count")
+        .select("id")
+        .contains("genres", [code]);
+      const artistIds = (artistRows ?? [])
+        .map((r) => r.id)
+        .filter((id): id is string => !!id);
+      if (artistIds.length === 0) {
+        out[code] = [];
+        return;
+      }
       const { data } = await supabase
         .from("songs")
         .select("image_url_small, image_url_medium")
-        .contains("genres", [code])
-        .not("image_url_small", "is", null)
+        .in("artist_id", artistIds)
         .order("fame_score", { ascending: false, nullsFirst: false })
         .order("spotify_popularity", { ascending: false, nullsFirst: false })
-        .limit(4);
-      out[code] = (data ?? [])
-        .map((r) => r.image_url_small ?? r.image_url_medium)
-        .filter((u): u is string => !!u);
+        .limit(16);
+      // 同じジャケが連続しないよう dedupe しつつ先頭 4 件を採る
+      const collected: string[] = [];
+      for (const r of data ?? []) {
+        const url = r.image_url_small ?? r.image_url_medium;
+        if (!url) continue;
+        if (collected.includes(url)) continue;
+        collected.push(url);
+        if (collected.length >= 4) break;
+      }
+      out[code] = collected;
     }),
   );
   return out;
