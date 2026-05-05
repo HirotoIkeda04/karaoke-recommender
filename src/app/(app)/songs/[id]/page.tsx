@@ -82,47 +82,49 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         </div>
       ) : null}
       <div className="relative mx-auto max-w-md space-y-5 px-4 py-4">
-        <div className="relative">
-          <BackButton
-            fallbackHref="/songs"
-            className="absolute left-0 -top-2 z-10 ml-0!"
-          />
-        <div className="relative mx-auto mt-2 aspect-square w-3/5 max-w-[14rem] overflow-hidden rounded-sm bg-zinc-200 dark:bg-zinc-800">
-          {image ? (
-            <JacketImage
-              src={image}
-              alt={`${song.title} のジャケット`}
-              fill
-              sizes="14rem"
-              priority
-              className="object-cover"
+        <div className="space-y-1">
+          <div className="relative">
+            <BackButton
+              fallbackHref="/songs"
+              className="absolute left-0 -top-2 z-10 ml-0!"
             />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-5xl text-zinc-400">
-              ♪
+            <div className="relative mx-auto mt-2 aspect-square w-3/5 max-w-[14rem] overflow-hidden rounded-sm bg-zinc-200 dark:bg-zinc-800">
+              {image ? (
+                <JacketImage
+                  src={image}
+                  alt={`${song.title} のジャケット`}
+                  fill
+                  sizes="14rem"
+                  priority
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-5xl text-zinc-400">
+                  ♪
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </div>
+          </div>
 
-      <div className="min-w-0 mt-1! text-center">
-        <h1 className="truncate text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-          {song.title}
-        </h1>
-        <p className="mt-0.5 truncate text-sm text-zinc-600 dark:text-zinc-400">
-          {song.artist_id ? (
-            <Link
-              href={`/artists/${song.artist_id}`}
-              className="underline-offset-2 hover:underline"
-            >
-              {song.artist}
-            </Link>
-          ) : (
-            song.artist
-          )}
-          {song.release_year ? ` · ${song.release_year}` : ""}
-        </p>
-      </div>
+          <div className="min-w-0 text-center">
+            <h1 className="truncate text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+              {song.title}
+            </h1>
+            <p className="mt-0.5 truncate text-sm text-zinc-600 dark:text-zinc-400">
+              {song.artist_id ? (
+                <Link
+                  href={`/artists/${song.artist_id}`}
+                  className="underline-offset-2 hover:underline"
+                >
+                  {song.artist}
+                </Link>
+              ) : (
+                song.artist
+              )}
+              {song.release_year ? ` · ${song.release_year}` : ""}
+            </p>
+          </div>
+        </div>
 
       <div className="flex items-center justify-center gap-3">
         <RatingControls
