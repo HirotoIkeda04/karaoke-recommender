@@ -177,22 +177,37 @@ async function resolveArtistQid(
 // --- Wikidata SPARQL: artist Q-ID -> songs ---------------------------------
 
 async function fetchSongsByArtistQid(qid: string): Promise<WikidataSong[]> {
-  // P175 (performer) が指定アーティスト。
+  // P175 (performer) が指定アーティスト + P31 が楽曲系の whitelist のいずれか。
   //
-  // 「P31/P279* で Q7366 の派生」フィルタは Wikidata の taxonomy が中途半端なため
-  // single (Q134556) 等を取りこぼす。代わりに明確に楽曲ではないもの (album/EP/
-  // compilation/video) のみを除外する。
+  // 当初は P31 の blacklist 方式 (album/EP/concert tour 等を NOT EXISTS で除外)
+  // だったが、Wikidata は「ビデオアルバム (Q10590726)」「コンサートツアー
+  // (Q1573906)」「映画 (Q11424)」「登場人物」など想定外の type を多数持ち、
+  // 1,123 アーティスト × 100 曲投入で約 2,110 件 (16%) のノイズが混入した
+  // (audit-wikidata-types.ts で観測)。
+  //
+  // whitelist に切り替え、楽曲系の type に 1 つでも該当する entity だけを採用。
+  // 漏れなくカバーするため SONG_WHITELIST は cleanup-non-song-wikidata と同期。
   // P577 (publication date) を OPTIONAL で取得 (release_year に使う)。
   const sparql = `
     SELECT DISTINCT ?song ?songLabel ?date WHERE {
       ?song wdt:P175 wd:${qid}.
-      FILTER NOT EXISTS { ?song wdt:P31 wd:Q482994. }   # album
-      FILTER NOT EXISTS { ?song wdt:P31 wd:Q209939. }   # studio album
-      FILTER NOT EXISTS { ?song wdt:P31 wd:Q24862. }    # compilation album
-      FILTER NOT EXISTS { ?song wdt:P31 wd:Q209598. }   # extended play (EP)
-      FILTER NOT EXISTS { ?song wdt:P31 wd:Q220935. }   # live album
-      FILTER NOT EXISTS { ?song wdt:P31 wd:Q108352648. } # video album
-      FILTER NOT EXISTS { ?song wdt:P31 wd:Q482994. }   # album (再掲: 安全のため)
+      ?song wdt:P31 ?type.
+      FILTER (?type IN (
+        wd:Q134556,       # シングル
+        wd:Q105543609,    # 音楽作品/楽曲
+        wd:Q7366,         # 歌
+        wd:Q55850593,     # ヴォーカルを伴う楽曲
+        wd:Q7302866,      # オーディオトラック
+        wd:Q66021463,     # 両A面シングル
+        wd:Q108352496,    # シングルリリース
+        wd:Q63141557,     # 翻訳歌
+        wd:Q59847891,     # digital promotional single
+        wd:Q106042566,    # シングル・アルバム (K-pop)
+        wd:Q106077699,    # video single
+        wd:Q207628,       # 楽曲
+        wd:Q4132319,      # 楽曲のサブクラス
+        wd:Q1259759       # cover song
+      ))
       OPTIONAL { ?song wdt:P577 ?date }
       SERVICE wikibase:label { bd:serviceParam wikibase:language "ja,en,en-us". }
     }
