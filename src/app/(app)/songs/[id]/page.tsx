@@ -82,7 +82,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         </div>
       ) : null}
       <div className="relative mx-auto max-w-md space-y-5 px-4 py-4">
-        <div className="space-y-1">
+        <div className="space-y-2">
           <div className="relative">
             <BackButton
               fallbackHref="/songs"
