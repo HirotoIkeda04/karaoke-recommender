@@ -105,7 +105,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         </div>
       </div>
 
-      <div className="min-w-0 !mt-3 text-center">
+      <div className="min-w-0 !mt-1 text-center">
         <h1 className="truncate text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
           {song.title}
         </h1>
