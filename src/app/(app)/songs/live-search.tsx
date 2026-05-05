@@ -351,12 +351,11 @@ function BrowseGrid({
                 className="relative flex aspect-[16/10] items-start overflow-hidden rounded-lg bg-zinc-900 pl-4 pr-3 pt-4 pb-3 transition active:scale-[0.98]"
               >
                 {covers.length > 0 ? (
-                  // モザイクに強めの blur をかけてジャケ写の輪郭をぼかし、
-                  // 抽象的な色面のような印象に。blur のフチ暗化を回避する
-                  // ため scale-110 で僅かにはみ出させて overflow-hidden で
-                  // クリップする。
+                  // モザイクは blur をかけずシャープに描画。
+                  // 文字可読性のための blur は後段の局所 backdrop-filter で
+                  // テキスト直下にのみ適用する (本要素は色情報の供給役)。
                   <div
-                    className="absolute inset-0 grid scale-110 grid-cols-2 grid-rows-2 blur-sm"
+                    className="absolute inset-0 grid grid-cols-2 grid-rows-2"
                     aria-hidden
                   >
                     {[0, 1, 2, 3].map((i) => {
@@ -405,8 +404,13 @@ function BrowseGrid({
                     maskComposite: "exclude",
                   }}
                 />
-                <span className="relative z-10 text-sm font-extrabold leading-tight tracking-tight text-zinc-200 drop-shadow-md">
-                  {GENRE_LABELS[code]}
+                {/* 文字直下だけに局所 backdrop-blur をかけてジャケの細かい
+                    エッジを和らげ、可読性を底上げする (全面 blur は使わない)。
+                    背景色は付けず、blur 効果のみで目立たないチップに。 */}
+                <span className="relative z-10 inline-block self-start rounded-md px-1.5 py-0.5 backdrop-blur-md">
+                  <span className="text-sm font-extrabold leading-tight tracking-tight text-zinc-200 drop-shadow-md">
+                    {GENRE_LABELS[code]}
+                  </span>
                 </span>
               </Link>
             </li>
