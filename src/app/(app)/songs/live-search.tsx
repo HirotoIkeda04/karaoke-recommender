@@ -356,7 +356,7 @@ function BrowseGrid({
                   // ため scale-110 で僅かにはみ出させて overflow-hidden で
                   // クリップする。
                   <div
-                    className="absolute inset-0 grid scale-110 grid-cols-2 grid-rows-2 blur-md"
+                    className="absolute inset-0 grid scale-110 grid-cols-2 grid-rows-2 blur-sm"
                     aria-hidden
                   >
                     {[0, 1, 2, 3].map((i) => {

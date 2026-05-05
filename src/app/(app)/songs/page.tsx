@@ -34,18 +34,22 @@ async function getGenreCovers(
       }
       const { data } = await supabase
         .from("songs")
-        .select("image_url_small, image_url_medium")
+        .select("image_url_small, image_url_medium, artist_id")
         .in("artist_id", artistIds)
         .order("fame_score", { ascending: false, nullsFirst: false })
         .order("spotify_popularity", { ascending: false, nullsFirst: false })
-        .limit(16);
-      // 同じジャケが連続しないよう dedupe しつつ先頭 4 件を採る
+        .limit(64);
+      // モザイクの色味が偏らないよう、同じアーティスト/同じジャケ URL は
+      // 1 度ずつだけ採用して先頭 4 件を集める。
       const collected: string[] = [];
+      const seenArtists = new Set<string>();
       for (const r of data ?? []) {
         const url = r.image_url_small ?? r.image_url_medium;
         if (!url) continue;
         if (collected.includes(url)) continue;
+        if (r.artist_id && seenArtists.has(r.artist_id)) continue;
         collected.push(url);
+        if (r.artist_id) seenArtists.add(r.artist_id);
         if (collected.length >= 4) break;
       }
       out[code] = collected;
