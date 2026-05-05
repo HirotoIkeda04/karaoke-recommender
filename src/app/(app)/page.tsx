@@ -24,6 +24,7 @@ export default async function HomePage() {
     (supabase.rpc as any)("get_unrated_songs_v2", {
       p_limit: 20,
       p_popular_only: true,
+      p_require_image: true,
     }),
     getUserKnownSongIds(),
   ]);
