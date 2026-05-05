@@ -375,6 +375,28 @@ function BrowseGrid({
                   className={`absolute inset-0 bg-gradient-to-br ${GENRE_OVERLAY[code]}`}
                   aria-hidden
                 />
+                {/* ガラス風 2px リム: padding=2px で枠の太さを定義し、
+                    border-box と content-box の mask を exclude 合成で
+                    中央をくり抜く。backdrop-filter は枠部分にのみ効くため、
+                    swipe-deck カードと同じ「内側 2px だけガラス」になる。
+                    static カードなので clip-path 二重描画は不要。 */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 rounded-lg"
+                  style={{
+                    padding: "2px",
+                    background: "rgba(255,255,255,0.18)",
+                    backdropFilter:
+                      "blur(20px) brightness(1.2) saturate(1.4)",
+                    WebkitBackdropFilter:
+                      "blur(20px) brightness(1.2) saturate(1.4)",
+                    WebkitMask:
+                      "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+                    WebkitMaskComposite: "xor",
+                    mask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+                    maskComposite: "exclude",
+                  }}
+                />
                 <span className="relative z-10 text-sm font-extrabold leading-tight tracking-tight text-white drop-shadow-md">
                   {GENRE_LABELS[code]}
                 </span>
