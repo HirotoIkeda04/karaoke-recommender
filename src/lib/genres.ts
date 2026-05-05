@@ -31,7 +31,7 @@ export const GENRE_LABELS: Record<GenreCode, string> = {
   idol_female: "女性アイドル",
   idol_male: "男性アイドル",
   rnb_soul: "R&B・ソウル",
-  hiphop: "ヒップホップ",
+  hiphop: "HipHop",
   enka_kayo: "演歌・歌謡曲",
   western: "洋楽",
   kpop: "K-POP",
