@@ -19,6 +19,9 @@ import { appendFileSync, existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { createAdminClient } from "../src/lib/supabase/admin";
+import type { Database } from "../src/types/database";
+
+type SongUpdate = Database["public"]["Tables"]["songs"]["Update"];
 
 // --- Config -----------------------------------------------------------------
 
@@ -324,7 +327,7 @@ async function worker(
       const artworkSmall = r.artworkUrl100!;
       const artworkMedium = resizeArtwork(artworkSmall, 600);
       const artworkLarge = resizeArtwork(artworkSmall, 1200);
-      const updates: Record<string, unknown> = {
+      const updates: SongUpdate = {
         image_url_small: artworkSmall,
         image_url_medium: artworkMedium,
         image_url_large: artworkLarge,
