@@ -105,11 +105,11 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         </div>
       </div>
 
-      <div className="min-w-0 text-center">
+      <div className="min-w-0 !mt-3 text-center">
         <h1 className="truncate text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
           {song.title}
         </h1>
-        <p className="mt-1 truncate text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-0.5 truncate text-sm text-zinc-600 dark:text-zinc-400">
           {song.artist_id ? (
             <Link
               href={`/artists/${song.artist_id}`}
