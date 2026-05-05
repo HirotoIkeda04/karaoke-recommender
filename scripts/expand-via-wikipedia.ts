@@ -22,6 +22,9 @@
  *   pnpm expand:wikipedia -- --limit 5 --dry-run
  */
 import { createAdminClient } from "../src/lib/supabase/admin";
+import type { Database } from "../src/types/database";
+
+type SongInsert = Database["public"]["Tables"]["songs"]["Insert"];
 
 // --- Configuration ----------------------------------------------------------
 
@@ -346,7 +349,7 @@ async function main() {
 
       // 3c) dedup -> 新規分のみ収集。
       const existingTitles = existingTitlesByArtist.get(a.id) ?? new Set<string>();
-      const inserts: Array<Record<string, unknown>> = [];
+      const inserts: SongInsert[] = [];
       for (const s of songs) {
         if (existingSongQids.has(s.qid)) {
           summary.duplicates++;

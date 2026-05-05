@@ -22,6 +22,8 @@ export type Database = {
           name: string
           name_norm: string
           updated_at: string
+          wikidata_qid: string | null
+          wikipedia_article: string | null
         }
         Insert: {
           created_at?: string
@@ -30,6 +32,8 @@ export type Database = {
           name: string
           name_norm: string
           updated_at?: string
+          wikidata_qid?: string | null
+          wikipedia_article?: string | null
         }
         Update: {
           created_at?: string
@@ -38,6 +42,8 @@ export type Database = {
           name?: string
           name_norm?: string
           updated_at?: string
+          wikidata_qid?: string | null
+          wikipedia_article?: string | null
         }
         Relationships: []
       }
@@ -332,7 +338,6 @@ export type Database = {
           id: string
           key_shift: number | null
           logged_at: string
-          score: number | null
           song_id: string
           updated_at: string
           user_id: string
@@ -344,7 +349,6 @@ export type Database = {
           id?: string
           key_shift?: number | null
           logged_at?: string
-          score?: number | null
           song_id: string
           updated_at?: string
           user_id: string
@@ -356,7 +360,6 @@ export type Database = {
           id?: string
           key_shift?: number | null
           logged_at?: string
-          score?: number | null
           song_id?: string
           updated_at?: string
           user_id?: string
@@ -413,6 +416,8 @@ export type Database = {
           spotify_track_id: string | null
           title: string
           updated_at: string
+          wikidata_qid: string | null
+          wikipedia_article: string | null
         }
         Insert: {
           artist: string
@@ -448,6 +453,8 @@ export type Database = {
           spotify_track_id?: string | null
           title: string
           updated_at?: string
+          wikidata_qid?: string | null
+          wikipedia_article?: string | null
         }
         Update: {
           artist?: string
@@ -483,6 +490,8 @@ export type Database = {
           spotify_track_id?: string | null
           title?: string
           updated_at?: string
+          wikidata_qid?: string | null
+          wikipedia_article?: string | null
         }
         Relationships: [
           {
@@ -758,6 +767,8 @@ export type Database = {
           spotify_track_id: string | null
           title: string
           updated_at: string
+          wikidata_qid: string | null
+          wikipedia_article: string | null
         }[]
         SetofOptions: {
           from: "*"
@@ -802,6 +813,8 @@ export type Database = {
           spotify_track_id: string | null
           title: string
           updated_at: string
+          wikidata_qid: string | null
+          wikipedia_article: string | null
         }[]
         SetofOptions: {
           from: "*"
@@ -838,8 +851,8 @@ export type Database = {
       search_songs_and_artists: {
         Args: {
           p_artist_limit?: number
-          p_high_max_midi?: number | null
-          p_high_min_midi?: number | null
+          p_high_max_midi?: number
+          p_high_min_midi?: number
           p_q: string
           p_song_limit?: number
         }
