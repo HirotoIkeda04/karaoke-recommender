@@ -351,24 +351,32 @@ function BrowseGrid({
                 className="relative flex aspect-[16/10] items-start overflow-hidden rounded-lg bg-zinc-900 pl-4 pr-3 pt-4 pb-3 transition active:scale-[0.98]"
               >
                 {covers.length > 0 ? (
-                  // モザイクは blur をかけずシャープに描画。
-                  // 文字可読性のための blur は後段の局所 backdrop-filter で
-                  // テキスト直下にのみ適用する (本要素は色情報の供給役)。
+                  // Bento 配置: 左に大ジャケ 1 枚、右に小 2 枚 (縦並び)、
+                  // 下に横長 1 枚。grid-template-areas で表現する。
+                  // 列比 3:2、行比 1:1:1 → 大タイルは横 60% × 縦 2/3。
                   <div
-                    className="absolute inset-0 grid grid-cols-2 grid-rows-2"
+                    className="absolute inset-0 grid"
+                    style={{
+                      gridTemplateColumns: "3fr 2fr",
+                      gridTemplateRows: "1fr 1fr 1fr",
+                      gridTemplateAreas: '"a b" "a c" "d d"',
+                    }}
                     aria-hidden
                   >
-                    {[0, 1, 2, 3].map((i) => {
-                      // 4 枚揃わない場合は循環させて隙間を埋める
+                    {(["a", "b", "c", "d"] as const).map((area, i) => {
                       const src = covers[i] ?? covers[i % covers.length];
                       return (
-                        <div key={i} className="relative bg-zinc-800">
+                        <div
+                          key={area}
+                          className="relative bg-zinc-800"
+                          style={{ gridArea: area }}
+                        >
                           {src ? (
                             <JacketImage
                               src={src}
                               alt=""
                               fill
-                              sizes="(max-width: 640px) 25vw, 12vw"
+                              sizes="(max-width: 640px) 30vw, 15vw"
                               className="object-cover"
                             />
                           ) : null}
