@@ -67,19 +67,19 @@ const HIGH_OPTIONS = [
 // 暗くしすぎるとジャケが潰れるので、from/via/to はジャケが透ける程度の
 // 中間不透明度に。Tailwind の JIT が拾えるよう必ず完全なクラス名で書く。
 const GENRE_OVERLAY: Record<GenreCode, string> = {
-  j_pop: "from-pink-950/75 via-rose-950/45 to-black/25",
-  j_rock: "from-orange-950/75 via-red-950/45 to-black/25",
-  anison: "from-sky-950/75 via-indigo-950/45 to-black/25",
-  vocaloid_utaite: "from-cyan-950/75 via-teal-950/45 to-black/25",
-  idol_female: "from-fuchsia-950/75 via-pink-950/45 to-black/25",
-  idol_male: "from-blue-950/75 via-indigo-950/45 to-black/25",
-  rnb_soul: "from-amber-950/75 via-yellow-950/45 to-black/25",
-  hiphop: "from-zinc-900/82 via-zinc-950/55 to-black/25",
-  enka_kayo: "from-red-950/75 via-rose-950/45 to-black/25",
-  western: "from-emerald-950/75 via-green-950/45 to-black/25",
-  kpop: "from-purple-950/75 via-violet-950/45 to-black/25",
-  game_bgm: "from-lime-950/75 via-emerald-950/45 to-black/25",
-  other: "from-slate-900/82 via-slate-950/55 to-black/25",
+  j_pop: "from-pink-950/88 via-rose-950/45 to-black/25",
+  j_rock: "from-orange-950/88 via-red-950/45 to-black/25",
+  anison: "from-sky-950/88 via-indigo-950/45 to-black/25",
+  vocaloid_utaite: "from-cyan-950/88 via-teal-950/45 to-black/25",
+  idol_female: "from-fuchsia-950/88 via-pink-950/45 to-black/25",
+  idol_male: "from-blue-950/88 via-indigo-950/45 to-black/25",
+  rnb_soul: "from-amber-950/88 via-yellow-950/45 to-black/25",
+  hiphop: "from-zinc-900/92 via-zinc-950/55 to-black/25",
+  enka_kayo: "from-red-950/88 via-rose-950/45 to-black/25",
+  western: "from-emerald-950/88 via-green-950/45 to-black/25",
+  kpop: "from-purple-950/88 via-violet-950/45 to-black/25",
+  game_bgm: "from-lime-950/88 via-emerald-950/45 to-black/25",
+  other: "from-slate-900/92 via-slate-950/55 to-black/25",
 };
 
 const DEBOUNCE_MS = 200;
