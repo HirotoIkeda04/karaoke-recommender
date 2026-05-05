@@ -105,32 +105,37 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <h1 className="truncate text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-            {song.title}
-          </h1>
-          <p className="mt-1 truncate text-sm text-zinc-600 dark:text-zinc-400">
-            {song.artist_id ? (
-              <Link
-                href={`/artists/${song.artist_id}`}
-                className="underline-offset-2 hover:underline"
-              >
-                {song.artist}
-              </Link>
-            ) : (
-              song.artist
-            )}
-            {song.release_year ? ` · ${song.release_year}` : ""}
-          </p>
-        </div>
+      <div className="min-w-0">
+        <h1 className="truncate text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          {song.title}
+        </h1>
+        <p className="mt-1 truncate text-sm text-zinc-600 dark:text-zinc-400">
+          {song.artist_id ? (
+            <Link
+              href={`/artists/${song.artist_id}`}
+              className="underline-offset-2 hover:underline"
+            >
+              {song.artist}
+            </Link>
+          ) : (
+            song.artist
+          )}
+          {song.release_year ? ` · ${song.release_year}` : ""}
+        </p>
+      </div>
+
+      <div className="flex items-center justify-center gap-3">
+        <RatingControls
+          songId={song.id}
+          initialRating={evaluation?.rating ?? null}
+        />
         {song.spotify_track_id ? (
           <Link
             href={`https://open.spotify.com/track/${song.spotify_track_id}`}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Spotify で聴く"
-            className="grid size-10 shrink-0 place-items-center rounded-full bg-white text-black shadow-lg transition hover:scale-105 hover:bg-zinc-100"
+            className="grid size-11 shrink-0 place-items-center rounded-full border-2 border-[#1DB954] bg-transparent text-[#1DB954] transition hover:scale-105 hover:bg-[#1DB954]/10"
           >
             <Play className="ml-0.5 size-4 fill-current" aria-hidden />
           </Link>
@@ -141,7 +146,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
           楽曲情報
         </h2>
-        <dl className="divide-y divide-zinc-200 rounded-xl bg-zinc-100 px-4 text-sm dark:divide-zinc-700/60 dark:bg-zinc-800/60">
+        <dl className="mx-4 divide-y divide-zinc-200 rounded-xl bg-zinc-100 px-4 text-sm dark:divide-zinc-700/60 dark:bg-zinc-800/60">
           <div className="flex items-baseline justify-between py-3">
             <dt className="text-zinc-600 dark:text-zinc-400">地声</dt>
             <dd className="font-mono">
@@ -162,13 +167,6 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
       </section>
 
       <SongLogs songId={song.id} initialLogs={logs} />
-
-      <div className="flex justify-center pt-4">
-        <RatingControls
-          songId={song.id}
-          initialRating={evaluation?.rating ?? null}
-        />
-      </div>
       </div>
     </div>
   );

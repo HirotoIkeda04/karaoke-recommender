@@ -180,7 +180,7 @@ export function SongLogs({ songId, initialLogs }: SongLogsProps) {
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-          歌った記録
+          歌唱記録
         </h2>
         {!isAdding ? (
           <button
