@@ -404,13 +404,26 @@ function BrowseGrid({
                     maskComposite: "exclude",
                   }}
                 />
-                {/* 文字直下だけに局所 backdrop-blur をかけてジャケの細かい
-                    エッジを和らげ、可読性を底上げする (全面 blur は使わない)。
-                    背景色は付けず、blur 効果のみで目立たないチップに。 */}
-                <span className="relative z-10 inline-block self-start rounded-md px-1.5 py-0.5 backdrop-blur-md">
-                  <span className="text-sm font-extrabold leading-tight tracking-tight text-zinc-200 drop-shadow-md">
-                    {GENRE_LABELS[code]}
-                  </span>
+                {/* 左上 → 右下方向の勾配 blur。
+                    backdrop-filter で全面に blur を効かせつつ、
+                    mask-image の linear-gradient(135deg, black, transparent)
+                    で左上だけ不透明・右下に向けて透明にすることで、
+                    結果として「左上が強い blur, 右下はシャープ」のグラデ
+                    blur に見える。 */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0"
+                  style={{
+                    backdropFilter: "blur(10px)",
+                    WebkitBackdropFilter: "blur(10px)",
+                    maskImage:
+                      "linear-gradient(135deg, black 0%, black 25%, transparent 80%)",
+                    WebkitMaskImage:
+                      "linear-gradient(135deg, black 0%, black 25%, transparent 80%)",
+                  }}
+                />
+                <span className="relative z-10 text-sm font-extrabold leading-tight tracking-tight text-zinc-200 drop-shadow-md">
+                  {GENRE_LABELS[code]}
                 </span>
               </Link>
             </li>
