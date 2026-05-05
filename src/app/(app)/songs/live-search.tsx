@@ -140,8 +140,8 @@ export function LiveSearch({
     const timer = window.setTimeout(async () => {
       setLoading(true);
       setErrMsg(null);
-      const highMinMidi = highMin ? karaokeToMidi(highMin) : null;
-      const highMaxMidi = highMax ? karaokeToMidi(highMax) : null;
+      const highMinMidi = (highMin ? karaokeToMidi(highMin) : undefined) ?? undefined;
+      const highMaxMidi = (highMax ? karaokeToMidi(highMax) : undefined) ?? undefined;
       const { data, error } = await supabase
         .rpc("search_songs_and_artists", {
           p_q: trimmedQ,
