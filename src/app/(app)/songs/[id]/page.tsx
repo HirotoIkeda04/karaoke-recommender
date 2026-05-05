@@ -105,7 +105,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         </div>
       </div>
 
-      <div className="min-w-0">
+      <div className="min-w-0 text-center">
         <h1 className="truncate text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
           {song.title}
         </h1>
@@ -147,20 +147,20 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
           楽曲情報
         </h2>
         <dl className="mx-4 divide-y divide-zinc-200 rounded-xl bg-zinc-100 px-4 text-sm dark:divide-zinc-700/60 dark:bg-zinc-800/60">
-          <div className="flex items-baseline justify-between py-3">
-            <dt className="text-zinc-600 dark:text-zinc-400">地声</dt>
+          <div className="flex items-baseline py-3">
+            <dt className="w-20 shrink-0 text-zinc-600 dark:text-zinc-400">地声</dt>
             <dd className="font-mono">
               {song.range_low_midi == null && song.range_high_midi == null
                 ? "—"
                 : `${midiToKaraoke(song.range_low_midi)} — ${midiToKaraoke(song.range_high_midi)}`}
             </dd>
           </div>
-          <div className="flex items-baseline justify-between py-3">
-            <dt className="text-zinc-600 dark:text-zinc-400">裏声</dt>
+          <div className="flex items-baseline py-3">
+            <dt className="w-20 shrink-0 text-zinc-600 dark:text-zinc-400">裏声</dt>
             <dd className="font-mono">{midiToKaraoke(song.falsetto_max_midi)}</dd>
           </div>
-          <div className="flex items-baseline justify-between py-3">
-            <dt className="text-zinc-600 dark:text-zinc-400">長さ</dt>
+          <div className="flex items-baseline py-3">
+            <dt className="w-20 shrink-0 text-zinc-600 dark:text-zinc-400">長さ</dt>
             <dd className="font-mono">{formatDuration(song.duration_ms)}</dd>
           </div>
         </dl>
