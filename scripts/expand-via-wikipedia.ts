@@ -198,16 +198,15 @@ async function fetchSongsByArtistQid(qid: string): Promise<WikidataSong[]> {
         wd:Q7366,         # 歌
         wd:Q55850593,     # ヴォーカルを伴う楽曲
         wd:Q7302866,      # オーディオトラック
-        wd:Q66021463,     # 両A面シングル
-        wd:Q108352496,    # シングルリリース
         wd:Q63141557,     # 翻訳歌
         wd:Q59847891,     # digital promotional single
-        wd:Q106042566,    # シングル・アルバム (K-pop)
-        wd:Q106077699,    # video single
         wd:Q207628,       # 楽曲
         wd:Q4132319,      # 楽曲のサブクラス
         wd:Q1259759       # cover song
       ))
+      # 両A面シングル (Q66021463) / シングルリリース (Q108352496) /
+      # シングル・アルバム K-pop (Q106042566) / video single (Q106077699) は
+      # "リリース単位" のため、中身が既存単曲と重複しがち。除外する。
       OPTIONAL { ?song wdt:P577 ?date }
       SERVICE wikibase:label { bd:serviceParam wikibase:language "ja,en,en-us". }
     }
@@ -236,11 +235,23 @@ async function fetchSongsByArtistQid(qid: string): Promise<WikidataSong[]> {
   const seen = new Map<string, WikidataSong>();
   for (const b of json.results?.bindings ?? []) {
     const songUri = b.song?.value;
-    const label = b.songLabel?.value;
-    if (!songUri || !label) continue;
+    const labelRaw = b.songLabel?.value;
+    if (!songUri || !labelRaw) continue;
     const qid = songUri.split("/").pop()!;
     // songLabel が Q-ID そのまま (= ja/en label が無かった) なら捨てる
-    if (/^Q\d+$/.test(label)) continue;
+    if (/^Q\d+$/.test(labelRaw)) continue;
+    // Wikipedia 記事名の disambiguation suffix を剥がす:
+    //   "もう一度だけ (Da-iCeの曲)" → "もう一度だけ"
+    //   "Clover (松たか子の曲)" → "Clover"
+    //   "○○ (楽曲)" / "○○ (曲)" / "○○ (song)" 等
+    const label = labelRaw
+      .replace(/\s*\([^()]*の曲\)\s*$/, "")
+      .replace(/\s*\([^()]*のシングル\)\s*$/, "")
+      .replace(/\s*\([^()]*の楽曲\)\s*$/, "")
+      .replace(/\s*\((?:楽曲|曲)\)\s*$/, "")
+      .replace(/\s*\((?:song|track)\)\s*$/i, "")
+      .trim();
+    if (!label) continue;
     const dateRaw = b.date?.value;
     const year = dateRaw ? parseInt(dateRaw.slice(0, 4), 10) : null;
     const existing = seen.get(qid);
