@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ArtistRow, type ArtistRowData } from "@/components/artist-row";
 import { SongCard } from "@/components/song-card";
+import { JacketImage } from "@/components/ui/jacket-image";
 import { GENRE_CODES, GENRE_LABELS, type GenreCode } from "@/lib/genres";
 import { karaokeToMidi } from "@/lib/note";
 import {
@@ -44,6 +45,8 @@ interface LiveSearchProps {
   ratings: Record<string, string>;
   /** Spotify で聴いたことがある song_id 一覧 */
   knownSongIds?: string[];
+  /** ジャンルカード背景に使う、各ジャンル top 4 曲のジャケット URL */
+  genreCovers?: Partial<Record<GenreCode, string[]>>;
 }
 
 const HIGH_OPTIONS = [
@@ -58,26 +61,13 @@ const HIGH_OPTIONS = [
   "hiF",
 ];
 
-// 各ジャンルの背景グラデーション (Spotify 風カラフル系)
-const GENRE_GRADIENTS: Record<GenreCode, string> = {
-  j_pop: "from-pink-500 to-rose-700",
-  j_rock: "from-orange-500 to-red-700",
-  anison: "from-sky-500 to-indigo-700",
-  vocaloid_utaite: "from-cyan-400 to-teal-700",
-  idol_female: "from-fuchsia-400 to-pink-700",
-  idol_male: "from-blue-500 to-indigo-800",
-  rnb_soul: "from-amber-600 to-yellow-800",
-  hiphop: "from-zinc-700 to-zinc-900",
-  enka_kayo: "from-red-700 to-rose-900",
-  western: "from-emerald-500 to-green-800",
-  kpop: "from-purple-500 to-violet-800",
-  game_bgm: "from-lime-500 to-emerald-700",
-  other: "from-slate-500 to-slate-700",
-};
-
 const DEBOUNCE_MS = 200;
 
-export function LiveSearch({ ratings, knownSongIds = [] }: LiveSearchProps) {
+export function LiveSearch({
+  ratings,
+  knownSongIds = [],
+  genreCovers = {},
+}: LiveSearchProps) {
   const [query, setQuery] = useState("");
   const [highMax, setHighMax] = useState("");
   const [highMin, setHighMin] = useState("");
@@ -289,7 +279,7 @@ export function LiveSearch({ ratings, knownSongIds = [] }: LiveSearchProps) {
       </div>
 
       {mode === "browse" ? (
-        <BrowseGrid />
+        <BrowseGrid genreCovers={genreCovers} />
       ) : mode === "history" ? (
         <HistoryList
           history={history}
@@ -315,27 +305,63 @@ export function LiveSearch({ ratings, knownSongIds = [] }: LiveSearchProps) {
 }
 
 // ============================================================================
-// Browse: ジャンルカードグリッド (Spotify 風)
+// Browse: ジャンルカードグリッド
+//   - 各ジャンルのランキング上位曲 (fame_score 降順) のジャケットを 2x2 モザイク
+//     で背景に敷き、暗いグラデーションを重ねてタイトルを白文字で乗せる。
+//   - covers が空のジャンルは zinc-900 のフラット背景にフォールバック。
 // ============================================================================
-function BrowseGrid() {
+function BrowseGrid({
+  genreCovers,
+}: {
+  genreCovers: Partial<Record<GenreCode, string[]>>;
+}) {
   return (
     <section>
       <h2 className="mb-2 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
         ブラウズを開始
       </h2>
       <ul className="grid grid-cols-2 gap-2">
-        {GENRE_CODES.map((code) => (
-          <li key={code}>
-            <Link
-              href={`/songs/genre/${code}`}
-              className={`relative flex aspect-[16/10] items-start overflow-hidden rounded-lg bg-gradient-to-br ${GENRE_GRADIENTS[code]} p-3 transition active:scale-[0.98]`}
-            >
-              <span className="text-sm font-bold leading-tight text-white drop-shadow">
-                {GENRE_LABELS[code]}
-              </span>
-            </Link>
-          </li>
-        ))}
+        {GENRE_CODES.map((code) => {
+          const covers = genreCovers[code] ?? [];
+          return (
+            <li key={code}>
+              <Link
+                href={`/songs/genre/${code}`}
+                className="relative flex aspect-[16/10] items-start overflow-hidden rounded-lg bg-zinc-900 p-3 transition active:scale-[0.98]"
+              >
+                {covers.length > 0 ? (
+                  <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
+                    {[0, 1, 2, 3].map((i) => {
+                      // 4 枚揃わない場合は循環させて隙間を埋める
+                      const src = covers[i] ?? covers[i % covers.length];
+                      return (
+                        <div key={i} className="relative bg-zinc-800">
+                          {src ? (
+                            <JacketImage
+                              src={src}
+                              alt=""
+                              fill
+                              sizes="(max-width: 640px) 25vw, 12vw"
+                              className="object-cover"
+                            />
+                          ) : null}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : null}
+                {/* 暗いグラデーションでタイトルの可読性を確保 */}
+                <div
+                  className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/55 to-black/30"
+                  aria-hidden
+                />
+                <span className="relative z-10 text-sm font-extrabold leading-tight tracking-tight text-white drop-shadow-md">
+                  {GENRE_LABELS[code]}
+                </span>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );

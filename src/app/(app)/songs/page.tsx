@@ -1,9 +1,36 @@
+import { GENRE_CODES, type GenreCode } from "@/lib/genres";
 import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
 import { createClient } from "@/lib/supabase/server";
 
 import { LiveSearch } from "./live-search";
 
 export const dynamic = "force-dynamic";
+
+type SupabaseServer = Awaited<ReturnType<typeof createClient>>;
+
+// 各ジャンルの fame_score 上位曲のジャケット画像 URL を 4 件まで取得。
+// BrowseGrid のカード背景 (2x2 モザイク) に使う。
+async function getGenreCovers(
+  supabase: SupabaseServer,
+): Promise<Partial<Record<GenreCode, string[]>>> {
+  const out: Partial<Record<GenreCode, string[]>> = {};
+  await Promise.all(
+    GENRE_CODES.map(async (code) => {
+      const { data } = await supabase
+        .from("songs")
+        .select("image_url_small, image_url_medium")
+        .contains("genres", [code])
+        .not("image_url_small", "is", null)
+        .order("fame_score", { ascending: false, nullsFirst: false })
+        .order("spotify_popularity", { ascending: false, nullsFirst: false })
+        .limit(4);
+      out[code] = (data ?? [])
+        .map((r) => r.image_url_small ?? r.image_url_medium)
+        .filter((u): u is string => !!u);
+    }),
+  );
+  return out;
+}
 
 export default async function SongsPage() {
   const supabase = await createClient();
@@ -16,7 +43,7 @@ export default async function SongsPage() {
   } = await supabase.auth.getSession();
   const userId = session?.user?.id;
 
-  const [knownIds, evalsRes] = await Promise.all([
+  const [knownIds, evalsRes, genreCovers] = await Promise.all([
     getUserKnownSongIds(),
     userId
       ? supabase
@@ -24,6 +51,7 @@ export default async function SongsPage() {
           .select("song_id,rating")
           .eq("user_id", userId)
       : Promise.resolve({ data: [] as Array<{ song_id: string; rating: string }> }),
+    getGenreCovers(supabase),
   ]);
 
   const ratings: Record<string, string> = {};
@@ -36,6 +64,7 @@ export default async function SongsPage() {
       <LiveSearch
         ratings={ratings}
         knownSongIds={Array.from(knownIds)}
+        genreCovers={genreCovers}
       />
     </div>
   );
