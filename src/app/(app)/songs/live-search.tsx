@@ -64,21 +64,22 @@ const HIGH_OPTIONS = [
 // 各ジャンルカードに被せる暗色グラデーション。
 // ジャンル識別性を保ちつつ、カラオケ向けに眩しすぎないよう *-950 系の
 // 深い色で from を作り、to は黒に向けて薄れさせてジャケ写を覗かせる。
+// 明度を下げるため from/via/to の不透明度を全体的に強めにしている。
 // Tailwind の JIT が拾えるよう必ず完全なクラス名で書く。
 const GENRE_OVERLAY: Record<GenreCode, string> = {
-  j_pop: "from-pink-950/85 via-rose-950/55 to-black/30",
-  j_rock: "from-orange-950/85 via-red-950/55 to-black/30",
-  anison: "from-sky-950/85 via-indigo-950/55 to-black/30",
-  vocaloid_utaite: "from-cyan-950/85 via-teal-950/55 to-black/30",
-  idol_female: "from-fuchsia-950/85 via-pink-950/55 to-black/30",
-  idol_male: "from-blue-950/85 via-indigo-950/55 to-black/30",
-  rnb_soul: "from-amber-950/85 via-yellow-950/55 to-black/30",
-  hiphop: "from-zinc-900/90 via-zinc-950/65 to-black/30",
-  enka_kayo: "from-red-950/85 via-rose-950/55 to-black/30",
-  western: "from-emerald-950/85 via-green-950/55 to-black/30",
-  kpop: "from-purple-950/85 via-violet-950/55 to-black/30",
-  game_bgm: "from-lime-950/85 via-emerald-950/55 to-black/30",
-  other: "from-slate-900/90 via-slate-950/65 to-black/30",
+  j_pop: "from-pink-950/92 via-rose-950/72 to-black/55",
+  j_rock: "from-orange-950/92 via-red-950/72 to-black/55",
+  anison: "from-sky-950/92 via-indigo-950/72 to-black/55",
+  vocaloid_utaite: "from-cyan-950/92 via-teal-950/72 to-black/55",
+  idol_female: "from-fuchsia-950/92 via-pink-950/72 to-black/55",
+  idol_male: "from-blue-950/92 via-indigo-950/72 to-black/55",
+  rnb_soul: "from-amber-950/92 via-yellow-950/72 to-black/55",
+  hiphop: "from-zinc-900/94 via-zinc-950/78 to-black/55",
+  enka_kayo: "from-red-950/92 via-rose-950/72 to-black/55",
+  western: "from-emerald-950/92 via-green-950/72 to-black/55",
+  kpop: "from-purple-950/92 via-violet-950/72 to-black/55",
+  game_bgm: "from-lime-950/92 via-emerald-950/72 to-black/55",
+  other: "from-slate-900/94 via-slate-950/78 to-black/55",
 };
 
 const DEBOUNCE_MS = 200;
@@ -350,7 +351,14 @@ function BrowseGrid({
                 className="relative flex aspect-[16/10] items-start overflow-hidden rounded-lg bg-zinc-900 pl-4 pr-3 pt-4 pb-3 transition active:scale-[0.98]"
               >
                 {covers.length > 0 ? (
-                  <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
+                  // モザイクに強めの blur をかけてジャケ写の輪郭をぼかし、
+                  // 抽象的な色面のような印象に。blur のフチ暗化を回避する
+                  // ため scale-110 で僅かにはみ出させて overflow-hidden で
+                  // クリップする。
+                  <div
+                    className="absolute inset-0 grid scale-110 grid-cols-2 grid-rows-2 blur-xl"
+                    aria-hidden
+                  >
                     {[0, 1, 2, 3].map((i) => {
                       // 4 枚揃わない場合は循環させて隙間を埋める
                       const src = covers[i] ?? covers[i % covers.length];
@@ -397,7 +405,7 @@ function BrowseGrid({
                     maskComposite: "exclude",
                   }}
                 />
-                <span className="relative z-10 text-sm font-extrabold leading-tight tracking-tight text-white drop-shadow-md">
+                <span className="relative z-10 text-sm font-extrabold leading-tight tracking-tight text-zinc-200 drop-shadow-md">
                   {GENRE_LABELS[code]}
                 </span>
               </Link>
