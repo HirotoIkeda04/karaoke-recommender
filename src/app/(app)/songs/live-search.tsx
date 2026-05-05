@@ -351,19 +351,18 @@ function BrowseGrid({
                 className="relative flex aspect-[16/10] items-start overflow-hidden rounded-lg bg-zinc-900 pl-4 pr-3 pt-4 pb-3 transition active:scale-[0.98]"
               >
                 {covers.length > 0 ? (
-                  // Bento 配置: 左に大ジャケ 1 枚、右に小 2 枚 (縦並び)、
-                  // 下に横長 1 枚。grid-template-areas で表現する。
-                  // 列比 3:2、行比 1:1:1 → 大タイルは横 60% × 縦 2/3。
+                  // Bento 配置: 左に大ジャケ 1 枚、右に小 2 枚 (縦並び)。
+                  // 列比 3:2 → 大タイルは横 60% × 縦全部、小は横 40% × 縦半分。
                   <div
                     className="absolute inset-0 grid"
                     style={{
                       gridTemplateColumns: "3fr 2fr",
-                      gridTemplateRows: "1fr 1fr 1fr",
-                      gridTemplateAreas: '"a b" "a c" "d d"',
+                      gridTemplateRows: "1fr 1fr",
+                      gridTemplateAreas: '"a b" "a c"',
                     }}
                     aria-hidden
                   >
-                    {(["a", "b", "c", "d"] as const).map((area, i) => {
+                    {(["a", "b", "c"] as const).map((area, i) => {
                       const src = covers[i] ?? covers[i % covers.length];
                       return (
                         <div
