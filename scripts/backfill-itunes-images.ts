@@ -34,8 +34,10 @@ const CACHE_PATH = resolve(
   "scraper/output/itunes_image_cache.jsonl",
 );
 
-const CONCURRENCY = 2;
-const PER_WORKER_INTERVAL_MS = 700;
+// 単スレ + 3.5s 間隔 (= ~17 req/min) で iTunes 公称の 20 req/min 上限内に収める。
+// 過去 (2026-05-05) に concurrency=4 / 0.7s で 403 soft-ban を喰らったため保守設定。
+const CONCURRENCY = 1;
+const PER_WORKER_INTERVAL_MS = 3500;
 const RATE_LIMIT_BACKOFF_MS = 60_000;
 const MIN_TITLE_SIMILARITY = 0.55;
 const MIN_ARTIST_SIMILARITY = 0.4;
@@ -388,19 +390,25 @@ async function main() {
   console.log(`resume cache: ${processed.size} song_ids already attempted`);
 
   // image_url_medium IS NULL な楽曲を全件取得 (ページング)。
-  // 並び: fame_score 降順 NULLS LAST → 有名曲を先に処理して途中で止まっても価値が高い順に埋まる。
+  // 並び: created_at 降順 (= 新しく投入された曲を先に処理)。
+  //
+  // fame_score 降順だと、過去の match:dam で既に「Spotify 不在」と判定された
+  // 古い・streaming 拒否系アーティストの曲ばかりが先頭に来てしまい、
+  // iTunes でも当然マッチしない (2026-05-06 計測で 0/50)。
+  // 直近に投入した DAM ランキング由来曲 (fame_score=NULL, created_at=最新) を
+  // 優先する方がマッチ率が高い。
   const targets: SongRow[] = [];
   let offset = 0;
   const PAGE = 1000;
   for (;;) {
     const { data, error } = await supabase
       .from("songs")
-      .select("id, title, artist, release_year, duration_ms, fame_score")
+      .select("id, title, artist, release_year, duration_ms, created_at")
       .is("image_url_medium", null)
-      .order("fame_score", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false })
       .range(offset, offset + PAGE - 1);
     if (error) throw error;
-    const rows = (data ?? []) as Array<SongRow & { fame_score: number | null }>;
+    const rows = (data ?? []) as Array<SongRow & { created_at: string }>;
     for (const r of rows) {
       if (processed.has(r.id)) continue;
       targets.push({
