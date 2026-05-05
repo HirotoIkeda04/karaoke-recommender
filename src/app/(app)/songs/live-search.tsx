@@ -61,6 +61,26 @@ const HIGH_OPTIONS = [
   "hiF",
 ];
 
+// 各ジャンルカードに被せる暗色グラデーション。
+// ジャンル識別性を保ちつつ、カラオケ向けに眩しすぎないよう *-950 系の
+// 深い色で from を作り、to は黒に向けて薄れさせてジャケ写を覗かせる。
+// Tailwind の JIT が拾えるよう必ず完全なクラス名で書く。
+const GENRE_OVERLAY: Record<GenreCode, string> = {
+  j_pop: "from-pink-950/85 via-rose-950/55 to-black/30",
+  j_rock: "from-orange-950/85 via-red-950/55 to-black/30",
+  anison: "from-sky-950/85 via-indigo-950/55 to-black/30",
+  vocaloid_utaite: "from-cyan-950/85 via-teal-950/55 to-black/30",
+  idol_female: "from-fuchsia-950/85 via-pink-950/55 to-black/30",
+  idol_male: "from-blue-950/85 via-indigo-950/55 to-black/30",
+  rnb_soul: "from-amber-950/85 via-yellow-950/55 to-black/30",
+  hiphop: "from-zinc-900/90 via-zinc-950/65 to-black/30",
+  enka_kayo: "from-red-950/85 via-rose-950/55 to-black/30",
+  western: "from-emerald-950/85 via-green-950/55 to-black/30",
+  kpop: "from-purple-950/85 via-violet-950/55 to-black/30",
+  game_bgm: "from-lime-950/85 via-emerald-950/55 to-black/30",
+  other: "from-slate-900/90 via-slate-950/65 to-black/30",
+};
+
 const DEBOUNCE_MS = 200;
 
 export function LiveSearch({
@@ -350,9 +370,9 @@ function BrowseGrid({
                     })}
                   </div>
                 ) : null}
-                {/* 暗いグラデーションでタイトルの可読性を確保 */}
+                {/* ジャンル別の暗色グラデーションで識別性 + 可読性を確保 */}
                 <div
-                  className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/55 to-black/30"
+                  className={`absolute inset-0 bg-gradient-to-br ${GENRE_OVERLAY[code]}`}
                   aria-hidden
                 />
                 <span className="relative z-10 text-sm font-extrabold leading-tight tracking-tight text-white drop-shadow-md">
