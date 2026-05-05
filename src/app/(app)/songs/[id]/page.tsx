@@ -146,7 +146,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
           楽曲情報
         </h2>
-        <dl className="mx-4 divide-y divide-zinc-200 rounded-xl bg-zinc-100 px-4 text-sm dark:divide-zinc-700/60 dark:bg-zinc-800/60">
+        <dl className="mx-4 divide-y divide-zinc-200 rounded-xl bg-zinc-100 px-6 text-sm dark:divide-zinc-700/60 dark:bg-zinc-800/60">
           <div className="flex items-baseline py-3">
             <dt className="w-20 shrink-0 text-zinc-600 dark:text-zinc-400">地声</dt>
             <dd className="font-mono">
