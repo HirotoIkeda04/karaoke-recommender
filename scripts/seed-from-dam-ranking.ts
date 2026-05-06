@@ -141,15 +141,19 @@ function extractSongsFromHtml(html: string, label: string): ScrapedSong[] {
 
 function normalizeForDedup(s: string): string {
   return s
+    .normalize("NFKC")
     .toLowerCase()
     .replace(/[（(][^）)]*[）)]/g, "")
     .replace(/[[【][^\]】]*[\]】]/g, "")
+    .replace(/『[^』]*』/g, "")
+    .replace(/「[^」]*」/g, "")
     .replace(/[^\p{L}\p{N}]+/gu, "")
     .trim();
 }
 
 function normalizeArtistName(s: string): string {
   return s
+    .normalize("NFKC")
     .toLowerCase()
     .replace(/\s+/g, "")
     .replace(/[（(][^）)]*[）)]/g, "")
