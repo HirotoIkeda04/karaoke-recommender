@@ -104,6 +104,13 @@ function decodeHtmlEntities(s: string): string {
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(parseInt(n, 10)));
 }
 
+/** タイトル末尾の 『アニメ名』 タイアップ表記を剥がす。
+ *  例: "聖者の行進 『平穏世代の韋駄天達』" → "聖者の行進"
+ *  「...」 (鉤括弧 1 重) は曲名に組み込まれる例があるため対象外。 */
+function stripAnimeSuffix(title: string): string {
+  return title.replace(/[ 　]*『[^』]*』[ 　]*$/, "").trim();
+}
+
 function extractSongsFromHtml(html: string, label: string): ScrapedSong[] {
   // <h4 class="p-song__title">...</h4> ... <div class="p-song__artist">...</div>
   // が順番に並んでいる前提でペアリング。
@@ -127,8 +134,9 @@ function extractSongsFromHtml(html: string, label: string): ScrapedSong[] {
     const window = html.slice(tEnd, tEnd + 600);
     const am = window.match(/<div class="p-song__artist">([\s\S]*?)<\/div>/);
     if (!am) continue;
-    const title = decodeHtmlEntities(tm[1].trim());
+    const titleRaw = decodeHtmlEntities(tm[1].trim());
     const artist = decodeHtmlEntities(am[1].trim());
+    const title = stripAnimeSuffix(titleRaw);
     if (!title || !artist) continue;
     songs.push({ title, artist, source_label: label });
     pos = tEnd;

@@ -27,6 +27,7 @@
     "seed:dam-ranking": "node --env-file=.env.local --import tsx scripts/seed-from-dam-ranking.ts",
     "seed:joysound-ranking": "node --env-file=.env.local --import tsx scripts/seed-from-joysound-ranking.ts",
     "dedup:songs": "node --env-file=.env.local --import tsx scripts/dedup-songs.ts",
+    "cleanup:anime-suffixes": "node --env-file=.env.local --import tsx scripts/cleanup-anime-suffixes.ts",
     "seed:vocaloid-dam": "node --env-file=.env.local --import tsx scripts/seed-vocaloid-dam.ts",
     "backfill:artist-id": "node --env-file=.env.local --import tsx scripts/backfill-artist-id.ts",
     "backfill:spotify-images": "node --env-file=.env.local --import tsx scripts/backfill-spotify-images.ts",

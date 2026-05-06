@@ -81,6 +81,12 @@ function decodeHtmlEntities(s: string): string {
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(parseInt(n, 10)));
 }
 
+/** タイトル末尾の 『アニメ名』 タイアップ表記を剥がす。
+ *  例: "聖者の行進 『平穏世代の韋駄天達』" → "聖者の行進" */
+function stripAnimeSuffix(title: string): string {
+  return title.replace(/[ 　]*『[^』]*』[ 　]*$/, "").trim();
+}
+
 function extractTable(html: string, label: string): ScrapedSong[] {
   // <td class="jp-page-sl-cell-song"><a ...>TITLE</a></td>
   // <td class="jp-page-sl-cell-artist"><a ...>ARTIST</a></td>
@@ -88,7 +94,7 @@ function extractTable(html: string, label: string): ScrapedSong[] {
     /<td class="jp-page-sl-cell-song"><a href="\/web\/search\/song\/\d+"[^>]*>([^<]+)<\/a><\/td>\s*<td class="jp-page-sl-cell-artist"><a href="\/web\/search\/artist\/\d+"[^>]*>([^<]+)<\/a><\/td>/g;
   const out: ScrapedSong[] = [];
   for (const m of html.matchAll(re)) {
-    const title = decodeHtmlEntities(m[1]).trim();
+    const title = stripAnimeSuffix(decodeHtmlEntities(m[1]).trim());
     const artist = decodeHtmlEntities(m[2]).trim();
     if (title && artist) out.push({ title, artist, source_label: label });
   }
@@ -102,7 +108,7 @@ function extractThirty(html: string, label: string): ScrapedSong[] {
     /<h4 class="rank-total-title">\s*<a [^>]*>([^<]+)<\/a>\s*<\/h4>\s*<p class="rank-total-artist">\s*<a [^>]*>([^<]+)<\/a>/g;
   const out: ScrapedSong[] = [];
   for (const m of html.matchAll(re)) {
-    const title = decodeHtmlEntities(m[1]).trim();
+    const title = stripAnimeSuffix(decodeHtmlEntities(m[1]).trim());
     const artist = decodeHtmlEntities(m[2]).trim();
     if (title && artist) out.push({ title, artist, source_label: label });
   }
