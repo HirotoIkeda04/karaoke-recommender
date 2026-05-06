@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "プライバシーポリシー | SetoriSetolu",
+  title: "プライバシーポリシー | KyokuMoku",
 };
 
 export default function PrivacyPolicyPage() {
@@ -12,7 +12,7 @@ export default function PrivacyPolicyPage() {
 
       <section className="mt-6 space-y-3 text-sm leading-relaxed">
         <p>
-          SetoriSetolu(以下「本アプリ」)は、ユーザーのプライバシーを尊重し、
+          KyokuMoku(以下「本アプリ」)は、ユーザーのプライバシーを尊重し、
           以下の方針に従ってデータを取り扱います。
         </p>
       </section>

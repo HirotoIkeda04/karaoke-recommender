@@ -13,12 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SetoriSetolu",
+  title: "KyokuMoku",
   description: "音域ベースのカラオケ楽曲評価アプリ",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    title: "SetoriSetolu",
+    title: "KyokuMoku",
     statusBarStyle: "default",
   },
   icons: {

@@ -1,6 +1,6 @@
 {
-  "name": "SetoriSetolu",
-  "short_name": "SetoriSetolu",
+  "name": "KyokuMoku",
+  "short_name": "KyokuMoku",
   "description": "音域ベースのカラオケ楽曲評価アプリ",
   "start_url": "/",
   "scope": "/",
