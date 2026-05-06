@@ -52,6 +52,10 @@ const URLS: Array<{ url: string; label: string; format: Format }> = [
   { url: "https://www.joysound.com/web/s/karaoke/feature/annual_age_2025", label: "age 2025", format: "table" },
   { url: "https://www.joysound.com/web/s/karaoke/feature/annual_age_2024", label: "age 2024", format: "table" },
   { url: "https://www.joysound.com/web/s/karaoke/feature/annual_age_2023", label: "age 2023", format: "table" },
+  { url: "https://www.joysound.com/web/s/karaoke/feature/annual_age_2022", label: "age 2022", format: "table" },
+  { url: "https://www.joysound.com/web/s/karaoke/feature/annual_age_2021", label: "age 2021", format: "table" },
+  { url: "https://www.joysound.com/web/s/karaoke/feature/annual_age_2020", label: "age 2020", format: "table" },
+  { url: "https://www.joysound.com/web/s/karaoke/feature/annual_age_2019", label: "age 2019", format: "table" },
   // --- 30 周年ランキング ---
   { url: "https://www.joysound.com/web/s/30th/ranking", label: "30th anniversary", format: "thirty" },
 ];
@@ -78,6 +82,9 @@ function decodeHtmlEntities(s: string): string {
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&nbsp;/g, " ")
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, h) =>
+      String.fromCharCode(parseInt(h, 16)),
+    )
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(parseInt(n, 10)));
 }
 
@@ -102,15 +109,32 @@ function extractTable(html: string, label: string): ScrapedSong[] {
 }
 
 function extractThirty(html: string, label: string): ScrapedSong[] {
-  // <h4 class="rank-total-title"><a ...>TITLE</a></h4>
-  // <p class="rank-total-artist"><a ...>ARTIST</a></p>
-  const re =
-    /<h4 class="rank-total-title">\s*<a [^>]*>([^<]+)<\/a>\s*<\/h4>\s*<p class="rank-total-artist">\s*<a [^>]*>([^<]+)<\/a>/g;
+  // 30th ranking は 2 種類のレイアウトが混在する。
+  //   (A) ランク 1-10:  <h4 class="rank-total-title"><a>TITLE</a></h4>
+  //                     <p class="rank-total-artist"><a>ARTIST</a></p>
+  //   (B) ランク 11-50: <li>NN<a href="/web/search/song/N">TITLE</a> ...
+  //                     <a [class?] href="/web/search/artist/N">ARTIST</a></li>
   const out: ScrapedSong[] = [];
-  for (const m of html.matchAll(re)) {
+  const seen = new Set<string>();
+  const push = (title: string, artist: string) => {
+    const k = title + "|" + artist;
+    if (seen.has(k)) return;
+    seen.add(k);
+    out.push({ title, artist, source_label: label });
+  };
+  const reA =
+    /<h4 class="rank-total-title">\s*<a [^>]*>([^<]+)<\/a>\s*<\/h4>\s*<p class="rank-total-artist">\s*<a [^>]*>([^<]+)<\/a>/g;
+  for (const m of html.matchAll(reA)) {
     const title = stripAnimeSuffix(decodeHtmlEntities(m[1]).trim());
     const artist = decodeHtmlEntities(m[2]).trim();
-    if (title && artist) out.push({ title, artist, source_label: label });
+    if (title && artist) push(title, artist);
+  }
+  const reB =
+    /<a href="\/web\/search\/song\/\d+"[^>]*>([^<]+)<\/a>[\s\S]{0,400}?<a [^>]*href="\/web\/search\/artist\/\d+"[^>]*>([^<]+)<\/a>/g;
+  for (const m of html.matchAll(reB)) {
+    const title = stripAnimeSuffix(decodeHtmlEntities(m[1]).trim());
+    const artist = decodeHtmlEntities(m[2]).trim();
+    if (title && artist) push(title, artist);
   }
   return out;
 }
