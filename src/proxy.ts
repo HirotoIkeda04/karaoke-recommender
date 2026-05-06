@@ -12,8 +12,8 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // _next/static, _next/image, favicon, 画像系は素通り (パフォーマンス)
+  // _next/static, _next/image, favicon, manifest, 画像系は素通り (パフォーマンス)
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw\\.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
