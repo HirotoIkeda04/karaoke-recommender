@@ -21,9 +21,6 @@ export const metadata: Metadata = {
     title: "KyokuMoku",
     statusBarStyle: "default",
   },
-  icons: {
-    apple: "/apple-touch-icon.png",
-  },
 };
 
 export const viewport: Viewport = {
