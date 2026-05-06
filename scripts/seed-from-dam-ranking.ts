@@ -35,19 +35,48 @@ const UA =
 const FETCH_INTERVAL_MS = 2000;
 
 const URLS: Array<{ url: string; label: string }> = [
+  // --- メインランキング ---
   { url: "https://www.clubdam.com/ranking/", label: "main daily/weekly/monthly" },
   { url: "https://www.clubdam.com/ranking/firsthalf.html", label: "2025 firsthalf" },
   { url: "https://www.clubdam.com/ranking/secondhalf.html", label: "2025 secondhalf" },
   { url: "https://www.clubdam.com/ranking/year.html", label: "2025 year" },
+  // --- メインランキング派生 ---
+  { url: "https://www.clubdam.com/ranking/kensaku/", label: "kensaku (search volume)" },
+  { url: "https://www.clubdam.com/ranking/burst/", label: "burst (急上昇)" },
+  { url: "https://www.clubdam.com/ranking/duet/", label: "duet" },
+  // --- ジャンル別 ---
   { url: "https://www.clubdam.com/genre/anison/ranking_year.html", label: "anison year" },
   { url: "https://www.clubdam.com/genre/anison/ranking_firsthalf.html", label: "anison firsthalf" },
   { url: "https://www.clubdam.com/genre/anison/ranking_secondhalf.html", label: "anison secondhalf" },
   { url: "https://www.clubdam.com/genre/enka/ranking_year.html", label: "enka year" },
+  { url: "https://www.clubdam.com/genre/enka/ranking_firsthalf.html", label: "enka firsthalf" },
+  { url: "https://www.clubdam.com/genre/enka/ranking_secondhalf.html", label: "enka secondhalf" },
   { url: "https://www.clubdam.com/genre/foreign/ranking_year.html", label: "foreign year" },
+  { url: "https://www.clubdam.com/genre/foreign/ranking_firsthalf.html", label: "foreign firsthalf" },
+  { url: "https://www.clubdam.com/genre/foreign/ranking_secondhalf.html", label: "foreign secondhalf" },
   { url: "https://www.clubdam.com/genre/vocaloid/ranking_year.html", label: "vocaloid year" },
   { url: "https://www.clubdam.com/genre/vocaloid/ranking_firsthalf.html", label: "vocaloid firsthalf" },
   { url: "https://www.clubdam.com/genre/vocaloid/ranking_secondhalf.html", label: "vocaloid secondhalf" },
   { url: "https://www.clubdam.com/genre/vtuber/ranking_firsthalf.html", label: "vtuber firsthalf" },
+  // --- 季節アニメ別 (2021 H2 - 2025 で実在分のみ) ---
+  { url: "https://www.clubdam.com/feature/standard/winter_anime_ranking_2025.html", label: "anime 2025 winter" },
+  { url: "https://www.clubdam.com/feature/standard/spring_anime_ranking_2025.html", label: "anime 2025 spring" },
+  { url: "https://www.clubdam.com/feature/standard/summer_anime_ranking_2025.html", label: "anime 2025 summer" },
+  { url: "https://www.clubdam.com/feature/standard/winter_anime_ranking_2024.html", label: "anime 2024 winter" },
+  { url: "https://www.clubdam.com/feature/standard/spring_anime_ranking_2024.html", label: "anime 2024 spring" },
+  { url: "https://www.clubdam.com/feature/standard/summer_anime_ranking_2024.html", label: "anime 2024 summer" },
+  { url: "https://www.clubdam.com/feature/standard/autumn_anime_ranking_2024.html", label: "anime 2024 autumn" },
+  { url: "https://www.clubdam.com/feature/standard/winter_anime_ranking_2023.html", label: "anime 2023 winter" },
+  { url: "https://www.clubdam.com/feature/standard/spring_anime_ranking_2023.html", label: "anime 2023 spring" },
+  { url: "https://www.clubdam.com/feature/standard/summer_anime_ranking_2023.html", label: "anime 2023 summer" },
+  { url: "https://www.clubdam.com/feature/standard/autumn_anime_ranking_2023.html", label: "anime 2023 autumn" },
+  { url: "https://www.clubdam.com/feature/standard/winter_anime_ranking_2022.html", label: "anime 2022 winter" },
+  { url: "https://www.clubdam.com/feature/standard/spring_anime_ranking_2022.html", label: "anime 2022 spring" },
+  { url: "https://www.clubdam.com/feature/standard/summer_anime_ranking_2022.html", label: "anime 2022 summer" },
+  { url: "https://www.clubdam.com/feature/standard/autumn_anime_ranking_2022.html", label: "anime 2022 autumn" },
+  { url: "https://www.clubdam.com/feature/standard/winter_anime_ranking_2021.html", label: "anime 2021 winter" },
+  { url: "https://www.clubdam.com/feature/standard/spring_anime_ranking_2021.html", label: "anime 2021 spring" },
+  { url: "https://www.clubdam.com/feature/standard/summer_anime_ranking_2021.html", label: "anime 2021 summer" },
 ];
 
 interface ScrapedSong {

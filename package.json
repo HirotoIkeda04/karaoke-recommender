@@ -25,6 +25,7 @@
     "cleanup:wikidata-titles": "node --env-file=.env.local --import tsx scripts/cleanup-wikidata-titles.ts",
     "cleanup:wikidata-romanized": "node --env-file=.env.local --import tsx scripts/cleanup-wikidata-romanized.ts",
     "seed:dam-ranking": "node --env-file=.env.local --import tsx scripts/seed-from-dam-ranking.ts",
+    "seed:joysound-ranking": "node --env-file=.env.local --import tsx scripts/seed-from-joysound-ranking.ts",
     "seed:vocaloid-dam": "node --env-file=.env.local --import tsx scripts/seed-vocaloid-dam.ts",
     "backfill:artist-id": "node --env-file=.env.local --import tsx scripts/backfill-artist-id.ts",
     "backfill:spotify-images": "node --env-file=.env.local --import tsx scripts/backfill-spotify-images.ts",
