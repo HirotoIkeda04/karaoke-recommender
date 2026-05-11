@@ -23,6 +23,11 @@ const OVERRIDES: Override[] = [
     genres: ["j_pop", "anison"],
     reason: "ボカロ/歌い手出身ではない。J-POP + アニメタイアップ多数",
   },
+  {
+    name: "SWEET STEADY",
+    genres: ["idol_female"],
+    reason: "KAWAII LAB. 配下の女性アイドルグループ。bulk-label が other と誤分類",
+  },
 ];
 
 function assertGenres(g: string[]): asserts g is GenreCode[] {
