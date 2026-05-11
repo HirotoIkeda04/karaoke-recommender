@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  karaoke-recommender 夜間ルーチン (launchd 設定)
+
+  ============================================================================
+  インストール手順 (一度だけ):
+  ============================================================================
+
+    # 1. plist をユーザーの LaunchAgents に配置
+    cp bin/com.kyokumoku.nightly-routine.plist ~/Library/LaunchAgents/
+
+    # 2. launchd に登録 + 開始
+    launchctl bootstrap "gui/$(id -u)" \
+      ~/Library/LaunchAgents/com.kyokumoku.nightly-routine.plist
+
+    # 3. (オプション) 動作確認のため即座に 1 回実行
+    launchctl kickstart -k gui/$(id -u)/com.kyokumoku.nightly-routine
+
+  ============================================================================
+  動作確認:
+  ============================================================================
+
+    # 登録されているか確認
+    launchctl list | grep nightly-routine
+
+    # 直近のログを見る (script 側のログ)
+    ls -lt logs/nightly-*.log | head -3
+    tail logs/nightly-$(date +%Y-%m-%d).log
+
+    # launchd 自体の stdout/stderr ログ
+    tail logs/launchd-stdout.log logs/launchd-stderr.log
+
+  ============================================================================
+  停止 / 削除:
+  ============================================================================
+
+    launchctl bootout "gui/$(id -u)" \
+      ~/Library/LaunchAgents/com.kyokumoku.nightly-routine.plist
+    rm ~/Library/LaunchAgents/com.kyokumoku.nightly-routine.plist
+
+  ============================================================================
+  注意:
+  ============================================================================
+
+  - 起動時刻 (StartCalendarInterval) はマシンの **ローカル時刻** で解釈される。
+    本 plist は 03:00 を指定しているので JST マシンなら 03:00 JST。
+  - 起動時刻に Mac がスリープ中だと skip される。launchd で Mac が
+    PreventComputerSleep するわけではない。スリープ中に逃した分の補填は無い。
+    確実に動かしたい場合は Mac を起こしておく or `pmset` で wake schedule を
+    別途設定する必要あり。
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.kyokumoku.nightly-routine</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/hiro/Desktop/karaoke-recommender/bin/nightly-routine.sh</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/hiro/Desktop/karaoke-recommender</string>
+
+  <!-- 毎日 03:00 (ローカル時刻 = JST) に実行 -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>3</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+
+  <!-- 失敗しても自動再起動はしない (quota_hit 後の再試行は無意味) -->
+  <key>KeepAlive</key>
+  <false/>
+
+  <!-- 標準出力/エラーは launchd 経由のログにも残しておく (script 側にも tee あり) -->
+  <key>StandardOutPath</key>
+  <string>/Users/hiro/Desktop/karaoke-recommender/logs/launchd-stdout.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/hiro/Desktop/karaoke-recommender/logs/launchd-stderr.log</string>
+
+  <!-- PATH を明示しないと node / tsx が見つからないことが多い -->
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+</dict>
+</plist>
