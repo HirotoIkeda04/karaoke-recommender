@@ -1,45 +1,48 @@
 /**
  * ホーム (/) 遷移時の skeleton。
- * SwipeDeck の構造を模した: 中央のカード + 戻る/スキップ + 4 評価ボタン。
+ * SwipeDeck の構造を模した: 22:30 比率カード + 4 評価ボタン + スキップ/戻る行。
  *
  * 子ルートで loading.tsx が定義されている場合はそちらが優先される。
  */
 export default function Loading() {
   return (
     <div
-      className="mx-auto flex max-w-md flex-col items-center gap-6 px-4 py-6"
+      className="mx-auto flex max-w-md flex-col items-center gap-5 overflow-hidden px-4 py-6"
       role="status"
       aria-label="読み込み中"
     >
-      {/* カード */}
-      <div className="relative h-[26rem] w-full">
-        <div className="absolute inset-0 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="flex h-full flex-col items-center justify-between gap-3">
-            <div className="aspect-square w-full max-w-[14rem] animate-pulse rounded-xl bg-zinc-200 dark:bg-zinc-800" />
-            <div className="w-full space-y-2 text-center">
-              <div className="mx-auto h-5 w-3/4 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-              <div className="mx-auto h-4 w-1/2 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-            </div>
-            <div className="h-7 w-32 animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800" />
-            <div className="h-12 w-full animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-          </div>
-        </div>
+      {/* カード: swipe-deck と同じ aspect-ratio / width formula */}
+      <div
+        className="relative"
+        style={{
+          aspectRatio: "22 / 30",
+          width:
+            "min(22rem, calc((100svh - 23rem - env(safe-area-inset-bottom)) * 22 / 30))",
+        }}
+      >
+        <div
+          className="absolute inset-0 animate-pulse bg-zinc-200 shadow-sm dark:bg-zinc-800"
+          style={{
+            clipPath: "inset(0 round 16px)",
+            WebkitClipPath: "inset(0 round 16px)",
+          }}
+        />
       </div>
 
-      {/* 戻る / スキップ行 */}
-      <div className="flex w-full items-center justify-between">
-        <div className="h-8 w-16 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-        <div className="h-8 w-36 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-      </div>
-
-      {/* 4 評価ボタン */}
-      <div className="grid w-full grid-cols-4 gap-2">
+      {/* 4 評価ボタン (丸 size-14 + ラベル) */}
+      <div className="grid w-full grid-cols-[repeat(4,3.5rem)] justify-around">
         {[0, 1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="h-16 animate-pulse rounded-xl bg-zinc-200 dark:bg-zinc-800"
-          />
+          <div key={i} className="flex flex-col items-center gap-1.5">
+            <div className="size-14 animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800" />
+            <div className="h-3 w-8 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+          </div>
         ))}
+      </div>
+
+      {/* スキップ (col-span-3) + 戻る (size-14) */}
+      <div className="grid w-full grid-cols-[repeat(4,3.5rem)] justify-around">
+        <div className="col-span-3 -mx-1 h-14 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
+        <div className="mx-auto size-14 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
       </div>
     </div>
   );

@@ -9551,11 +9551,4027 @@
         "https://karaoto.net/max_key/38",
         "https://open.spotify.com/track/6rcPP3eWwKcUrIEWb1bR5S"
       ]
+    },
+    {
+      "title": "夜に駆ける",
+      "artist": "YOASOBI",
+      "release_year": 2019,
+      "range_low_midi": 55,
+      "range_high_midi": 77,
+      "falsetto_max_midi": 77,
+      "spotify_track_id": "3dPtXHP0oXQ4HCWHsOA9js",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273c5716278abba6a103ad13aa7",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02c5716278abba6a103ad13aa7",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851c5716278abba6a103ad13aa7",
+      "source_urls": [
+        "https://karaoto.net/max_key/44",
+        "https://open.spotify.com/track/3dPtXHP0oXQ4HCWHsOA9js"
+      ]
+    },
+    {
+      "title": "紅蓮華",
+      "artist": "LiSA",
+      "release_year": 2020,
+      "range_low_midi": 52,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 79,
+      "spotify_track_id": "0qMip0B2D4ePEjBJvAtYre",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27364c8cf7bc530a05dd10e8efe",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0264c8cf7bc530a05dd10e8efe",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485164c8cf7bc530a05dd10e8efe",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/0qMip0B2D4ePEjBJvAtYre"
+      ]
+    },
+    {
+      "title": "Lemon",
+      "artist": "米津玄師",
+      "release_year": 2020,
+      "range_low_midi": 47,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 71,
+      "spotify_track_id": "04TshWXkhV1qkqHzf31Hn6",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273775e8184725e0fb89337dd9a",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02775e8184725e0fb89337dd9a",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851775e8184725e0fb89337dd9a",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/04TshWXkhV1qkqHzf31Hn6"
+      ]
+    },
+    {
+      "title": "うっせぇわ",
+      "artist": "Ado",
+      "release_year": 2020,
+      "range_low_midi": 57,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6EzZn96uOc9JsVGNRpx06n",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27389e3b38cb86ef8cfb0cd8def",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0289e3b38cb86ef8cfb0cd8def",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485189e3b38cb86ef8cfb0cd8def",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/6EzZn96uOc9JsVGNRpx06n"
+      ]
+    },
+    {
+      "title": "残酷な天使のテーゼ",
+      "artist": "高橋洋子",
+      "release_year": 2018,
+      "range_low_midi": 58,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "23phSRwoMy48rwFpmuAP8q",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273dd8da80a88d4885b6e0ae01b",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02dd8da80a88d4885b6e0ae01b",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851dd8da80a88d4885b6e0ae01b",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/23phSRwoMy48rwFpmuAP8q"
+      ]
+    },
+    {
+      "title": "炎",
+      "artist": "LiSA",
+      "release_year": 2020,
+      "range_low_midi": 54,
+      "range_high_midi": 76,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "0cSkn2l67csUljEy0EEBPn",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273e0dc47dd1584c66ad4492094",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02e0dc47dd1584c66ad4492094",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851e0dc47dd1584c66ad4492094",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/0cSkn2l67csUljEy0EEBPn"
+      ]
+    },
+    {
+      "title": "負けないで",
+      "artist": "ZARD",
+      "release_year": 1993,
+      "range_low_midi": 55,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "7og9wvfr4puwj0WtowXStj",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2731160d9f369da9c04d40b2911",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e021160d9f369da9c04d40b2911",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048511160d9f369da9c04d40b2911",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/7og9wvfr4puwj0WtowXStj"
+      ]
+    },
+    {
+      "title": "アイドル",
+      "artist": "YOASOBI",
+      "release_year": 2023,
+      "range_low_midi": 54,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 78,
+      "spotify_track_id": "7ovUcF5uHTBRzUpB6ZOmvt",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273b7d6ca50bf766ad72226290c",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02b7d6ca50bf766ad72226290c",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851b7d6ca50bf766ad72226290c",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/7ovUcF5uHTBRzUpB6ZOmvt"
+      ]
+    },
+    {
+      "title": "Tomorrow never knows",
+      "artist": "Mr.Children",
+      "release_year": 1994,
+      "range_low_midi": 53,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "42JrgapwGBuPHG9YKjR6dj",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273d627e02b2c5ef38d30424a29",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02d627e02b2c5ef38d30424a29",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851d627e02b2c5ef38d30424a29",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/42JrgapwGBuPHG9YKjR6dj"
+      ]
+    },
+    {
+      "title": "ultra soul",
+      "artist": "B'z",
+      "release_year": 2001,
+      "range_low_midi": 54,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5QAZVZA3FN1s368XgijXHZ",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273de2dae1187c2b8983f323195",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02de2dae1187c2b8983f323195",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851de2dae1187c2b8983f323195",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/5QAZVZA3FN1s368XgijXHZ"
+      ]
+    },
+    {
+      "title": "innocent world",
+      "artist": "Mr.Children",
+      "release_year": 1994,
+      "range_low_midi": 49,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 73,
+      "spotify_track_id": "70xcWRujaf34LOu0Vdubtp",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27311f38252c756bdf75720b3e5",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0211f38252c756bdf75720b3e5",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485111f38252c756bdf75720b3e5",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/70xcWRujaf34LOu0Vdubtp"
+      ]
+    },
+    {
+      "title": "群青",
+      "artist": "YOASOBI",
+      "release_year": 2020,
+      "range_low_midi": 53,
+      "range_high_midi": 77,
+      "falsetto_max_midi": 80,
+      "spotify_track_id": "0T4AitQuq8IJhWBWuZwkFA",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2735235b1b2b4feb3783e12a434",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e025235b1b2b4feb3783e12a434",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048515235b1b2b4feb3783e12a434",
+      "source_urls": [
+        "https://karaoto.net/max_key/44",
+        "https://open.spotify.com/track/0T4AitQuq8IJhWBWuZwkFA"
+      ]
+    },
+    {
+      "title": "そばかす",
+      "artist": "JUDY AND MARY",
+      "release_year": 1997,
+      "range_low_midi": 56,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 76,
+      "spotify_track_id": "5zydI0vRlMI6mrEKgZR8zq",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273cf8805ce8411879bc7673fb6",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02cf8805ce8411879bc7673fb6",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851cf8805ce8411879bc7673fb6",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/5zydI0vRlMI6mrEKgZR8zq"
+      ]
+    },
+    {
+      "title": "First Love",
+      "artist": "宇多田ヒカル",
+      "release_year": 1999,
+      "range_low_midi": 52,
+      "range_high_midi": 75,
+      "falsetto_max_midi": 77,
+      "spotify_track_id": "39HrUxcvKF3jtLz7fUDWXc",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2734fa36b14a276fe560940baa0",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e024fa36b14a276fe560940baa0",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048514fa36b14a276fe560940baa0",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/39HrUxcvKF3jtLz7fUDWXc"
+      ]
+    },
+    {
+      "title": "月光",
+      "artist": "鬼束ちひろ",
+      "release_year": 2001,
+      "range_low_midi": 54,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "7HG0j0jOmoXKmD5UvrQbGj",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273f57309a9a7b4197c66c6e3ff",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02f57309a9a7b4197c66c6e3ff",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851f57309a9a7b4197c66c6e3ff",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/7HG0j0jOmoXKmD5UvrQbGj"
+      ]
+    },
+    {
+      "title": "ロマンスの神様",
+      "artist": "広瀬香美",
+      "release_year": 1993,
+      "range_low_midi": 55,
+      "range_high_midi": 77,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "0xYSgQHddr1lh6IfqWgn2W",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273b60086833bd44b9fc21769f8",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02b60086833bd44b9fc21769f8",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851b60086833bd44b9fc21769f8",
+      "source_urls": [
+        "https://karaoto.net/max_key/44",
+        "https://open.spotify.com/track/0xYSgQHddr1lh6IfqWgn2W"
+      ]
+    },
+    {
+      "title": "HOWEVER",
+      "artist": "GLAY",
+      "release_year": 2000,
+      "range_low_midi": 52,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "019oDnXj3TCond0iuRa5QR",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27322944413ed452ab312fbd49e",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0222944413ed452ab312fbd49e",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485122944413ed452ab312fbd49e",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/019oDnXj3TCond0iuRa5QR"
+      ]
+    },
+    {
+      "title": "Catch the Moment",
+      "artist": "LiSA",
+      "release_year": 2017,
+      "range_low_midi": 55,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6vRkYTrWDzzVrZTqBJFR0u",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2738f3dc36ed6737a2f83c723cd",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e028f3dc36ed6737a2f83c723cd",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048518f3dc36ed6737a2f83c723cd",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/6vRkYTrWDzzVrZTqBJFR0u"
+      ]
+    },
+    {
+      "title": "Automatic",
+      "artist": "宇多田ヒカル",
+      "release_year": 1999,
+      "range_low_midi": 53,
+      "range_high_midi": 76,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6DJ3dfsY7fOU161ZMjzWIH",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2734fa36b14a276fe560940baa0",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e024fa36b14a276fe560940baa0",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048514fa36b14a276fe560940baa0",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/6DJ3dfsY7fOU161ZMjzWIH"
+      ]
+    },
+    {
+      "title": "しるし",
+      "artist": "Mr.Children",
+      "release_year": 2007,
+      "range_low_midi": 48,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 70,
+      "spotify_track_id": "7wpCPK6zC3rDTfvjVn0ErU",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2739ca781afbd6790d8bb1e33e6",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e029ca781afbd6790d8bb1e33e6",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048519ca781afbd6790d8bb1e33e6",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/7wpCPK6zC3rDTfvjVn0ErU"
+      ]
+    },
+    {
+      "title": "ちゅ、多様性。",
+      "artist": "ano",
+      "release_year": 2022,
+      "range_low_midi": 58,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5KLL3cZEyuSJRvyS84o4Df",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2730cb271e6d74c293570320ab4",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e020cb271e6d74c293570320ab4",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048510cb271e6d74c293570320ab4",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/5KLL3cZEyuSJRvyS84o4Df"
+      ]
+    },
+    {
+      "title": "終わりなき旅",
+      "artist": "Mr.Children",
+      "release_year": 1999,
+      "range_low_midi": 47,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "1MO9nfvsVcW3Hgh0FqYfXq",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2733b60fa2d2af5a3abc549da54",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e023b60fa2d2af5a3abc549da54",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048513b60fa2d2af5a3abc549da54",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/1MO9nfvsVcW3Hgh0FqYfXq"
+      ]
+    },
+    {
+      "title": "愛唄",
+      "artist": "GReeeeN",
+      "release_year": 2007,
+      "range_low_midi": 51,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "7iXHLtPosbHvglVSJ4rxLq",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27389b4d69bb7719af21f770f3f",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0289b4d69bb7719af21f770f3f",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485189b4d69bb7719af21f770f3f",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/7iXHLtPosbHvglVSJ4rxLq"
+      ]
+    },
+    {
+      "title": "YELL",
+      "artist": "いきものがかり",
+      "release_year": 2009,
+      "range_low_midi": 53,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4NmzMLuyfuF9UpzjbhSiwl",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27374b9a0a138b331a6d1cbd32f",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0274b9a0a138b331a6d1cbd32f",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485174b9a0a138b331a6d1cbd32f",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/4NmzMLuyfuF9UpzjbhSiwl"
+      ]
+    },
+    {
+      "title": "ありがとう",
+      "artist": "いきものがかり",
+      "release_year": 2010,
+      "range_low_midi": 55,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "3hlQBw2Z5YQQqIiX9JmLG4",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27345e4f13800ece3dce00e2606",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0245e4f13800ece3dce00e2606",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485145e4f13800ece3dce00e2606",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/3hlQBw2Z5YQQqIiX9JmLG4"
+      ]
+    },
+    {
+      "title": "Sign",
+      "artist": "Mr.Children",
+      "release_year": 2005,
+      "range_low_midi": 45,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4Qoy76tEOBaCEvuydNQ2ep",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273e1f4a21dacd5275b54ae724d",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02e1f4a21dacd5275b54ae724d",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851e1f4a21dacd5275b54ae724d",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/4Qoy76tEOBaCEvuydNQ2ep"
+      ]
+    },
+    {
+      "title": "M",
+      "artist": "浜崎あゆみ",
+      "release_year": 2002,
+      "range_low_midi": 55,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5zNBixUKk94nh9vh7LBOLs",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273781bf029df688d074e86316d",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02781bf029df688d074e86316d",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851781bf029df688d074e86316d",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/5zNBixUKk94nh9vh7LBOLs"
+      ]
+    },
+    {
+      "title": "ギリギリchop",
+      "artist": "B'z",
+      "release_year": 1999,
+      "range_low_midi": 55,
+      "range_high_midi": 76,
+      "falsetto_max_midi": 81,
+      "spotify_track_id": "6UUmbqYhL4p8W70bCzfOpx",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2732df4409caad994d75e653e38",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e022df4409caad994d75e653e38",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048512df4409caad994d75e653e38",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/6UUmbqYhL4p8W70bCzfOpx"
+      ]
+    },
+    {
+      "title": "シーソーゲーム～勇敢な恋の歌～",
+      "artist": "Mr.Children",
+      "release_year": 1997,
+      "range_low_midi": 47,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "20VGCJzkwHCgchhy5JwKq1",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273799187d4c92b7296a0cb2858",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02799187d4c92b7296a0cb2858",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851799187d4c92b7296a0cb2858",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/20VGCJzkwHCgchhy5JwKq1"
+      ]
+    },
+    {
+      "title": "あなただけ見つめてる",
+      "artist": "大黒摩季",
+      "release_year": 2016,
+      "range_low_midi": null,
+      "range_high_midi": 76,
+      "falsetto_max_midi": 76,
+      "spotify_track_id": "0e4jGLY8dwOnhniy2Hdtzc",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273d36f69bd924f6587c56ff0e8",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02d36f69bd924f6587c56ff0e8",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851d36f69bd924f6587c56ff0e8",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/0e4jGLY8dwOnhniy2Hdtzc"
+      ]
+    },
+    {
+      "title": "チェスト",
+      "artist": "ORANGE RANGE",
+      "release_year": 2004,
+      "range_low_midi": 48,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "37Muvkym8Fby6CYAw4Dwsc",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273a0479c337eed325bfc726bac",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02a0479c337eed325bfc726bac",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851a0479c337eed325bfc726bac",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/37Muvkym8Fby6CYAw4Dwsc"
+      ]
+    },
+    {
+      "title": "GIFT",
+      "artist": "Mr.Children",
+      "release_year": 2008,
+      "range_low_midi": 45,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 71,
+      "spotify_track_id": "0KuX5JwRcmB7316EcvhmLS",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2734eb972483c4de7618b526019",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e024eb972483c4de7618b526019",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048514eb972483c4de7618b526019",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/0KuX5JwRcmB7316EcvhmLS"
+      ]
+    },
+    {
+      "title": "揺れる想い",
+      "artist": "ZARD",
+      "release_year": 1993,
+      "range_low_midi": 55,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "7GjZ2TXXfyukkhJrnh754c",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2737f0bbb7ba0ba561880db09e5",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e027f0bbb7ba0ba561880db09e5",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048517f0bbb7ba0ba561880db09e5",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/7GjZ2TXXfyukkhJrnh754c"
+      ]
+    },
+    {
+      "title": "Winter,again",
+      "artist": "GLAY",
+      "release_year": 2025,
+      "range_low_midi": 54,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6KcF1SN9CGrSJY767zyL4o",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27341a00d990cba7791c7798a3a",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0241a00d990cba7791c7798a3a",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485141a00d990cba7791c7798a3a",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/6KcF1SN9CGrSJY767zyL4o"
+      ]
+    },
+    {
+      "title": "fragile",
+      "artist": "Every Little Thing",
+      "release_year": 2001,
+      "range_low_midi": 60,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "0mRm9OJxlTf7XNd1uT6BR5",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273987bba9591efdeae91c8e2ee",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02987bba9591efdeae91c8e2ee",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851987bba9591efdeae91c8e2ee",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/0mRm9OJxlTf7XNd1uT6BR5"
+      ]
+    },
+    {
+      "title": "ZERO",
+      "artist": "B'z",
+      "release_year": 1992,
+      "range_low_midi": 48,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "7jfJw6EnyMaPAryntOKyKI",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2735c4dfcfe09853c2aa1e5e2a7",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e025c4dfcfe09853c2aa1e5e2a7",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048515c4dfcfe09853c2aa1e5e2a7",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/7jfJw6EnyMaPAryntOKyKI"
+      ]
+    },
+    {
+      "title": "Beautiful World",
+      "artist": "宇多田ヒカル",
+      "release_year": 2008,
+      "range_low_midi": 59,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 77,
+      "spotify_track_id": "6aOoUkiQ9rLweL8IkPBN0L",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273189e41798cd255d340b21be9",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02189e41798cd255d340b21be9",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851189e41798cd255d340b21be9",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/6aOoUkiQ9rLweL8IkPBN0L"
+      ]
+    },
+    {
+      "title": "イチブトゼンブ",
+      "artist": "B'z",
+      "release_year": 2009,
+      "range_low_midi": 55,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "3IYcbagYZ9z1Svaw8B33Pd",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273970b98230d6464d7dafccf56",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02970b98230d6464d7dafccf56",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851970b98230d6464d7dafccf56",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/3IYcbagYZ9z1Svaw8B33Pd"
+      ]
+    },
+    {
+      "title": "CHE.R.RY",
+      "artist": "YUI",
+      "release_year": 2007,
+      "range_low_midi": 55,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6PBBGlTEVfUyfnmemrnhbp",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2737508bd4e7236b2524dc2ec91",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e027508bd4e7236b2524dc2ec91",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048517508bd4e7236b2524dc2ec91",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/6PBBGlTEVfUyfnmemrnhbp"
+      ]
+    },
+    {
+      "title": "掌",
+      "artist": "Mr.Children",
+      "release_year": 2004,
+      "range_low_midi": 48,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 72,
+      "spotify_track_id": "0rBmNBvBFH2RwtYOGzLvXN",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273100533021ac8c129b43c8ecc",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02100533021ac8c129b43c8ecc",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851100533021ac8c129b43c8ecc",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/0rBmNBvBFH2RwtYOGzLvXN"
+      ]
+    },
+    {
+      "title": "夏色",
+      "artist": "ゆず",
+      "release_year": 1998,
+      "range_low_midi": 58,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "3nYe3TNoETmeXkseSdnUFz",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273abca55ad362a8d2779e45265",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02abca55ad362a8d2779e45265",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851abca55ad362a8d2779e45265",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/3nYe3TNoETmeXkseSdnUFz"
+      ]
+    },
+    {
+      "title": "マイ フレンド",
+      "artist": "ZARD",
+      "release_year": 1996,
+      "range_low_midi": 56,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "0bJgRNIPx6qAUCWVJdiVBR",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273b656ba837a3bb3b0f085a005",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02b656ba837a3bb3b0f085a005",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851b656ba837a3bb3b0f085a005",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/0bJgRNIPx6qAUCWVJdiVBR"
+      ]
+    },
+    {
+      "title": "LADY NAVIGATION",
+      "artist": "B'z",
+      "release_year": 1991,
+      "range_low_midi": 54,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6bMPlRSCZ8SKuPU6dlX0AS",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27311f11a86463244424df46106",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0211f11a86463244424df46106",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485111f11a86463244424df46106",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/6bMPlRSCZ8SKuPU6dlX0AS"
+      ]
+    },
+    {
+      "title": "Pretender",
+      "artist": "Official髭男dism",
+      "release_year": 2019,
+      "range_low_midi": 51,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 73,
+      "spotify_track_id": "5LkWXxDxUTwEVHL0pfKL55",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27378582014369e64b6596f30ad",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0278582014369e64b6596f30ad",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485178582014369e64b6596f30ad",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/5LkWXxDxUTwEVHL0pfKL55"
+      ]
+    },
+    {
+      "title": "カブトムシ",
+      "artist": "aiko",
+      "release_year": 1999,
+      "range_low_midi": 53,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 77,
+      "spotify_track_id": "2Os0vzke5CakbU3dkSHckx",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2733b2550ba6ca5262414f78ebf",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e023b2550ba6ca5262414f78ebf",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048513b2550ba6ca5262414f78ebf",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/2Os0vzke5CakbU3dkSHckx"
+      ]
+    },
+    {
+      "title": "Best Friend",
+      "artist": "Kiroro",
+      "release_year": 2002,
+      "range_low_midi": 56,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "3zYklKjGLqqliuuY7iBprG",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273e2a9179a5b1029af05c7f161",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02e2a9179a5b1029af05c7f161",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851e2a9179a5b1029af05c7f161",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/3zYklKjGLqqliuuY7iBprG"
+      ]
+    },
+    {
+      "title": "裸の心",
+      "artist": "あいみょん",
+      "release_year": 2020,
+      "range_low_midi": 53,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 75,
+      "spotify_track_id": "4Jv7U0JJpbQnOrjtDwDZTZ",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2734cf57a2df30a90a9a3fc39ef",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e024cf57a2df30a90a9a3fc39ef",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048514cf57a2df30a90a9a3fc39ef",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/4Jv7U0JJpbQnOrjtDwDZTZ"
+      ]
+    },
+    {
+      "title": "SEASONS",
+      "artist": "浜崎あゆみ",
+      "release_year": 2000,
+      "range_low_midi": 60,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "1cqpwSj2BFeKYKavle5FYL",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273fe925435ad805f43279d2cef",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02fe925435ad805f43279d2cef",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851fe925435ad805f43279d2cef",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/1cqpwSj2BFeKYKavle5FYL"
+      ]
+    },
+    {
+      "title": "Calling",
+      "artist": "B'z",
+      "release_year": 1997,
+      "range_low_midi": 47,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 77,
+      "spotify_track_id": "4EF7ZivjMVDtndYRjIj0Jd",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2735fc3193d9fc587d24dd60e7c",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e025fc3193d9fc587d24dd60e7c",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048515fc3193d9fc587d24dd60e7c",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/4EF7ZivjMVDtndYRjIj0Jd"
+      ]
+    },
+    {
+      "title": "ハルノヒ",
+      "artist": "あいみょん",
+      "release_year": 2020,
+      "range_low_midi": 52,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 73,
+      "spotify_track_id": "1oNeSCt0CMekCyyLo06kFs",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2734cf57a2df30a90a9a3fc39ef",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e024cf57a2df30a90a9a3fc39ef",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048514cf57a2df30a90a9a3fc39ef",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/1oNeSCt0CMekCyyLo06kFs"
+      ]
+    },
+    {
+      "title": "Secret of my heart",
+      "artist": "倉木麻衣",
+      "release_year": 2000,
+      "range_low_midi": 57,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6InX9TFsaezFfm8E258IuT",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273bbe41e06edf0fc66f2128d7e",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02bbe41e06edf0fc66f2128d7e",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851bbe41e06edf0fc66f2128d7e",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/6InX9TFsaezFfm8E258IuT"
+      ]
+    },
+    {
+      "title": "crossing field",
+      "artist": "LiSA",
+      "release_year": 2013,
+      "range_low_midi": 57,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 74,
+      "spotify_track_id": "4BvuZVf9KyBN3QiPfeI9hw",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2735f685067786c7e2d1253ecff",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e025f685067786c7e2d1253ecff",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048515f685067786c7e2d1253ecff",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/4BvuZVf9KyBN3QiPfeI9hw"
+      ]
+    },
+    {
+      "title": "光",
+      "artist": "宇多田ヒカル",
+      "release_year": 2002,
+      "range_low_midi": 57,
+      "range_high_midi": 75,
+      "falsetto_max_midi": 79,
+      "spotify_track_id": "7CVug9n4FomAqQV4RCunYv",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27358aff8f2aee2be5726d0bf71",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0258aff8f2aee2be5726d0bf71",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485158aff8f2aee2be5726d0bf71",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/7CVug9n4FomAqQV4RCunYv"
+      ]
+    },
+    {
+      "title": "怪物",
+      "artist": "YOASOBI",
+      "release_year": 2021,
+      "range_low_midi": 54,
+      "range_high_midi": 77,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "06XQvnJb53SUYmlWIhUXUi",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273b2efc5e5f5922ca1f1b88928",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02b2efc5e5f5922ca1f1b88928",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851b2efc5e5f5922ca1f1b88928",
+      "source_urls": [
+        "https://karaoto.net/max_key/44",
+        "https://open.spotify.com/track/06XQvnJb53SUYmlWIhUXUi"
+      ]
+    },
+    {
+      "title": "風が吹いている",
+      "artist": "いきものがかり",
+      "release_year": 2012,
+      "range_low_midi": 56,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 71,
+      "spotify_track_id": "46ioD2OgRS8CVAA41aml2F",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27389935737d2e700ea1e45784d",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0289935737d2e700ea1e45784d",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485189935737d2e700ea1e45784d",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/46ioD2OgRS8CVAA41aml2F"
+      ]
+    },
+    {
+      "title": "会いたくて 会いたくて",
+      "artist": "西野カナ",
+      "release_year": 2010,
+      "range_low_midi": 56,
+      "range_high_midi": 76,
+      "falsetto_max_midi": 75,
+      "spotify_track_id": "5yp5wFjiFMI5TiYKBTUSzs",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27311f9fa546e03d8ce188732b6",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0211f9fa546e03d8ce188732b6",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485111f9fa546e03d8ce188732b6",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/5yp5wFjiFMI5TiYKBTUSzs"
+      ]
+    },
+    {
+      "title": "ねがい",
+      "artist": "B'z",
+      "release_year": 1995,
+      "range_low_midi": 57,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "1DCPNjIaSxNkOORVUOQ2to",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273905a8e00cbc1d329d77bee8a",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02905a8e00cbc1d329d77bee8a",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851905a8e00cbc1d329d77bee8a",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/1DCPNjIaSxNkOORVUOQ2to"
+      ]
+    },
+    {
+      "title": "SAKURAドロップス",
+      "artist": "宇多田ヒカル",
+      "release_year": 2002,
+      "range_low_midi": 53,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 77,
+      "spotify_track_id": "7fsrKBv2IPdHz9G0DLhL50",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27358aff8f2aee2be5726d0bf71",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0258aff8f2aee2be5726d0bf71",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485158aff8f2aee2be5726d0bf71",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/7fsrKBv2IPdHz9G0DLhL50"
+      ]
+    },
+    {
+      "title": "RAIN",
+      "artist": "GLAY",
+      "release_year": 1995,
+      "range_low_midi": 49,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5vVUiYtgFh7HrlGA5B7twU",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27336bb34c0abdec484044c5d7c",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0236bb34c0abdec484044c5d7c",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485136bb34c0abdec484044c5d7c",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/5vVUiYtgFh7HrlGA5B7twU"
+      ]
+    },
+    {
+      "title": "Blue Velvet",
+      "artist": "工藤静香",
+      "release_year": 1998,
+      "range_low_midi": 61,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "0tRuyBjU644y3yqJwXa3HH",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273d349dacb70d2c25f04807788",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02d349dacb70d2c25f04807788",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851d349dacb70d2c25f04807788",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/0tRuyBjU644y3yqJwXa3HH"
+      ]
+    },
+    {
+      "title": "出逢った頃のように",
+      "artist": "Every Little Thing",
+      "release_year": 1998,
+      "range_low_midi": 58,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6Z7LayRg0N3mkFFjGsO8fN",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2737e6a7000eb4a388e5227377b",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e027e6a7000eb4a388e5227377b",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048517e6a7000eb4a388e5227377b",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/6Z7LayRg0N3mkFFjGsO8fN"
+      ]
+    },
+    {
+      "title": "【es】～Theme of es～",
+      "artist": "Mr.Children",
+      "release_year": 1997,
+      "range_low_midi": 49,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4PBYxs4Eh65wJ69rBnhqt2",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273799187d4c92b7296a0cb2858",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02799187d4c92b7296a0cb2858",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851799187d4c92b7296a0cb2858",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/4PBYxs4Eh65wJ69rBnhqt2"
+      ]
+    },
+    {
+      "title": "COLORS",
+      "artist": "宇多田ヒカル",
+      "release_year": 2003,
+      "range_low_midi": 57,
+      "range_high_midi": 76,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5rICX8H20r156hQqJVErxY",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273d6df3e322722119345ef3682",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02d6df3e322722119345ef3682",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851d6df3e322722119345ef3682",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/5rICX8H20r156hQqJVErxY"
+      ]
+    },
+    {
+      "title": "Dearest",
+      "artist": "浜崎あゆみ",
+      "release_year": 2002,
+      "range_low_midi": 61,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4uraEw7BcTjMmUcRKE3XaD",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273781bf029df688d074e86316d",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02781bf029df688d074e86316d",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851781bf029df688d074e86316d",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/4uraEw7BcTjMmUcRKE3XaD"
+      ]
+    },
+    {
+      "title": "promise",
+      "artist": "広瀬香美",
+      "release_year": 1998,
+      "range_low_midi": 58,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "39rZVvBPsAc4h0BfPLUqOj",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2738ad66b39a6e3dd6b93ac2407",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e028ad66b39a6e3dd6b93ac2407",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048518ad66b39a6e3dd6b93ac2407",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/39rZVvBPsAc4h0BfPLUqOj"
+      ]
+    },
+    {
+      "title": "White Love",
+      "artist": "SPEED",
+      "release_year": 1998,
+      "range_low_midi": 58,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "649bQvPsCrBYxk8s8lXHbn",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2734d2e6ef98d6cadde220a0328",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e024d2e6ef98d6cadde220a0328",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048514d2e6ef98d6cadde220a0328",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/649bQvPsCrBYxk8s8lXHbn"
+      ]
+    },
+    {
+      "title": "愛のバクダン",
+      "artist": "B'z",
+      "release_year": 2005,
+      "range_low_midi": 56,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6b2BKq7AZ564QdptHFmvm5",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27386dd20a3806b9e5d3cc5e9c3",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0286dd20a3806b9e5d3cc5e9c3",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485186dd20a3806b9e5d3cc5e9c3",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/6b2BKq7AZ564QdptHFmvm5"
+      ]
+    },
+    {
+      "title": "フェイク",
+      "artist": "Mr.Children",
+      "release_year": 2007,
+      "range_low_midi": 53,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4xR7Z0jsq41nG2zBJf5MIO",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2739ca781afbd6790d8bb1e33e6",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e029ca781afbd6790d8bb1e33e6",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048519ca781afbd6790d8bb1e33e6",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/4xR7Z0jsq41nG2zBJf5MIO"
+      ]
+    },
+    {
+      "title": "Good-bye My Loneliness",
+      "artist": "ZARD",
+      "release_year": 2006,
+      "range_low_midi": 50,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "7Cw7EakNuOGvt6e6rGcnmH",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273b1c58fe9ea5e2d3c0023502a",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02b1c58fe9ea5e2d3c0023502a",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851b1c58fe9ea5e2d3c0023502a",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/7Cw7EakNuOGvt6e6rGcnmH"
+      ]
+    },
+    {
+      "title": "遥か",
+      "artist": "GReeeeN",
+      "release_year": 2009,
+      "range_low_midi": 45,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4wBFubvNAwVox8q4SYXHqU",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27328b205399bb40d6d9b3a0bc5",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0228b205399bb40d6d9b3a0bc5",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485128b205399bb40d6d9b3a0bc5",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/4wBFubvNAwVox8q4SYXHqU"
+      ]
+    },
+    {
+      "title": "MOTEL",
+      "artist": "B'z",
+      "release_year": 1994,
+      "range_low_midi": 52,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4LTM1Ib8WdAHbUy05Blh5q",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273048ebd62fa232937702eb3ff",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02048ebd62fa232937702eb3ff",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851048ebd62fa232937702eb3ff",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/4LTM1Ib8WdAHbUy05Blh5q"
+      ]
+    },
+    {
+      "title": "今夜このまま",
+      "artist": "あいみょん",
+      "release_year": 2019,
+      "range_low_midi": 56,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 78,
+      "spotify_track_id": "6kKvmT4i0Dercz6f3kftg3",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273c12d785df5dbf2b15ec49504",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02c12d785df5dbf2b15ec49504",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851c12d785df5dbf2b15ec49504",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/6kKvmT4i0Dercz6f3kftg3"
+      ]
+    },
+    {
+      "title": "衝動",
+      "artist": "B'z",
+      "release_year": 2006,
+      "range_low_midi": 55,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "0s38Mpf6UkodyUtYCTaZav",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273a278526bf5a9f69d80a82110",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02a278526bf5a9f69d80a82110",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851a278526bf5a9f69d80a82110",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/0s38Mpf6UkodyUtYCTaZav"
+      ]
+    },
+    {
+      "title": "陽のあたる坂道",
+      "artist": "Do As Infinity",
+      "release_year": 2021,
+      "range_low_midi": 58,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "2OT5wh9kfq5oawv1YIaHsL",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273dc1ec27edbb5c6ca82b22897",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02dc1ec27edbb5c6ca82b22897",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851dc1ec27edbb5c6ca82b22897",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/2OT5wh9kfq5oawv1YIaHsL"
+      ]
+    },
+    {
+      "title": "君が好き",
+      "artist": "Mr.Children",
+      "release_year": 2002,
+      "range_low_midi": 47,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 66,
+      "spotify_track_id": "7mH2yFJ44kpiex624KTC5Q",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2731f39f3aaebf5b24af7ab4d25",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e021f39f3aaebf5b24af7ab4d25",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048511f39f3aaebf5b24af7ab4d25",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/7mH2yFJ44kpiex624KTC5Q"
+      ]
+    },
+    {
+      "title": "ゲレンデがとけるほど恋したい",
+      "artist": "広瀬香美",
+      "release_year": 1998,
+      "range_low_midi": 55,
+      "range_high_midi": 76,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6EvrfdvQ254FkKbNOnVXuQ",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2738ad66b39a6e3dd6b93ac2407",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e028ad66b39a6e3dd6b93ac2407",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048518ad66b39a6e3dd6b93ac2407",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/6EvrfdvQ254FkKbNOnVXuQ"
+      ]
+    },
+    {
+      "title": "心を開いて",
+      "artist": "ZARD",
+      "release_year": 1996,
+      "range_low_midi": 55,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5KOGSQIg6Il74PbAsrB0zU",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273b656ba837a3bb3b0f085a005",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02b656ba837a3bb3b0f085a005",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851b656ba837a3bb3b0f085a005",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/5KOGSQIg6Il74PbAsrB0zU"
+      ]
+    },
+    {
+      "title": "グロリアス マインド",
+      "artist": "ZARD",
+      "release_year": 2007,
+      "range_low_midi": 56,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "2lswHSoclUEk4jGm3k05Oe",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27323fddb1cf65ab45c2930c439",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0223fddb1cf65ab45c2930c439",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485123fddb1cf65ab45c2930c439",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/2lswHSoclUEk4jGm3k05Oe"
+      ]
+    },
+    {
+      "title": "未来へ",
+      "artist": "Kiroro",
+      "release_year": 2002,
+      "range_low_midi": 55,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4a3AO5h7l2AtHTZySZuqIT",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273e2a9179a5b1029af05c7f161",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02e2a9179a5b1029af05c7f161",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851e2a9179a5b1029af05c7f161",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/4a3AO5h7l2AtHTZySZuqIT"
+      ]
+    },
+    {
+      "title": "深い森",
+      "artist": "Do As Infinity",
+      "release_year": 2001,
+      "range_low_midi": 58,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5JbIiEY2Ttextq0Eoiw7qn",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2733957a30e8f71d5adf8889a9b",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e023957a30e8f71d5adf8889a9b",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048513957a30e8f71d5adf8889a9b",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/5JbIiEY2Ttextq0Eoiw7qn"
+      ]
+    },
+    {
+      "title": "花火",
+      "artist": "aiko",
+      "release_year": 2000,
+      "range_low_midi": 57,
+      "range_high_midi": 77,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "0I0zZHGJ6ea8TxwbUvvJEH",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2732d10769ad060ad70b5ebe0c2",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e022d10769ad060ad70b5ebe0c2",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048512d10769ad060ad70b5ebe0c2",
+      "source_urls": [
+        "https://karaoto.net/max_key/44",
+        "https://open.spotify.com/track/0I0zZHGJ6ea8TxwbUvvJEH"
+      ]
+    },
+    {
+      "title": "幾億光年",
+      "artist": "Omoinotake",
+      "release_year": 2024,
+      "range_low_midi": 50,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 78,
+      "spotify_track_id": "4dmruTsdHIOjfOIeaFitXK",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273041c5ffe0b8b02e029276100",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02041c5ffe0b8b02e029276100",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851041c5ffe0b8b02e029276100",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/4dmruTsdHIOjfOIeaFitXK"
+      ]
+    },
+    {
+      "title": "SOUL LOVE",
+      "artist": "GLAY",
+      "release_year": 1998,
+      "range_low_midi": 51,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "28uEz3ea3dyYlNf07Lf69F",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27308d794162ccc50496dab2bc0",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0208d794162ccc50496dab2bc0",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485108d794162ccc50496dab2bc0",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/28uEz3ea3dyYlNf07Lf69F"
+      ]
+    },
+    {
+      "title": "君に逢いたくなったら…",
+      "artist": "ZARD",
+      "release_year": 1997,
+      "range_low_midi": 54,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4bi6TvMOrAAWtRePOyoU9L",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273392ee8187a7a4b6f00f6fb7a",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02392ee8187a7a4b6f00f6fb7a",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851392ee8187a7a4b6f00f6fb7a",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/4bi6TvMOrAAWtRePOyoU9L"
+      ]
+    },
+    {
+      "title": "Liar! Liar!",
+      "artist": "B'z",
+      "release_year": 1997,
+      "range_low_midi": 58,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6CDOY6O95QaTKyftaoPKJS",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27399cba03282999018247ed11a",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0299cba03282999018247ed11a",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485199cba03282999018247ed11a",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/6CDOY6O95QaTKyftaoPKJS"
+      ]
+    },
+    {
+      "title": "Can't Stop Fallin' in Love",
+      "artist": "globe",
+      "release_year": 1997,
+      "range_low_midi": 57,
+      "range_high_midi": 75,
+      "falsetto_max_midi": 77,
+      "spotify_track_id": "2Q2xgTPY9PpBIEM6UlW1gM",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27312be766c3a99554b8182c832",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0212be766c3a99554b8182c832",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485112be766c3a99554b8182c832",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/2Q2xgTPY9PpBIEM6UlW1gM"
+      ]
+    },
+    {
+      "title": "Movin' on without you",
+      "artist": "宇多田ヒカル",
+      "release_year": 1999,
+      "range_low_midi": 52,
+      "range_high_midi": 76,
+      "falsetto_max_midi": 76,
+      "spotify_track_id": "0lsMGTm5MpI2VGMJy0Ya3x",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273eea6220da568442ea6293f05",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02eea6220da568442ea6293f05",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851eea6220da568442ea6293f05",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/0lsMGTm5MpI2VGMJy0Ya3x"
+      ]
+    },
+    {
+      "title": "虹",
+      "artist": "ゆず",
+      "release_year": 2012,
+      "range_low_midi": 54,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 71,
+      "spotify_track_id": "1auxo0MzUgjI6tre1PZYIw",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273a83ef3c145975f4b200f9dd2",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02a83ef3c145975f4b200f9dd2",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851a83ef3c145975f4b200f9dd2",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/1auxo0MzUgjI6tre1PZYIw"
+      ]
+    },
+    {
+      "title": "花に亡霊",
+      "artist": "ヨルシカ",
+      "release_year": 2020,
+      "range_low_midi": 59,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "3FUqp10RhCmMjyyB9extmo",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2732794743c6eb13addc2b01420",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e022794743c6eb13addc2b01420",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048512794743c6eb13addc2b01420",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/3FUqp10RhCmMjyyB9extmo"
+      ]
+    },
+    {
+      "title": "ベテルギウス",
+      "artist": "優里",
+      "release_year": 2022,
+      "range_low_midi": 50,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 74,
+      "spotify_track_id": "4JK1kDUdH9RTBQrrSO1QfR",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273d0bd51668da5629aa0cc77d8",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02d0bd51668da5629aa0cc77d8",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851d0bd51668da5629aa0cc77d8",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/4JK1kDUdH9RTBQrrSO1QfR"
+      ]
+    },
+    {
+      "title": "Voyage",
+      "artist": "浜崎あゆみ",
+      "release_year": 2002,
+      "range_low_midi": 56,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "7qxiMTivPRxgHqHaIUML48",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2732a2bb7b5dab973edb87ae3dd",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e022a2bb7b5dab973edb87ae3dd",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048512a2bb7b5dab973edb87ae3dd",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/7qxiMTivPRxgHqHaIUML48"
+      ]
+    },
+    {
+      "title": "長い間",
+      "artist": "Kiroro",
+      "release_year": 2002,
+      "range_low_midi": 58,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "1HqDxJI4vF0dloG1gKDJ2o",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273e2a9179a5b1029af05c7f161",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02e2a9179a5b1029af05c7f161",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851e2a9179a5b1029af05c7f161",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/1HqDxJI4vF0dloG1gKDJ2o"
+      ]
+    },
+    {
+      "title": "ボーイフレンド",
+      "artist": "aiko",
+      "release_year": 2000,
+      "range_low_midi": 54,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 76,
+      "spotify_track_id": "4h4qR86LKL1KnzQWM2484a",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27351ef3a6c331a046891d443af",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0251ef3a6c331a046891d443af",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485151ef3a6c331a046891d443af",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/4h4qR86LKL1KnzQWM2484a"
+      ]
+    },
+    {
+      "title": "散歩道",
+      "artist": "JUDY AND MARY",
+      "release_year": 1998,
+      "range_low_midi": 57,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "72DDgSntVmV2Epq3ihPXKO",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2731f0927ea9a6ca01511bdfb91",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e021f0927ea9a6ca01511bdfb91",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048511f0927ea9a6ca01511bdfb91",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/72DDgSntVmV2Epq3ihPXKO"
+      ]
+    },
+    {
+      "title": "Wanderin' Destiny",
+      "artist": "globe",
+      "release_year": 1998,
+      "range_low_midi": null,
+      "range_high_midi": 75,
+      "falsetto_max_midi": 74,
+      "spotify_track_id": "34HplLjMFcmhkyWvZLGjbp",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2730909abba56fe02fe6d68e990",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e020909abba56fe02fe6d68e990",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048510909abba56fe02fe6d68e990",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/34HplLjMFcmhkyWvZLGjbp"
+      ]
+    },
+    {
+      "title": "サブリナ",
+      "artist": "家入レオ",
+      "release_year": 2012,
+      "range_low_midi": 59,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "67ZjPP9Jol63IuJduIx0uv",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273dc18839b4c03ab6003c8346d",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02dc18839b4c03ab6003c8346d",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851dc18839b4c03ab6003c8346d",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/67ZjPP9Jol63IuJduIx0uv"
+      ]
+    },
+    {
+      "title": "光の射す方へ",
+      "artist": "Mr.Children",
+      "release_year": 1999,
+      "range_low_midi": 52,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "2aDwyLJLPUb6C9mtVKQ5nN",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2733b60fa2d2af5a3abc549da54",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e023b60fa2d2af5a3abc549da54",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048513b60fa2d2af5a3abc549da54",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/2aDwyLJLPUb6C9mtVKQ5nN"
+      ]
+    },
+    {
+      "title": "ゆるぎないものひとつ",
+      "artist": "B'z",
+      "release_year": 2006,
+      "range_low_midi": 54,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6hZLgkwB6M8JvcOGBK08Dj",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27311bf31f6aa10acc10c33ce1e",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0211bf31f6aa10acc10c33ce1e",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485111bf31f6aa10acc10c33ce1e",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/6hZLgkwB6M8JvcOGBK08Dj"
+      ]
+    },
+    {
+      "title": "Time goes by",
+      "artist": "Every Little Thing",
+      "release_year": 2016,
+      "range_low_midi": 60,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "1U2It4ydGIJ9L2LKyyRYCc",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273f731405f383e1ce5798408c5",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02f731405f383e1ce5798408c5",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851f731405f383e1ce5798408c5",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/1U2It4ydGIJ9L2LKyyRYCc"
+      ]
+    },
+    {
+      "title": "熱き鼓動の果て",
+      "artist": "B'z",
+      "release_year": 2002,
+      "range_low_midi": 57,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6NYqmAtuBlVU9fYdkrViJm",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273f005f980d8bc32784875e70f",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02f005f980d8bc32784875e70f",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851f005f980d8bc32784875e70f",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/6NYqmAtuBlVU9fYdkrViJm"
+      ]
+    },
+    {
+      "title": "FACE",
+      "artist": "globe",
+      "release_year": 1997,
+      "range_low_midi": 60,
+      "range_high_midi": 76,
+      "falsetto_max_midi": 76,
+      "spotify_track_id": "5dCALHqP4zS2v8tqGoBKbO",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27312be766c3a99554b8182c832",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0212be766c3a99554b8182c832",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485112be766c3a99554b8182c832",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/5dCALHqP4zS2v8tqGoBKbO"
+      ]
+    },
+    {
+      "title": "笑顔の行方",
+      "artist": "DREAMS COME TRUE",
+      "release_year": 1990,
+      "range_low_midi": 60,
+      "range_high_midi": 77,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "72YZmhIzcI958gmw0lsBpn",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273bb1d2b0c1948ec67f0560e4f",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02bb1d2b0c1948ec67f0560e4f",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851bb1d2b0c1948ec67f0560e4f",
+      "source_urls": [
+        "https://karaoto.net/max_key/44",
+        "https://open.spotify.com/track/72YZmhIzcI958gmw0lsBpn"
+      ]
+    },
+    {
+      "title": "涙がキラリ☆",
+      "artist": "スピッツ",
+      "release_year": 1995,
+      "range_low_midi": 54,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "02kBYC3M7ss43dr7i8ADyT",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27316aeaa20fccbe7ef8e32f876",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0216aeaa20fccbe7ef8e32f876",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485116aeaa20fccbe7ef8e32f876",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/02kBYC3M7ss43dr7i8ADyT"
+      ]
+    },
+    {
+      "title": "STEADY",
+      "artist": "SPEED",
+      "release_year": 1997,
+      "range_low_midi": 53,
+      "range_high_midi": 75,
+      "falsetto_max_midi": 77,
+      "spotify_track_id": "75EUObA0opJ8ipOzT3VGVm",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2731cf5a7074796f4cc5b1fa6fa",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e021cf5a7074796f4cc5b1fa6fa",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048511cf5a7074796f4cc5b1fa6fa",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/75EUObA0opJ8ipOzT3VGVm"
+      ]
+    },
+    {
+      "title": "祝福",
+      "artist": "YOASOBI",
+      "release_year": 2022,
+      "range_low_midi": 55,
+      "range_high_midi": 75,
+      "falsetto_max_midi": 77,
+      "spotify_track_id": "7ajpbW6tBpqUI9foCtwlLw",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273c5993ff2f059a0a5a7f6270b",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02c5993ff2f059a0a5a7f6270b",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851c5993ff2f059a0a5a7f6270b",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/7ajpbW6tBpqUI9foCtwlLw"
+      ]
+    },
+    {
+      "title": "Way of Difference",
+      "artist": "GLAY",
+      "release_year": 2005,
+      "range_low_midi": 52,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "1ILy4V5o5D3RzmhQLchTu3",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273386fe4a72f98020a6f318407",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02386fe4a72f98020a6f318407",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851386fe4a72f98020a6f318407",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/1ILy4V5o5D3RzmhQLchTu3"
+      ]
+    },
+    {
+      "title": "Dear My Friend",
+      "artist": "Every Little Thing",
+      "release_year": 2016,
+      "range_low_midi": 59,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "0N1jIgrl1HMk2PlHW0IupQ",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2731c0fe318c146d5c393d66297",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e021c0fe318c146d5c393d66297",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048511c0fe318c146d5c393d66297",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/0N1jIgrl1HMk2PlHW0IupQ"
+      ]
+    },
+    {
+      "title": "my graduation",
+      "artist": "SPEED",
+      "release_year": 1998,
+      "range_low_midi": 59,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "2hVd9JbsiyErluM1fF4hdF",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2734d2e6ef98d6cadde220a0328",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e024d2e6ef98d6cadde220a0328",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048514d2e6ef98d6cadde220a0328",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/2hVd9JbsiyErluM1fF4hdF"
+      ]
+    },
+    {
+      "title": "if",
+      "artist": "西野カナ",
+      "release_year": 2010,
+      "range_low_midi": 57,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "0l8OTE4sFHWrjVUSUmcu2P",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2738bbcf9ec9e301165d2f435fb",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e028bbcf9ec9e301165d2f435fb",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048518bbcf9ec9e301165d2f435fb",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/0l8OTE4sFHWrjVUSUmcu2P"
+      ]
+    },
+    {
+      "title": "real Emotion",
+      "artist": "倖田來未",
+      "release_year": 2003,
+      "range_low_midi": 54,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5reHMU3gki8Dm3eJNnIOYH",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273daf0aca043b8e111b6355246",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02daf0aca043b8e111b6355246",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851daf0aca043b8e111b6355246",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/5reHMU3gki8Dm3eJNnIOYH"
+      ]
+    },
+    {
+      "title": "きっと忘れない",
+      "artist": "ZARD",
+      "release_year": 1994,
+      "range_low_midi": 56,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "7o8v1FrGxIBQd3gQRiX3w7",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273537fc7fa4140bf249dccaa70",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02537fc7fa4140bf249dccaa70",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851537fc7fa4140bf249dccaa70",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/7o8v1FrGxIBQd3gQRiX3w7"
+      ]
+    },
+    {
+      "title": "コイスルオトメ",
+      "artist": "いきものがかり",
+      "release_year": 2007,
+      "range_low_midi": 59,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 73,
+      "spotify_track_id": "1GyOsMcLEZyJrBsT9NDgmr",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273f13650decb20299d996448a8",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02f13650decb20299d996448a8",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851f13650decb20299d996448a8",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/1GyOsMcLEZyJrBsT9NDgmr"
+      ]
+    },
+    {
+      "title": "DEPARTURES",
+      "artist": "globe",
+      "release_year": 2002,
+      "range_low_midi": 58,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 75,
+      "spotify_track_id": "1NF6koRrvqGD77tHfLQh8N",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273a3c2806db831a949f227f24b",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02a3c2806db831a949f227f24b",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851a3c2806db831a949f227f24b",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/1NF6koRrvqGD77tHfLQh8N"
+      ]
+    },
+    {
+      "title": "飛べない鳥",
+      "artist": "ゆず",
+      "release_year": 2000,
+      "range_low_midi": 52,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 73,
+      "spotify_track_id": "5z6kNpfh0vmewNJJIOyGXs",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273dd09d44bf0eac4927677db44",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02dd09d44bf0eac4927677db44",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851dd09d44bf0eac4927677db44",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/5z6kNpfh0vmewNJJIOyGXs"
+      ]
+    },
+    {
+      "title": "again",
+      "artist": "YUI",
+      "release_year": 2010,
+      "range_low_midi": 57,
+      "range_high_midi": 75,
+      "falsetto_max_midi": 74,
+      "spotify_track_id": "4OQq1bcP12GQQXJNupxqfR",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273fdec3ee19da7cd9b1b02ca9c",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02fdec3ee19da7cd9b1b02ca9c",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851fdec3ee19da7cd9b1b02ca9c",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/4OQq1bcP12GQQXJNupxqfR"
+      ]
+    },
+    {
+      "title": "SUPER LOVE SONG",
+      "artist": "B'z",
+      "release_year": 2008,
+      "range_low_midi": 57,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5xu2lfzWaiXlrUbq7Su2m6",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273f3e408025c6a200a7b3f3df8",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02f3e408025c6a200a7b3f3df8",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851f3e408025c6a200a7b3f3df8",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/5xu2lfzWaiXlrUbq7Su2m6"
+      ]
+    },
+    {
+      "title": "チャンピオーネ",
+      "artist": "ORANGE RANGE",
+      "release_year": 2005,
+      "range_low_midi": 45,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "1Al9BPCpkbIFjwzi8IK5Pm",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2735e2c7115be30383ef91f9d53",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e025e2c7115be30383ef91f9d53",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048515e2c7115be30383ef91f9d53",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/1Al9BPCpkbIFjwzi8IK5Pm"
+      ]
+    },
+    {
+      "title": "ラッキープール",
+      "artist": "JUDY AND MARY",
+      "release_year": 2000,
+      "range_low_midi": 60,
+      "range_high_midi": 76,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "00Z1o8c9lApIYLnlXTfJB4",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273aea8d46beb3c0617ea919f0a",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02aea8d46beb3c0617ea919f0a",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851aea8d46beb3c0617ea919f0a",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/00Z1o8c9lApIYLnlXTfJB4"
+      ]
+    },
+    {
+      "title": "愛のうた",
+      "artist": "倖田來未",
+      "release_year": 2008,
+      "range_low_midi": 57,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6qt4DNJ94JlcYw5aZJP9D1",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2738e3d86b2a1e5b23e45a8480e",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e028e3d86b2a1e5b23e45a8480e",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048518e3d86b2a1e5b23e45a8480e",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/6qt4DNJ94JlcYw5aZJP9D1"
+      ]
+    },
+    {
+      "title": "BE WITH YOU",
+      "artist": "GLAY",
+      "release_year": 2000,
+      "range_low_midi": 50,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "1Xs6ugAD4XxfiOS9DDicND",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27322944413ed452ab312fbd49e",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0222944413ed452ab312fbd49e",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485122944413ed452ab312fbd49e",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/1Xs6ugAD4XxfiOS9DDicND"
+      ]
+    },
+    {
+      "title": "茜色の約束",
+      "artist": "いきものがかり",
+      "release_year": 2008,
+      "range_low_midi": 54,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "290VvkzjKPHW6JksM9dxme",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273cd6d3bd410d04813965d8a8e",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02cd6d3bd410d04813965d8a8e",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851cd6d3bd410d04813965d8a8e",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/290VvkzjKPHW6JksM9dxme"
+      ]
+    },
+    {
+      "title": "Love again",
+      "artist": "globe",
+      "release_year": 1998,
+      "range_low_midi": 53,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 72,
+      "spotify_track_id": "2qrIanTYKhR7H1dOJv9g1X",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2730909abba56fe02fe6d68e990",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e020909abba56fe02fe6d68e990",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048510909abba56fe02fe6d68e990",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/2qrIanTYKhR7H1dOJv9g1X"
+      ]
+    },
+    {
+      "title": "歩いていこう",
+      "artist": "いきものがかり",
+      "release_year": 2012,
+      "range_low_midi": 55,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5MZ4BLULdM4i1q79oQVVOa",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273b020303782b0f116872b026f",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02b020303782b0f116872b026f",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851b020303782b0f116872b026f",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/5MZ4BLULdM4i1q79oQVVOa"
+      ]
+    },
+    {
+      "title": "花になって",
+      "artist": "緑黄色社会",
+      "release_year": 2023,
+      "range_low_midi": 57,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 75,
+      "spotify_track_id": "2EmkTBTh964LQen4Vz0svg",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27389e9b12f91f811198b14e15d",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0289e9b12f91f811198b14e15d",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485189e9b12f91f811198b14e15d",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/2EmkTBTh964LQen4Vz0svg"
+      ]
+    },
+    {
+      "title": "Stay by my side",
+      "artist": "倉木麻衣",
+      "release_year": 2000,
+      "range_low_midi": 52,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 72,
+      "spotify_track_id": "59UaCwB3SoMyevnN28GW59",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273bbe41e06edf0fc66f2128d7e",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02bbe41e06edf0fc66f2128d7e",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851bbe41e06edf0fc66f2128d7e",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/59UaCwB3SoMyevnN28GW59"
+      ]
+    },
+    {
+      "title": "Grip!",
+      "artist": "Every Little Thing",
+      "release_year": 2003,
+      "range_low_midi": 55,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5Zd4apBLWFi02llEupsokX",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27328f20ecfb26a7da08cbf27e2",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0228f20ecfb26a7da08cbf27e2",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485128f20ecfb26a7da08cbf27e2",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/5Zd4apBLWFi02llEupsokX"
+      ]
+    },
+    {
+      "title": "Feel My Heart",
+      "artist": "Every Little Thing",
+      "release_year": 2016,
+      "range_low_midi": 60,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "42hAFY7mvpHJD4gUJCDE6I",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2731c0fe318c146d5c393d66297",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e021c0fe318c146d5c393d66297",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048511c0fe318c146d5c393d66297",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/42hAFY7mvpHJD4gUJCDE6I"
+      ]
+    },
+    {
+      "title": "優しい彗星",
+      "artist": "YOASOBI",
+      "release_year": 2021,
+      "range_low_midi": 60,
+      "range_high_midi": 75,
+      "falsetto_max_midi": 77,
+      "spotify_track_id": "1KiJQAgOCabKSzgQgArFTz",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2739c3625a413a9a79facea38c2",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e029c3625a413a9a79facea38c2",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048519c3625a413a9a79facea38c2",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/1KiJQAgOCabKSzgQgArFTz"
+      ]
+    },
+    {
+      "title": "君って",
+      "artist": "西野カナ",
+      "release_year": 2010,
+      "range_low_midi": 54,
+      "range_high_midi": 76,
+      "falsetto_max_midi": 79,
+      "spotify_track_id": "5hsPvf0Tn4llsdCl3MN1VQ",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273cccc07f81cbbf2f879dc3ad5",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02cccc07f81cbbf2f879dc3ad5",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851cccc07f81cbbf2f879dc3ad5",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/5hsPvf0Tn4llsdCl3MN1VQ"
+      ]
+    },
+    {
+      "title": "DEAR...again",
+      "artist": "広瀬香美",
+      "release_year": 2011,
+      "range_low_midi": 55,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "74Iunh5momVEMq0E6ZpDGc",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273867ebb4304acef2866a9972b",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02867ebb4304acef2866a9972b",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851867ebb4304acef2866a9972b",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/74Iunh5momVEMq0E6ZpDGc"
+      ]
+    },
+    {
+      "title": "wanna Be A Dreammaker",
+      "artist": "globe",
+      "release_year": 1998,
+      "range_low_midi": 59,
+      "range_high_midi": 76,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "2bwxd43spmwPS96fBwEJLE",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273e6e01fef5235e8c7d0f3dd31",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02e6e01fef5235e8c7d0f3dd31",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851e6e01fef5235e8c7d0f3dd31",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/2bwxd43spmwPS96fBwEJLE"
+      ]
+    },
+    {
+      "title": "Missing You",
+      "artist": "GLAY",
+      "release_year": 2000,
+      "range_low_midi": 55,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 72,
+      "spotify_track_id": "5CXnzJPWbRL6J5LARcHKnm",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27322944413ed452ab312fbd49e",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0222944413ed452ab312fbd49e",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485122944413ed452ab312fbd49e",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/5CXnzJPWbRL6J5LARcHKnm"
+      ]
+    },
+    {
+      "title": "Wings of Words",
+      "artist": "CHEMISTRY",
+      "release_year": 2005,
+      "range_low_midi": 52,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 72,
+      "spotify_track_id": "2H2eM8StBnOLOzRI0rZ7G2",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273029fea715d25c9ecf6022bbf",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02029fea715d25c9ecf6022bbf",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851029fea715d25c9ecf6022bbf",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/2H2eM8StBnOLOzRI0rZ7G2"
+      ]
+    },
+    {
+      "title": "アンサイズニア",
+      "artist": "ONE OK ROCK",
+      "release_year": 2011,
+      "range_low_midi": 48,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 74,
+      "spotify_track_id": "2BOAZnDHaso2jfVMmqfRnK",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27371a6a4b38da1045d8d700b2f",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0271a6a4b38da1045d8d700b2f",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485171a6a4b38da1045d8d700b2f",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/2BOAZnDHaso2jfVMmqfRnK"
+      ]
+    },
+    {
+      "title": "always",
+      "artist": "倉木麻衣",
+      "release_year": 2021,
+      "range_low_midi": 57,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "7BUTvMscLY29cBxspSOsY6",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273439ca7ef2ce81624e7ee3b7a",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02439ca7ef2ce81624e7ee3b7a",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851439ca7ef2ce81624e7ee3b7a",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/7BUTvMscLY29cBxspSOsY6"
+      ]
+    },
+    {
+      "title": "Darling",
+      "artist": "西野カナ",
+      "release_year": 2014,
+      "range_low_midi": 60,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 74,
+      "spotify_track_id": "1xNuNkY51qJ3wIEUkjXN4o",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273e9bf439de45b549c1253086e",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02e9bf439de45b549c1253086e",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851e9bf439de45b549c1253086e",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/1xNuNkY51qJ3wIEUkjXN4o"
+      ]
+    },
+    {
+      "title": "ALL MY TRUE LOVE",
+      "artist": "SPEED",
+      "release_year": 1998,
+      "range_low_midi": 56,
+      "range_high_midi": 76,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6wRrIgfGHnnArzURa83Qpk",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2738c7a6ca21228dbc569c68c17",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e028c7a6ca21228dbc569c68c17",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048518c7a6ca21228dbc569c68c17",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/6wRrIgfGHnnArzURa83Qpk"
+      ]
+    },
+    {
+      "title": "空の青さを知る人よ",
+      "artist": "あいみょん",
+      "release_year": 2020,
+      "range_low_midi": 52,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6pHcxtpwNOIATrwHCL5WNw",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2734cf57a2df30a90a9a3fc39ef",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e024cf57a2df30a90a9a3fc39ef",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048514cf57a2df30a90a9a3fc39ef",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/6pHcxtpwNOIATrwHCL5WNw"
+      ]
+    },
+    {
+      "title": "Perfume of love",
+      "artist": "globe",
+      "release_year": 2015,
+      "range_low_midi": 47,
+      "range_high_midi": 75,
+      "falsetto_max_midi": 77,
+      "spotify_track_id": "75sOgK5KSuREKAca4yW3Xb",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273fbeaf50cfcd5754aa138bac0",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02fbeaf50cfcd5754aa138bac0",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851fbeaf50cfcd5754aa138bac0",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/75sOgK5KSuREKAca4yW3Xb"
+      ]
+    },
+    {
+      "title": "恋文",
+      "artist": "Every Little Thing",
+      "release_year": 2006,
+      "range_low_midi": 54,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "0u1UWNteISFgK9VneExY9f",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2731a8fb3419f590a4e6e7b4c4c",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e021a8fb3419f590a4e6e7b4c4c",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048511a8fb3419f590a4e6e7b4c4c",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/0u1UWNteISFgK9VneExY9f"
+      ]
+    },
+    {
+      "title": "Reach for the sky",
+      "artist": "倉木麻衣",
+      "release_year": 2000,
+      "range_low_midi": 54,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 75,
+      "spotify_track_id": "1ru6Hthv0uKaB9UslOkLUA",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27348cf7d3300dfa18877308942",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0248cf7d3300dfa18877308942",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485148cf7d3300dfa18877308942",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/1ru6Hthv0uKaB9UslOkLUA"
+      ]
+    },
+    {
+      "title": "SUMMER SONG",
+      "artist": "YUI",
+      "release_year": 2010,
+      "range_low_midi": 56,
+      "range_high_midi": 77,
+      "falsetto_max_midi": 77,
+      "spotify_track_id": "1ZCFq7Fq1ZN5nI5GHXEAdg",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273fdec3ee19da7cd9b1b02ca9c",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02fdec3ee19da7cd9b1b02ca9c",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851fdec3ee19da7cd9b1b02ca9c",
+      "source_urls": [
+        "https://karaoto.net/max_key/44",
+        "https://open.spotify.com/track/1ZCFq7Fq1ZN5nI5GHXEAdg"
+      ]
+    },
+    {
+      "title": "GLORIA",
+      "artist": "YUI",
+      "release_year": 2010,
+      "range_low_midi": 60,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 76,
+      "spotify_track_id": "4Gz6tu4JJD7NtlcTSkB4VC",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273fdec3ee19da7cd9b1b02ca9c",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02fdec3ee19da7cd9b1b02ca9c",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851fdec3ee19da7cd9b1b02ca9c",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/4Gz6tu4JJD7NtlcTSkB4VC"
+      ]
+    },
+    {
+      "title": "Deeper Deeper",
+      "artist": "ONE OK ROCK",
+      "release_year": 2013,
+      "range_low_midi": 52,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5FpiP6PGPcg4zjoHU6bAgi",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27316a06fd7db82ead8dee01ee5",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0216a06fd7db82ead8dee01ee5",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485116a06fd7db82ead8dee01ee5",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/5FpiP6PGPcg4zjoHU6bAgi"
+      ]
+    },
+    {
+      "title": "眩暈",
+      "artist": "鬼束ちひろ",
+      "release_year": 2001,
+      "range_low_midi": 56,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5TK6ya23aqRwlWmk5zUmXA",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273f57309a9a7b4197c66c6e3ff",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02f57309a9a7b4197c66c6e3ff",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851f57309a9a7b4197c66c6e3ff",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/5TK6ya23aqRwlWmk5zUmXA"
+      ]
+    },
+    {
+      "title": "For the moment",
+      "artist": "Every Little Thing",
+      "release_year": 1998,
+      "range_low_midi": 59,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5BK9fmJ4lDYfVpZHZHaj80",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2737e6a7000eb4a388e5227377b",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e027e6a7000eb4a388e5227377b",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048517e6a7000eb4a388e5227377b",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/5BK9fmJ4lDYfVpZHZHaj80"
+      ]
+    },
+    {
+      "title": "Wake Me Up!",
+      "artist": "SPEED",
+      "release_year": 1997,
+      "range_low_midi": null,
+      "range_high_midi": 77,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4bYSgi0rH5o7OsfEv7gsfj",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273e91682e269158444f9f960b6",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02e91682e269158444f9f960b6",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851e91682e269158444f9f960b6",
+      "source_urls": [
+        "https://karaoto.net/max_key/44",
+        "https://open.spotify.com/track/4bYSgi0rH5o7OsfEv7gsfj"
+      ]
+    },
+    {
+      "title": "宿命",
+      "artist": "Official髭男dism",
+      "release_year": 2019,
+      "range_low_midi": 53,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 72,
+      "spotify_track_id": "2yozZfRYHP7Elsymghu5t3",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27376f402d83c2a85e5deca60e7",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0276f402d83c2a85e5deca60e7",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485176f402d83c2a85e5deca60e7",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/2yozZfRYHP7Elsymghu5t3"
+      ]
+    },
+    {
+      "title": "また あした",
+      "artist": "Every Little Thing",
+      "release_year": 2004,
+      "range_low_midi": 55,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "29pSGXe0DcXZhHG6xQpfLj",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27339167f8f78e5eed211dab9db",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0239167f8f78e5eed211dab9db",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485139167f8f78e5eed211dab9db",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/29pSGXe0DcXZhHG6xQpfLj"
+      ]
+    },
+    {
+      "title": "Universe",
+      "artist": "Official髭男dism",
+      "release_year": 2021,
+      "range_low_midi": 56,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 75,
+      "spotify_track_id": "6KLaKHxwJE3CZECVJLH4cN",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27376b0bb5718d2e9f13107951b",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0276b0bb5718d2e9f13107951b",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485176b0bb5718d2e9f13107951b",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/6KLaKHxwJE3CZECVJLH4cN"
+      ]
+    },
+    {
+      "title": "Invisible Sensation",
+      "artist": "UNISON SQUARE GARDEN",
+      "release_year": 2019,
+      "range_low_midi": 53,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "2bQ4E3XRBLBnJMd8iSm59b",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2730540b17bee2a0759ef59d90e",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e020540b17bee2a0759ef59d90e",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048510540b17bee2a0759ef59d90e",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/2bQ4E3XRBLBnJMd8iSm59b"
+      ]
+    },
+    {
+      "title": "桜の時",
+      "artist": "aiko",
+      "release_year": 2000,
+      "range_low_midi": 56,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 76,
+      "spotify_track_id": "2CukFFswRZixS0AMkdMHSk",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2732d10769ad060ad70b5ebe0c2",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e022d10769ad060ad70b5ebe0c2",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048512d10769ad060ad70b5ebe0c2",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/2CukFFswRZixS0AMkdMHSk"
+      ]
+    },
+    {
+      "title": "たぶん",
+      "artist": "YOASOBI",
+      "release_year": 2020,
+      "range_low_midi": 50,
+      "range_high_midi": 76,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "62Lv9WcrfzJqhvYDbilJy3",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2737b7d90956f81e0cc3f39d0b8",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e027b7d90956f81e0cc3f39d0b8",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048517b7d90956f81e0cc3f39d0b8",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/62Lv9WcrfzJqhvYDbilJy3"
+      ]
+    },
+    {
+      "title": "恋のつぼみ",
+      "artist": "倖田來未",
+      "release_year": 2006,
+      "range_low_midi": 56,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 73,
+      "spotify_track_id": "7n5B4w1KY8OFeRyVfOwRJV",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27326440e03374db6cbd88b4e8f",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0226440e03374db6cbd88b4e8f",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485126440e03374db6cbd88b4e8f",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/7n5B4w1KY8OFeRyVfOwRJV"
+      ]
+    },
+    {
+      "title": "僕たちの行方",
+      "artist": "高橋瞳",
+      "release_year": 2022,
+      "range_low_midi": 60,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "1Wv3Mnr1MTj0Z4abHQANuq",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2737d621a405d8a1606688904ef",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e027d621a405d8a1606688904ef",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048517d621a405d8a1606688904ef",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/1Wv3Mnr1MTj0Z4abHQANuq"
+      ]
+    },
+    {
+      "title": "Endless sorrow",
+      "artist": "浜崎あゆみ",
+      "release_year": 2001,
+      "range_low_midi": 59,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5LftEfLY9HeIXvbTeg42aR",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273063ffdd1d591cd387efc92cd",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02063ffdd1d591cd387efc92cd",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851063ffdd1d591cd387efc92cd",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/5LftEfLY9HeIXvbTeg42aR"
+      ]
+    },
+    {
+      "title": "冒険者たち",
+      "artist": "Do As Infinity",
+      "release_year": 2001,
+      "range_low_midi": null,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "2py5vjyboDCOlh2HqpGmLo",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2733957a30e8f71d5adf8889a9b",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e023957a30e8f71d5adf8889a9b",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048513957a30e8f71d5adf8889a9b",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/2py5vjyboDCOlh2HqpGmLo"
+      ]
+    },
+    {
+      "title": "ヒューマン",
+      "artist": "WANIMA",
+      "release_year": 2018,
+      "range_low_midi": 55,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5xi5xPMoPhUzz1BDLcJMUY",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273be77ec342dae727a2ce8c7d7",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02be77ec342dae727a2ce8c7d7",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851be77ec342dae727a2ce8c7d7",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/5xi5xPMoPhUzz1BDLcJMUY"
+      ]
+    },
+    {
+      "title": "SWEET PAIN",
+      "artist": "globe",
+      "release_year": 2017,
+      "range_low_midi": 62,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 76,
+      "spotify_track_id": "3ic06w33AlQkNoLcqeTtwb",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273cff9ef9d483eb65c626508e7",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02cff9ef9d483eb65c626508e7",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851cff9ef9d483eb65c626508e7",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/3ic06w33AlQkNoLcqeTtwb"
+      ]
+    },
+    {
+      "title": "Face the change",
+      "artist": "Every Little Thing",
+      "release_year": 2016,
+      "range_low_midi": 56,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "3hGzMkwwQ7suIzneh5nqDa",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2731c0fe318c146d5c393d66297",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e021c0fe318c146d5c393d66297",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048511c0fe318c146d5c393d66297",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/3hGzMkwwQ7suIzneh5nqDa"
+      ]
+    },
+    {
+      "title": "ALIVE",
+      "artist": "SPEED",
+      "release_year": 1998,
+      "range_low_midi": 55,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4K5BwXPHcchIDx7biXh1hy",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2738c7a6ca21228dbc569c68c17",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e028c7a6ca21228dbc569c68c17",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048518c7a6ca21228dbc569c68c17",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/4K5BwXPHcchIDx7biXh1hy"
+      ]
+    },
+    {
+      "title": "Winter Bells",
+      "artist": "倉木麻衣",
+      "release_year": 2021,
+      "range_low_midi": 57,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 75,
+      "spotify_track_id": "2TFL8feRqEcd2Wf8Xp8caV",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273439ca7ef2ce81624e7ee3b7a",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02439ca7ef2ce81624e7ee3b7a",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851439ca7ef2ce81624e7ee3b7a",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/2TFL8feRqEcd2Wf8Xp8caV"
+      ]
+    },
+    {
+      "title": "笑ってたいんだ",
+      "artist": "いきものがかり",
+      "release_year": 2012,
+      "range_low_midi": 60,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4L0rwZ4431TGlgOGexX8wW",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273b020303782b0f116872b026f",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02b020303782b0f116872b026f",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851b020303782b0f116872b026f",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/4L0rwZ4431TGlgOGexX8wW"
+      ]
+    },
+    {
+      "title": "真夏の夜の匂いがする",
+      "artist": "あいみょん",
+      "release_year": 2020,
+      "range_low_midi": 54,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "20mJp0Ix72iR2EF8BdCfE5",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2734cf57a2df30a90a9a3fc39ef",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e024cf57a2df30a90a9a3fc39ef",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048514cf57a2df30a90a9a3fc39ef",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/20mJp0Ix72iR2EF8BdCfE5"
+      ]
+    },
+    {
+      "title": "Rescue me",
+      "artist": "Every Little Thing",
+      "release_year": 2000,
+      "range_low_midi": 59,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "68RjcWY9HyVF17TUs4yvLV",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2735aba15d71fa47bf0e71ffeb2",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e025aba15d71fa47bf0e71ffeb2",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048515aba15d71fa47bf0e71ffeb2",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/68RjcWY9HyVF17TUs4yvLV"
+      ]
+    },
+    {
+      "title": "いちご",
+      "artist": "ゆず",
+      "release_year": 2017,
+      "range_low_midi": 58,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5bA3gIGkmPPBxWEdnQVfE7",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273e0e18055f07bbbacceeabbff",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02e0e18055f07bbbacceeabbff",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851e0e18055f07bbbacceeabbff",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/5bA3gIGkmPPBxWEdnQVfE7"
+      ]
+    },
+    {
+      "title": "Bedtime Story",
+      "artist": "西野カナ",
+      "release_year": 2018,
+      "range_low_midi": 55,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5tV9q9nBBjMl8inUdrJeyB",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273325b36435e7135199b230f29",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02325b36435e7135199b230f29",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851325b36435e7135199b230f29",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/5tV9q9nBBjMl8inUdrJeyB"
+      ]
+    },
+    {
+      "title": "Graceful World",
+      "artist": "Every Little Thing",
+      "release_year": 2001,
+      "range_low_midi": 56,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 75,
+      "spotify_track_id": "0rmTR24YosiCbCkMLOxy7Z",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273987bba9591efdeae91c8e2ee",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02987bba9591efdeae91c8e2ee",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851987bba9591efdeae91c8e2ee",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/0rmTR24YosiCbCkMLOxy7Z"
+      ]
+    },
+    {
+      "title": "Over and Over",
+      "artist": "Every Little Thing",
+      "release_year": 2024,
+      "range_low_midi": 60,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5G11SsOISQhEx4FVLMgVTT",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273648315d3582ad818587fc580",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02648315d3582ad818587fc580",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851648315d3582ad818587fc580",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/5G11SsOISQhEx4FVLMgVTT"
+      ]
+    },
+    {
+      "title": "Future World",
+      "artist": "Every Little Thing",
+      "release_year": 1997,
+      "range_low_midi": 55,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "3tpEKGf4hjs07o5dVdAjgP",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273c4014c00f589d6fa8e9527d4",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02c4014c00f589d6fa8e9527d4",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851c4014c00f589d6fa8e9527d4",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/3tpEKGf4hjs07o5dVdAjgP"
+      ]
+    },
+    {
+      "title": "Anytime smokin' cigarette",
+      "artist": "globe",
+      "release_year": 1997,
+      "range_low_midi": null,
+      "range_high_midi": 77,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "0i9Kf3qdVuXWw1Mro1TR8o",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27312be766c3a99554b8182c832",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0212be766c3a99554b8182c832",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485112be766c3a99554b8182c832",
+      "source_urls": [
+        "https://karaoto.net/max_key/44",
+        "https://open.spotify.com/track/0i9Kf3qdVuXWw1Mro1TR8o"
+      ]
+    },
+    {
+      "title": "愛のカケラ",
+      "artist": "Every Little Thing",
+      "release_year": 2001,
+      "range_low_midi": 57,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 74,
+      "spotify_track_id": "0Ls6Ae4wnKdSjQCKTfyTyk",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273987bba9591efdeae91c8e2ee",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02987bba9591efdeae91c8e2ee",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851987bba9591efdeae91c8e2ee",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/0Ls6Ae4wnKdSjQCKTfyTyk"
+      ]
+    },
+    {
+      "title": "夢のうた",
+      "artist": "倖田來未",
+      "release_year": 2006,
+      "range_low_midi": 55,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 77,
+      "spotify_track_id": "7njVyPtfcxggr5vQ3KI2HJ",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27326440e03374db6cbd88b4e8f",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0226440e03374db6cbd88b4e8f",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485126440e03374db6cbd88b4e8f",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/7njVyPtfcxggr5vQ3KI2HJ"
+      ]
+    },
+    {
+      "title": "サマータイムシンデレラ",
+      "artist": "緑黄色社会",
+      "release_year": 2023,
+      "range_low_midi": 55,
+      "range_high_midi": 75,
+      "falsetto_max_midi": 76,
+      "spotify_track_id": "6SwATVDZUy3jha72jDyxe2",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273b23ac720180e95d852f8d274",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02b23ac720180e95d852f8d274",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851b23ac720180e95d852f8d274",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/6SwATVDZUy3jha72jDyxe2"
+      ]
+    },
+    {
+      "title": "アゲイン2",
+      "artist": "ゆず",
+      "release_year": 2005,
+      "range_low_midi": 59,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4jpk3RIsrzSwZo8nrQ7NAL",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2731fe15ab3db779033648695c5",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e021fe15ab3db779033648695c5",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048511fe15ab3db779033648695c5",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/4jpk3RIsrzSwZo8nrQ7NAL"
+      ]
+    },
+    {
+      "title": "ホワイトロード",
+      "artist": "GLAY",
+      "release_year": 2005,
+      "range_low_midi": 47,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "3sfV2HHNJFZZs2a6ed52D4",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273386fe4a72f98020a6f318407",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02386fe4a72f98020a6f318407",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851386fe4a72f98020a6f318407",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/3sfV2HHNJFZZs2a6ed52D4"
+      ]
+    },
+    {
+      "title": "We Don't Stop",
+      "artist": "西野カナ",
+      "release_year": 2014,
+      "range_low_midi": 55,
+      "range_high_midi": 76,
+      "falsetto_max_midi": 76,
+      "spotify_track_id": "7yoA45s3Ky0FWI0176PbcX",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2739e9272015a221b5766f9ba1a",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e029e9272015a221b5766f9ba1a",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048519e9272015a221b5766f9ba1a",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/7yoA45s3Ky0FWI0176PbcX"
+      ]
+    },
+    {
+      "title": "stereo future",
+      "artist": "BiSH",
+      "release_year": 2018,
+      "range_low_midi": 55,
+      "range_high_midi": 76,
+      "falsetto_max_midi": 74,
+      "spotify_track_id": "1V9fhEM1WBJuwdrmRFrxIo",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273787c2b0860ff7b2a8b07c601",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02787c2b0860ff7b2a8b07c601",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851787c2b0860ff7b2a8b07c601",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/1V9fhEM1WBJuwdrmRFrxIo"
+      ]
+    },
+    {
+      "title": "私たち",
+      "artist": "西野カナ",
+      "release_year": 2012,
+      "range_low_midi": 59,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 79,
+      "spotify_track_id": "4ZGI27l5Vs1zrrrEZIWxZa",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27380a0e566f566e3c6e7d6518b",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0280a0e566f566e3c6e7d6518b",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485180a0e566f566e3c6e7d6518b",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/4ZGI27l5Vs1zrrrEZIWxZa"
+      ]
+    },
+    {
+      "title": "Pray",
+      "artist": "Every Little Thing",
+      "release_year": 2000,
+      "range_low_midi": 59,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6Dy1NCKtKQAOXvlpPmj6ZB",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2737c3a0352b329bc3ff2d60333",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e027c3a0352b329bc3ff2d60333",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048517c3a0352b329bc3ff2d60333",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/6Dy1NCKtKQAOXvlpPmj6ZB"
+      ]
+    },
+    {
+      "title": "VERB",
+      "artist": "GLAY",
+      "release_year": 2009,
+      "range_low_midi": 52,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "76SZiO6hZmXKnZ1S5qeX9h",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2737bb3a9818ff09f36f40858e7",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e027bb3a9818ff09f36f40858e7",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048517bb3a9818ff09f36f40858e7",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/76SZiO6hZmXKnZ1S5qeX9h"
+      ]
+    },
+    {
+      "title": "My Generation",
+      "artist": "YUI",
+      "release_year": 2008,
+      "range_low_midi": 57,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "2azLechYEt0LlcDqrGl1tX",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2734b42e0a290fa21e7151244ec",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e024b42e0a290fa21e7151244ec",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048514b42e0a290fa21e7151244ec",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/2azLechYEt0LlcDqrGl1tX"
+      ]
+    },
+    {
+      "title": "Ring! Ring! Ring!",
+      "artist": "DREAMS COME TRUE",
+      "release_year": 1990,
+      "range_low_midi": 55,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "30HjQyqCy1qnETAH9SGDQ8",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273be21c7b655adfa0bdbc6cf3d",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02be21c7b655adfa0bdbc6cf3d",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851be21c7b655adfa0bdbc6cf3d",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/30HjQyqCy1qnETAH9SGDQ8"
+      ]
+    },
+    {
+      "title": "sure",
+      "artist": "Every Little Thing",
+      "release_year": 2016,
+      "range_low_midi": 63,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4kl2MNy2nTiXXRjix3ZI5A",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273f731405f383e1ce5798408c5",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02f731405f383e1ce5798408c5",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851f731405f383e1ce5798408c5",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/4kl2MNy2nTiXXRjix3ZI5A"
+      ]
+    },
+    {
+      "title": "きみの て",
+      "artist": "Every Little Thing",
+      "release_year": 2006,
+      "range_low_midi": 53,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 74,
+      "spotify_track_id": "6D9PFkKciBFbUkSjcmbdhW",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2731a8fb3419f590a4e6e7b4c4c",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e021a8fb3419f590a4e6e7b4c4c",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048511a8fb3419f590a4e6e7b4c4c",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/6D9PFkKciBFbUkSjcmbdhW"
+      ]
+    },
+    {
+      "title": "初恋",
+      "artist": "aiko",
+      "release_year": 2001,
+      "range_low_midi": 53,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 78,
+      "spotify_track_id": "4TIzGtB0QtOGtgeVXkIKjG",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273afa93c22a1c22a43f62ef32a",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02afa93c22a1c22a43f62ef32a",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851afa93c22a1c22a43f62ef32a",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/4TIzGtB0QtOGtgeVXkIKjG"
+      ]
+    },
+    {
+      "title": "ロージー",
+      "artist": "aiko",
+      "release_year": 2001,
+      "range_low_midi": 55,
+      "range_high_midi": 76,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6Yywn4SZxs9OrtejvCXXo1",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273637d589222cd74f5b12920e2",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02637d589222cd74f5b12920e2",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851637d589222cd74f5b12920e2",
+      "source_urls": [
+        "https://karaoto.net/max_key/43",
+        "https://open.spotify.com/track/6Yywn4SZxs9OrtejvCXXo1"
+      ]
+    },
+    {
+      "title": "愛の花",
+      "artist": "あいみょん",
+      "release_year": 2024,
+      "range_low_midi": 54,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 75,
+      "spotify_track_id": "49DUifaclCSbxQa1upNXuO",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273d8e2823280baa2e69cff04dd",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02d8e2823280baa2e69cff04dd",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851d8e2823280baa2e69cff04dd",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/49DUifaclCSbxQa1upNXuO"
+      ]
+    },
+    {
+      "title": "Distance",
+      "artist": "西野カナ",
+      "release_year": 2011,
+      "range_low_midi": 55,
+      "range_high_midi": 75,
+      "falsetto_max_midi": 77,
+      "spotify_track_id": "4c0Ju5rIY2T8J4bi7WNy36",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273afcae8730aa18e363a6d8f25",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02afcae8730aa18e363a6d8f25",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851afcae8730aa18e363a6d8f25",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/4c0Ju5rIY2T8J4bi7WNy36"
+      ]
+    },
+    {
+      "title": "It's all too much",
+      "artist": "YUI",
+      "release_year": 2010,
+      "range_low_midi": 57,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "59xZqXzmTzo9djPDRWYi3C",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273fdec3ee19da7cd9b1b02ca9c",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02fdec3ee19da7cd9b1b02ca9c",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851fdec3ee19da7cd9b1b02ca9c",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/59xZqXzmTzo9djPDRWYi3C"
+      ]
+    },
+    {
+      "title": "さよならを待ってる",
+      "artist": "DREAMS COME TRUE",
+      "release_year": 1990,
+      "range_low_midi": 60,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4oL8gJVizmcH5R4EiFPKVP",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2739cd9c291ffb3913213aa6352",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e029cd9c291ffb3913213aa6352",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048519cd9c291ffb3913213aa6352",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/4oL8gJVizmcH5R4EiFPKVP"
+      ]
+    },
+    {
+      "title": "キヲク",
+      "artist": "Every Little Thing",
+      "release_year": 2003,
+      "range_low_midi": 55,
+      "range_high_midi": 74,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5HlSEt8nCRMSq9tWCpFL2P",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27328f20ecfb26a7da08cbf27e2",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0228f20ecfb26a7da08cbf27e2",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485128f20ecfb26a7da08cbf27e2",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/5HlSEt8nCRMSq9tWCpFL2P"
+      ]
+    },
+    {
+      "title": "幸せをつかみたい",
+      "artist": "広瀬香美",
+      "release_year": 1998,
+      "range_low_midi": 57,
+      "range_high_midi": 77,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6EPqLYc40b6I3yczx8KZBt",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2738ad66b39a6e3dd6b93ac2407",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e028ad66b39a6e3dd6b93ac2407",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048518ad66b39a6e3dd6b93ac2407",
+      "source_urls": [
+        "https://karaoto.net/max_key/44",
+        "https://open.spotify.com/track/6EPqLYc40b6I3yczx8KZBt"
+      ]
+    },
+    {
+      "title": "ストロボ",
+      "artist": "広瀬香美",
+      "release_year": 2006,
+      "range_low_midi": 57,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "0mEY3X3ienMj656HXBYlqM",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273a3bb87673e2e15f3d13cf238",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02a3bb87673e2e15f3d13cf238",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851a3bb87673e2e15f3d13cf238",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/0mEY3X3ienMj656HXBYlqM"
+      ]
+    },
+    {
+      "title": "jump",
+      "artist": "Every Little Thing",
+      "release_year": 2016,
+      "range_low_midi": 54,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 74,
+      "spotify_track_id": "7ucCd1ZqWCJjK09KVRqFGs",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2731c0fe318c146d5c393d66297",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e021c0fe318c146d5c393d66297",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048511c0fe318c146d5c393d66297",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/7ucCd1ZqWCJjK09KVRqFGs"
+      ]
+    },
+    {
+      "title": "桜が降る夜は",
+      "artist": "あいみょん",
+      "release_year": 2022,
+      "range_low_midi": 56,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 74,
+      "spotify_track_id": "0H2n6GpHAMlujiER71ubMB",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2733baf45bc783428f905c5fd66",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e023baf45bc783428f905c5fd66",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048513baf45bc783428f905c5fd66",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/0H2n6GpHAMlujiER71ubMB"
+      ]
+    },
+    {
+      "title": "ソラアイ",
+      "artist": "Every Little Thing",
+      "release_year": 2004,
+      "range_low_midi": 54,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "2JHiOuuilSHSuHbc9zm0ew",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27339167f8f78e5eed211dab9db",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0239167f8f78e5eed211dab9db",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485139167f8f78e5eed211dab9db",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/2JHiOuuilSHSuHbc9zm0ew"
+      ]
+    },
+    {
+      "title": "ハート",
+      "artist": "あいみょん",
+      "release_year": 2022,
+      "range_low_midi": 54,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6MkbBtxdVggObSGnqB8miZ",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2733baf45bc783428f905c5fd66",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e023baf45bc783428f905c5fd66",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048513baf45bc783428f905c5fd66",
+      "source_urls": [
+        "https://karaoto.net/max_key/42",
+        "https://open.spotify.com/track/6MkbBtxdVggObSGnqB8miZ"
+      ]
+    },
+    {
+      "title": "ファンダメンタル・ラブ",
+      "artist": "Every Little Thing",
+      "release_year": 2004,
+      "range_low_midi": 60,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 77,
+      "spotify_track_id": "29MXzE8B0DGUaLlTQmcOoB",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27339167f8f78e5eed211dab9db",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0239167f8f78e5eed211dab9db",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485139167f8f78e5eed211dab9db",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/29MXzE8B0DGUaLlTQmcOoB"
+      ]
+    },
+    {
+      "title": "パラボラ",
+      "artist": "Official髭男dism",
+      "release_year": 2021,
+      "range_low_midi": 53,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 74,
+      "spotify_track_id": "55pezTty1DSrrc8wlOMZbA",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2731ce13e03759fd585b8115476",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e021ce13e03759fd585b8115476",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048511ce13e03759fd585b8115476",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/55pezTty1DSrrc8wlOMZbA"
+      ]
+    },
+    {
+      "title": "奇跡",
+      "artist": "倖田來未",
+      "release_year": 2005,
+      "range_low_midi": 57,
+      "range_high_midi": 73,
+      "falsetto_max_midi": 75,
+      "spotify_track_id": "3G4nD1gzGsIKiUEp6ECaIR",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2731242f8dad5ec08d08dd499ef",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e021242f8dad5ec08d08dd499ef",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048511242f8dad5ec08d08dd499ef",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/3G4nD1gzGsIKiUEp6ECaIR"
+      ]
+    },
+    {
+      "title": "hands",
+      "artist": "倖田來未",
+      "release_year": 2005,
+      "range_low_midi": 55,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 74,
+      "spotify_track_id": "0MHLzEHPnghxut4aqCK6Nx",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2731242f8dad5ec08d08dd499ef",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e021242f8dad5ec08d08dd499ef",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048511242f8dad5ec08d08dd499ef",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/0MHLzEHPnghxut4aqCK6Nx"
+      ]
+    },
+    {
+      "title": "FOREVER YOURS",
+      "artist": "Every Little Thing",
+      "release_year": 1998,
+      "range_low_midi": 58,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6XPLfuyg3cN1paNu8QRsa4",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273924907863964d67364665e13",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02924907863964d67364665e13",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851924907863964d67364665e13",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/6XPLfuyg3cN1paNu8QRsa4"
+      ]
+    },
+    {
+      "title": "It Takes Two",
+      "artist": "CHEMISTRY",
+      "release_year": 2001,
+      "range_low_midi": 61,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "31Elj3v04u7odRylkMg1L4",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2736a73071b29695b44bc1a5413",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e026a73071b29695b44bc1a5413",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048516a73071b29695b44bc1a5413",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/31Elj3v04u7odRylkMg1L4"
+      ]
+    },
+    {
+      "title": "とまどい",
+      "artist": "GLAY",
+      "release_year": 2009,
+      "range_low_midi": 52,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 73,
+      "spotify_track_id": "0vRSA4fKHoOv5Np967Q8kd",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2730d3b3d4cbc10d3bb2084ee29",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e020d3b3d4cbc10d3bb2084ee29",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048510d3b3d4cbc10d3bb2084ee29",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/0vRSA4fKHoOv5Np967Q8kd"
+      ]
+    },
+    {
+      "title": "Shapes Of Love",
+      "artist": "Every Little Thing",
+      "release_year": 1998,
+      "range_low_midi": 59,
+      "range_high_midi": 73,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6e71Bf2xDi7ML7KC5nJY9n",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2737e6a7000eb4a388e5227377b",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e027e6a7000eb4a388e5227377b",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048517e6a7000eb4a388e5227377b",
+      "source_urls": [
+        "https://karaoto.net/max_key/40",
+        "https://open.spotify.com/track/6e71Bf2xDi7ML7KC5nJY9n"
+      ]
+    },
+    {
+      "title": "ミックスナッツ",
+      "artist": "Official髭男dism",
+      "release_year": 2022,
+      "range_low_midi": 51,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 73,
+      "spotify_track_id": "60ReNXcPcsVFd7nUuQw5HZ",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273e4432f106a0ca7a2088fbb3d",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02e4432f106a0ca7a2088fbb3d",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851e4432f106a0ca7a2088fbb3d",
+      "source_urls": [
+        "https://karaoto.net/max_key/41",
+        "https://open.spotify.com/track/60ReNXcPcsVFd7nUuQw5HZ"
+      ]
+    },
+    {
+      "title": "HERO 〜希望の歌〜",
+      "artist": "FLOW",
+      "release_year": 2013,
+      "range_low_midi": 55,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "1o7D1gLUgpFR3eJfIgpSUx",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273590e83f52748cf24680fb628",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02590e83f52748cf24680fb628",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851590e83f52748cf24680fb628",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/1o7D1gLUgpFR3eJfIgpSUx"
+      ]
+    },
+    {
+      "title": "Re:member",
+      "artist": "FLOW",
+      "release_year": 2012,
+      "range_low_midi": 54,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "7eyNBX6ffLGH4q2Ef0Xbvz",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2733f0c3f3648735e392d76e698",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e023f0c3f3648735e392d76e698",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048513f0c3f3648735e392d76e698",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/7eyNBX6ffLGH4q2Ef0Xbvz"
+      ]
+    },
+    {
+      "title": "EXIT",
+      "artist": "ポルノグラフィティ",
+      "release_year": 2013,
+      "range_low_midi": 52,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "7ixb94d9qY0iCTgusOpCFZ",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27307e01091f436e17043d84af7",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0207e01091f436e17043d84af7",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485107e01091f436e17043d84af7",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/7ixb94d9qY0iCTgusOpCFZ"
+      ]
+    },
+    {
+      "title": "青春花道",
+      "artist": "ポルノグラフィティ",
+      "release_year": 2013,
+      "range_low_midi": 51,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "3aEbylXcizPlyDJ4El4QmV",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273e13263d5eeaf490e85cba3c1",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02e13263d5eeaf490e85cba3c1",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851e13263d5eeaf490e85cba3c1",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/3aEbylXcizPlyDJ4El4QmV"
+      ]
+    },
+    {
+      "title": "ワンモアタイム",
+      "artist": "ポルノグラフィティ",
+      "release_year": 2012,
+      "range_low_midi": 48,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 73,
+      "spotify_track_id": "1DaxLLjesHa8GOCrnidY8H",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27301c20d9f8928c98aa5c72021",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0201c20d9f8928c98aa5c72021",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485101c20d9f8928c98aa5c72021",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/1DaxLLjesHa8GOCrnidY8H"
+      ]
+    },
+    {
+      "title": "hypnosis",
+      "artist": "Mr.Children",
+      "release_year": 2012,
+      "range_low_midi": 47,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4sOODPWofUi3aHsIWLqOgD",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273ce8c6dff448d65545bce459b",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02ce8c6dff448d65545bce459b",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851ce8c6dff448d65545bce459b",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/4sOODPWofUi3aHsIWLqOgD"
+      ]
+    },
+    {
+      "title": "インフェルノ",
+      "artist": "Mrs.GREEN APPLE",
+      "release_year": 2019,
+      "range_low_midi": 40,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 76,
+      "spotify_track_id": "64yajM6CxtLghmgB53VeXT",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2731a4e99f0c693fecc9038d3dd",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e021a4e99f0c693fecc9038d3dd",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048511a4e99f0c693fecc9038d3dd",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/64yajM6CxtLghmgB53VeXT"
+      ]
+    },
+    {
+      "title": "Speaking",
+      "artist": "Mrs.GREEN APPLE",
+      "release_year": 2016,
+      "range_low_midi": 50,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 74,
+      "spotify_track_id": "0MyTMrPTh0GgtuyhYRdl3P",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2735664894bcae0d7d67a4c32d3",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e025664894bcae0d7d67a4c32d3",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048515664894bcae0d7d67a4c32d3",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/0MyTMrPTh0GgtuyhYRdl3P"
+      ]
+    },
+    {
+      "title": "WHOO WHOO WHOO",
+      "artist": "Mrs.GREEN APPLE",
+      "release_year": 2018,
+      "range_low_midi": 55,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 83,
+      "spotify_track_id": "75EokCY14cefojSgs2wYst",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27322c627adf9c8754c9302fa35",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0222c627adf9c8754c9302fa35",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485122c627adf9c8754c9302fa35",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/75EokCY14cefojSgs2wYst"
+      ]
+    },
+    {
+      "title": "サムライハート",
+      "artist": "森口博子",
+      "release_year": 1989,
+      "range_low_midi": 59,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6pmKC3jN81hcfu59BVtGGc",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273f9472f05ec69970ef47e436a",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02f9472f05ec69970ef47e436a",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851f9472f05ec69970ef47e436a",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/6pmKC3jN81hcfu59BVtGGc"
+      ]
+    },
+    {
+      "title": "青",
+      "artist": "ゆず",
+      "release_year": 2003,
+      "range_low_midi": 52,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5diSl7o50TV3vwQxI48DmD",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273892441e6f02d925230beee88",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02892441e6f02d925230beee88",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851892441e6f02d925230beee88",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/5diSl7o50TV3vwQxI48DmD"
+      ]
+    },
+    {
+      "title": "呼吸",
+      "artist": "ゆず",
+      "release_year": 2003,
+      "range_low_midi": 54,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "0StpOoIaWGtEHVBVAX17nT",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2739cbc0eb2a0e1564fc1e17a27",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e029cbc0eb2a0e1564fc1e17a27",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048519cbc0eb2a0e1564fc1e17a27",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/0StpOoIaWGtEHVBVAX17nT"
+      ]
+    },
+    {
+      "title": "3カウント",
+      "artist": "ゆず",
+      "release_year": 2002,
+      "range_low_midi": 57,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "5SzgaMI9QqbaPS45Z3Ln5b",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273a43daa364c4d8cc80beb3574",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02a43daa364c4d8cc80beb3574",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851a43daa364c4d8cc80beb3574",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/5SzgaMI9QqbaPS45Z3Ln5b"
+      ]
+    },
+    {
+      "title": "歩行者優先",
+      "artist": "ゆず",
+      "release_year": 2004,
+      "range_low_midi": 54,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "1Op992ApkUKyEr0DiuU1FF",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273f3cc4641c66bd0f761344887",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02f3cc4641c66bd0f761344887",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851f3cc4641c66bd0f761344887",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/1Op992ApkUKyEr0DiuU1FF"
+      ]
+    },
+    {
+      "title": "REASON",
+      "artist": "ゆず",
+      "release_year": 2013,
+      "range_low_midi": 47,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 74,
+      "spotify_track_id": "3ERIqXHoQnhhiRuQxyjXcL",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273f726d7ecb95e32f84fd88ab8",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02f726d7ecb95e32f84fd88ab8",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851f726d7ecb95e32f84fd88ab8",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/3ERIqXHoQnhhiRuQxyjXcL"
+      ]
+    },
+    {
+      "title": "オリオンをなぞる",
+      "artist": "UNISON SQUARE GARDEN",
+      "release_year": 2011,
+      "range_low_midi": 53,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "0opkjjC7nn6YO8NXzkDAPP",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273956fce6c2c601f85eceeac85",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02956fce6c2c601f85eceeac85",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851956fce6c2c601f85eceeac85",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/0opkjjC7nn6YO8NXzkDAPP"
+      ]
+    },
+    {
+      "title": "桜のあと(all quartets lead to the?)",
+      "artist": "UNISON SQUARE GARDEN",
+      "release_year": 2024,
+      "range_low_midi": 56,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "2Hvedz2AA3YjULUhiLPHJu",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273a6026aa38b62d9dfe40274d4",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02a6026aa38b62d9dfe40274d4",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851a6026aa38b62d9dfe40274d4",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/2Hvedz2AA3YjULUhiLPHJu"
+      ]
+    },
+    {
+      "title": "シュガーソングとビターステップ",
+      "artist": "UNISON SQUARE GARDEN",
+      "release_year": 2019,
+      "range_low_midi": 54,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6uR92injo4PDzSrOPRFfHt",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2730540b17bee2a0759ef59d90e",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e020540b17bee2a0759ef59d90e",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048510540b17bee2a0759ef59d90e",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/6uR92injo4PDzSrOPRFfHt"
+      ]
+    },
+    {
+      "title": "スカースデイル",
+      "artist": "UNISON SQUARE GARDEN",
+      "release_year": 2011,
+      "range_low_midi": null,
+      "range_high_midi": 71,
+      "falsetto_max_midi": 73,
+      "spotify_track_id": "1OOLTJ1XzBHFSiy4TlwF8g",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273956fce6c2c601f85eceeac85",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02956fce6c2c601f85eceeac85",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851956fce6c2c601f85eceeac85",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/1OOLTJ1XzBHFSiy4TlwF8g"
+      ]
+    },
+    {
+      "title": "センチメンタルピリオド",
+      "artist": "UNISON SQUARE GARDEN",
+      "release_year": 2009,
+      "range_low_midi": 53,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4f1zepqZ36gAWIQWWLIg21",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2732e82a1fdc09fa4f678497436",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e022e82a1fdc09fa4f678497436",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048512e82a1fdc09fa4f678497436",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/4f1zepqZ36gAWIQWWLIg21"
+      ]
+    },
+    {
+      "title": "流星のスコール",
+      "artist": "UNISON SQUARE GARDEN",
+      "release_year": 2013,
+      "range_low_midi": 47,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "3f0qVKID70JSn59TlmYftk",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27370f5c86937145816b1305e3c",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0270f5c86937145816b1305e3c",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485170f5c86937145816b1305e3c",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/3f0qVKID70JSn59TlmYftk"
+      ]
+    },
+    {
+      "title": "TEENAGE RIOT",
+      "artist": "米津玄師",
+      "release_year": 2020,
+      "range_low_midi": 47,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "03anCl0CUIi29mbrbsA8pY",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273775e8184725e0fb89337dd9a",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02775e8184725e0fb89337dd9a",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851775e8184725e0fb89337dd9a",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/03anCl0CUIi29mbrbsA8pY"
+      ]
+    },
+    {
+      "title": "明日もし君が壊れても",
+      "artist": "WANDS",
+      "release_year": 2020,
+      "range_low_midi": 52,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "3MEbgUZ8gAQVDC4t93ewDW",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2736782765be77091cd1f74afa1",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e026782765be77091cd1f74afa1",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048516782765be77091cd1f74afa1",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/3MEbgUZ8gAQVDC4t93ewDW"
+      ]
+    },
+    {
+      "title": "錆びついたマシンガンで今を撃ち抜こう",
+      "artist": "WANDS",
+      "release_year": 2021,
+      "range_low_midi": 52,
+      "range_high_midi": 71,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "3EBZWM6EZnT85f3O6MdilR",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2735bf37f8fda50ecabae21fd9b",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e025bf37f8fda50ecabae21fd9b",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048515bf37f8fda50ecabae21fd9b",
+      "source_urls": [
+        "https://karaoto.net/max_key/38",
+        "https://open.spotify.com/track/3EBZWM6EZnT85f3O6MdilR"
+      ]
+    },
+    {
+      "title": "さよならの今日に",
+      "artist": "あいみょん",
+      "release_year": 2020,
+      "range_low_midi": 56,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "1BMFlDfS1ZLTKhqBGkM6zb",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2734cf57a2df30a90a9a3fc39ef",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e024cf57a2df30a90a9a3fc39ef",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048514cf57a2df30a90a9a3fc39ef",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/1BMFlDfS1ZLTKhqBGkM6zb"
+      ]
+    },
+    {
+      "title": "双葉",
+      "artist": "あいみょん",
+      "release_year": 2022,
+      "range_low_midi": 53,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "66KE3cwbqJjtzjN3ezTmxy",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2733baf45bc783428f905c5fd66",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e023baf45bc783428f905c5fd66",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048513baf45bc783428f905c5fd66",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/66KE3cwbqJjtzjN3ezTmxy"
+      ]
+    },
+    {
+      "title": "満月の夜なら",
+      "artist": "あいみょん",
+      "release_year": 2019,
+      "range_low_midi": 55,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 75,
+      "spotify_track_id": "7DW5Dro8AHE7x19COl26E3",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273c12d785df5dbf2b15ec49504",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02c12d785df5dbf2b15ec49504",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851c12d785df5dbf2b15ec49504",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/7DW5Dro8AHE7x19COl26E3"
+      ]
+    },
+    {
+      "title": "夢追いベンガル",
+      "artist": "あいみょん",
+      "release_year": 2019,
+      "range_low_midi": 55,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "526NsA2BI2b10l05a13VWm",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273c12d785df5dbf2b15ec49504",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02c12d785df5dbf2b15ec49504",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851c12d785df5dbf2b15ec49504",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/526NsA2BI2b10l05a13VWm"
+      ]
+    },
+    {
+      "title": "うるわしきひと",
+      "artist": "いきものがかり",
+      "release_year": 2007,
+      "range_low_midi": 53,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 77,
+      "spotify_track_id": "2BJMizd2ynJECHPcfDp8Xn",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273f13650decb20299d996448a8",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02f13650decb20299d996448a8",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851f13650decb20299d996448a8",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/2BJMizd2ynJECHPcfDp8Xn"
+      ]
+    },
+    {
+      "title": "帰りたくなったよ",
+      "artist": "いきものがかり",
+      "release_year": 2008,
+      "range_low_midi": 55,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 72,
+      "spotify_track_id": "1XeXsv2fN21KzHca8UuGS6",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273d4be0946ba3b18ec00d76266",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02d4be0946ba3b18ec00d76266",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851d4be0946ba3b18ec00d76266",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/1XeXsv2fN21KzHca8UuGS6"
+      ]
+    },
+    {
+      "title": "SAKURA",
+      "artist": "いきものがかり",
+      "release_year": 2007,
+      "range_low_midi": 53,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 75,
+      "spotify_track_id": "47llhtLFunfzq4KBwzZmOP",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273f13650decb20299d996448a8",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02f13650decb20299d996448a8",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851f13650decb20299d996448a8",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/47llhtLFunfzq4KBwzZmOP"
+      ]
+    },
+    {
+      "title": "escape",
+      "artist": "いとうかなこ",
+      "release_year": 2010,
+      "range_low_midi": 59,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "3AoIOMwFTJYrhEKq7SpOPs",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b27381f0671d77f562cfae3e40c5",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e0281f0671d77f562cfae3e40c5",
+      "image_url_small": "https://i.scdn.co/image/ab67616d0000485181f0671d77f562cfae3e40c5",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/3AoIOMwFTJYrhEKq7SpOPs"
+      ]
+    },
+    {
+      "title": "キラメキアワー",
+      "artist": "Every Little Thing",
+      "release_year": 2007,
+      "range_low_midi": 55,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "54IACmUzGVLkBgW0cX93bM",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273d6d87da189ea99ae8551962a",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02d6d87da189ea99ae8551962a",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851d6d87da189ea99ae8551962a",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/54IACmUzGVLkBgW0cX93bM"
+      ]
+    },
+    {
+      "title": "Someday,Someplace",
+      "artist": "Every Little Thing",
+      "release_year": 1999,
+      "range_low_midi": 62,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4OfiiVuu8opYkWQ9TJKNP7",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273a62db3c4efa30a0c9f41266c",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02a62db3c4efa30a0c9f41266c",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851a62db3c4efa30a0c9f41266c",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/4OfiiVuu8opYkWQ9TJKNP7"
+      ]
+    },
+    {
+      "title": "NECESSARY",
+      "artist": "Every Little Thing",
+      "release_year": 1998,
+      "range_low_midi": 59,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "3McZNsh3sy1YSThJF9MCO4",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273f60a78e193c90a1c3a4ff8f7",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02f60a78e193c90a1c3a4ff8f7",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851f60a78e193c90a1c3a4ff8f7",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/3McZNsh3sy1YSThJF9MCO4"
+      ]
+    },
+    {
+      "title": "Never Stop!",
+      "artist": "Every Little Thing",
+      "release_year": 1997,
+      "range_low_midi": 58,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "6cEjOYu06GwsAqsO1ToD2E",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273c4014c00f589d6fa8e9527d4",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02c4014c00f589d6fa8e9527d4",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851c4014c00f589d6fa8e9527d4",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/6cEjOYu06GwsAqsO1ToD2E"
+      ]
+    },
+    {
+      "title": "男は行く",
+      "artist": "エレファントカシマシ",
+      "release_year": 1990,
+      "range_low_midi": 57,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 83,
+      "spotify_track_id": "2H8cfvn4p9bj1ti8JOdGOU",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2734648c531e861f645bfa67398",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e024648c531e861f645bfa67398",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048514648c531e861f645bfa67398",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/2H8cfvn4p9bj1ti8JOdGOU"
+      ]
+    },
+    {
+      "title": "ガストロンジャー",
+      "artist": "エレファントカシマシ",
+      "release_year": 2000,
+      "range_low_midi": null,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 80,
+      "spotify_track_id": "1ahZi5wVr8Wzy3MFHHBrG7",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2730a514060bf0d4966d6b5d97d",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e020a514060bf0d4966d6b5d97d",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048510a514060bf0d4966d6b5d97d",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/1ahZi5wVr8Wzy3MFHHBrG7"
+      ]
+    },
+    {
+      "title": "桜の花、舞い上がる道を",
+      "artist": "エレファントカシマシ",
+      "release_year": 2009,
+      "range_low_midi": 47,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4745MvL6xD9FmG7eIR8KCV",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273426b3e56efaa54f9f1bb336a",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02426b3e56efaa54f9f1bb336a",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851426b3e56efaa54f9f1bb336a",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/4745MvL6xD9FmG7eIR8KCV"
+      ]
+    },
+    {
+      "title": "so many people",
+      "artist": "エレファントカシマシ",
+      "release_year": 2017,
+      "range_low_midi": 46,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 78,
+      "spotify_track_id": "0sFYV9GEqXrTtFygaOIIBW",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2736ab726624ff3ae3df7c14914",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e026ab726624ff3ae3df7c14914",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048516ab726624ff3ae3df7c14914",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/0sFYV9GEqXrTtFygaOIIBW"
+      ]
+    },
+    {
+      "title": "ハロー人生!!",
+      "artist": "エレファントカシマシ",
+      "release_year": 2003,
+      "range_low_midi": 57,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "2BssHtpMrmAdFNI47ez703",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273492a73989fd61ff248081aaa",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02492a73989fd61ff248081aaa",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851492a73989fd61ff248081aaa",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/2BssHtpMrmAdFNI47ez703"
+      ]
+    },
+    {
+      "title": "さくらんぼ",
+      "artist": "大塚愛",
+      "release_year": 2004,
+      "range_low_midi": 57,
+      "range_high_midi": 72,
+      "falsetto_max_midi": 74,
+      "spotify_track_id": "5U1xJmlRimUm6DtRd0kM6f",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273444be612d18aed64a9f38ca4",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02444be612d18aed64a9f38ca4",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851444be612d18aed64a9f38ca4",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/5U1xJmlRimUm6DtRd0kM6f"
+      ]
+    },
+    {
+      "title": "PEACH",
+      "artist": "大塚愛",
+      "release_year": 2007,
+      "range_low_midi": 56,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "3L4Z5i8oVS0srXX5t6OBGr",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b273c9526201fa1d0488d82303bf",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e02c9526201fa1d0488d82303bf",
+      "image_url_small": "https://i.scdn.co/image/ab67616d00004851c9526201fa1d0488d82303bf",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/3L4Z5i8oVS0srXX5t6OBGr"
+      ]
+    },
+    {
+      "title": "蛍",
+      "artist": "鬼束ちひろ",
+      "release_year": 2009,
+      "range_low_midi": 56,
+      "range_high_midi": 72,
+      "falsetto_max_midi": null,
+      "spotify_track_id": "4nzU2hoRaWFA16Om4mCi8q",
+      "image_url_large": "https://i.scdn.co/image/ab67616d0000b2737fbd140945cb929095ff666c",
+      "image_url_medium": "https://i.scdn.co/image/ab67616d00001e027fbd140945cb929095ff666c",
+      "image_url_small": "https://i.scdn.co/image/ab67616d000048517fbd140945cb929095ff666c",
+      "source_urls": [
+        "https://karaoto.net/max_key/39",
+        "https://open.spotify.com/track/4nzU2hoRaWFA16Om4mCi8q"
+      ]
     }
   ],
   "metadata": {
-    "scraped_at": "2026-04-27T01:04:38.711666+00:00",
-    "total_count": 597,
+    "scraped_at": "2026-05-01T20:47:43.465740+00:00",
+    "total_count": 848,
     "sources": [
       "karaoto.net",
       "spotify"

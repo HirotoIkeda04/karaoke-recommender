@@ -1,6 +1,6 @@
 /**
  * /songs (検索) 遷移時の skeleton。
- * h1 + 検索フォーム + 件数 + リスト 5 件。
+ * 検索バー + ブラウズ用ジャンルカードグリッド (2 列, aspect 16/10) を模す。
  */
 export default function Loading() {
   return (
@@ -9,29 +9,19 @@ export default function Loading() {
       role="status"
       aria-label="読み込み中"
     >
-      {/* 検索フォーム */}
-      <div className="space-y-2">
-        <div className="h-10 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />
-        <div className="grid grid-cols-2 gap-2">
-          <div className="h-9 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />
-          <div className="h-9 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />
-        </div>
-      </div>
+      {/* 検索バー */}
+      <div className="h-9 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
 
-      <div className="h-3 w-20 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+      {/* ブラウズを開始 見出し */}
+      <div className="h-4 w-24 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
 
-      <ul>
-        {[0, 1, 2, 3, 4].map((i) => (
+      {/* ジャンルカードグリッド */}
+      <ul className="grid grid-cols-2 gap-2">
+        {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
           <li
             key={i}
-            className="flex items-center gap-3 rounded-md p-2"
-          >
-            <div className="size-12 shrink-0 animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-800" />
-            <div className="min-w-0 flex-1 space-y-1.5">
-              <div className="h-4 w-3/4 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-              <div className="h-3 w-2/3 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-            </div>
-          </li>
+            className="aspect-[16/10] animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800"
+          />
         ))}
       </ul>
     </div>

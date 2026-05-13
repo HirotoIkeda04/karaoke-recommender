@@ -1,6 +1,6 @@
 /**
  * /songs/genre/[code] 遷移時の skeleton。
- * ヘッダー (戻る + タイトル) + 楽曲行 8 件。
+ * ヘッダー (戻る + タイトル + 件数) + SongCard 風の楽曲行 8 件。
  */
 export default function Loading() {
   return (
@@ -10,7 +10,7 @@ export default function Loading() {
       aria-label="読み込み中"
     >
       <div className="flex items-center gap-2">
-        <div className="size-9 animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800" />
+        <div className="-ml-2 size-9 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
         <div className="h-5 w-24 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
         <div className="ml-auto h-3 w-12 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
       </div>
@@ -20,8 +20,8 @@ export default function Loading() {
           <li key={i} className="flex items-center gap-3 rounded-md p-2">
             <div className="size-12 shrink-0 animate-pulse rounded-sm bg-zinc-200 dark:bg-zinc-800" />
             <div className="min-w-0 flex-1 space-y-1.5">
-              <div className="h-4 w-32 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-              <div className="h-3 w-20 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+              <div className="h-4 w-3/4 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+              <div className="h-3 w-2/3 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
             </div>
           </li>
         ))}

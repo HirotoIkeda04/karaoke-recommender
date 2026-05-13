@@ -781,7 +781,11 @@ export type Database = {
         }
       }
       get_unrated_songs_v2: {
-        Args: { p_limit?: number; p_popular_only?: boolean }
+        Args: {
+          p_limit?: number
+          p_popular_only?: boolean
+          p_require_image?: boolean
+        }
         Returns: {
           artist: string
           artist_id: string | null
