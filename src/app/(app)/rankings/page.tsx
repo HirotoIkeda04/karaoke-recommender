@@ -34,20 +34,6 @@ type SongRow = Pick<
   | "image_url_medium"
 >;
 
-interface SourceRanks {
-  spotify?: number;
-  apple?: number;
-}
-
-function parseSources(value: unknown): SourceRanks {
-  if (!value || typeof value !== "object") return {};
-  const v = value as Record<string, unknown>;
-  const out: SourceRanks = {};
-  if (typeof v.spotify === "number") out.spotify = v.spotify;
-  if (typeof v.apple === "number") out.apple = v.apple;
-  return out;
-}
-
 function formatWeekRange(weekStart: string): string {
   // weekStart は YYYY-MM-DD (月曜 UTC)。日本ユーザー向けに「M/D 週」と表記。
   const d = new Date(`${weekStart}T00:00:00Z`);
@@ -136,7 +122,6 @@ export default async function RankingsPage() {
         {rows.map((r) => {
           const song = songsById.get(r.song_id);
           if (!song) return null;
-          const sources = parseSources(r.sources);
           return (
             <li key={r.song_id} className="flex items-center gap-2">
               <div className="w-7 shrink-0 text-right text-base font-bold tabular-nums text-zinc-700 dark:text-zinc-200">
@@ -148,22 +133,6 @@ export default async function RankingsPage() {
                   rating={ratings[song.id] ?? null}
                   isKnown={knownSet.has(song.id)}
                 />
-                <div className="ml-14 -mt-1.5 mb-1 flex flex-wrap gap-1">
-                  {sources.spotify ? (
-                    <SourceChip
-                      label="Spotify"
-                      rank={sources.spotify}
-                      tone="emerald"
-                    />
-                  ) : null}
-                  {sources.apple ? (
-                    <SourceChip
-                      label="Apple"
-                      rank={sources.apple}
-                      tone="zinc"
-                    />
-                  ) : null}
-                </div>
               </div>
             </li>
           );
@@ -190,24 +159,3 @@ function PageHeader() {
   );
 }
 
-function SourceChip({
-  label,
-  rank,
-  tone,
-}: {
-  label: string;
-  rank: number;
-  tone: "emerald" | "zinc";
-}) {
-  const color =
-    tone === "emerald"
-      ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-      : "bg-zinc-500/15 text-zinc-700 dark:text-zinc-300";
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium tabular-nums ${color}`}
-    >
-      {label} #{rank}
-    </span>
-  );
-}
