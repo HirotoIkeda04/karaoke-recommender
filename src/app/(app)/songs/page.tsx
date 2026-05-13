@@ -69,7 +69,7 @@ export default async function SongsPage() {
   } = await supabase.auth.getSession();
   const userId = session?.user?.id;
 
-  const [knownIds, evalsRes, genreCovers] = await Promise.all([
+  const [knownIds, evalsRes, genreCovers, rankingCovers] = await Promise.all([
     getUserKnownSongIds(),
     userId
       ? supabase
@@ -78,6 +78,7 @@ export default async function SongsPage() {
           .eq("user_id", userId)
       : Promise.resolve({ data: [] as Array<{ song_id: string; rating: string }> }),
     getGenreCovers(supabase),
+    getRankingCovers(supabase),
   ]);
 
   const ratings: Record<string, string> = {};
@@ -91,7 +92,42 @@ export default async function SongsPage() {
         ratings={ratings}
         knownSongIds={Array.from(knownIds)}
         genreCovers={genreCovers}
+        rankingCovers={rankingCovers}
       />
     </div>
   );
+}
+
+// 今週ランキングの上位曲ジャケットを 4 件まで取得し、Browse の
+// "今週のランキング" カード背景に使う。
+async function getRankingCovers(supabase: SupabaseServer): Promise<string[]> {
+  const { data: latest } = await supabase
+    .from("weekly_rankings")
+    .select("week_start")
+    .order("week_start", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!latest) return [];
+  const { data: rankRows } = await supabase
+    .from("weekly_rankings")
+    .select("song_id, final_rank")
+    .eq("week_start", latest.week_start)
+    .order("final_rank", { ascending: true })
+    .limit(12);
+  const ids = (rankRows ?? []).map((r) => r.song_id);
+  if (ids.length === 0) return [];
+  const { data: songs } = await supabase
+    .from("songs")
+    .select("id, image_url_medium, image_url_small")
+    .in("id", ids);
+  const byId = new Map(
+    (songs ?? []).map((s) => [s.id, s.image_url_medium ?? s.image_url_small ?? null]),
+  );
+  const covers: string[] = [];
+  for (const r of rankRows ?? []) {
+    const url = byId.get(r.song_id);
+    if (url && !covers.includes(url)) covers.push(url);
+    if (covers.length >= 4) break;
+  }
+  return covers;
 }

@@ -71,6 +71,18 @@ run_step "match:dam --max-new 400" \
 run_step "backfill:spotify-metadata --max 100" \
   node --import tsx scripts/backfill-spotify-metadata.ts --max 100
 
+# Step 3: 週次ランキング取得 (月曜のみ)
+# date +%u: 1=Mon ... 7=Sun。Spotify Top 50 + Apple Top 100 を合算して
+# weekly_rankings に upsert する。所要 Spotify call: ~100 (Apple 100 件 ×
+# search 1 回ずつ) — quota 残量に注意。
+DOW="$(date +%u)"
+if [ "$DOW" = "1" ]; then
+  run_step "fetch:weekly-rankings" \
+    node --import tsx scripts/fetch-weekly-rankings.ts
+else
+  echo "===== [$(date +%H:%M:%S)] fetch:weekly-rankings skipped (DOW=$DOW, not Monday) =====" | tee -a "$LOG_FILE"
+fi
+
 echo "=========================================" | tee -a "$LOG_FILE"
 echo "nightly routine end: $(date)" | tee -a "$LOG_FILE"
 echo "=========================================" | tee -a "$LOG_FILE"

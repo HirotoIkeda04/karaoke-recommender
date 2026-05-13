@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, X } from "lucide-react";
+import { Search, TrendingUp, X } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -47,6 +47,8 @@ interface LiveSearchProps {
   knownSongIds?: string[];
   /** ジャンルカード背景に使う、各ジャンル top 4 曲のジャケット URL */
   genreCovers?: Partial<Record<GenreCode, string[]>>;
+  /** ランキングカード背景に使う、今週 top 4 曲のジャケット URL */
+  rankingCovers?: string[];
 }
 
 const HIGH_OPTIONS = [
@@ -88,6 +90,7 @@ export function LiveSearch({
   ratings,
   knownSongIds = [],
   genreCovers = {},
+  rankingCovers = [],
 }: LiveSearchProps) {
   const [query, setQuery] = useState("");
   const [highMax, setHighMax] = useState("");
@@ -300,7 +303,7 @@ export function LiveSearch({
       </div>
 
       {mode === "browse" ? (
-        <BrowseGrid genreCovers={genreCovers} />
+        <BrowseGrid genreCovers={genreCovers} rankingCovers={rankingCovers} />
       ) : mode === "history" ? (
         <HistoryList
           history={history}
@@ -333,8 +336,10 @@ export function LiveSearch({
 // ============================================================================
 function BrowseGrid({
   genreCovers,
+  rankingCovers,
 }: {
   genreCovers: Partial<Record<GenreCode, string[]>>;
+  rankingCovers: string[];
 }) {
   return (
     <section>
@@ -342,6 +347,84 @@ function BrowseGrid({
         ブラウズを開始
       </h2>
       <ul className="grid grid-cols-2 gap-2">
+        {/* 「今週のランキング」エントリ。col-span-2 で全幅、aspect は
+            ジャンルカード半分弱の高さに揃えて視覚的バランスを取る。 */}
+        <li className="col-span-2">
+          <Link
+            href="/rankings"
+            className="relative flex aspect-[16/5] items-center overflow-hidden rounded-lg bg-zinc-900 px-4 py-3 transition active:scale-[0.98]"
+          >
+            {rankingCovers.length > 0 ? (
+              // 横長カードなので 4 列 1 行のストリップでジャケットを敷く
+              <div
+                className="absolute inset-0 grid grid-cols-4"
+                aria-hidden
+              >
+                {[0, 1, 2, 3].map((i) => {
+                  const src =
+                    rankingCovers[i] ??
+                    rankingCovers[i % Math.max(rankingCovers.length, 1)];
+                  return (
+                    <div key={i} className="relative bg-zinc-800">
+                      {src ? (
+                        <JacketImage
+                          src={src}
+                          alt=""
+                          fill
+                          sizes="(max-width: 640px) 25vw, 12vw"
+                          className="object-cover"
+                        />
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
+            {/* ランキング識別色: amber/orange 系で「熱量」を表現 */}
+            <div
+              className="absolute inset-0 bg-gradient-to-br from-amber-950/88 via-orange-950/45 to-black/30"
+              aria-hidden
+            />
+            {/* 2px ガラスリム (ジャンルカードと同じ手法) */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 rounded-lg"
+              style={{
+                padding: "2px",
+                background: "rgba(255,255,255,0.18)",
+                backdropFilter: "blur(20px) brightness(1.2) saturate(1.4)",
+                WebkitBackdropFilter:
+                  "blur(20px) brightness(1.2) saturate(1.4)",
+                WebkitMask:
+                  "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+                WebkitMaskComposite: "xor",
+                mask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+                maskComposite: "exclude",
+              }}
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                backdropFilter: "blur(10px)",
+                WebkitBackdropFilter: "blur(10px)",
+                maskImage:
+                  "linear-gradient(135deg, black 0%, black 25%, transparent 80%)",
+                WebkitMaskImage:
+                  "linear-gradient(135deg, black 0%, black 25%, transparent 80%)",
+              }}
+            />
+            <div className="relative z-10 flex items-center gap-2">
+              <TrendingUp
+                className="size-4 text-amber-200 drop-shadow-md"
+                aria-hidden
+              />
+              <span className="text-sm font-extrabold leading-tight tracking-tight text-zinc-100 drop-shadow-md">
+                今週のランキング
+              </span>
+            </div>
+          </Link>
+        </li>
         {GENRE_CODES.map((code) => {
           const covers = genreCovers[code] ?? [];
           return (
