@@ -115,8 +115,8 @@ export default async function RankingsPage() {
     <div className="mx-auto max-w-md space-y-4 px-4 py-4">
       <PageHeader />
       <p className="text-xs text-zinc-500 dark:text-zinc-400">
-        {formatWeekRange(weekStart)} / Spotify Top 50 と Apple Music Top 100
-        を合算
+        {formatWeekRange(weekStart)} / Apple Music Top 100 と YouTube Top 50
+        (Music) を合算
       </p>
       <ol className="space-y-1">
         {rows.map((r) => {
