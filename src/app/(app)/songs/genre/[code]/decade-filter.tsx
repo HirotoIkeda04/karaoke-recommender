@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
 
 import { SongCard } from "@/components/song-card";
@@ -34,13 +35,15 @@ const DECADES: Array<{ label: string; start: number; end: number }> = [
 ];
 
 export function DecadeFilter({ songs, ratings, knownIds }: DecadeFilterProps) {
-  // 選択中の年代 (start 年の集合)。空 Set = フィルタ無し (全件表示)。
-  const [selected, setSelected] = useState<Set<number>>(new Set());
+  // 選択順を保持するため Set ではなく配列で管理する。
+  // Spotify のように先頭から固まる順序付けに使う。
+  const [selected, setSelected] = useState<number[]>([]);
+  const selectedSet = useMemo(() => new Set(selected), [selected]);
 
   const knownSet = useMemo(() => new Set(knownIds), [knownIds]);
 
   const filtered = useMemo(() => {
-    if (selected.size === 0) return songs;
+    if (selected.length === 0) return songs;
     return songs.filter((s) => {
       const y = s.release_year;
       if (y == null) return false;
@@ -52,44 +55,54 @@ export function DecadeFilter({ songs, ratings, knownIds }: DecadeFilterProps) {
   }, [songs, selected]);
 
   const toggle = (start: number) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(start)) next.delete(start);
-      else next.add(start);
-      return next;
-    });
+    setSelected((prev) =>
+      prev.includes(start) ? prev.filter((s) => s !== start) : [...prev, start],
+    );
   };
+
+  // チップ並び: 選択中 (選択順) → 未選択 (元の DECADES 順)。
+  // framer-motion の layout 属性が key を頼りに位置をアニメさせる。
+  const ordered = useMemo(() => {
+    const selectedChips = selected
+      .map((start) => DECADES.find((d) => d.start === start))
+      .filter((d): d is (typeof DECADES)[number] => Boolean(d));
+    const unselectedChips = DECADES.filter((d) => !selectedSet.has(d.start));
+    return [...selectedChips, ...unselectedChips];
+  }, [selected, selectedSet]);
 
   return (
     <div className="space-y-3">
-      {/* チップ列: 横スクロール可能。Spotify のソートチップに近い見た目。
-          選択中: bg-zinc-100/text-zinc-900 (= primary 白系)。
-          未選択: ダーク背景に薄い枠線。 */}
-      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {DECADES.map((d) => {
-          const active = selected.has(d.start);
+      {/* チップ列: 横スクロール可能。選択順に先頭に寄せて Spotify 風に「固まる」。 */}
+      <motion.div
+        layout
+        className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {ordered.map((d) => {
+          const active = selectedSet.has(d.start);
           return (
-            <button
+            <motion.button
               key={d.start}
+              layout
+              transition={{ type: "spring", stiffness: 500, damping: 35 }}
               type="button"
               onClick={() => toggle(d.start)}
               aria-pressed={active}
               className={
                 active
-                  ? "shrink-0 rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-900 transition active:scale-95 dark:bg-zinc-50 dark:text-zinc-950"
-                  : "shrink-0 rounded-full border border-zinc-300 bg-transparent px-3 py-1 text-xs font-medium text-zinc-700 transition active:scale-95 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  ? "shrink-0 rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-900 active:scale-95 dark:bg-zinc-50 dark:text-zinc-950"
+                  : "shrink-0 rounded-full border border-zinc-300 bg-transparent px-3 py-1 text-xs font-medium text-zinc-700 active:scale-95 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
               }
             >
               {d.label}
-            </button>
+            </motion.button>
           );
         })}
-      </div>
+      </motion.div>
 
       <p className="text-xs text-zinc-500 dark:text-zinc-400">
-        {selected.size === 0
+        {selected.length === 0
           ? `全 ${songs.length.toLocaleString()} 曲`
-          : `${filtered.length.toLocaleString()} 曲 (${selected.size} 年代を選択中)`}
+          : `${filtered.length.toLocaleString()} 曲 (${selected.length} 年代を選択中)`}
       </p>
 
       {filtered.length === 0 ? (
