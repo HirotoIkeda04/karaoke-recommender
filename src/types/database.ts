@@ -513,6 +513,41 @@ export type Database = {
           },
         ]
       }
+      weekly_rankings: {
+        Row: {
+          created_at: string
+          final_rank: number
+          score: number
+          song_id: string
+          sources: Json
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          final_rank: number
+          score: number
+          song_id: string
+          sources?: Json
+          week_start: string
+        }
+        Update: {
+          created_at?: string
+          final_rank?: number
+          score?: number
+          song_id?: string
+          sources?: Json
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_rankings_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_known_songs: {
         Row: {
           last_seen: string
