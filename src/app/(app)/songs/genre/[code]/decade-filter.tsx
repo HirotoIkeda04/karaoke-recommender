@@ -72,13 +72,45 @@ export function DecadeFilter({ songs, ratings, knownIds }: DecadeFilterProps) {
 
   return (
     <div className="space-y-3">
-      {/* チップ列: 横スクロール可能。選択順に先頭に寄せて Spotify 風に「固まる」。 */}
+      {/* チップ列: gap は CSS では持たず、隣接関係に応じて各チップ側で
+          動的に margin-right を決める。
+          同じグループ (両方選択中) の隣接時は margin=0 + 角丸を直線にして
+          「物理的にくっついて連結ピルに見える」状態を作る。
+          選択順 → 未選択順 の並び替えは framer-motion の layout で
+          スプリングアニメーションさせる。 */}
       <motion.div
         layout
-        className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="-mx-4 flex overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {ordered.map((d) => {
+        {ordered.map((d, i) => {
           const active = selectedSet.has(d.start);
+          const prev = i > 0 ? ordered[i - 1] : null;
+          const next = i < ordered.length - 1 ? ordered[i + 1] : null;
+          const prevSameGroup = prev != null && selectedSet.has(prev.start) && active;
+          const nextSameGroup = next != null && selectedSet.has(next.start) && active;
+          const radius =
+            prevSameGroup && nextSameGroup
+              ? "rounded-none"
+              : prevSameGroup
+                ? "rounded-l-none rounded-r-full"
+                : nextSameGroup
+                  ? "rounded-l-full rounded-r-none"
+                  : "rounded-full";
+          // 連結ピル内では分割線として薄いボーダーを入れて識別性を出す
+          const divider = prevSameGroup ? "border-l border-zinc-300/60 dark:border-zinc-700" : "";
+          // 同グループ内の隣接時は隙間 0、それ以外は 8px
+          const marginRight =
+            next == null
+              ? ""
+              : active && next && selectedSet.has(next.start)
+                ? ""
+                : "mr-2";
+
+          const base = "shrink-0 px-3 py-1 text-xs active:scale-95";
+          const tone = active
+            ? "bg-zinc-100 font-semibold text-zinc-900 dark:bg-zinc-50 dark:text-zinc-950"
+            : "border border-zinc-300 bg-transparent font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800";
+
           return (
             <motion.button
               key={d.start}
@@ -87,11 +119,7 @@ export function DecadeFilter({ songs, ratings, knownIds }: DecadeFilterProps) {
               type="button"
               onClick={() => toggle(d.start)}
               aria-pressed={active}
-              className={
-                active
-                  ? "shrink-0 rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-900 active:scale-95 dark:bg-zinc-50 dark:text-zinc-950"
-                  : "shrink-0 rounded-full border border-zinc-300 bg-transparent px-3 py-1 text-xs font-medium text-zinc-700 active:scale-95 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-              }
+              className={`${base} ${tone} ${radius} ${divider} ${marginRight}`}
             >
               {d.label}
             </motion.button>
