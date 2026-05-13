@@ -6,6 +6,8 @@ import { GENRE_LABELS, isGenreCode } from "@/lib/genres";
 import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
 import { createClient } from "@/lib/supabase/server";
 
+import { DecadeFilter } from "./decade-filter";
+
 export const dynamic = "force-dynamic";
 
 interface GenrePageProps {
@@ -110,17 +112,23 @@ export default async function GenreSongsPage({ params }: GenrePageProps) {
     ratings[ev.song_id] = ev.rating;
   }
 
+  // J-POP は年代別フィルタチップ付きのクライアントコンポーネントで描画する。
+  // それ以外のジャンルは従来通り単純リスト。
+  const isJpop = code === "j_pop";
+
   return (
     <div className="mx-auto max-w-md space-y-4 px-4 py-4">
       <div className="flex items-center gap-2">
         <BackButton href="/songs" label="検索に戻る" />
         <h1 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
-          {GENRE_LABELS[code]}
+          {isJpop ? "年代別J-POP" : GENRE_LABELS[code]}
         </h1>
-        <span className="ml-auto text-xs text-zinc-500 dark:text-zinc-400">
-          {songs.length.toLocaleString()} 曲
-          {songs.length === SONG_LIMIT ? "+" : ""}
-        </span>
+        {!isJpop ? (
+          <span className="ml-auto text-xs text-zinc-500 dark:text-zinc-400">
+            {songs.length.toLocaleString()} 曲
+            {songs.length === SONG_LIMIT ? "+" : ""}
+          </span>
+        ) : null}
       </div>
 
       {error ? (
@@ -131,6 +139,12 @@ export default async function GenreSongsPage({ params }: GenrePageProps) {
         <p className="px-2 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
           このジャンルの楽曲はまだ登録されていません
         </p>
+      ) : isJpop ? (
+        <DecadeFilter
+          songs={songs}
+          ratings={ratings}
+          knownIds={Array.from(knownIds)}
+        />
       ) : (
         <ul>
           {songs.map((s) => (

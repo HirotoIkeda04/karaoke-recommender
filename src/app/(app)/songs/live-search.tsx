@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, TrendingUp, X } from "lucide-react";
+import { CalendarRange, Search, TrendingUp, X } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -425,7 +425,81 @@ function BrowseGrid({
             </div>
           </Link>
         </li>
-        {GENRE_CODES.map((code) => {
+        {/* 「年代別J-POP」エントリ。col-span-2 で全幅。視覚的にランキング
+            カードと並ぶ。色は元の j_pop カードと同じピンク/ローズ系を踏襲。 */}
+        <li className="col-span-2">
+          <Link
+            href="/songs/genre/j_pop"
+            className="relative flex aspect-[16/5] items-center overflow-hidden rounded-lg bg-zinc-900 px-4 py-3 transition active:scale-[0.98]"
+          >
+            {(genreCovers.j_pop ?? []).length > 0 ? (
+              <div
+                className="absolute inset-0 grid grid-cols-4"
+                aria-hidden
+              >
+                {[0, 1, 2, 3].map((i) => {
+                  const covers = genreCovers.j_pop ?? [];
+                  const src = covers[i] ?? covers[i % Math.max(covers.length, 1)];
+                  return (
+                    <div key={i} className="relative bg-zinc-800">
+                      {src ? (
+                        <JacketImage
+                          src={src}
+                          alt=""
+                          fill
+                          sizes="(max-width: 640px) 25vw, 12vw"
+                          className="object-cover"
+                        />
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
+            <div
+              className="absolute inset-0 bg-gradient-to-br from-pink-950/88 via-rose-950/45 to-black/30"
+              aria-hidden
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 rounded-lg"
+              style={{
+                padding: "2px",
+                background: "rgba(255,255,255,0.18)",
+                backdropFilter: "blur(20px) brightness(1.2) saturate(1.4)",
+                WebkitBackdropFilter:
+                  "blur(20px) brightness(1.2) saturate(1.4)",
+                WebkitMask:
+                  "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+                WebkitMaskComposite: "xor",
+                mask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+                maskComposite: "exclude",
+              }}
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                backdropFilter: "blur(10px)",
+                WebkitBackdropFilter: "blur(10px)",
+                maskImage:
+                  "linear-gradient(135deg, black 0%, black 25%, transparent 80%)",
+                WebkitMaskImage:
+                  "linear-gradient(135deg, black 0%, black 25%, transparent 80%)",
+              }}
+            />
+            <div className="relative z-10 flex items-center gap-2">
+              <CalendarRange
+                className="size-4 text-pink-200 drop-shadow-md"
+                aria-hidden
+              />
+              <span className="text-sm font-extrabold leading-tight tracking-tight text-zinc-100 drop-shadow-md">
+                年代別J-POP
+              </span>
+            </div>
+          </Link>
+        </li>
+        {GENRE_CODES.filter((c) => c !== "j_pop").map((code) => {
           const covers = genreCovers[code] ?? [];
           return (
             <li key={code}>
