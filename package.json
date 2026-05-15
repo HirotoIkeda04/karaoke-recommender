@@ -31,6 +31,7 @@
     "import:wanted-songs": "node --env-file=.env.local --import tsx scripts/import-wanted-songs.ts",
     "import:artist-songs": "node --env-file=.env.local --import tsx scripts/import-artist-songs.ts",
     "backfill:spotify-metadata": "node --env-file=.env.local --import tsx scripts/backfill-spotify-metadata.ts",
+    "backfill:itunes-metadata": "node --env-file=.env.local --import tsx scripts/backfill-itunes-metadata.ts",
     "seed:vocaloid-dam": "node --env-file=.env.local --import tsx scripts/seed-vocaloid-dam.ts",
     "backfill:artist-id": "node --env-file=.env.local --import tsx scripts/backfill-artist-id.ts",
     "backfill:spotify-images": "node --env-file=.env.local --import tsx scripts/backfill-spotify-images.ts",
