@@ -3,12 +3,19 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BackButton } from "@/components/back-button";
+import { SongCard } from "@/components/song-card";
 import { JacketImage } from "@/components/ui/jacket-image";
 import { midiToKaraoke } from "@/lib/note";
 import { createClient } from "@/lib/supabase/server";
 
 import { RatingControls } from "./rating-controls";
 import { SongLogs } from "./song-logs";
+
+const SIMILAR_RANGE_WINDOW = 12;
+const SIMILAR_RANGE_LIMIT = 5;
+// fame_score は日本語 Wikipedia 累計 pageviews の log10。5.0 ≈ 10 万 view で
+// 「かなりの有名曲」の目安。これ未満は同アーティスト曲のみ候補にする。
+const SIMILAR_FAME_MIN = 5.0;
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +29,57 @@ function formatDuration(durationMs: number | null | undefined): string {
 
 interface SongDetailProps {
   params: Promise<{ id: string }>;
+}
+
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
+
+async function fetchSimilarSongs(
+  supabase: SupabaseServerClient,
+  songId: string,
+  artistId: string | null,
+  lowMidi: number,
+  highMidi: number,
+) {
+  const select =
+    "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, fame_score";
+
+  // 音域ウィンドウ内に絞った上で「同じアーティスト」と「かなりの有名曲」を
+  // 別々に引いてマージする。どちらにも当てはまらない無名の他人曲は出さない。
+  const rangeFiltered = () =>
+    supabase
+      .from("songs")
+      .select(select)
+      .neq("id", songId)
+      .gte("range_low_midi", lowMidi - SIMILAR_RANGE_WINDOW)
+      .lte("range_low_midi", lowMidi + SIMILAR_RANGE_WINDOW)
+      .gte("range_high_midi", highMidi - SIMILAR_RANGE_WINDOW)
+      .lte("range_high_midi", highMidi + SIMILAR_RANGE_WINDOW);
+
+  const [sameArtistRes, famousRes] = await Promise.all([
+    artistId
+      ? rangeFiltered().eq("artist_id", artistId).limit(100)
+      : Promise.resolve({ data: [] }),
+    rangeFiltered().gte("fame_score", SIMILAR_FAME_MIN).limit(100),
+  ]);
+
+  type Row = NonNullable<typeof famousRes.data>[number];
+  const merged = new Map<string, Row>();
+  for (const r of sameArtistRes.data ?? []) merged.set(r.id, r);
+  for (const r of famousRes.data ?? []) merged.set(r.id, r);
+
+  return Array.from(merged.values())
+    .map((song) => ({
+      song,
+      distance:
+        Math.abs((song.range_low_midi ?? lowMidi) - lowMidi) +
+        Math.abs((song.range_high_midi ?? highMidi) - highMidi),
+    }))
+    .sort((a, b) => {
+      if (a.distance !== b.distance) return a.distance - b.distance;
+      return (b.song.fame_score ?? -Infinity) - (a.song.fame_score ?? -Infinity);
+    })
+    .slice(0, SIMILAR_RANGE_LIMIT)
+    .map(({ song }) => song);
 }
 
 export default async function SongDetailPage({ params }: SongDetailProps) {
@@ -63,6 +121,17 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
   const evaluation = evalRes.data ?? null;
   const logs = logsRes.data ?? [];
   const image = song.image_url_large ?? song.image_url_medium;
+
+  const similarSongs =
+    song.range_low_midi != null && song.range_high_midi != null
+      ? await fetchSimilarSongs(
+          supabase,
+          song.id,
+          song.artist_id,
+          song.range_low_midi,
+          song.range_high_midi,
+        )
+      : [];
 
   return (
     <div className="relative">
@@ -167,6 +236,21 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
           </div>
         </dl>
       </section>
+
+      {similarSongs.length > 0 ? (
+        <section className="space-y-2">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            似た音域の楽曲
+          </h2>
+          <ul className="space-y-1">
+            {similarSongs.map((s) => (
+              <li key={s.id}>
+                <SongCard song={s} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <SongLogs songId={song.id} initialLogs={logs} />
       </div>
