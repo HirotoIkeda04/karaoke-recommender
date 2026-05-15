@@ -237,6 +237,8 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         </dl>
       </section>
 
+      <SongLogs songId={song.id} initialLogs={logs} />
+
       {similarSongs.length > 0 ? (
         <section className="space-y-2">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
@@ -251,8 +253,6 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
           </ul>
         </section>
       ) : null}
-
-      <SongLogs songId={song.id} initialLogs={logs} />
       </div>
     </div>
   );
