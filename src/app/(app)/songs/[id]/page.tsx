@@ -13,6 +13,7 @@ import { SongLogs } from "./song-logs";
 
 const SIMILAR_RANGE_WINDOW = 12;
 const SIMILAR_RANGE_LIMIT = 5;
+const RATED_SIMILAR_LIMIT = 2;
 // fame_score は日本語 Wikipedia 累計 pageviews の log10。5.0 ≈ 10 万 view で
 // 「かなりの有名曲」の目安。これ未満は同アーティスト曲のみ候補にする。
 const SIMILAR_FAME_MIN = 5.0;
@@ -82,6 +83,50 @@ async function fetchSimilarSongs(
     .map(({ song }) => song);
 }
 
+async function fetchRatedSimilarSongs(
+  supabase: SupabaseServerClient,
+  userId: string,
+  songId: string,
+  lowMidi: number,
+  highMidi: number,
+) {
+  const { data } = await supabase
+    .from("evaluations")
+    .select(
+      `
+      rating,
+      song:songs (
+        id, title, artist, release_year,
+        range_low_midi, range_high_midi, falsetto_max_midi,
+        image_url_small, image_url_medium
+      )
+    `,
+    )
+    .eq("user_id", userId);
+
+  if (!data) return [];
+
+  return data
+    .flatMap((row) => {
+      const song = row.song;
+      if (
+        !song ||
+        song.id === songId ||
+        song.range_low_midi == null ||
+        song.range_high_midi == null
+      ) {
+        return [];
+      }
+      const distance =
+        Math.abs(song.range_low_midi - lowMidi) +
+        Math.abs(song.range_high_midi - highMidi);
+      if (distance > SIMILAR_RANGE_WINDOW * 2) return [];
+      return [{ song, rating: row.rating, distance }];
+    })
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, RATED_SIMILAR_LIMIT);
+}
+
 export default async function SongDetailPage({ params }: SongDetailProps) {
   const { id } = await params;
 
@@ -122,16 +167,27 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
   const logs = logsRes.data ?? [];
   const image = song.image_url_large ?? song.image_url_medium;
 
-  const similarSongs =
-    song.range_low_midi != null && song.range_high_midi != null
-      ? await fetchSimilarSongs(
+  const hasRange =
+    song.range_low_midi != null && song.range_high_midi != null;
+
+  const [similarSongs, ratedSimilarSongs] = hasRange
+    ? await Promise.all([
+        fetchSimilarSongs(
           supabase,
           song.id,
           song.artist_id,
-          song.range_low_midi,
-          song.range_high_midi,
-        )
-      : [];
+          song.range_low_midi!,
+          song.range_high_midi!,
+        ),
+        fetchRatedSimilarSongs(
+          supabase,
+          user.id,
+          song.id,
+          song.range_low_midi!,
+          song.range_high_midi!,
+        ),
+      ])
+    : [[], []];
 
   return (
     <div className="relative">
@@ -238,6 +294,21 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
       </section>
 
       <SongLogs songId={song.id} initialLogs={logs} />
+
+      {ratedSimilarSongs.length > 0 ? (
+        <section className="space-y-2">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            評価済みの似た音域の楽曲
+          </h2>
+          <ul className="space-y-1">
+            {ratedSimilarSongs.map(({ song: s, rating }) => (
+              <li key={s.id}>
+                <SongCard song={s} rating={rating} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {similarSongs.length > 0 ? (
         <section className="space-y-2">
