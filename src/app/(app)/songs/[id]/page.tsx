@@ -53,14 +53,16 @@ async function fetchSimilarSongs(
   supabase: SupabaseServerClient,
   songId: string,
   artistId: string | null,
+  genres: string[] | null,
   lowMidi: number,
   highMidi: number,
 ) {
   const select =
-    "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, fame_score";
+    "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, fame_score, genres";
 
-  // 音域ウィンドウ内に絞った上で「同じアーティスト」と「かなりの有名曲」を
-  // 別々に引いてマージする。どちらにも当てはまらない無名の他人曲は出さない。
+  // 音域ウィンドウ内に絞った上で「同じアーティスト」「かなりの有名曲」
+  // 「同系統ジャンル」を別々に引いてマージする。どれにも当てはまらない
+  // 無名の他人曲は出さない。
   const rangeFiltered = () =>
     supabase
       .from("songs")
@@ -71,31 +73,64 @@ async function fetchSimilarSongs(
       .gte("range_high_midi", highMidi - SIMILAR_RANGE_WINDOW)
       .lte("range_high_midi", highMidi + SIMILAR_RANGE_WINDOW);
 
-  const [sameArtistRes, famousRes] = await Promise.all([
+  const genreList = (genres ?? []).filter(Boolean);
+
+  const [sameArtistRes, famousRes, sameGenreRes] = await Promise.all([
     artistId
       ? rangeFiltered().eq("artist_id", artistId).limit(100)
       : Promise.resolve({ data: [] }),
     rangeFiltered().gte("fame_score", SIMILAR_FAME_MIN).limit(100),
+    genreList.length > 0
+      ? rangeFiltered().overlaps("genres", genreList).limit(100)
+      : Promise.resolve({ data: [] }),
   ]);
 
   type Row = NonNullable<typeof famousRes.data>[number];
+  const withDistance = (song: Row) => ({
+    song,
+    distance:
+      Math.abs((song.range_low_midi ?? lowMidi) - lowMidi) +
+      Math.abs((song.range_high_midi ?? highMidi) - highMidi),
+  });
+  const byDistance = (
+    a: { song: Row; distance: number },
+    b: { song: Row; distance: number },
+  ) =>
+    a.distance !== b.distance
+      ? a.distance - b.distance
+      : (b.song.fame_score ?? -Infinity) - (a.song.fame_score ?? -Infinity);
+
   const merged = new Map<string, Row>();
   for (const r of sameArtistRes.data ?? []) merged.set(r.id, r);
   for (const r of famousRes.data ?? []) merged.set(r.id, r);
 
-  return Array.from(merged.values())
-    .map((song) => ({
-      song,
-      distance:
-        Math.abs((song.range_low_midi ?? lowMidi) - lowMidi) +
-        Math.abs((song.range_high_midi ?? highMidi) - highMidi),
-    }))
-    .sort((a, b) => {
-      if (a.distance !== b.distance) return a.distance - b.distance;
-      return (b.song.fame_score ?? -Infinity) - (a.song.fame_score ?? -Infinity);
-    })
-    .slice(0, SIMILAR_RANGE_LIMIT)
-    .map(({ song }) => song);
+  const ranked = Array.from(merged.values())
+    .map(withDistance)
+    .sort(byDistance)
+    .slice(0, SIMILAR_RANGE_LIMIT);
+
+  // 少なくとも 1 曲は同系統ジャンルから出す。上位リストに同ジャンル曲が
+  // 無ければ、最も音域が近い同ジャンル曲で末尾を差し替える。
+  const sharesGenre = (s: Row) =>
+    (s.genres ?? []).some((g) => genreList.includes(g));
+
+  if (
+    genreList.length > 0 &&
+    ranked.length > 0 &&
+    !ranked.some(({ song }) => sharesGenre(song))
+  ) {
+    const best = (sameGenreRes.data ?? [])
+      .filter((s) => !merged.has(s.id))
+      .map(withDistance)
+      .sort(byDistance)[0];
+    if (best) {
+      // 枠に空きがあれば末尾に追加、埋まっていれば最遠の曲と差し替え
+      if (ranked.length < SIMILAR_RANGE_LIMIT) ranked.push(best);
+      else ranked.splice(ranked.length - 1, 1, best);
+    }
+  }
+
+  return ranked.map(({ song }) => song);
 }
 
 async function fetchRatedSimilarSongs(
@@ -191,6 +226,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
           supabase,
           song.id,
           song.artist_id,
+          song.genres,
           song.range_low_midi!,
           song.range_high_midi!,
         ),
