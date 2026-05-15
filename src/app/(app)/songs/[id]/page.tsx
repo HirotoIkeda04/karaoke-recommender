@@ -8,8 +8,23 @@ import { JacketImage } from "@/components/ui/jacket-image";
 import { midiToKaraoke } from "@/lib/note";
 import { createClient } from "@/lib/supabase/server";
 
+import type { Database } from "@/types/database";
+
 import { RatingControls } from "./rating-controls";
 import { SongLogs } from "./song-logs";
+
+type SimilarSong = Pick<
+  Database["public"]["Tables"]["songs"]["Row"],
+  | "id"
+  | "title"
+  | "artist"
+  | "release_year"
+  | "range_low_midi"
+  | "range_high_midi"
+  | "falsetto_max_midi"
+  | "image_url_small"
+  | "image_url_medium"
+>;
 
 const SIMILAR_RANGE_WINDOW = 12;
 const SIMILAR_RANGE_LIMIT = 5;
@@ -170,7 +185,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
   const hasRange =
     song.range_low_midi != null && song.range_high_midi != null;
 
-  const [similarSongs, ratedSimilarSongs] = hasRange
+  const [recommended, ratedSimilarSongs] = hasRange
     ? await Promise.all([
         fetchSimilarSongs(
           supabase,
@@ -188,6 +203,17 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         ),
       ])
     : [[], []];
+
+  // 評価済みの似た音域曲を先頭に置き、残りを一般推薦で埋める (重複は除外)
+  const similarSongs: { id: string; song: SimilarSong; rating?: string }[] = [];
+  for (const { song: s, rating } of ratedSimilarSongs) {
+    similarSongs.push({ id: s.id, song: s, rating });
+  }
+  for (const s of recommended) {
+    if (similarSongs.length >= SIMILAR_RANGE_LIMIT) break;
+    if (similarSongs.some((x) => x.id === s.id)) continue;
+    similarSongs.push({ id: s.id, song: s });
+  }
 
   return (
     <div className="relative">
@@ -295,30 +321,15 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
 
       <SongLogs songId={song.id} initialLogs={logs} />
 
-      {ratedSimilarSongs.length > 0 ? (
-        <section className="space-y-2">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-            評価済みの似た音域の楽曲
-          </h2>
-          <ul className="space-y-1">
-            {ratedSimilarSongs.map(({ song: s, rating }) => (
-              <li key={s.id}>
-                <SongCard song={s} rating={rating} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
       {similarSongs.length > 0 ? (
         <section className="space-y-2">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             似た音域の楽曲
           </h2>
           <ul className="space-y-1">
-            {similarSongs.map((s) => (
-              <li key={s.id}>
-                <SongCard song={s} />
+            {similarSongs.map(({ id: sid, song: s, rating }) => (
+              <li key={sid}>
+                <SongCard song={s} rating={rating} />
               </li>
             ))}
           </ul>
