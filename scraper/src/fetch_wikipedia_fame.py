@@ -128,6 +128,51 @@ _NEGATIVE_DISAMBIGUATORS: tuple[str, ...] = (
     "曖昧さ回避",
 )
 
+# 記事が「楽曲そのもの」であることを示す Wikipedia カテゴリのトークン。
+# jawiki の楽曲/シングル記事はほぼ必ず `○年のシングル` `<artist>の楽曲`
+# `楽曲 <かしら文字>` `<作品>の主題歌` 等で分類される。これらが 1 つも
+# 無い記事 (例: 学校・施設・人物) に曲名が一致しても誤マッチとみなす。
+_SONG_CATEGORY_TOKENS: tuple[str, ...] = (
+    "楽曲",
+    "シングル",
+    "主題歌",
+    "歌曲",
+    "歌謡曲",
+)
+
+# 曖昧さ回避ページを示すカテゴリトークン。どの曲か特定不能なので採用しない。
+_DISAMBIG_CATEGORY_TOKENS: tuple[str, ...] = (
+    "曖昧さ回避",
+    "同名の",
+)
+
+
+def _is_song_article(categories: list[str]) -> bool:
+    """記事のカテゴリ群に楽曲系カテゴリが 1 つでもあるか。"""
+    return any(
+        tok in cat for cat in categories for tok in _SONG_CATEGORY_TOKENS
+    )
+
+
+def _is_disambiguation_page(categories: list[str]) -> bool:
+    """記事が曖昧さ回避ページか (カテゴリで判定)。"""
+    return any(
+        tok in cat for cat in categories for tok in _DISAMBIG_CATEGORY_TOKENS
+    )
+
+
+# アーティスト名末尾/中の括弧読みグロス (例: `平原綾香(ひらはらあやか)`,
+# `SEKAI NO OWARI(世界の終わり)`) を除去するための正規表現。曲マスタ由来の
+# この表記は Wikipedia 記事タイトル `(<artist>の曲)` を壊し誤マッチ/未解決の
+# 主因になるため、解決前に剥がす。
+_RE_ARTIST_GLOSS = re.compile(r"[（(][^）)]*[）)]")
+
+
+def _clean_artist(artist: str) -> str:
+    """アーティスト名から括弧読みグロスを除去。空になる場合は原文を返す。"""
+    cleaned = _RE_ARTIST_GLOSS.sub("", artist).strip()
+    return cleaned or artist
+
 
 def _candidate_titles(title: str, artist: str) -> list[str]:
     """Wikipedia 記事タイトルの候補を生成。「曲名 (アーティスト名の曲)」を優先。"""
@@ -173,6 +218,8 @@ class WikipediaClient:
         normalize/redirect 後の正式名なので Pageviews API にそのまま渡せる。
         記事が見つからない/アーティスト不一致の場合は None。
         """
+        artist = _clean_artist(artist)
+
         # 1. 候補タイトルから既存記事を探し、アーティスト・タイトル一致を検証
         for candidate in _candidate_titles(title, artist):
             canonical = self._resolve_with_verification(candidate, title, artist)
@@ -193,14 +240,23 @@ class WikipediaClient:
         Wikipedia は先頭文字大文字化やリダイレクトを内部で吸収。
         Pageviews API は厳密一致なので必ず canonical title を返す。
 
-        2 段の検証:
+        3 段の検証:
             1) タイトル一致: canonical の disambig 除去後コアと input_title が
                十分似ているか
             2) アーティスト一致: disambig が `(artist の曲)` 形式 OR
                extract にアーティスト名が含まれている
+            3) 楽曲記事性: 曲系 disambiguator が付いている OR カテゴリが
+               楽曲系。これが無い記事 (学校・施設・人物等) に曲名が一致し、
+               本文にアーティスト名がトリビアとして出るだけのケースを弾く。
         """
-        canonical, extract = self._fetch_canonical_and_extract(candidate_title)
+        canonical, extract, categories = self._fetch_canonical_and_extract(
+            candidate_title,
+        )
         if not canonical:
+            return None
+
+        # 曖昧さ回避ページはどの曲か特定できないので採用しない。
+        if _is_disambiguation_page(categories):
             return None
 
         article_core, disambig = _strip_disambig(canonical)
@@ -213,11 +269,24 @@ class WikipediaClient:
         norm_artist = _normalize_text(artist)
         if not norm_artist:
             return None
-        # 2a. disambig に artist が含まれる (`Lemon (米津玄師の曲)` 等の典型)
-        if disambig and norm_artist in _normalize_text(disambig):
-            return canonical
-        # 2b. extract 冒頭にアーティスト名が含まれる
-        if extract and norm_artist in _normalize_text(extract):
+        artist_in_disambig = bool(
+            disambig and norm_artist in _normalize_text(disambig)
+        )
+        artist_in_extract = bool(
+            extract and norm_artist in _normalize_text(extract)
+        )
+        if not (artist_in_disambig or artist_in_extract):
+            return None
+
+        # (3) 楽曲記事であることの確証。曲系 disambiguator
+        # (`(米津玄師の曲)` 等) はそれ自体が楽曲記事の証拠。無い場合は
+        # カテゴリに楽曲系が 1 つでもあることを要求する。裸タイトルで
+        # extract にアーティスト名が出るだけ (例: 学校記事のトリビア) は
+        # 誤マッチなので弾く。
+        disambig_is_song = bool(
+            disambig and any(d in disambig for d in _SONG_DISAMBIGUATORS)
+        )
+        if disambig_is_song or _is_song_article(categories):
             return canonical
 
         return None
@@ -260,35 +329,41 @@ class WikipediaClient:
 
     def _fetch_canonical_and_extract(
         self, page_title: str,
-    ) -> tuple[str | None, str | None]:
-        """canonical title と記事プレーンテキスト抜粋を 1 リクエストで取得。
+    ) -> tuple[str | None, str | None, list[str]]:
+        """canonical title・記事抜粋・カテゴリを 1 リクエストで取得。
 
         `exintro` を外すと記事全体が返るが、カバー曲やコラボ表記まで拾うため
         recall が上がる。`exchars=10000` で長文記事の青天井は防ぐ。
+        カテゴリ (非隠し) は「記事が楽曲か」の検証に使う。
         """
         params = {
             "action": "query",
             "titles": page_title,
             "redirects": "1",
-            "prop": "extracts",
+            "prop": "extracts|categories",
             "explaintext": "1",
             "exchars": "10000",
+            "cllimit": "max",
+            "clshow": "!hidden",
             "format": "json",
         }
         data = self._request_with_retry(
             params, self._throttle_search, f"query {page_title!r}",
         )
         if not data:
-            return None, None
+            return None, None, []
         pages = data.get("query", {}).get("pages", {})
         for pid, page in pages.items():
             if int(pid) > 0 and "missing" not in page:
-                return page.get("title"), page.get("extract")
-        return None, None
+                categories = [
+                    c.get("title", "") for c in page.get("categories", [])
+                ]
+                return page.get("title"), page.get("extract"), categories
+        return None, None, []
 
     def _resolve_canonical(self, page_title: str) -> str | None:
         """canonical title 単独取得 (検証なし)。検索 fallback 用。"""
-        canonical, _ = self._fetch_canonical_and_extract(page_title)
+        canonical, _, _ = self._fetch_canonical_and_extract(page_title)
         return canonical
 
     def _search_best_match(self, title: str, artist: str) -> str | None:
