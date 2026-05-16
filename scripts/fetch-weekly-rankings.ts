@@ -2,20 +2,23 @@
  * 週次ランキング取得・集計スクリプト。
  *
  * ソース:
- *   - Spotify "Top 50 - Japan" (editorial playlist)
  *   - Apple Music Top 100 JP (Marketing Tools RSS, 無認証)
  *
  * 処理フロー:
- *   1. 両ソースから tracks 配列を取得
- *   2. Spotify トラックは spotify_track_id / ISRC で songs テーブルにマッチ
- *   3. Apple Music トラックは Spotify search で Spotify ID を解決し同じく match
- *   4. DB に無い曲は新規 INSERT (画像・メタフル付与)
- *   5. ソース横断スコア (正規化 Borda) を合算
- *   6. weekly_rankings に upsert (week_start = 今週月曜 UTC)
+ *   1. Apple Music Top 100 RSS を取得
+ *   2. 各 Apple トラックを既存 songs と (title+artist 正規化) でマッチ
+ *   3. 未マッチは Spotify search で track を解決し ISRC/ID で再マッチ →
+ *      無ければ新規 INSERT (画像・メタフル付与)
+ *   4. 正規化 Borda スコアを採番し weekly_rankings に upsert
+ *      (week_start = 今週月曜 UTC)
  *
- * 注意:
- *   - Spotify editorial playlist は 2024 後半〜新規 app で 404 になる例あり。
- *     失敗時は警告のみ出して Apple ソースのみで処理継続。
+ * 設計メモ:
+ *   - 当初は Spotify "Top 50 - Japan" editorial playlist も併用していたが、
+ *     2024 後半に Spotify が新規 app の /v1/playlists を 403/404 で遮断
+ *     (project_spotify_playlist_blocked.md)。Top 50 取得は恒久的に不能の
+ *     ため該当コードを削除し Apple Music RSS 一本化した (2026-05-15)。
+ *   - Spotify search (/v1/search) は引き続き 200 なので、Apple トラックの
+ *     Spotify ID 解決・新規 INSERT のエンリッチには使用する。
  *   - Apple RSS は ISRC を持たないため title+artist の正規化マッチに依存。
  *
  * 使い方:
@@ -32,11 +35,6 @@ type WeeklyRankingInsert =
 
 const SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token";
 const SPOTIFY_SEARCH_URL = "https://api.spotify.com/v1/search";
-const SPOTIFY_PLAYLIST_URL = "https://api.spotify.com/v1/playlists";
-
-// Spotify "Top 50 - Japan" editorial playlist (Daily Charts)
-// 別の playlist を使いたい場合は SPOTIFY_TOP50_JP_PLAYLIST_ID で上書き可能
-const DEFAULT_SPOTIFY_TOP50_JP = "37i9dQZEVXbKXQ4mDTEBXq";
 
 // Apple Music の Marketing Tools RSS (JP 国コード)。サインインや API key 不要。
 // 100 件取得 = .../most-played/100/songs.json
@@ -175,45 +173,6 @@ async function spotifyGet(token: string, url: URL): Promise<Response> {
   return res;
 }
 
-interface PlaylistTrackItem {
-  track: SpotifyTrack | null;
-}
-interface PlaylistResponse {
-  items: PlaylistTrackItem[];
-  next: string | null;
-}
-
-/** Spotify Top 50 Japan のトラックを順位付きで返す。失敗時は空配列。 */
-async function fetchSpotifyTop50(
-  token: string,
-  playlistId: string,
-): Promise<Array<{ rank: number; track: SpotifyTrack }>> {
-  const url = new URL(`${SPOTIFY_PLAYLIST_URL}/${playlistId}/tracks`);
-  url.searchParams.set("market", "JP");
-  url.searchParams.set(
-    "fields",
-    "items(track(id,name,artists(name),album(name,release_date,images),duration_ms,preview_url,explicit,external_ids)),next",
-  );
-  url.searchParams.set("limit", "50");
-  const res = await spotifyGet(token, url);
-  if (!res.ok) {
-    console.warn(
-      `[spotify] playlist ${playlistId} fetch failed: ${res.status}. ` +
-        `Editorial playlist の取得が新規 app で制限されている可能性あり。`,
-    );
-    return [];
-  }
-  const json = (await res.json()) as PlaylistResponse;
-  const out: Array<{ rank: number; track: SpotifyTrack }> = [];
-  let rank = 1;
-  for (const item of json.items) {
-    if (!item.track || !item.track.id) continue;
-    out.push({ rank, track: item.track });
-    rank++;
-  }
-  return out;
-}
-
 async function searchSpotify(
   token: string,
   title: string,
@@ -290,18 +249,17 @@ async function fetchAppleTop100(): Promise<
 interface RankedSongBucket {
   songId: string;
   // ソース別の順位。null なら未登場。
-  sources: { spotify?: number; apple?: number };
+  // 現状 Apple のみ。将来 Spotify Top50 を別経路で復活させる場合に備え
+  // sources は拡張可能な形のまま残す。
+  sources: { apple?: number };
 }
 
 /**
  * 正規化 Borda スコア:
- *   spotify (50件) → (51 - rank) / 50
- *   apple   (100件) → (101 - rank) / 100
- *   各ソースの最大寄与は 1.0。両ソース 1 位なら 2.0 が上限。
+ *   apple (100件) → (101 - rank) / 100  (最大寄与 1.0)
  */
 function computeScore(sources: RankedSongBucket["sources"]): number {
   let s = 0;
-  if (sources.spotify) s += (51 - sources.spotify) / 50;
   if (sources.apple) s += (101 - sources.apple) / 100;
   return s;
 }
@@ -435,10 +393,7 @@ async function loadArtistIndex(
 async function main() {
   const { dryRun } = parseArgs();
   const weekStart = isoWeekMondayUtc();
-  const playlistId =
-    process.env.SPOTIFY_TOP50_JP_PLAYLIST_ID ?? DEFAULT_SPOTIFY_TOP50_JP;
   console.log(`week_start=${weekStart}, dryRun=${dryRun}`);
-  console.log(`spotify playlist=${playlistId}`);
 
   const supabase = createAdminClient();
   console.log("loading songs/artists index...");
@@ -453,16 +408,12 @@ async function main() {
 
   const token = await getSpotifyToken();
 
-  // --- 1. Spotify Top 50 ---------------------------------------------------
-  const spotifyItems = await fetchSpotifyTop50(token, playlistId);
-  console.log(`spotify top50: fetched ${spotifyItems.length}`);
-
-  // --- 2. Apple Top 100 ----------------------------------------------------
+  // --- 1. Apple Top 100 ----------------------------------------------------
   const appleItems = await fetchAppleTop100();
   console.log(`apple top100: fetched ${appleItems.length}`);
 
-  if (spotifyItems.length === 0 && appleItems.length === 0) {
-    console.error("全ソース取得失敗。終了。");
+  if (appleItems.length === 0) {
+    console.error("Apple RSS 取得失敗。終了。");
     process.exit(1);
   }
 
@@ -477,41 +428,6 @@ async function main() {
     }
     return b;
   };
-
-  for (const { rank, track } of spotifyItems) {
-    let songId =
-      songIdx.bySpotifyId.get(track.id) ??
-      (track.external_ids?.isrc
-        ? songIdx.byIsrc.get(track.external_ids.isrc)
-        : undefined) ??
-      songIdx.byNormKey.get(
-        normalizeArtistName(track.artists[0]?.name ?? "") +
-          "|" +
-          normalizeTitle(track.name),
-      );
-    if (!songId) {
-      if (dryRun) {
-        console.log(
-          `  [DRY-NEW-SP] rank=${rank} ${track.artists[0]?.name} | ${track.name}`,
-        );
-      } else {
-        const newId = await insertSongFromSpotify(
-          supabase,
-          track,
-          artistByNorm,
-        );
-        if (newId) {
-          songId = newId;
-          songIdx.bySpotifyId.set(track.id, newId);
-          if (track.external_ids?.isrc)
-            songIdx.byIsrc.set(track.external_ids.isrc, newId);
-        }
-      }
-    }
-    if (songId) {
-      ensureBucket(songId).sources.spotify = rank;
-    }
-  }
 
   for (const { rank, entry } of appleItems) {
     // 既存マッチをまず試す (Spotify を呼ばずに済むなら省略)
@@ -578,9 +494,9 @@ async function main() {
     .map((b) => ({ ...b, score: computeScore(b.sources) }))
     .sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
-      // tie-breaker: Spotify 順位優先、無ければ Apple
-      const aRank = a.sources.spotify ?? a.sources.apple ?? 9999;
-      const bRank = b.sources.spotify ?? b.sources.apple ?? 9999;
+      // tie-breaker: Apple 順位
+      const aRank = a.sources.apple ?? 9999;
+      const bRank = b.sources.apple ?? 9999;
       return aRank - bRank;
     });
 
