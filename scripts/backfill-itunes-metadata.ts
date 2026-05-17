@@ -265,32 +265,46 @@ function parseArgs() {
   const args = process.argv.slice(2);
   let limit: number | null = null;
   let dryRun = false;
+  // order: "recent" = created_at 降順 (新曲優先, iTunes ヒット率高)
+  //        "fame"   = fame_score 降順 NULLS LAST (有名曲優先)
+  let order: "recent" | "fame" = "recent";
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--limit") limit = parseInt(args[i + 1] ?? "0", 10);
     else if (args[i] === "--dry-run") dryRun = true;
+    else if (args[i] === "--order") {
+      const v = args[i + 1];
+      if (v === "fame" || v === "recent") order = v;
+    }
   }
-  return { limit, dryRun };
+  return { limit, dryRun, order };
 }
 
 async function main() {
-  const { limit, dryRun } = parseArgs();
+  const { limit, dryRun, order } = parseArgs();
   const supabase = createAdminClient();
   const processed = loadProcessedSongIds();
-  console.log(`resume cache: ${processed.size} song_ids already attempted`);
+  console.log(
+    `resume cache: ${processed.size} song_ids already attempted, order=${order}`,
+  );
 
-  // duration_ms IS NULL の曲を created_at 降順で取得 (新しい曲を優先)
+  // duration_ms IS NULL の曲を取得。
+  //   order=recent: created_at 降順 (新曲ほど iTunes JP ヒット率が高い)
+  //   order=fame:   fame_score 降順 NULLS LAST (有名曲のページを優先で埋める)
   const targets: SongRow[] = [];
   let offset = 0;
   const PAGE = 1000;
   for (;;) {
-    const { data, error } = await supabase
+    let query = supabase
       .from("songs")
       .select(
         "id, title, artist, release_year, duration_ms, image_url_medium, created_at",
       )
-      .is("duration_ms", null)
-      .order("created_at", { ascending: false })
-      .range(offset, offset + PAGE - 1);
+      .is("duration_ms", null);
+    query =
+      order === "fame"
+        ? query.order("fame_score", { ascending: false, nullsFirst: false })
+        : query.order("created_at", { ascending: false });
+    const { data, error } = await query.range(offset, offset + PAGE - 1);
     if (error) throw error;
     const rows = (data ?? []) as Array<SongRow & { created_at: string }>;
     for (const r of rows) {

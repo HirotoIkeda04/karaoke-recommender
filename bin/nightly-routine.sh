@@ -70,8 +70,11 @@ run_step "match:dam --max-new 400" \
 # Step 2: backfill:itunes-metadata (duration_ms / release_year / 画像欠損補完)
 # Spotify の /v1/tracks 制限・quota を回避し iTunes Search で duration を埋める。
 # iTunes は quota が緩いので 1 夜 500 件処理可能 (~29 分 @ 3.5s/req)。
-run_step "backfill:itunes-metadata --limit 500" \
-  node --import tsx scripts/backfill-itunes-metadata.ts --limit 500
+# --order fame: 有名曲 (fame_score 降順) を優先。有名曲のページ歯抜け
+# (duration 99.8% 欠損) を先に解消するため。fame 帯を埋め切ったら
+# NULLS LAST で自動的に無名曲へ移行する。
+run_step "backfill:itunes-metadata --order fame --limit 500" \
+  node --import tsx scripts/backfill-itunes-metadata.ts --order fame --limit 500
 
 # Step 3: 週次ランキング取得 (月曜のみ)
 # date +%u: 1=Mon ... 7=Sun。Spotify Top 50 + Apple Top 100 を合算して
