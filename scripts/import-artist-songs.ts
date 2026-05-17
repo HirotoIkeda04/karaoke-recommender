@@ -129,6 +129,35 @@ async function spotifyGet(token: string, url: URL): Promise<Response> {
   return res;
 }
 
+/**
+ * wanted アーティスト名を Spotify の artist ID に解決する。
+ * 邦楽アイドル等は Spotify 上で英字登録 (乃木坂46 → "Nogizaka46") のため
+ * 名前一致では track をフィルタできない。artist ID なら言語非依存で厳密。
+ * 最上位 1 件の artist ID のみ採用。top-2 まで取ると別アーティスト
+ * (例: =LOVE 検索の 2 位に FRUITS ZIPPER) が混入し track が誤って通る。
+ * idol グループ名は識別性が高いので Spotify の #1 結果は信頼できる。
+ * 取りこぼしは名前一致 fallback で拾う。
+ */
+async function resolveArtistSpotifyIds(
+  token: string,
+  artist: string,
+): Promise<Set<string>> {
+  const url = new URL(SPOTIFY_SEARCH_URL);
+  url.searchParams.set("q", artist);
+  url.searchParams.set("type", "artist");
+  url.searchParams.set("market", "JP");
+  url.searchParams.set("limit", "5");
+  const res = await spotifyGet(token, url);
+  const ids = new Set<string>();
+  if (!res.ok) return ids;
+  const json = (await res.json()) as {
+    artists?: { items: Array<{ id: string; name: string }> };
+  };
+  const top = json.artists?.items?.[0];
+  if (top) ids.add(top.id);
+  return ids;
+}
+
 async function searchTracksByArtist(
   token: string,
   artist: string,
@@ -227,14 +256,29 @@ async function main() {
     }
     totalCandidates += candidates.length;
 
-    // Filter: track の artists に wantedArtist が含まれるもの
+    // Spotify artist ID を解決 (言語跨ぎ救済: 乃木坂46 → "Nogizaka46")
+    let spotifyArtistIds = new Set<string>();
+    try {
+      spotifyArtistIds = await resolveArtistSpotifyIds(token, wantedArtist);
+      await sleep(INTERVAL_MS);
+      if (spotifyArtistIds.size > 0)
+        console.log(`  resolved artist ids: ${[...spotifyArtistIds].join(",")}`);
+    } catch (e) {
+      if (e instanceof QuotaExceededError) {
+        console.error(`  [QUOTA] aborting at artist resolve. Retry-After=${e.retryAfter}s`);
+        break;
+      }
+    }
+
+    // Filter: track の artists が解決済 ID を含む (第一) or 名前一致 (fallback)
     const wantedNorm = normalizeArtistName(wantedArtist);
-    const filtered = candidates.filter((t) =>
-      t.artists.some((a) => {
+    const matchesWanted = (a: { name: string; id: string }) =>
+      spotifyArtistIds.has(a.id) ||
+      (() => {
         const an = normalizeArtistName(a.name);
         return an === wantedNorm || an.includes(wantedNorm) || wantedNorm.includes(an);
-      }),
-    );
+      })();
+    const filtered = candidates.filter((t) => t.artists.some(matchesWanted));
 
     // Dedupe by track id (Spotify returns dupes across album versions)
     const seenId = new Set<string>();
@@ -257,10 +301,7 @@ async function main() {
     for (const t of targets) {
       // 候補の中で wantedArtist にマッチした artist 名を採用
       const matchedSpotifyName =
-        t.artists.find((a) => {
-          const an = normalizeArtistName(a.name);
-          return an === wantedNorm || an.includes(wantedNorm) || wantedNorm.includes(an);
-        })?.name ?? wantedArtist;
+        t.artists.find(matchesWanted)?.name ?? wantedArtist;
 
       const dupKey =
         normalizeArtistName(matchedSpotifyName) + "|" + normalizeTitle(t.name);
