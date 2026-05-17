@@ -98,8 +98,13 @@ def _fetch_null_range_songs(
     supabase_url: str,
     service_key: str,
     year_from: int | None = None,
+    order: str = "recent",
 ) -> list[dict]:
-    """release_year DESC で range_high_midi NULL 曲を全取得。
+    """range_high_midi NULL 曲を全取得。
+
+    order:
+        "recent" -> release_year.desc.nullslast,title.asc (新曲優先, 既定)
+        "fame"   -> fame_score.desc.nullslast,title.asc (有名曲のページを優先)
 
     year_from を指定すると release_year >= year_from のみに絞る。
     """
@@ -109,6 +114,11 @@ def _fetch_null_range_songs(
         "Accept": "application/json",
     }
     year_filter = f"&release_year=gte.{year_from}" if year_from else ""
+    order_clause = (
+        "fame_score.desc.nullslast,title.asc"
+        if order == "fame"
+        else "release_year.desc.nullslast,title.asc"
+    )
     out: list[dict] = []
     # PostgREST のページサイズ上限 (default 1000)。逐次取得。
     page_size = 1000
@@ -119,7 +129,7 @@ def _fetch_null_range_songs(
             f"select=id,title,artist,release_year,range_low_midi,range_high_midi,falsetto_max_midi"
             f"&range_high_midi=is.null"
             f"{year_filter}"
-            f"&order=release_year.desc.nullslast,title.asc"
+            f"&order={order_clause}"
             f"&limit={page_size}&offset={offset}"
         )
         resp = requests.get(url, headers=headers, timeout=30)
@@ -246,6 +256,7 @@ def run(
     limit: int | None = None,
     year_from: int | None = None,
     retry_misses: bool = False,
+    order: str = "recent",
 ) -> int:
     contact = require("SCRAPER_CONTACT_EMAIL")
     supabase_url, service_key = _load_env_supabase()
@@ -255,9 +266,13 @@ def run(
     cache_path = output_dir / "range_results_cache.jsonl"
     checkpoint_path = output_dir / "range_results.json"
 
-    songs = _fetch_null_range_songs(supabase_url, service_key, year_from=year_from)
-    logger.info("DB: %d songs need range data%s",
-                len(songs), f" (release_year >= {year_from})" if year_from else "")
+    songs = _fetch_null_range_songs(
+        supabase_url, service_key, year_from=year_from, order=order
+    )
+    logger.info("DB: %d songs need range data%s (order=%s)",
+                len(songs),
+                f" (release_year >= {year_from})" if year_from else "",
+                order)
     if limit:
         songs = songs[:limit]
         logger.info("--limit %d 適用", limit)
@@ -360,6 +375,10 @@ def main(argv: list[str] | None = None) -> int:
         help="この release_year 以降の曲のみ処理 (例: 2022)",
     )
     parser.add_argument(
+        "--order", default="recent", choices=["recent", "fame"],
+        help="recent=新曲優先(既定) / fame=有名曲(fame_score)優先",
+    )
+    parser.add_argument(
         "--retry-misses", action="store_true",
         help="対象曲のキャッシュ miss エントリを破棄して再試行 (新ソース投入時)",
     )
@@ -378,6 +397,7 @@ def main(argv: list[str] | None = None) -> int:
         limit=args.limit,
         year_from=args.year_from,
         retry_misses=args.retry_misses,
+        order=args.order,
     )
 
 
