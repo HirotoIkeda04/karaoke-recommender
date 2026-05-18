@@ -1,0 +1,340 @@
+/* 仮想モック専用スタイル。本採用が決まったら globals.css へ昇格させる想定。
+   方針: iOS Safari でも確実に出る範囲 (backdrop-filter + 鏡面ハイライト + 縁の光)
+   だけで Apple Liquid Glass の質感に寄せる。SVG 屈折フィルタは使わない。 */
+
+.page {
+  min-height: 100dvh;
+  background: #0a0a0c;
+  color: #fff;
+  padding: 2rem 1rem 4rem;
+}
+
+.heading {
+  max-width: 64rem;
+  margin: 0 auto 1.5rem;
+}
+
+.headingTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.headingSub {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.grid {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.col {
+  min-width: 0;
+}
+
+.colLabel {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.colLabelName {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.colLabelBadge {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.badgeOk {
+  background: rgba(52, 211, 153, 0.18);
+  color: #6ee7b7;
+}
+
+.badgeWarn {
+  background: rgba(251, 191, 36, 0.18);
+  color: #fcd34d;
+}
+
+/* ===== 端末フレーム ===== */
+.frame {
+  position: relative;
+  height: 660px;
+  border-radius: 2.25rem;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 30px 60px -20px rgba(0, 0, 0, 0.8);
+}
+
+/* スクロールして背景がガラス越しに動くのを見せる層 */
+.scrollArea {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 鮮やかな背景 (ガラスのブラー/彩度を見せるため意図的にカラフル) */
+.backdrop {
+  position: relative;
+  padding: 5.5rem 0.9rem 7rem;
+  background:
+    radial-gradient(circle at 18% 12%, #ff2d78 0, transparent 38%),
+    radial-gradient(circle at 82% 22%, #7c3aed 0, transparent 42%),
+    radial-gradient(circle at 30% 70%, #06b6d4 0, transparent 40%),
+    radial-gradient(circle at 75% 85%, #f59e0b 0, transparent 38%),
+    #18181b;
+}
+
+.songRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+}
+.songRow + .songRow {
+  margin-top: 0.15rem;
+}
+
+.jacket {
+  width: 3rem;
+  height: 3rem;
+  flex-shrink: 0;
+  border-radius: 0.4rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+.j1 { background: linear-gradient(135deg, #f43f5e, #f59e0b); }
+.j2 { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+.j3 { background: linear-gradient(135deg, #06b6d4, #3b82f6); }
+.j4 { background: linear-gradient(135deg, #22c55e, #84cc16); }
+.j5 { background: linear-gradient(135deg, #eab308, #f97316); }
+.j6 { background: linear-gradient(135deg, #6366f1, #06b6d4); }
+
+.songMeta { min-width: 0; flex: 1; }
+.songTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.songArtist {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.65);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== 自前 CSS Liquid Glass ===== */
+.glass {
+  --r: 1.25rem;
+  position: relative;
+  border-radius: var(--r);
+  /* レンズ本体: ブラー + 彩度 + わずかな明度持ち上げ */
+  backdrop-filter: blur(16px) saturate(180%) brightness(1.08);
+  -webkit-backdrop-filter: blur(16px) saturate(180%) brightness(1.08);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  /* 縁の鏡面 + 厚み (内側ハイライト/影) + 浮遊影 */
+  box-shadow:
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.55),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 10px 30px -8px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+/* 斜めの光沢スイープ (Apple Liquid Glass の動的ハイライト擬似) */
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.18) 42%,
+    rgba(255, 255, 255, 0.04) 55%,
+    transparent 72%
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* 上端の強いスペキュラ (ガラスの最も光る稜線) */
+.glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    120% 80% at 50% -20%,
+    rgba(255, 255, 255, 0.35) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+.glassHeader {
+  position: absolute;
+  top: 0.7rem;
+  left: 0.7rem;
+  right: 0.7rem;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 1rem;
+}
+
+.glassNav {
+  position: absolute;
+  bottom: 0.9rem;
+  left: 1.1rem;
+  right: 1.1rem;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 0.55rem 0.4rem;
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.35rem 0;
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+.navItemActive {
+  color: #fff;
+}
+
+.brand {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.headerBtn {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* フローティングのガラス操作チップ (評価ボタン群の例) */
+.dock {
+  position: absolute;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  --r: 999px;
+}
+.dockBtn {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+/* rdev 版でナビ行を流し込むための内側レイアウト */
+.navRowInner {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 100%;
+}
+
+/* rdev は中身を内包サイズで描画し位置追従するため、
+   absolute + flex 中央寄せの「浮遊ピル」枠に入れて静止させる。 */
+.rdevSlotTop {
+  position: absolute;
+  top: 1.5rem;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.rdevSlotBottom {
+  position: absolute;
+  bottom: 1.6rem;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.rdevHeaderInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  width: 15rem;
+  padding: 0 0.4rem;
+}
+.rdevNavInner {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 17rem;
+}
+
+.note {
+  max-width: 64rem;
+  margin: 1.75rem auto 0;
+  font-size: 0.75rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.55);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 1rem;
+}
+.note b { color: rgba(255, 255, 255, 0.85); }
+.note code {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.05rem 0.35rem;
+  border-radius: 0.3rem;
+}

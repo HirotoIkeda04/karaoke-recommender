@@ -12,6 +12,8 @@ const PUBLIC_PATHS = [
   "/friend",
   "/r",
   "/opengraph-image",
+  // Liquid Glass 移行検討用の仮想モック (ユーザーデータ無し・誰でも閲覧可)
+  "/liquid-glass",
 ] as const;
 
 export async function proxy(request: NextRequest) {
