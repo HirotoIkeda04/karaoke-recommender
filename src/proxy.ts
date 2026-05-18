@@ -1,4 +1,4 @@
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 import { updateSession } from "@/lib/supabase/middleware";
 
@@ -12,11 +12,24 @@ const PUBLIC_PATHS = [
   "/friend",
   "/r",
   "/opengraph-image",
-  // Liquid Glass 移行検討用の仮想モック (ユーザーデータ無し・誰でも閲覧可)
+  // Liquid Glass 移行検討用の参照モック。デプロイ環境では下で 404 にするため
+  // 実質ローカル dev 限定だが、dev ではログイン不要にしておく。
   "/liquid-glass",
 ] as const;
 
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // /liquid-glass は段階移行用の参照モック。コードは温存しつつ、
+  // デプロイ環境 (Vercel prod/preview, next start) では非表示にする。
+  // NODE_ENV はローカル `next dev` のみ "development"。
+  if (
+    process.env.NODE_ENV === "production" &&
+    (pathname === "/liquid-glass" || pathname.startsWith("/liquid-glass/"))
+  ) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   return updateSession(request, PUBLIC_PATHS);
 }
 
