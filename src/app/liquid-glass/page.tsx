@@ -1,15 +1,8 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { Check, Dumbbell, Home, LibraryBig, Search, Users, X } from "lucide-react";
 
 import styles from "./liquid-glass.module.css";
-
-// rdev 版は feDisplacementMap (SVG filter) を使うため SSR を無効化して
-// クライアントのみで描画する。これにより SSR 時の window 参照も回避。
-const LiquidGlass = dynamic(() => import("liquid-glass-react"), {
-  ssr: false,
-});
 
 const SONGS = [
   { t: "Lemon", a: "米津玄師", j: styles.j1 },
@@ -47,8 +40,7 @@ function Backdrop() {
   );
 }
 
-/* ===== A. 自前 CSS Liquid Glass ===== */
-function CssGlassMock() {
+function GlassMock() {
   return (
     <div className={styles.frame}>
       <div className={styles.scrollArea}>
@@ -87,113 +79,40 @@ function CssGlassMock() {
   );
 }
 
-/* ===== B. liquid-glass-react (rdev) ===== */
-function RdevGlassMock() {
-  return (
-    <div className={styles.frame}>
-      <div className={styles.scrollArea}>
-        <Backdrop />
-      </div>
-
-      <div className={styles.rdevSlotTop}>
-        <LiquidGlass
-          cornerRadius={20}
-          blurAmount={0.08}
-          saturation={170}
-          displacementScale={38}
-          aberrationIntensity={2}
-          elasticity={0}
-          padding="0.7rem 1.1rem"
-          mode="standard"
-        >
-          <div className={styles.rdevHeaderInner}>
-            <span className={styles.brand}>KyokuMoku</span>
-            <span className={styles.headerBtn}>ホームに追加</span>
-          </div>
-        </LiquidGlass>
-      </div>
-
-      <div className={styles.rdevSlotBottom}>
-        <LiquidGlass
-          cornerRadius={22}
-          blurAmount={0.08}
-          saturation={170}
-          displacementScale={52}
-          aberrationIntensity={2}
-          elasticity={0}
-          padding="0.55rem 0.9rem"
-          mode="standard"
-        >
-          <div className={styles.rdevNavInner}>
-            {NAV.map(({ label, Icon, active }) => (
-              <div
-                key={label}
-                className={`${styles.navItem} ${active ? styles.navItemActive : ""}`}
-              >
-                <Icon size={20} />
-                <span>{label}</span>
-              </div>
-            ))}
-          </div>
-        </LiquidGlass>
-      </div>
-    </div>
-  );
-}
-
 export default function LiquidGlassPreviewPage() {
   return (
     <div className={styles.page}>
       <div className={styles.heading}>
-        <div className={styles.headingTitle}>Liquid Glass 移行プレビュー</div>
+        <div className={styles.headingTitle}>Liquid Glass リファレンス</div>
         <p className={styles.headingSub}>
-          同じ KyokuMoku 画面 (ヘッダー / 評価ドック / ボトムナビ) を 2 方式で実装。
-          背景はガラスのブラー・彩度・屈折を見せるため意図的にカラフルにしています。
-          スクロールすると背景がガラス越しに動きます。
+          KyokuMoku の各サーフェス (ヘッダー / 評価ドック / ボトムナビ) を
+          自前 CSS Liquid Glass で実装した参照モック。背景はガラスのブラー・彩度を
+          見せるため意図的にカラフルにしています。スクロールすると背景が
+          ガラス越しに動きます。
           <br />
-          <b>実機 (iOS Safari / PWA) で必ず両方を見比べてください。</b>
-          rdev 版は実機では屈折が出ません。
+          <b>本アプリへ段階移行する際の見本</b>として残しています。
         </p>
       </div>
 
       <div className={styles.grid}>
         <div className={styles.col}>
           <div className={styles.colLabel}>
-            <span className={styles.colLabelName}>
-              A. 自前 CSS Liquid Glass
-            </span>
+            <span className={styles.colLabelName}>自前 CSS Liquid Glass</span>
             <span className={`${styles.colLabelBadge} ${styles.badgeOk}`}>
-              iOS Safari ◎ そのまま出荷可
+              iOS Safari ◎ 依存ゼロ
             </span>
           </div>
-          <CssGlassMock />
-        </div>
-
-        <div className={styles.col}>
-          <div className={styles.colLabel}>
-            <span className={styles.colLabelName}>
-              B. liquid-glass-react (rdev)
-            </span>
-            <span className={`${styles.colLabelBadge} ${styles.badgeWarn}`}>
-              Chrome ◎ / iOS Safari △ 屈折なし
-            </span>
-          </div>
-          <RdevGlassMock />
+          <GlassMock />
         </div>
       </div>
 
       <div className={styles.note}>
-        <b>判断材料:</b> A は <code>backdrop-filter: blur + saturate</code> に
-        鏡面ハイライト・極薄ボーダー・内側シャドウを重ねた自前実装。依存ゼロ・
-        iOS Safari で安定動作し、本アプリ (PWA) でそのまま採用できます。
-        B は <code>feDisplacementMap</code> による本物の屈折・色収差で、
-        デスクトップ Chrome では最も Apple に近い見た目ですが、
-        <b> Safari / Firefox では屈折が描画されず単なる blur に劣化</b>します
-        (公式 README に明記)。さらに B は <b>ガラス内のプレーンテキストが
-        displacement で歪み・視認性が落ちる</b> (上のヘッダーで「KyokuMoku」が
-        溶ける / ナビ文字が滲む) ため、文字主体の UI バーには不向きです。
-        本アプリの主ターゲットが iOS Safari PWA である以上、
-        実採用は A、B は質感の上限を知るための参考、という位置づけが現実的です。
+        <b>実装:</b> <code>backdrop-filter: blur + saturate</code> に
+        鏡面ハイライト・極薄ボーダー・内側シャドウを重ねた自前 CSS。
+        依存ゼロ・iOS Safari で安定動作し、コンポーネント単位で
+        既存 UI に段階適用できます。採用が固まったらこのスタイルを
+        <code>globals.css</code> / 共通コンポーネントへ昇格させ、
+        サーフェス単位で順次差し替えていく想定です。
       </div>
     </div>
   );
