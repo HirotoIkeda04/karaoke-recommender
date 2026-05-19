@@ -95,7 +95,7 @@ export function RatingControls({ songId, initialRating }: RatingControlsProps) {
         className={`inline-flex h-11 items-center gap-2 rounded-full pl-14 pr-16 text-sm font-medium transition disabled:opacity-50 ${
           activeRating
             ? `${activeRating.color} shadow-sm`
-            : "border border-zinc-300 text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
         }`}
       >
         {activeRating ? (
