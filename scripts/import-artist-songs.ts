@@ -71,11 +71,13 @@ function parseArgs() {
   const args = process.argv.slice(2);
   let file: string | null = null;
   let dryRun = false;
+  let max: number | null = null; // 1 アーティストあたり投入上限の上書き
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--file") file = args[i + 1] ?? null;
     else if (args[i] === "--dry-run") dryRun = true;
+    else if (args[i] === "--max") max = parseInt(args[i + 1] ?? "0", 10);
   }
-  return { file, dryRun };
+  return { file, dryRun, max };
 }
 
 function normalizeTitle(s: string): string {
@@ -161,9 +163,10 @@ async function resolveArtistSpotifyIds(
 async function searchTracksByArtist(
   token: string,
   artist: string,
+  pages: number = PAGES_PER_ARTIST,
 ): Promise<SpotifyTrack[]> {
   const all: SpotifyTrack[] = [];
-  for (let page = 0; page < PAGES_PER_ARTIST; page++) {
+  for (let page = 0; page < pages; page++) {
     const url = new URL(SPOTIFY_SEARCH_URL);
     url.searchParams.set("q", artist);
     url.searchParams.set("type", "track");
@@ -185,7 +188,13 @@ async function searchTracksByArtist(
 }
 
 async function main() {
-  const { file, dryRun } = parseArgs();
+  const { file, dryRun, max } = parseArgs();
+  const perArtistMax = max ?? MAX_PER_ARTIST;
+  // 候補数が perArtistMax を満たすよう取得ページ数を調整 (10件/ページ)。
+  const pagesNeeded = Math.max(
+    PAGES_PER_ARTIST,
+    Math.ceil((perArtistMax * 1.5) / PAGE_LIMIT),
+  );
   const path = resolve(process.cwd(), file ?? "scripts/wanted-artists.json");
   if (!existsSync(path)) throw new Error(`file not found: ${path}`);
   const wantedArtists = JSON.parse(readFileSync(path, "utf-8")) as string[];
@@ -245,7 +254,7 @@ async function main() {
     console.log(`\n=== ${wantedArtist} ===`);
     let candidates: SpotifyTrack[] = [];
     try {
-      candidates = await searchTracksByArtist(token, wantedArtist);
+      candidates = await searchTracksByArtist(token, wantedArtist, pagesNeeded);
     } catch (e) {
       if (e instanceof QuotaExceededError) {
         console.error(`  [QUOTA] aborting. Retry-After=${e.retryAfter}s`);
@@ -292,7 +301,7 @@ async function main() {
     );
 
     // Cap per artist
-    const targets = unique.slice(0, MAX_PER_ARTIST);
+    const targets = unique.slice(0, perArtistMax);
 
     // Resolve artist_id (DB の既存と照合 or 作成)
     let artistId: string | null =
