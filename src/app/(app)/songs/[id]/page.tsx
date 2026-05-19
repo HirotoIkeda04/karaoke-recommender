@@ -319,7 +319,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="歌詞ネットで歌詞を見る"
-          className="grid size-11 shrink-0 place-items-center rounded-full text-zinc-700 transition hover:bg-zinc-100 active:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:active:bg-zinc-800"
+          className="grid size-11 shrink-0 place-items-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
         >
           <ScrollText className="size-4" aria-hidden />
         </Link>
@@ -333,7 +333,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Spotify で聴く"
-            className="grid size-11 shrink-0 place-items-center rounded-full text-zinc-700 transition hover:bg-zinc-100 active:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:active:bg-zinc-800"
+            className="grid size-11 shrink-0 place-items-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
           >
             <Play className="ml-0.5 size-4 fill-current" aria-hidden />
           </Link>
