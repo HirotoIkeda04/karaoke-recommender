@@ -1,4 +1,4 @@
-import { Play } from "lucide-react";
+import { Play, ScrollText } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -329,6 +329,15 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
             <Play className="ml-0.5 size-4 fill-current" aria-hidden />
           </Link>
         ) : null}
+        <Link
+          href={`https://www.uta-net.com/search/?target=song&type=in&Keyword=${encodeURIComponent(song.title)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="歌詞ネットで歌詞を見る"
+          className="grid size-11 shrink-0 place-items-center rounded-full border-2 border-[#d4007a] bg-transparent text-[#d4007a] transition hover:scale-105 hover:bg-[#d4007a]/10"
+        >
+          <ScrollText className="size-4" aria-hidden />
+        </Link>
       </div>
 
       <section className="space-y-2">
