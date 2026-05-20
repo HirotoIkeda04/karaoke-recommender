@@ -81,7 +81,7 @@ export function ProfileHeader({
       {/* 上段: 名前 (左、大) + アバター (右、小)。
           スタッツは Instagram 風に名前のすぐ下の bio 1 行に muted で並べる */}
       <div className="flex items-center gap-3">
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className="flex min-w-0 flex-1 flex-col gap-1 pl-3">
           <p className="truncate font-[family-name:var(--font-noto-serif-jp)] text-2xl font-medium text-zinc-900 dark:text-zinc-50">
             {displayName}
           </p>
