@@ -230,7 +230,31 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-md space-y-6 px-4 pt-5">
+      <div className="relative">
+        {/* Spotify 風の反射グラデーション: ヒーロー画像を強めに blur したものを
+            下方向にフェードアウトさせ、画像の支配色がアーティスト名下に滲み出る効果 */}
+        {heroImage ? (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-72 overflow-hidden"
+          >
+            <div
+              className="absolute -inset-x-12 -top-24 bottom-0"
+              style={{
+                backgroundImage: `url("${heroImage}")`,
+                backgroundSize: "cover",
+                backgroundPosition: "center 80%",
+                filter: "blur(64px) saturate(1.4)",
+                WebkitMaskImage:
+                  "linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 100%)",
+                maskImage:
+                  "linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 100%)",
+              }}
+            />
+          </div>
+        ) : null}
+
+        <div className="relative mx-auto max-w-md space-y-6 px-4 pt-5">
         {genres.length > 0 ? (
           <div className="flex flex-wrap gap-1.5">
             {genres.map((g) => (
@@ -313,6 +337,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
             </ul>
           </section>
         ) : null}
+        </div>
       </div>
     </div>
   );
