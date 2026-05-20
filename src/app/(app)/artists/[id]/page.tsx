@@ -216,7 +216,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
             ♪
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/10 to-black/40" />
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-black/0 to-black/40" />
         <div className="absolute left-3 top-3 sm:left-4 sm:top-4">
           <BackButton variant="overlay" fallbackHref="/songs" />
         </div>
@@ -236,7 +236,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
         {heroImage ? (
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-72 overflow-hidden"
+            className="pointer-events-none absolute inset-x-0 top-0 h-24 overflow-hidden"
           >
             <div
               className="absolute -inset-x-12 -top-24 bottom-0"
