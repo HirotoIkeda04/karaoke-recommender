@@ -78,30 +78,24 @@ export function ProfileHeader({
 
   return (
     <section className="space-y-4">
-      {/* 上段: 名前 / スタッツ / アバター を同じ行に並べる */}
+      {/* 上段: 名前 (左、大) + アバター (右、小)。
+          スタッツは Instagram 風に名前のすぐ下の bio 1 行に muted で並べる */}
       <div className="flex items-center gap-3">
-        <p className="min-w-0 flex-1 truncate font-[family-name:var(--font-noto-serif-jp)] text-2xl font-medium text-zinc-900 dark:text-zinc-50">
-          {displayName}
-        </p>
-        <div className="flex shrink-0 flex-col items-center">
-          <span className="text-base font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
-            {ratedSongCount}
-          </span>
-          <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
-            曲評価
-          </span>
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <p className="truncate font-[family-name:var(--font-noto-serif-jp)] text-2xl font-medium text-zinc-900 dark:text-zinc-50">
+            {displayName}
+          </p>
+          <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+            <span className="tabular-nums">{ratedSongCount}</span> 曲評価
+            <span className="mx-1.5">·</span>
+            <Link
+              href="/friends"
+              className="transition hover:text-zinc-700 active:text-zinc-700 dark:hover:text-zinc-200 dark:active:text-zinc-200"
+            >
+              <span className="tabular-nums">{friendCount}</span> フレンド
+            </Link>
+          </p>
         </div>
-        <Link
-          href="/friends"
-          className="flex shrink-0 flex-col items-center transition active:opacity-70"
-        >
-          <span className="text-base font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
-            {friendCount}
-          </span>
-          <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
-            フレンド
-          </span>
-        </Link>
         <div
           className="flex size-14 shrink-0 items-center justify-center rounded-full text-xl font-semibold text-white"
           style={{ backgroundColor: avatarBg }}
