@@ -78,22 +78,14 @@ export function ProfileHeader({
 
   return (
     <section className="space-y-4">
-      {/* 上段: アバター + 表示名 / Insta 風の縦積みスタッツ */}
-      <div className="flex items-start gap-4">
-        <div
-          className="flex size-20 shrink-0 items-center justify-center rounded-full text-3xl font-semibold text-white"
-          style={{ backgroundColor: avatarBg }}
-          aria-label={`${displayName} のアイコン`}
-        >
-          {initial}
-        </div>
-
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <p className="truncate pl-[5%] text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+      {/* 上段: 表示名 (左) + スタッツ + アバター (右、小さめ) */}
+      <div className="flex items-center gap-4">
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <p className="truncate text-lg font-semibold text-zinc-900 dark:text-zinc-50">
             {displayName}
           </p>
 
-          <div className="grid grid-cols-4 items-center">
+          <div className="grid grid-cols-2 items-center">
             <div className="flex flex-col items-center">
               <span className="text-base font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
                 {ratedSongCount}
@@ -113,12 +105,15 @@ export function ProfileHeader({
                 フレンド
               </span>
             </Link>
-            {isSelf ? (
-              <div className="col-start-4 flex justify-center">
-                <SignOutButton />
-              </div>
-            ) : null}
           </div>
+        </div>
+
+        <div
+          className="flex size-16 shrink-0 items-center justify-center rounded-full text-2xl font-semibold text-white"
+          style={{ backgroundColor: avatarBg }}
+          aria-label={`${displayName} のアイコン`}
+        >
+          {initial}
         </div>
       </div>
 
@@ -147,7 +142,7 @@ export function ProfileHeader({
 
       {/* アクションボタン */}
       {isSelf ? (
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Link
             href="/profile/setup"
             className="flex-1 rounded-full bg-zinc-200 px-3 py-1.5 text-center text-[11px] font-medium text-zinc-700 hover:bg-zinc-300 active:bg-zinc-300 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:active:bg-zinc-800"
@@ -155,6 +150,7 @@ export function ProfileHeader({
             プロフィールを編集
           </Link>
           <ShareProfileButton />
+          <SignOutButton />
         </div>
       ) : friendUserId ? (
         <div className="flex gap-2">
