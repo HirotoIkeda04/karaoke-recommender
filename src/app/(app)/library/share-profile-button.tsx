@@ -73,7 +73,7 @@ export function ShareProfileButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex-1 rounded-full bg-zinc-200 px-3 py-1.5 text-[11px] font-medium text-zinc-700 hover:bg-zinc-300 active:bg-zinc-300 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600 dark:active:bg-zinc-600"
+        className="flex-1 rounded-full bg-zinc-200 px-3 py-1.5 text-[11px] font-medium text-zinc-700 hover:bg-zinc-300 active:bg-zinc-300 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:active:bg-zinc-800"
       >
         プロフィールをシェア
       </button>
