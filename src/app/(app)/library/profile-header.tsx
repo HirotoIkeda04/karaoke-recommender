@@ -150,7 +150,7 @@ export function ProfileHeader({
         <div className="flex gap-2">
           <Link
             href="/profile/setup"
-            className="flex-1 rounded-full bg-zinc-100 px-3 py-1.5 text-center text-[11px] font-medium text-zinc-700 hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
+            className="flex-1 rounded-full bg-zinc-200 px-3 py-1.5 text-center text-[11px] font-medium text-zinc-700 hover:bg-zinc-300 active:bg-zinc-300 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600 dark:active:bg-zinc-600"
           >
             プロフィールを編集
           </Link>
