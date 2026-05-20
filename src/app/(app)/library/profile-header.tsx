@@ -78,38 +78,32 @@ export function ProfileHeader({
 
   return (
     <section className="space-y-4">
-      {/* 上段: 表示名 (左) + スタッツ + アバター (右、小さめ) */}
-      <div className="flex items-center gap-4">
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <p className="truncate text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-            {displayName}
-          </p>
-
-          <div className="grid grid-cols-2 items-center">
-            <div className="flex flex-col items-center">
-              <span className="text-base font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
-                {ratedSongCount}
-              </span>
-              <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                曲評価
-              </span>
-            </div>
-            <Link
-              href="/friends"
-              className="flex flex-col items-center transition active:opacity-70"
-            >
-              <span className="text-base font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
-                {friendCount}
-              </span>
-              <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                フレンド
-              </span>
-            </Link>
-          </div>
+      {/* 上段: 名前 / スタッツ / アバター を同じ行に並べる */}
+      <div className="flex items-center gap-3">
+        <p className="min-w-0 flex-1 truncate font-[family-name:var(--font-noto-serif-jp)] text-2xl font-medium text-zinc-900 dark:text-zinc-50">
+          {displayName}
+        </p>
+        <div className="flex shrink-0 flex-col items-center">
+          <span className="text-base font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
+            {ratedSongCount}
+          </span>
+          <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
+            曲評価
+          </span>
         </div>
-
+        <Link
+          href="/friends"
+          className="flex shrink-0 flex-col items-center transition active:opacity-70"
+        >
+          <span className="text-base font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
+            {friendCount}
+          </span>
+          <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
+            フレンド
+          </span>
+        </Link>
         <div
-          className="flex size-16 shrink-0 items-center justify-center rounded-full text-2xl font-semibold text-white"
+          className="flex size-14 shrink-0 items-center justify-center rounded-full text-xl font-semibold text-white"
           style={{ backgroundColor: avatarBg }}
           aria-label={`${displayName} のアイコン`}
         >
