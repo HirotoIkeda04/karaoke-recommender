@@ -1,7 +1,7 @@
 /**
- * /library 遷移時の skeleton。
- * Insta 風プロフィールヘッダー (アバター + 4 col スタッツ + 推定音域 + 年代/ジャンル分布 + 編集/シェア) +
- * 4 タブ (下線スタイル) + ソート行 + SongCard リスト 5 件。
+ * /library 遷移時の skeleton。実 UI (profile-header / era-distribution /
+ * genre-distribution / rating-tabs / sortable-list) のレイアウトと
+ * 揃えるためのプレースホルダー。
  */
 export default function Loading() {
   return (
@@ -12,50 +12,64 @@ export default function Loading() {
     >
       {/* プロフィールヘッダー */}
       <section className="space-y-4">
-        {/* 上段: アバター + スタッツ */}
-        <div className="flex items-start gap-4">
-          <div className="size-20 shrink-0 animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800" />
+        {/* 上段: 名前+bio (左) + アバター (右, size-14) */}
+        <div className="flex items-center gap-3">
           <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <div className="ml-[5%] h-4 w-28 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-            <div className="grid grid-cols-4 items-center pt-1">
-              {[0, 1].map((i) => (
-                <div key={i} className="flex flex-col items-center gap-1">
-                  <div className="h-4 w-8 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-                  <div className="h-3 w-10 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-                </div>
-              ))}
-              <div />
-              <div className="col-start-4 flex justify-center">
-                <div className="size-8 animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800" />
-              </div>
-            </div>
+            {/* name (text-2xl ≒ h-7) */}
+            <div className="h-7 w-32 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+            {/* bio "N 曲評価 · M フレンド" */}
+            <div className="h-3 w-36 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+          </div>
+          <div className="size-14 shrink-0 animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800" />
+        </div>
+
+        {/* 推定音域: w-12 label + flex-1 値 */}
+        <div className="flex items-center gap-1.5">
+          <div className="h-3 w-12 shrink-0 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+          <div className="h-3 min-w-0 flex-1 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+        </div>
+
+        {/* 年代分布: w-12 label + バー (h-6), 凡例 (w-12 spacer + flex-1) */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-12 shrink-0 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+            <div className="h-6 min-w-0 flex-1 animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-800" />
+          </div>
+          <div className="flex gap-1.5">
+            <div className="w-12 shrink-0" aria-hidden />
+            <div className="h-3 min-w-0 flex-1 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
           </div>
         </div>
 
-        {/* 推定音域 / 年代分布 / ジャンル分布: 左 16px ラベル + 右 1fr 内容 */}
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="flex items-center gap-1.5">
-            <div className="h-3 w-16 shrink-0 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-            <div className="h-4 min-w-0 flex-1 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+        {/* ジャンル: 年代分布と同形 */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-12 shrink-0 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+            <div className="h-6 min-w-0 flex-1 animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-800" />
           </div>
-        ))}
+          <div className="flex gap-1.5">
+            <div className="w-12 shrink-0" aria-hidden />
+            <div className="h-3 min-w-0 flex-1 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+          </div>
+        </div>
 
-        {/* 編集 / シェア ボタン */}
-        <div className="flex gap-2">
+        {/* アクション: 編集 (flex-1) + シェア (flex-1) + サインアウト (h-8 アイコン) */}
+        <div className="flex items-center gap-2">
           <div className="h-7 flex-1 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
-          <div className="h-7 w-10 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
+          <div className="h-7 flex-1 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
+          <div className="size-8 shrink-0 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
         </div>
       </section>
 
-      {/* 4 タブ (下線スタイル) */}
+      {/* 4 タブ (アイコン + ラベル, gap-0.5 py-3) */}
       <div className="grid grid-cols-4 border-b border-zinc-200 dark:border-zinc-800">
         {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
-            className="flex flex-col items-center gap-1 px-2 py-3"
+            className="flex flex-col items-center gap-0.5 py-3"
           >
             <div className="size-4 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-            <div className="h-3 w-6 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+            <div className="h-3 w-12 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
           </div>
         ))}
       </div>
