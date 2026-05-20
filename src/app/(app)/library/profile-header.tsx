@@ -81,7 +81,7 @@ export function ProfileHeader({
       {/* 上段: 名前 (左、大) + アバター (右、小)。
           スタッツは Instagram 風に名前のすぐ下の bio 1 行に muted で並べる */}
       <div className="flex items-center gap-3">
-        <div className="flex min-w-0 flex-1 flex-col gap-1 pl-3">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
           <p className="truncate font-[family-name:var(--font-noto-serif-jp)] text-2xl font-medium text-zinc-900 dark:text-zinc-50">
             {displayName}
           </p>
@@ -107,11 +107,11 @@ export function ProfileHeader({
 
       {/* bio: 推定音域 */}
       {rangeLabel ? (
-        <div className="flex items-center gap-1.5">
-          <h3 className="w-16 shrink-0 whitespace-nowrap text-right text-[11px] font-medium text-zinc-500 dark:text-zinc-500">
+        <div className="space-y-1.5">
+          <h3 className="text-[11px] font-medium text-zinc-500 dark:text-zinc-500">
             推定音域
           </h3>
-          <p className="min-w-0 flex-1 font-mono text-[11px] text-zinc-600 dark:text-zinc-400">
+          <p className="font-mono text-[11px] text-zinc-600 dark:text-zinc-400">
             {rangeLabel}
             {falsettoLabel ? ` ・ ${falsettoLabel}` : ""}
           </p>

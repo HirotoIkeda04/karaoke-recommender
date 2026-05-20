@@ -25,7 +25,7 @@ export function GenreDistribution({ buckets }: Props) {
     return (
       <section className="space-y-2">
         <h3 className="text-[11px] font-medium text-zinc-500 dark:text-zinc-500">
-          ジャンル分布
+          ジャンル
         </h3>
         <p className="text-xs text-zinc-500 dark:text-zinc-500">
           「得意 / 練習中 / 普通」評価がまだありません
@@ -51,60 +51,52 @@ export function GenreDistribution({ buckets }: Props) {
   const restPct = (restCount / total) * 100;
 
   return (
-    <section className="space-y-2">
-      <div className="flex items-center gap-1.5">
-        <h3 className="w-16 shrink-0 whitespace-nowrap text-right text-[11px] font-medium text-zinc-500 dark:text-zinc-500">
-          ジャンル分布
-        </h3>
-        <div className="min-w-0 flex-1">
-          <BarChart
-            segments={[
-              ...top.map(([code, count], i) => {
-                const pct = (count / total) * 100;
-                return {
-                  key: code,
-                  value: count,
-                  colorClass: tealShadeColor(i),
-                  title: `${GENRE_LABELS[code]}: ${count}曲 (${pct.toFixed(0)}%)`,
-                };
-              }),
-              ...(restCount > 0
-                ? [
-                    {
-                      key: "rest",
-                      value: restCount,
-                      colorClass: REST_COLOR_CLASS,
-                      title: `${REST_LABEL}: ${restCount}曲 (${restPct.toFixed(0)}%) — ${rest
-                        .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
-                        .join(", ")}`,
-                    },
-                  ]
-                : []),
-            ]}
-          />
-        </div>
-      </div>
-
-      <div className="flex gap-1.5">
-        <div className="w-16 shrink-0" aria-hidden />
-        <ul className="flex min-w-0 flex-1 flex-wrap gap-x-3 gap-y-1 text-[11px]">
-          {top.map(([code, count], i) => (
-            <li key={code} className={tealShadeColor(i)}>
-              {GENRE_LABELS[code]} ({count})
-            </li>
-          ))}
-          {restCount > 0 && (
-            <li
-              className={REST_COLOR_CLASS}
-              title={rest
-                .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
-                .join(", ")}
-            >
-              {REST_LABEL} ({restCount})
-            </li>
-          )}
-        </ul>
-      </div>
+    <section className="space-y-1.5">
+      <h3 className="text-[11px] font-medium text-zinc-500 dark:text-zinc-500">
+        ジャンル
+      </h3>
+      <BarChart
+        segments={[
+          ...top.map(([code, count], i) => {
+            const pct = (count / total) * 100;
+            return {
+              key: code,
+              value: count,
+              colorClass: tealShadeColor(i),
+              title: `${GENRE_LABELS[code]}: ${count}曲 (${pct.toFixed(0)}%)`,
+            };
+          }),
+          ...(restCount > 0
+            ? [
+                {
+                  key: "rest",
+                  value: restCount,
+                  colorClass: REST_COLOR_CLASS,
+                  title: `${REST_LABEL}: ${restCount}曲 (${restPct.toFixed(0)}%) — ${rest
+                    .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
+                    .join(", ")}`,
+                },
+              ]
+            : []),
+        ]}
+      />
+      <ul className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
+        {top.map(([code, count], i) => (
+          <li key={code} className={tealShadeColor(i)}>
+            {GENRE_LABELS[code]} ({count})
+          </li>
+        ))}
+        {restCount > 0 && (
+          <li
+            className={REST_COLOR_CLASS}
+            title={rest
+              .map(([code, c]) => `${GENRE_LABELS[code]} ${c}`)
+              .join(", ")}
+          >
+            {REST_LABEL} ({restCount})
+          </li>
+        )}
+      </ul>
     </section>
   );
 }
