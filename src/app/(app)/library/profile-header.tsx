@@ -107,11 +107,11 @@ export function ProfileHeader({
 
       {/* bio: 推定音域 */}
       {rangeLabel ? (
-        <div className="space-y-1.5">
-          <h3 className="text-[11px] font-medium text-zinc-500 dark:text-zinc-500">
+        <div className="flex items-center gap-1.5">
+          <h3 className="w-16 shrink-0 whitespace-nowrap text-[11px] font-medium text-zinc-500 dark:text-zinc-500">
             推定音域
           </h3>
-          <p className="font-mono text-[11px] text-zinc-600 dark:text-zinc-400">
+          <p className="min-w-0 flex-1 font-mono text-[11px] text-zinc-600 dark:text-zinc-400">
             {rangeLabel}
             {falsettoLabel ? ` ・ ${falsettoLabel}` : ""}
           </p>
