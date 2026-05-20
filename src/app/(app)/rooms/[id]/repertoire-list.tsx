@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { deterministicIconColor, resolveIconColor } from "@/lib/icon-color";
+import { iconBackgroundStyleOrAuto } from "@/lib/icon-color";
 
 export interface RepertoireItem {
   songId: string;
@@ -143,17 +143,15 @@ function SingerAvatars({
       {visible.map((id) => {
         const profile = profileMap[id];
         const name = profile?.name ?? "?";
-        // ユーザー選択色を優先。未設定なら user_id ハッシュで自動色を決定
-        const bg = profile?.iconColor
-          ? resolveIconColor(profile.iconColor)
-          : deterministicIconColor(id);
+        // ユーザー選択 (ソリッド/グラデ) を優先。未設定なら user_id ハッシュで自動色
+        const style = iconBackgroundStyleOrAuto(profile?.iconColor, id);
         return (
           <div
             key={id}
             title={name}
             aria-label={name}
             className="flex size-7 items-center justify-center rounded-full border-2 border-white text-[11px] font-semibold text-white dark:border-zinc-900"
-            style={{ backgroundColor: bg }}
+            style={style}
           >
             {initialOf(name)}
           </div>

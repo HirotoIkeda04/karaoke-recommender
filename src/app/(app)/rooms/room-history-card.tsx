@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ChevronRight, Star } from "lucide-react";
 
-import { resolveIconColor } from "@/lib/icon-color";
+import { iconBackgroundStyle } from "@/lib/icon-color";
 import { RoomDateLabel } from "./room-date-label";
 
 export interface HistoryCardParticipant {
@@ -43,15 +43,15 @@ function AvatarStack({
   return (
     <div className="flex shrink-0 -space-x-1.5">
       {visible.map((p, i) => {
-        const color = p.userId
-          ? resolveIconColor(p.iconColor)
-          : "#71717a"; // ゲストは zinc グレー
+        const style = p.userId
+          ? iconBackgroundStyle(p.iconColor)
+          : { backgroundColor: "#71717a" }; // ゲストは zinc グレー
         const label = p.isSelf ? `${p.name} (自分)` : p.name;
         return (
           <span
             key={i}
             className="flex size-7 items-center justify-center rounded-full text-xs font-semibold text-white ring-2 ring-white dark:ring-zinc-900"
-            style={{ backgroundColor: color }}
+            style={style}
             title={label}
             aria-label={label}
           >

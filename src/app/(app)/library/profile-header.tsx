@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import type { GenreCode } from "@/lib/genres";
-import { resolveIconColor } from "@/lib/icon-color";
+import { iconBackgroundStyle } from "@/lib/icon-color";
 import { midiToKaraoke } from "@/lib/note";
 
 import { SignOutButton } from "@/components/sign-out-button";
@@ -58,7 +58,7 @@ export function ProfileHeader({
   friendUserId,
 }: Props) {
   const initial = firstGrapheme(displayName);
-  const avatarBg = resolveIconColor(iconColor);
+  const avatarStyle = iconBackgroundStyle(iconColor);
   const showEstimate =
     voiceEstimate &&
     (voiceEstimate.easy_count ?? 0) >= minEasyForEstimate &&
@@ -98,7 +98,7 @@ export function ProfileHeader({
         </div>
         <div
           className="flex size-14 shrink-0 items-center justify-center rounded-full text-xl font-semibold text-white"
-          style={{ backgroundColor: avatarBg }}
+          style={avatarStyle}
           aria-label={`${displayName} のアイコン`}
         >
           {initial}

@@ -6,7 +6,10 @@ import { Button } from "@/components/ui/button";
 import {
   DEFAULT_ICON_COLOR,
   ICON_COLOR_PALETTE,
-  resolveIconColor,
+  ICON_GRADIENT_PALETTE,
+  gradientToken,
+  iconBackgroundStyle,
+  isIconColor,
 } from "@/lib/icon-color";
 
 import { updateProfile } from "./actions";
@@ -31,7 +34,7 @@ function firstGrapheme(name: string): string {
 export function ProfileForm({ initialName, initialColor, next }: Props) {
   const [name, setName] = useState(initialName);
   const [color, setColor] = useState<string>(
-    resolveIconColor(initialColor) ?? DEFAULT_ICON_COLOR,
+    isIconColor(initialColor) ? (initialColor as string) : DEFAULT_ICON_COLOR,
   );
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -94,7 +97,7 @@ export function ProfileForm({ initialName, initialColor, next }: Props) {
         <div className="flex items-center gap-3">
           <div
             className="flex size-16 shrink-0 items-center justify-center rounded-full text-2xl font-semibold text-white"
-            style={{ backgroundColor: color }}
+            style={iconBackgroundStyle(color)}
             aria-label="アイコンプレビュー"
           >
             {initial}
@@ -129,6 +132,40 @@ export function ProfileForm({ initialName, initialColor, next }: Props) {
               />
             );
           })}
+        </div>
+
+        <div className="space-y-2 pt-2">
+          <p className="text-xs font-medium text-zinc-500 dark:text-zinc-500">
+            グラデーション
+          </p>
+          <div
+            role="radiogroup"
+            aria-label="アイコンのグラデーション"
+            className="grid grid-cols-4 gap-3"
+          >
+            {ICON_GRADIENT_PALETTE.map((g) => {
+              const token = gradientToken(g.id);
+              const selected = token === color;
+              return (
+                <button
+                  key={g.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  aria-label={g.name}
+                  title={g.name}
+                  onClick={() => setColor(token)}
+                  className={
+                    "aspect-square w-full rounded-full transition active:scale-95 " +
+                    (selected
+                      ? "ring-2 ring-offset-2 ring-zinc-900 ring-offset-white dark:ring-zinc-50 dark:ring-offset-zinc-950"
+                      : "")
+                  }
+                  style={{ backgroundImage: g.css }}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
 
