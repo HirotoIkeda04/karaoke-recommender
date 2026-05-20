@@ -256,16 +256,11 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
 
         <div className="relative mx-auto max-w-md space-y-6 px-4 pt-5">
         {genres.length > 0 ? (
-          <div className="flex flex-wrap gap-1.5">
+          <p className="flex flex-wrap gap-x-2 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">
             {genres.map((g) => (
-              <span
-                key={g}
-                className="rounded-full bg-zinc-100 px-2.5 py-1 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
-              >
-                {GENRE_LABELS[g as GenreCode] ?? g}
-              </span>
+              <span key={g}>#{GENRE_LABELS[g as GenreCode] ?? g}</span>
             ))}
-          </div>
+          </p>
         ) : null}
 
         {popular.length > 0 ? (
