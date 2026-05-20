@@ -244,7 +244,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
                 backgroundImage: `url("${heroImage}")`,
                 backgroundSize: "cover",
                 backgroundPosition: "center 80%",
-                filter: "blur(64px) saturate(1.4)",
+                filter: "blur(64px) saturate(1.4) brightness(0.45)",
                 WebkitMaskImage:
                   "linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 100%)",
                 maskImage:
