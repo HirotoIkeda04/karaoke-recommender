@@ -79,7 +79,7 @@ export function SongCard({
 
   return (
     <Wrapper>
-      <div className="relative size-12 shrink-0 overflow-hidden rounded-sm bg-white dark:bg-zinc-900">
+      <div className="relative size-12 shrink-0 overflow-hidden rounded-xs bg-white dark:bg-zinc-900">
         {image ? (
           <JacketImage
             src={image}

@@ -11,7 +11,7 @@ export default function Loading() {
     >
       <div className="space-y-2">
         {/* ジャケット (3/5 幅, max 14rem, 中央寄せ) */}
-        <div className="mx-auto mt-2 aspect-square w-3/5 max-w-[14rem] animate-pulse rounded-sm bg-zinc-200 dark:bg-zinc-800" />
+        <div className="mx-auto mt-2 aspect-square w-3/5 max-w-[14rem] animate-pulse rounded-xs bg-zinc-200 dark:bg-zinc-800" />
 
         {/* 曲名 + アーティスト (中央寄せ) */}
         <div className="space-y-2 text-center">

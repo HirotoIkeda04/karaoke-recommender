@@ -34,7 +34,7 @@ export default function Loading() {
           <ul>
             {[0, 1, 2, 3, 4].map((i) => (
               <li key={i} className="flex items-center gap-3 p-2">
-                <div className="size-12 shrink-0 animate-pulse rounded-sm bg-zinc-200 dark:bg-zinc-800" />
+                <div className="size-12 shrink-0 animate-pulse rounded-xs bg-zinc-200 dark:bg-zinc-800" />
                 <div className="min-w-0 flex-1 space-y-1.5">
                   <div className="h-3.5 w-2/3 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
                   <div className="h-3 w-1/2 animate-pulse rounded bg-zinc-100 dark:bg-zinc-800" />
@@ -50,7 +50,7 @@ export default function Loading() {
           <ul>
             {[0, 1, 2, 3, 4].map((i) => (
               <li key={i} className="flex items-center gap-3 p-2">
-                <div className="size-12 shrink-0 animate-pulse rounded-sm bg-zinc-200 dark:bg-zinc-800" />
+                <div className="size-12 shrink-0 animate-pulse rounded-xs bg-zinc-200 dark:bg-zinc-800" />
                 <div className="min-w-0 flex-1 space-y-1.5">
                   <div className="h-3.5 w-2/3 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
                   <div className="h-3 w-1/2 animate-pulse rounded bg-zinc-100 dark:bg-zinc-800" />
