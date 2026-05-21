@@ -1,8 +1,9 @@
 "use client";
 
-import { Check, Dumbbell, Minus, X } from "lucide-react";
+import { Check, Minus, X } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 
+import { DumbbellMini } from "@/components/icons/dumbbell-mini";
 import type { Database } from "@/types/database";
 
 import { rateSong, unrateSong } from "../../actions";
@@ -18,7 +19,7 @@ const RATINGS: ReadonlyArray<{
   { value: "hard", label: "苦手", Icon: X, color: "bg-red-500 text-white" },
   { value: "medium", label: "普通", Icon: Minus, color: "bg-yellow-500 text-white" },
   { value: "easy", label: "得意", Icon: Check, color: "bg-emerald-500 text-white" },
-  { value: "practicing", label: "練習中", Icon: Dumbbell, color: "bg-purple-500 text-white" },
+  { value: "practicing", label: "練習中", Icon: DumbbellMini, color: "bg-purple-500 text-white" },
 ];
 
 const RATING_LABELS: Record<Rating, string> = RATINGS.reduce(

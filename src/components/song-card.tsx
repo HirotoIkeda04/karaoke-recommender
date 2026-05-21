@@ -1,6 +1,7 @@
-import { Check, Dumbbell, Headphones, Minus, X } from "lucide-react";
+import { Check, Headphones, Minus, X } from "lucide-react";
 import Link from "next/link";
 
+import { DumbbellMini } from "@/components/icons/dumbbell-mini";
 import { JacketImage } from "@/components/ui/jacket-image";
 import { formatDuration, midiToKaraoke, noteChipColor } from "@/lib/note";
 import type { Database } from "@/types/database";
@@ -41,7 +42,7 @@ const RATING_BADGE: Record<
   practicing: {
     label: "練習中",
     color: "bg-purple-600 dark:bg-purple-500",
-    Icon: Dumbbell,
+    Icon: DumbbellMini,
   },
 };
 
