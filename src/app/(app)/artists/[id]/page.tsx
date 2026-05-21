@@ -216,7 +216,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
             ♪
           </div>
         )}
-        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-black/0 to-black/40" />
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-black/0 to-black/60" />
         <div className="absolute left-3 top-3 sm:left-4 sm:top-4">
           <BackButton variant="overlay" fallbackHref="/songs" />
         </div>
