@@ -2,7 +2,7 @@ import { Check, Dumbbell, Headphones, Minus, X } from "lucide-react";
 import Link from "next/link";
 
 import { JacketImage } from "@/components/ui/jacket-image";
-import { midiToKaraoke } from "@/lib/note";
+import { formatDuration, midiToKaraoke, noteChipColor } from "@/lib/note";
 import type { Database } from "@/types/database";
 
 type Song = Pick<
@@ -14,6 +14,7 @@ type Song = Pick<
   | "range_low_midi"
   | "range_high_midi"
   | "falsetto_max_midi"
+  | "duration_ms"
   | "image_url_small"
   | "image_url_medium"
 >;
@@ -61,6 +62,15 @@ export function SongCard({
 }: SongCardProps) {
   const badge = rating ? RATING_BADGE[rating] : null;
   const image = song.image_url_small ?? song.image_url_medium;
+  const durationLabel = formatDuration(song.duration_ms);
+  const highNote = song.range_high_midi;
+  const noteChip =
+    highNote != null
+      ? {
+          label: midiToKaraoke(highNote),
+          ...noteChipColor(highNote),
+        }
+      : null;
 
   const Wrapper = linkable
     ? ({ children }: { children: React.ReactNode }) => (
@@ -96,34 +106,51 @@ export function SongCard({
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-          {song.title}
-        </p>
-        <div className="flex items-center gap-1 text-xs text-zinc-600 dark:text-zinc-400">
-          {badge ? (
+        {/* タイトル行: 左 タイトル / 右 地声最高音チップ */}
+        <div className="flex items-center gap-2">
+          <p className="min-w-0 flex-1 truncate text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+            {song.title}
+          </p>
+          {noteChip ? (
             <span
-              className={`inline-flex size-2.5 shrink-0 items-center justify-center rounded-[2px] ${badge.color}`}
-              aria-label={badge.label}
+              className="shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold tabular-nums"
+              style={{
+                backgroundColor: noteChip.background,
+                color: noteChip.foreground,
+              }}
+              aria-label={`地声最高音 ${noteChip.label}`}
             >
-              <badge.Icon
-                className="size-2 text-white dark:text-zinc-950"
-                strokeWidth={rating === "practicing" ? 2.5 : 4}
-                aria-hidden
-              />
+              {noteChip.label}
             </span>
           ) : null}
-          {isKnown ? (
-            <Headphones
-              className="size-3 shrink-0 text-emerald-500"
-              aria-label="Spotify で聴いたことがある曲"
-            />
+        </div>
+
+        {/* アーティスト行: 左 評価アイコン + アーティスト名 / 右 曲長 */}
+        <div className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400">
+          <div className="flex min-w-0 flex-1 items-center gap-1">
+            {badge ? (
+              <span
+                className={`inline-flex size-3 shrink-0 items-center justify-center rounded-full ${badge.color}`}
+                aria-label={badge.label}
+              >
+                <badge.Icon
+                  className="size-2 text-white dark:text-zinc-950"
+                  strokeWidth={rating === "practicing" ? 2.5 : 4}
+                  aria-hidden
+                />
+              </span>
+            ) : null}
+            {isKnown ? (
+              <Headphones
+                className="size-3 shrink-0 text-emerald-500"
+                aria-label="Spotify で聴いたことがある曲"
+              />
+            ) : null}
+            <p className="truncate">{song.artist}</p>
+          </div>
+          {durationLabel ? (
+            <span className="shrink-0 tabular-nums">{durationLabel}</span>
           ) : null}
-          <p className="truncate">
-            {song.artist}
-            {song.range_high_midi !== null
-              ? ` · ~ ${midiToKaraoke(song.range_high_midi)}`
-              : ""}
-          </p>
         </div>
       </div>
     </Wrapper>

@@ -39,7 +39,7 @@ export default async function GenreSongsPage({ params }: GenrePageProps) {
     .filter((id): id is string => !!id);
 
   const songSelect =
-    "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, fame_score, spotify_popularity";
+    "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, duration_ms, fame_score, spotify_popularity";
 
   const [byArtistRes, byTagRes] = await Promise.all([
     artistIds.length > 0

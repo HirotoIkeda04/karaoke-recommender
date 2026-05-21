@@ -17,6 +17,7 @@ type Song = Pick<
   | "image_url_small"
   | "image_url_medium"
   | "image_url_large"
+  | "duration_ms"
   | "fame_score"
   | "cert_score"
 >;

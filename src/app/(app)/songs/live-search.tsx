@@ -29,6 +29,7 @@ type Song = Pick<
   | "falsetto_max_midi"
   | "image_url_small"
   | "image_url_medium"
+  | "duration_ms"
 >;
 
 interface ArtistResult extends ArtistRowData {
@@ -656,6 +657,7 @@ function HistoryList({
                         falsetto_max_midi: null,
                         image_url_small: item.image,
                         image_url_medium: null,
+                        duration_ms: null,
                       })
                   : undefined
               }
@@ -672,6 +674,7 @@ function HistoryList({
                     falsetto_max_midi: null,
                     image_url_small: item.image,
                     image_url_medium: null,
+                    duration_ms: null,
                   }}
                   rating={ratings[item.id] ?? null}
                   isKnown={knownSet.has(item.id)}

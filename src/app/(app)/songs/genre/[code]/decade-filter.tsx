@@ -17,6 +17,7 @@ type Song = Pick<
   | "falsetto_max_midi"
   | "image_url_small"
   | "image_url_medium"
+  | "duration_ms"
 >;
 
 interface DecadeFilterProps {

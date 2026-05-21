@@ -32,6 +32,7 @@ type SongRow = Pick<
   | "falsetto_max_midi"
   | "image_url_small"
   | "image_url_medium"
+  | "duration_ms"
 >;
 
 function formatWeekRange(weekStart: string): string {
@@ -86,7 +87,7 @@ export default async function RankingsPage() {
     const { data: songs } = await supabase
       .from("songs")
       .select(
-        "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium",
+        "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, duration_ms",
       )
       .in("id", songIds);
     for (const s of (songs ?? []) as SongRow[]) songsById.set(s.id, s);

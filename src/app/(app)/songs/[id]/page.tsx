@@ -24,6 +24,7 @@ type SimilarSong = Pick<
   | "falsetto_max_midi"
   | "image_url_small"
   | "image_url_medium"
+  | "duration_ms"
 >;
 
 const SIMILAR_RANGE_WINDOW = 12;
@@ -58,7 +59,7 @@ async function fetchSimilarSongs(
   highMidi: number,
 ) {
   const select =
-    "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, fame_score, genres";
+    "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, duration_ms, fame_score, genres";
 
   // 音域ウィンドウ内に絞った上で「同じアーティスト」「かなりの有名曲」
   // 「同系統ジャンル」を別々に引いてマージする。どれにも当てはまらない
@@ -148,7 +149,7 @@ async function fetchRatedSimilarSongs(
       song:songs (
         id, title, artist, release_year,
         range_low_midi, range_high_midi, falsetto_max_midi,
-        image_url_small, image_url_medium
+        image_url_small, image_url_medium, duration_ms
       )
     `,
     )

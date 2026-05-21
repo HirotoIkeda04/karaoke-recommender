@@ -23,6 +23,7 @@ type Song = Pick<
   | "image_url_small"
   | "image_url_medium"
   | "image_url_large"
+  | "duration_ms"
   | "fame_score"
   | "cert_score"
 >;
@@ -52,7 +53,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
     supabase
       .from("songs")
       .select(
-        "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, image_url_large, fame_score, cert_score",
+        "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, image_url_large, duration_ms, fame_score, cert_score",
       )
       .eq("artist_id", id),
     getUserKnownSongIds(),

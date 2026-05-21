@@ -147,6 +147,9 @@ export default async function FriendLibraryPage({
         falsetto_max_midi: row.song_falsetto_max_midi,
         image_url_small: row.song_image_url_small,
         image_url_medium: row.song_image_url_medium,
+        // フレンドの library RPC は duration_ms を返さないため null フォールバック。
+        // 必要なら 030 系の RPC を拡張する。
+        duration_ms: null,
       },
     });
   }

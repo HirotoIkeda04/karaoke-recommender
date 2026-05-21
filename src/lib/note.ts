@@ -45,3 +45,41 @@ export function midiToKaraoke(midi: number | null | undefined): string {
 export function karaokeToMidi(notation: string): number | null {
   return NOTE_TABLE[notation] ?? null;
 }
+
+// 地声最高音 (MIDI) を音域別の OKLCH 背景色 + 暗めの文字色に変換する。
+// Spotify Camelot wheel 風のカラフルチップ用。低い音は寒色、高い音ほど
+// 暖色〜マゼンタへと変化させ、人がパッと見て高低を区別できるようにする。
+// 区切りはカラオケで実用的な男声/女声レンジを考慮して 8 段階。
+export function noteChipColor(midi: number): {
+  background: string;
+  foreground: string;
+} {
+  // 連続的な印象を与えつつ、隣り合うバンドは同じ色 (近い高さは同色)。
+  // chroma は 0.10〜0.16 で控えめにし、白文字でも黒文字でも読める明度
+  // 0.78〜0.90 をキープ。
+  if (midi < 56) return chip(245); // < mid1G#: 深めの低音 → 青
+  if (midi < 60) return chip(220); // mid1G#-mid2C: 低音 → スカイ
+  if (midi < 66) return chip(195); // mid2C-mid2F#: 中低 → シアン
+  if (midi < 70) return chip(165); // mid2F#-hiA#: 中音 → 緑寄り
+  if (midi < 73) return chip(130); // hiA#-hiC: 中高 → ライム
+  if (midi < 76) return chip(85);  // hiC-hiE: 高音 → 黄
+  if (midi < 79) return chip(45);  // hiE-hiF#: 高音 → オレンジ
+  if (midi < 82) return chip(15);  // hiF#-hiA#: 超高音 → 朱
+  return chip(340);                // hiA# 以上: ハイトーン → マゼンタ
+}
+
+function chip(hue: number): { background: string; foreground: string } {
+  // 明度 0.86 + 中程度の彩度。Spotify Camelot 風の柔らかい色味。
+  return {
+    background: `oklch(0.86 0.13 ${hue})`,
+    // 文字は dark zinc。低明度なので明色背景に対して十分なコントラスト。
+    foreground: "oklch(0.25 0.02 260)",
+  };
+}
+
+// duration_ms → "m:ss" 表示。
+export function formatDuration(ms: number | null | undefined): string {
+  if (ms == null || ms <= 0) return "";
+  const sec = Math.round(ms / 1000);
+  return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
+}
