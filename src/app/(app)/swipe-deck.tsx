@@ -23,7 +23,7 @@ import { startTransition, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { JacketImage } from "@/components/ui/jacket-image";
 import { triggerHaptic } from "@/lib/haptics";
-import { midiToKaraoke } from "@/lib/note";
+import { midiToKaraoke, noteChipColor } from "@/lib/note";
 import type { Database } from "@/types/database";
 
 import { markSkipped, rateSong, unrateSong } from "./actions";
@@ -735,11 +735,27 @@ function SongCardContent({
           <dt className="text-zinc-300">地声</dt>
           <dd className="font-mono text-zinc-100">
             {midiToKaraoke(song.range_low_midi)} 〜{" "}
-            {midiToKaraoke(song.range_high_midi)}
+            {song.range_high_midi != null ? (
+              <span
+                style={{ color: noteChipColor(song.range_high_midi).background }}
+              >
+                {midiToKaraoke(song.range_high_midi)}
+              </span>
+            ) : (
+              midiToKaraoke(song.range_high_midi)
+            )}
           </dd>
           <dt className="text-zinc-300">裏声</dt>
           <dd className="font-mono text-zinc-100">
-            {midiToKaraoke(song.falsetto_max_midi)}
+            {song.falsetto_max_midi != null ? (
+              <span
+                style={{ color: noteChipColor(song.falsetto_max_midi).background }}
+              >
+                {midiToKaraoke(song.falsetto_max_midi)}
+              </span>
+            ) : (
+              midiToKaraoke(song.falsetto_max_midi)
+            )}
           </dd>
         </dl>
       </div>
