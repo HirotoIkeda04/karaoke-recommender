@@ -113,7 +113,7 @@ export function SongCard({
           </p>
           {noteChip ? (
             <span
-              className="shrink-0 rounded-sm px-1.5 py-0.5 text-[10px] font-semibold tabular-nums"
+              className="shrink-0 rounded-sm px-1.5 py-px text-[10px] font-semibold tabular-nums"
               style={{
                 backgroundColor: noteChip.background,
                 color: noteChip.foreground,
