@@ -221,7 +221,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
           <BackButton variant="overlay" fallbackHref="/songs" />
         </div>
         <div className="absolute inset-x-0 bottom-0 px-4 pb-2 sm:px-6 sm:pb-3">
-          <h1 className="text-3xl font-bold leading-tight text-white drop-shadow-md sm:text-4xl">
+          <h1 className="text-4xl font-bold leading-tight text-white drop-shadow-md sm:text-5xl">
             {artist.name}
           </h1>
         </div>
