@@ -224,9 +224,6 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
           <h1 className="text-3xl font-bold leading-tight text-white drop-shadow-md sm:text-4xl">
             {artist.name}
           </h1>
-          <p className="mt-1 text-sm text-white/85 drop-shadow">
-            {songCount.toLocaleString()} 曲
-          </p>
         </div>
       </div>
 
@@ -255,13 +252,12 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
         ) : null}
 
         <div className="relative mx-auto max-w-md space-y-6 px-4 pt-5">
-        {genres.length > 0 ? (
-          <p className="flex flex-wrap gap-x-2 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">
-            {genres.map((g) => (
-              <span key={g}>#{GENRE_LABELS[g as GenreCode] ?? g}</span>
-            ))}
-          </p>
-        ) : null}
+        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">
+          <span className="tabular-nums">{songCount.toLocaleString()} 曲</span>
+          {genres.map((g) => (
+            <span key={g}>#{GENRE_LABELS[g as GenreCode] ?? g}</span>
+          ))}
+        </p>
 
         {popular.length > 0 ? (
           <section>
