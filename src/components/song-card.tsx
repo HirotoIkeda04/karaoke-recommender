@@ -149,7 +149,9 @@ export function SongCard({
             <p className="truncate">{song.artist}</p>
           </div>
           {durationLabel ? (
-            <span className="shrink-0 tabular-nums">{durationLabel}</span>
+            <span className="shrink-0 text-[11px] tabular-nums text-zinc-500 dark:text-zinc-500">
+              {durationLabel}
+            </span>
           ) : null}
         </div>
       </div>
