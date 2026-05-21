@@ -114,10 +114,12 @@ export function SongCard({
           </p>
           {noteChip ? (
             <span
-              className="-mr-1 shrink-0 rounded-sm px-1.5 py-px text-[10px] font-semibold tabular-nums"
+              className="-mr-1 shrink-0 px-1.5 py-px text-[10px] font-semibold tabular-nums"
               style={{
                 backgroundColor: noteChip.background,
                 color: noteChip.foreground,
+                // 左上・右上・右下 = 1.8px、左下のみ角無し (TL TR BR BL)
+                borderRadius: "1.8px 1.8px 1.8px 0",
               }}
               aria-label={`地声最高音 ${noteChip.label}`}
             >
@@ -150,7 +152,7 @@ export function SongCard({
             <p className="truncate">{song.artist}</p>
           </div>
           {durationLabel ? (
-            <span className="shrink-0 text-[11px] tabular-nums text-zinc-500 dark:text-zinc-500">
+            <span className="shrink-0 tabular-nums">
               {durationLabel}
             </span>
           ) : null}
