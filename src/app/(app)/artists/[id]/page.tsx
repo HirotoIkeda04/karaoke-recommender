@@ -220,7 +220,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
         <div className="absolute left-3 top-3 sm:left-4 sm:top-4">
           <BackButton variant="overlay" fallbackHref="/songs" />
         </div>
-        <div className="absolute inset-x-0 bottom-0 px-4 pb-5 sm:px-6">
+        <div className="absolute inset-x-0 bottom-0 px-4 pb-2 sm:px-6 sm:pb-3">
           <h1 className="text-3xl font-bold leading-tight text-white drop-shadow-md sm:text-4xl">
             {artist.name}
           </h1>
@@ -251,7 +251,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
           </div>
         ) : null}
 
-        <div className="relative mx-auto max-w-md space-y-6 px-4 pt-5">
+        <div className="relative mx-auto max-w-md space-y-6 px-4 pt-2">
         <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">
           <span className="tabular-nums">{songCount.toLocaleString()} 曲</span>
           {genres.map((g) => (
