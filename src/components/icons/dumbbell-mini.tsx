@@ -26,8 +26,8 @@ export const DumbbellMini = forwardRef<
       strokeLinejoin="round"
       {...props}
     >
-      {/* 中心 (12,12) 基準で -45° 回転させ、左下→右上の斜めダンベルに */}
-      <g transform="rotate(-45 12 12)">
+      {/* 中心 (12,12) 基準で -30° 回転させ、左下→右上の斜めダンベルに */}
+      <g transform="rotate(-30 12 12)">
         <rect x="4" y="7" width="3" height="10" rx="0.5" />
         <rect x="17" y="7" width="3" height="10" rx="0.5" />
         <line x1="7" y1="12" x2="17" y2="12" />

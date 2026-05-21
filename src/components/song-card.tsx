@@ -118,8 +118,8 @@ export function SongCard({
               style={{
                 backgroundColor: noteChip.background,
                 color: noteChip.foreground,
-                // 左上・右上・右下 = 1.8px、左下のみ角無し (TL TR BR BL)
-                borderRadius: "1.8px 1.8px 1.8px 0",
+                // TL TR BR BL = 1.8px 1.8px 1.8px 2px
+                borderRadius: "1.8px 1.8px 1.8px 2px",
               }}
               aria-label={`地声最高音 ${noteChip.label}`}
             >
