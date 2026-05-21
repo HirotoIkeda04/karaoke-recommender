@@ -734,7 +734,16 @@ function SongCardContent({
         <dl className="relative z-10 grid w-full grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[11px]">
           <dt className="text-zinc-300">地声</dt>
           <dd className="font-mono text-zinc-100">
-            {midiToKaraoke(song.range_low_midi)} 〜{" "}
+            {song.range_low_midi != null ? (
+              <span
+                style={{ color: noteChipColor(song.range_low_midi).background }}
+              >
+                {midiToKaraoke(song.range_low_midi)}
+              </span>
+            ) : (
+              midiToKaraoke(song.range_low_midi)
+            )}
+            {" 〜 "}
             {song.range_high_midi != null ? (
               <span
                 style={{ color: noteChipColor(song.range_high_midi).background }}
