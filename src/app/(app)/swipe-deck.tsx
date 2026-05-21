@@ -10,13 +10,14 @@ import {
 } from "framer-motion";
 import {
   Check,
-  Dumbbell,
   Headphones,
   Minus,
   Play,
   Undo2,
   X,
 } from "lucide-react";
+
+import { DumbbellMini } from "@/components/icons/dumbbell-mini";
 import Link from "next/link";
 import { startTransition, useEffect, useMemo, useState } from "react";
 
@@ -235,7 +236,7 @@ const RATINGS: ReadonlyArray<{
   {
     value: "practicing",
     label: "練習中",
-    Icon: Dumbbell,
+    Icon: DumbbellMini,
     color:
       "bg-[linear-gradient(135deg,#c084fc_0%,#a855f7_28%,#a855f7_72%,#7e22ce_100%)] hover:brightness-110 active:brightness-95",
   },

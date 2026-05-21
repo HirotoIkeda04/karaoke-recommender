@@ -5,12 +5,12 @@ import {
   ArrowUp,
   ArrowUpDown,
   Check,
-  Dumbbell,
   Minus,
   X,
 } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
+import { DumbbellMini } from "@/components/icons/dumbbell-mini";
 import type { Database } from "@/types/database";
 
 import {
@@ -27,7 +27,7 @@ type DisplayRating = Exclude<Rating, "skip">;
 
 const TABS: ReadonlyArray<{ value: DisplayRating; label: string; Icon: typeof X }> = [
   { value: "easy", label: "得意", Icon: Check },
-  { value: "practicing", label: "練習中", Icon: Dumbbell },
+  { value: "practicing", label: "練習中", Icon: DumbbellMini },
   { value: "medium", label: "普通", Icon: Minus },
   { value: "hard", label: "苦手", Icon: X },
 ];
