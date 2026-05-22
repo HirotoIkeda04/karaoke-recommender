@@ -7,7 +7,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArtistRow, type ArtistRowData } from "@/components/artist-row";
 import { SongCard } from "@/components/song-card";
 import { JacketImage } from "@/components/ui/jacket-image";
-import { GENRE_CODES, GENRE_LABELS, type GenreCode } from "@/lib/genres";
+import {
+  BROWSE_GENRE_CODES,
+  GENRE_LABELS,
+  type GenreCode,
+} from "@/lib/genres";
 import { karaokeToMidi } from "@/lib/note";
 import {
   loadHistory,
@@ -500,7 +504,7 @@ function BrowseGrid({
             </div>
           </Link>
         </li>
-        {GENRE_CODES.filter((c) => c !== "j_pop").map((code) => {
+        {BROWSE_GENRE_CODES.filter((c) => c !== "j_pop").map((code) => {
           const covers = genreCovers[code] ?? [];
           return (
             <li key={code}>

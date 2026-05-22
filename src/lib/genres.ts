@@ -36,8 +36,15 @@ export const GENRE_LABELS: Record<GenreCode, string> = {
   western: "洋楽",
   kpop: "K-POP",
   game_bgm: "ゲーム・劇伴",
-  other: "その他",
+  other: "分類不能",
 };
+
+// ブラウズ画面のジャンル一覧に出すコード。
+// game_bgm / other はカテゴリとして探しづらいので一覧からは除外する
+// (ラベル自体はアーティストのタグ等で引き続き使う)。
+export const BROWSE_GENRE_CODES = GENRE_CODES.filter(
+  (c) => c !== "game_bgm" && c !== "other",
+) as readonly GenreCode[];
 
 export function isGenreCode(value: string): value is GenreCode {
   return (GENRE_CODES as readonly string[]).includes(value);
