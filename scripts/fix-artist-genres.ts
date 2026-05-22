@@ -28,6 +28,41 @@ const OVERRIDES: Override[] = [
     genres: ["idol_female"],
     reason: "KAWAII LAB. 配下の女性アイドルグループ。bulk-label が other と誤分類",
   },
+  {
+    name: "HANA",
+    genres: ["idol_female"],
+    reason: "BMSG×ちゃんみな『No No Girls』発の7人組ガールズグループ (2025メジャーデビュー)",
+  },
+  {
+    name: "iLiFE!",
+    genres: ["idol_female"],
+    reason: "imaginate/日本コロムビアの女性アイドルグループ。Idol Life Starter Pack でバズ",
+  },
+  {
+    name: "GEMN",
+    genres: ["anison"],
+    reason: "中島健人×キタニタツヤのユニット。アニメ『【推しの子】』第2期OP「ファタール」",
+  },
+  {
+    name: "離婚伝説",
+    genres: ["j_pop"],
+    reason: "2人組シティポップ/ファンク系バンド。「愛が一層メロウ」(Sony 2024メジャーデビュー)",
+  },
+  {
+    name: "TENBLANK",
+    genres: ["j_rock"],
+    reason: "Netflixドラマ『グラスハート』劇中バンド。RADWIMPS野田洋次郎ら楽曲提供のロック",
+  },
+  {
+    name: "水槽",
+    genres: ["vocaloid_utaite"],
+    reason: "ニコ動「歌ってみた」出身の歌い手・ボカロP・SSW。エレクトロ×ロック",
+  },
+  {
+    name: "MEGARYU",
+    genres: ["j_pop"],
+    reason: "2人組レゲエユニット。「我流旋風」オリコン1位、「Day by Day」CM起用の大衆ヒット",
+  },
 ];
 
 function assertGenres(g: string[]): asserts g is GenreCode[] {
