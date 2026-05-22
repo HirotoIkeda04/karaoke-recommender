@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { BackButton } from "@/components/back-button";
 import { SongCard } from "@/components/song-card";
 import { JacketImage } from "@/components/ui/jacket-image";
-import { midiToKaraoke } from "@/lib/note";
+import { midiToKaraoke, noteChipColor } from "@/lib/note";
 import { createClient } from "@/lib/supabase/server";
 
 import type { Database } from "@/types/database";
@@ -42,6 +42,16 @@ function formatDuration(durationMs: number | null | undefined): string {
   const min = Math.floor(totalSec / 60);
   const sec = totalSec % 60;
   return `${min}:${sec.toString().padStart(2, "0")}`;
+}
+
+/** 音域ノートを高さ由来の色で表示する。null は無印 "—"。 */
+function ColoredNote({ midi }: { midi: number | null | undefined }) {
+  if (midi == null) return <>—</>;
+  return (
+    <span style={{ color: noteChipColor(midi).background }}>
+      {midiToKaraoke(midi)}
+    </span>
+  );
 }
 
 interface SongDetailProps {
@@ -257,7 +267,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
       {image ? (
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[28rem] overflow-hidden"
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[84rem] overflow-hidden"
         >
           <div
             className="absolute inset-0 scale-125 bg-cover bg-center"
@@ -349,14 +359,22 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
           <div className="flex items-baseline py-3">
             <dt className="w-20 shrink-0 text-zinc-600 dark:text-zinc-400">地声</dt>
             <dd className="font-mono">
-              {song.range_low_midi == null && song.range_high_midi == null
-                ? "—"
-                : `${midiToKaraoke(song.range_low_midi)} — ${midiToKaraoke(song.range_high_midi)}`}
+              {song.range_low_midi == null && song.range_high_midi == null ? (
+                "—"
+              ) : (
+                <>
+                  <ColoredNote midi={song.range_low_midi} />
+                  {" — "}
+                  <ColoredNote midi={song.range_high_midi} />
+                </>
+              )}
             </dd>
           </div>
           <div className="flex items-baseline py-3">
             <dt className="w-20 shrink-0 text-zinc-600 dark:text-zinc-400">裏声</dt>
-            <dd className="font-mono">{midiToKaraoke(song.falsetto_max_midi)}</dd>
+            <dd className="font-mono">
+              <ColoredNote midi={song.falsetto_max_midi} />
+            </dd>
           </div>
           <div className="flex items-baseline py-3">
             <dt className="w-20 shrink-0 text-zinc-600 dark:text-zinc-400">長さ</dt>
