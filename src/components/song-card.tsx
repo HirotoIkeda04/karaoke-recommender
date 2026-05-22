@@ -152,7 +152,9 @@ export function SongCard({
             <p className="truncate">{song.artist}</p>
           </div>
           {durationLabel ? (
-            <span className="shrink-0 tabular-nums">
+            // 色はアーティスト行 (text-zinc-600/400) を継承、サイズだけ
+            // text-xs(12px) の約 8 割 = 0.6rem(9.6px) に縮小。
+            <span className="shrink-0 tabular-nums text-[0.6rem]">
               {durationLabel}
             </span>
           ) : null}
