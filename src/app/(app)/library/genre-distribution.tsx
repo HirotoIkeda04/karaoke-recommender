@@ -12,7 +12,7 @@ interface Props {
 const TOP_THRESHOLD = 0.9;
 
 const REST_COLOR_CLASS = "text-zinc-400/60";
-const REST_LABEL = "他のジャンル";
+const REST_LABEL = "その他";
 
 export function GenreDistribution({ buckets }: Props) {
   const entries = (Object.entries(buckets) as [GenreCode, number][])
