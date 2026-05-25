@@ -12,13 +12,16 @@
  *       (b) spotify_track_id あり
  *       (c) image_url_medium あり
  *       (d) created_at が古い (=元から居た方)
- *  3. 残し以外を DELETE (CASCADE で評価も消えるが、(a) で評価ある側を必ず残す)
+ *  3. 残し以外は、削除前に evaluations / user_known_songs / song_logs を
+ *     keep へ付け替えてから DELETE する。これによりユーザー評価が
+ *     cascade で消えるのを防ぐ (どの重複を評価していても survivor に残る)。
  *
  * 使い方:
  *   pnpm dedup:songs --dry-run
  *   pnpm dedup:songs
  */
 import { createAdminClient } from "../src/lib/supabase/admin";
+import { mergeSongReferences } from "./lib/merge-song-refs";
 
 interface SongRow {
   id: string;
@@ -142,10 +145,10 @@ async function main() {
 
   const dropIds = decisions.flatMap((d) => d.drop.map((s) => s.id));
   console.log(`\ntotal to delete: ${dropIds.length}`);
-  const totalRefsLost = decisions
+  const totalRefsToMigrate = decisions
     .flatMap((d) => d.drop)
     .reduce((a, s) => a + (refCount.get(s.id) ?? 0), 0);
-  console.log(`refs lost (cascade delete): ${totalRefsLost}`);
+  console.log(`refs to migrate to keep (not lost): ${totalRefsToMigrate}`);
 
   if (dryRun) {
     console.log("\nDRY-RUN: no writes performed.");
@@ -153,16 +156,28 @@ async function main() {
   }
 
   let deleted = 0;
-  for (let i = 0; i < dropIds.length; i += 50) {
-    const batch = dropIds.slice(i, i + 50);
-    const { error } = await supabase.from("songs").delete().in("id", batch);
-    if (error) {
-      console.error(`  delete batch ${i}: ${error.message}`);
-      continue;
+  let movedEvals = 0;
+  let movedKnown = 0;
+  let movedLogs = 0;
+  for (const d of decisions) {
+    for (const s of d.drop) {
+      // 削除前に評価などを keep へ付け替える (cascade 消失を防ぐ)
+      const moved = await mergeSongReferences(supabase, s.id, d.keep.id);
+      movedEvals += moved.moved.evaluations;
+      movedKnown += moved.moved.userKnownSongs;
+      movedLogs += moved.moved.songLogs;
+
+      const { error } = await supabase.from("songs").delete().eq("id", s.id);
+      if (error) {
+        console.error(`  delete ${s.id}: ${error.message}`);
+        continue;
+      }
+      deleted++;
     }
-    deleted += batch.length;
   }
-  console.log(`\ndone. deleted=${deleted}`);
+  console.log(
+    `\ndone. deleted=${deleted} | moved evaluations=${movedEvals}, user_known=${movedKnown}, song_logs=${movedLogs}`,
+  );
 }
 
 main().catch((e) => {

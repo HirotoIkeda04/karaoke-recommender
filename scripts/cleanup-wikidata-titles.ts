@@ -16,6 +16,10 @@
  *   pnpm cleanup:wikidata-titles             # 実行
  */
 import { createAdminClient } from "../src/lib/supabase/admin";
+import {
+  countEvaluationsForSongs,
+  mergeSongReferences,
+} from "./lib/merge-song-refs";
 
 interface SongRow {
   id: string;
@@ -109,6 +113,9 @@ async function main() {
 
   const wdSongs = all.filter((s) => s.wikidata_qid);
 
+  // 削除対象 id → 付け替え先 (survivor) id。survivor が無い (空タイトル等) は null。
+  const deleteWinner = new Map<string, string | null>();
+
   // ---------- Phase A: disambiguation suffix ----------
   const phaseAUpdates: Array<{ id: string; from: string; to: string }> = [];
   const phaseADeletes: Array<{ id: string; reason: string; title: string }> = [];
@@ -119,6 +126,7 @@ async function main() {
     if (!stripped || stripped === s.title) continue;
     if (stripped === "") {
       phaseADeletes.push({ id: s.id, reason: "stripped to empty", title: s.title });
+      deleteWinner.set(s.id, null);
       continue;
     }
     const newNorm = normalizeTitle(stripped);
@@ -131,6 +139,7 @@ async function main() {
         reason: `dup of ${others[0].title} (${others[0].id})`,
         title: s.title,
       });
+      deleteWinner.set(s.id, others[0].id);
     } else {
       phaseAUpdates.push({ id: s.id, from: s.title, to: stripped });
     }
@@ -144,14 +153,19 @@ async function main() {
     if (!parts) continue;
     const idx = idxByArtist.get(s.artist_id);
     if (!idx) continue;
+    let firstPartWinner: string | null = null;
     const allPartsExist = parts.every((p) => {
       const norm = normalizeTitle(p);
       const list = idx.get(norm) ?? [];
       // 自分以外の row が同 artist で居るかチェック
-      return list.some((x) => x.id !== s.id);
+      const other = list.find((x) => x.id !== s.id);
+      if (other && !firstPartWinner) firstPartWinner = other.id;
+      return Boolean(other);
     });
     if (allPartsExist) {
       phaseBDeletes.push({ id: s.id, title: s.title, parts });
+      // 複数 part に分割される compilation。評価は先頭 part の既存曲へ寄せる。
+      deleteWinner.set(s.id, firstPartWinner);
     }
   }
 
@@ -204,21 +218,48 @@ async function main() {
     if ((i + 1) % 100 === 0) console.log(`  updated ${i + 1}/${updates.length}`);
   }
 
-  // DELETE は batch で
+  // DELETE は 1 件ずつ。削除前に評価などを survivor へ付け替えて cascade 消失を防ぐ。
+  // survivor が無い候補 (空タイトル等) に評価が付いている場合は警告して評価を残す
+  // (= その曲は削除しない)。
   let deletedCount = 0;
+  let movedEvals = 0;
+  let skippedNoWinner = 0;
   const ids = Array.from(deleteIds);
-  for (let i = 0; i < ids.length; i += 100) {
-    const batch = ids.slice(i, i + 100);
-    const { error } = await supabase.from("songs").delete().in("id", batch);
-    if (error) {
-      console.error(`  delete batch ${i}: ${error.message}`);
+  for (const id of ids) {
+    const winner = deleteWinner.get(id) ?? null;
+    if (!winner) {
+      const evalCount = await countEvaluationsForSongs(supabase, [id]);
+      if (evalCount > 0) {
+        console.warn(
+          `  SKIP delete ${id}: survivor が無く評価 ${evalCount} 件を巻き込むため削除中止`,
+        );
+        skippedNoWinner++;
+        continue;
+      }
+      // 評価が無ければそのまま削除して良い
+      const { error } = await supabase.from("songs").delete().eq("id", id);
+      if (error) {
+        console.error(`  delete ${id}: ${error.message}`);
+        continue;
+      }
+      deletedCount++;
       continue;
     }
-    deletedCount += batch.length;
-    if ((i / 100) % 5 === 0) console.log(`  deleted ${deletedCount}/${ids.length}`);
+    const moved = await mergeSongReferences(supabase, id, winner);
+    movedEvals += moved.moved.evaluations;
+    const { error } = await supabase.from("songs").delete().eq("id", id);
+    if (error) {
+      console.error(`  delete ${id}: ${error.message}`);
+      continue;
+    }
+    deletedCount++;
+    if (deletedCount % 100 === 0)
+      console.log(`  deleted ${deletedCount}/${ids.length}`);
   }
 
-  console.log(`\ndone. updated=${updatedCount}, deleted=${deletedCount}`);
+  console.log(
+    `\ndone. updated=${updatedCount}, deleted=${deletedCount}, evaluations moved=${movedEvals}, skipped(no winner & has evals)=${skippedNoWinner}`,
+  );
 }
 
 main().catch((e) => {

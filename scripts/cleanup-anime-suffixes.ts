@@ -20,6 +20,7 @@
  *   pnpm cleanup:anime-suffixes
  */
 import { createAdminClient } from "../src/lib/supabase/admin";
+import { mergeSongReferences } from "./lib/merge-song-refs";
 
 interface SongRow {
   id: string;
@@ -78,7 +79,12 @@ async function main() {
 
   // 3. suffix を持つ曲の処理候補を作る
   const updates: Array<{ id: string; from: string; to: string }> = [];
-  const deletes: Array<{ id: string; reason: string; title: string }> = [];
+  const deletes: Array<{
+    id: string;
+    winnerId: string;
+    reason: string;
+    title: string;
+  }> = [];
 
   for (const s of all) {
     if (!SUFFIX_RE.test(s.title)) continue;
@@ -95,6 +101,7 @@ async function main() {
     if (others.length > 0) {
       deletes.push({
         id: s.id,
+        winnerId: others[0].id,
         reason: `dup of "${others[0].title}"`,
         title: s.title,
       });
@@ -135,20 +142,23 @@ async function main() {
     if ((i + 1) % 100 === 0) console.log(`  updated ${i + 1}/${updates.length}`);
   }
 
-  // 5. DELETE
+  // 5. DELETE (削除前に評価などを winner へ付け替える)
   let deleted = 0;
-  const ids = deletes.map((d) => d.id);
-  for (let i = 0; i < ids.length; i += 100) {
-    const batch = ids.slice(i, i + 100);
-    const { error } = await supabase.from("songs").delete().in("id", batch);
+  let movedEvals = 0;
+  for (const d of deletes) {
+    const moved = await mergeSongReferences(supabase, d.id, d.winnerId);
+    movedEvals += moved.moved.evaluations;
+    const { error } = await supabase.from("songs").delete().eq("id", d.id);
     if (error) {
-      console.error(`  delete batch ${i}: ${error.message}`);
+      console.error(`  delete ${d.id}: ${error.message}`);
       continue;
     }
-    deleted += batch.length;
+    deleted++;
   }
 
-  console.log(`\ndone. updated=${updated}, deleted=${deleted}`);
+  console.log(
+    `\ndone. updated=${updated}, deleted=${deleted}, evaluations moved=${movedEvals}`,
+  );
 }
 
 main().catch((e) => {

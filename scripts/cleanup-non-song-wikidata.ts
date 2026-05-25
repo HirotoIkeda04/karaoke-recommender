@@ -17,8 +17,14 @@
  * 使い方:
  *   pnpm cleanup:non-song-wikidata --dry-run   # 削除候補一覧のみ
  *   pnpm cleanup:non-song-wikidata             # DELETE 実行
+ *   pnpm cleanup:non-song-wikidata --force     # 評価付き非楽曲も強制削除
+ *
+ * 安全策: 削除候補に評価 (evaluations) が付いている場合、既定ではその曲を
+ * 削除せずスキップする (cascade でユーザー評価が消えるのを防ぐ)。
+ * 意図的に消す場合のみ --force を指定する。
  */
 import { createAdminClient } from "../src/lib/supabase/admin";
+import { countEvaluationsForSongs } from "./lib/merge-song-refs";
 
 const SPARQL = "https://query.wikidata.org/sparql";
 const UA =
@@ -52,11 +58,15 @@ function sleep(ms: number): Promise<void> {
 
 function parseArgs() {
   const args = process.argv.slice(2);
-  return { dryRun: args.includes("--dry-run") };
+  return {
+    dryRun: args.includes("--dry-run"),
+    // 評価が付いた非楽曲も強制的に削除する (既定はユーザー評価保護のためスキップ)
+    force: args.includes("--force"),
+  };
 }
 
 async function main() {
-  const { dryRun } = parseArgs();
+  const { dryRun, force } = parseArgs();
   const supabase = createAdminClient();
 
   // 全 wikidata_qid を取得 (id も含めて削除に使う)。
@@ -142,16 +152,53 @@ async function main() {
     console.log(`  ${s.qid}\t${s.artist} - ${s.title}\t[${types.join(",")}]`);
   }
 
+  // 安全策: 評価が付いた候補を特定する。survivor が無いので付け替えできず、
+  // 削除すると cascade でユーザー評価が消える。既定では除外、--force で削除。
+  const ratedIds = new Set<string>();
+  {
+    const candidateIds = toDelete.map((s) => s.id);
+    for (let i = 0; i < candidateIds.length; i += 200) {
+      const ids = candidateIds.slice(i, i + 200);
+      const { data, error } = await supabase
+        .from("evaluations")
+        .select("song_id")
+        .in("song_id", ids);
+      if (error) throw error;
+      for (const r of data ?? []) ratedIds.add(r.song_id);
+    }
+  }
+  if (ratedIds.size > 0) {
+    const totalEvals = await countEvaluationsForSongs(
+      supabase,
+      Array.from(ratedIds),
+    );
+    if (force) {
+      console.warn(
+        `\n[--force] 評価付き非楽曲 ${ratedIds.size} 件 (評価 ${totalEvals} 件) も削除します`,
+      );
+    } else {
+      console.warn(
+        `\n評価付きの候補 ${ratedIds.size} 件 (評価 ${totalEvals} 件) は削除をスキップします (--force で強制削除)`,
+      );
+    }
+  }
+
+  const finalDelete = force
+    ? toDelete
+    : toDelete.filter((s) => !ratedIds.has(s.id));
+
   if (dryRun) {
-    console.log("\nDRY-RUN: no deletes performed.");
+    console.log(
+      `\nDRY-RUN: no deletes performed. (would delete ${finalDelete.length}, skip-rated ${toDelete.length - finalDelete.length})`,
+    );
     return;
   }
 
   // DELETE は ID リストで in() するが、PostgREST URL 長制限を避けるため batch。
   const DELETE_BATCH = 100;
   let deleted = 0;
-  for (let i = 0; i < toDelete.length; i += DELETE_BATCH) {
-    const ids = toDelete.slice(i, i + DELETE_BATCH).map((s) => s.id);
+  for (let i = 0; i < finalDelete.length; i += DELETE_BATCH) {
+    const ids = finalDelete.slice(i, i + DELETE_BATCH).map((s) => s.id);
     const { error } = await supabase.from("songs").delete().in("id", ids);
     if (error) {
       console.error(`  delete batch ${i}: ${error.message}`);
@@ -159,10 +206,12 @@ async function main() {
     }
     deleted += ids.length;
     if (Math.floor(i / DELETE_BATCH) % 5 === 0) {
-      console.log(`  deleted ${deleted}/${toDelete.length}`);
+      console.log(`  deleted ${deleted}/${finalDelete.length}`);
     }
   }
-  console.log(`\ndone. deleted=${deleted}`);
+  console.log(
+    `\ndone. deleted=${deleted}, skipped(rated)=${toDelete.length - finalDelete.length}`,
+  );
 }
 
 main().catch((e) => {
