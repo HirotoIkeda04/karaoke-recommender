@@ -3,6 +3,7 @@ import Link from "next/link";
 import { BackButton } from "@/components/back-button";
 import { Button } from "@/components/ui/button";
 import { GENRE_CODES, type GenreCode } from "@/lib/genres";
+import { fetchAllPaginated } from "@/lib/supabase/paginate";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
@@ -88,9 +89,15 @@ export default async function FriendLibraryPage({
   // RPC は型生成されていないので as キャストで呼ぶ
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sb = supabase as any;
+  // 評価リスト RPC は set-returning なので PostgREST の 1000 行上限に掛かる。
+  // 1000 件超のフレンドで評価が欠落しないよう range() でページ送りして全件取得する。
   const [profileRes, evaluationsRes] = await Promise.all([
     sb.rpc("get_friend_library_profile", { p_friend_id: friendId }),
-    sb.rpc("get_friend_library_evaluations", { p_friend_id: friendId }),
+    fetchAllPaginated<FriendEvaluationRow>((from, to) =>
+      sb
+        .rpc("get_friend_library_evaluations", { p_friend_id: friendId })
+        .range(from, to),
+    ),
   ]);
 
   const profile = (profileRes.data?.[0] ?? null) as FriendProfileRow | null;

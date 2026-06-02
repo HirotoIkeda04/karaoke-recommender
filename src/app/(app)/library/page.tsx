@@ -1,5 +1,6 @@
 import { GENRE_CODES, type GenreCode } from "@/lib/genres";
 import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
+import { fetchAllPaginated } from "@/lib/supabase/paginate";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
@@ -24,10 +25,8 @@ const VALID_RATINGS: ReadonlySet<DisplayRating> = new Set([
 
 const MIN_FOR_ESTIMATE = 5; // 「得意」評価がこの件数以上で推定音域を表示
 
-// Supabase (PostgREST) は 1 リクエスト最大 1000 行。評価が 1000 件を超える
-// ユーザーで古い評価が切り捨てられ、「練習中」などのリストから一部の曲が
-// 欠落していたため、range() でページ送りして全件取得する。
-const EVAL_PAGE_SIZE = 1000;
+// Supabase の 1000 行上限を range() のページ送りで越えて全評価を取得する
+// (1000 件超のユーザーで「練習中」などのリストから曲が欠落する不具合を防ぐ)。
 const EVAL_SELECT = `
       rating,
       updated_at,
@@ -38,25 +37,19 @@ const EVAL_SELECT = `
       )
     `;
 
-async function fetchAllEvaluations(
+function fetchAllEvaluations(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,
   userId: string,
 ): Promise<{ data: EvaluationRow[]; error: { message: string } | null }> {
-  const all: EvaluationRow[] = [];
-  for (let from = 0; ; from += EVAL_PAGE_SIZE) {
-    const { data, error } = await supabase
+  return fetchAllPaginated<EvaluationRow>((from, to) =>
+    supabase
       .from("evaluations")
       .select(EVAL_SELECT)
       .eq("user_id", userId)
       .order("updated_at", { ascending: false })
-      .range(from, from + EVAL_PAGE_SIZE - 1);
-    if (error) return { data: all, error };
-    const batch = (data ?? []) as unknown as EvaluationRow[];
-    all.push(...batch);
-    if (batch.length < EVAL_PAGE_SIZE) break;
-  }
-  return { data: all, error: null };
+      .range(from, to),
+  );
 }
 
 interface LibraryPageProps {

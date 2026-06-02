@@ -6,6 +6,7 @@ import { BackButton } from "@/components/back-button";
 import { SongCard } from "@/components/song-card";
 import { JacketImage } from "@/components/ui/jacket-image";
 import { midiToKaraoke, noteChipColor } from "@/lib/note";
+import { fetchAllPaginated } from "@/lib/supabase/paginate";
 import { createClient } from "@/lib/supabase/server";
 
 import type { Database } from "@/types/database";
@@ -151,10 +152,13 @@ async function fetchRatedSimilarSongs(
   lowMidi: number,
   highMidi: number,
 ) {
-  const { data } = await supabase
-    .from("evaluations")
-    .select(
-      `
+  // Supabase の 1000 行上限を range() のページ送りで越えて全評価を取得する
+  // (1000 件超のユーザーで古い評価が欠落し似た曲推薦の精度が落ちる不具合を防ぐ)。
+  const { data } = await fetchAllPaginated((from, to) =>
+    supabase
+      .from("evaluations")
+      .select(
+        `
       rating,
       song:songs (
         id, title, artist, release_year,
@@ -162,10 +166,11 @@ async function fetchRatedSimilarSongs(
         image_url_small, image_url_medium, duration_ms
       )
     `,
-    )
-    .eq("user_id", userId);
-
-  if (!data) return [];
+      )
+      .eq("user_id", userId)
+      .order("updated_at", { ascending: false })
+      .range(from, to),
+  );
 
   return data
     .flatMap((row) => {
