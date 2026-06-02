@@ -24,6 +24,41 @@ const VALID_RATINGS: ReadonlySet<DisplayRating> = new Set([
 
 const MIN_FOR_ESTIMATE = 5; // 「得意」評価がこの件数以上で推定音域を表示
 
+// Supabase (PostgREST) は 1 リクエスト最大 1000 行。評価が 1000 件を超える
+// ユーザーで古い評価が切り捨てられ、「練習中」などのリストから一部の曲が
+// 欠落していたため、range() でページ送りして全件取得する。
+const EVAL_PAGE_SIZE = 1000;
+const EVAL_SELECT = `
+      rating,
+      updated_at,
+      song:songs (
+        id, title, artist, release_year,
+        range_low_midi, range_high_midi, falsetto_max_midi,
+        image_url_small, image_url_medium, duration_ms
+      )
+    `;
+
+async function fetchAllEvaluations(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  userId: string,
+): Promise<{ data: EvaluationRow[]; error: { message: string } | null }> {
+  const all: EvaluationRow[] = [];
+  for (let from = 0; ; from += EVAL_PAGE_SIZE) {
+    const { data, error } = await supabase
+      .from("evaluations")
+      .select(EVAL_SELECT)
+      .eq("user_id", userId)
+      .order("updated_at", { ascending: false })
+      .range(from, from + EVAL_PAGE_SIZE - 1);
+    if (error) return { data: all, error };
+    const batch = (data ?? []) as unknown as EvaluationRow[];
+    all.push(...batch);
+    if (batch.length < EVAL_PAGE_SIZE) break;
+  }
+  return { data: all, error: null };
+}
+
 interface LibraryPageProps {
   searchParams: Promise<{
     tab?: string;
@@ -54,24 +89,9 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
     profileRes,
     voiceEstimateRes,
     friendshipsRes,
-    yearDistRes,
     genreDistRes,
   ] = await Promise.all([
-    supabase
-      .from("evaluations")
-      .select(
-        `
-      rating,
-      updated_at,
-      song:songs (
-        id, title, artist, release_year,
-        range_low_midi, range_high_midi, falsetto_max_midi,
-        image_url_small, image_url_medium, duration_ms
-      )
-    `,
-      )
-      .eq("user_id", userId)
-      .order("updated_at", { ascending: false }),
+    fetchAllEvaluations(supabase, userId),
     getUserKnownSongIds(),
     supabase
       .from("profiles")
@@ -88,11 +108,6 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
       .select("user_a_id", { count: "exact", head: true })
       .eq("status", "accepted")
       .or(`user_a_id.eq.${userId},user_b_id.eq.${userId}`),
-    supabase
-      .from("evaluations")
-      .select("song:songs(release_year)")
-      .eq("user_id", userId)
-      .in("rating", ["easy", "practicing", "medium", "hard"]),
     // ジャンル分布 (014 マイグレーションの view) — db:types 再生成までは型が乗らないので as キャスト
     sb
       .from("user_genre_distribution")
@@ -108,19 +123,16 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
     medium: [],
     hard: [],
   };
-  for (const row of (rows ?? []) as unknown as EvaluationRow[]) {
-    if (row.rating !== "skip" && VALID_RATINGS.has(row.rating)) {
-      evaluationsByRating[row.rating].push(row);
-    }
-  }
-
-  // 年代分布: release_year を 10年単位でバケット
+  // 年代分布: release_year を 10年単位でバケット (評価一覧と同じ全件から算出)
   const eraBuckets: Record<number, number> = {};
-  for (const row of yearDistRes.data ?? []) {
+  for (const row of (rows ?? []) as unknown as EvaluationRow[]) {
+    if (row.rating === "skip" || !VALID_RATINGS.has(row.rating)) continue;
+    evaluationsByRating[row.rating].push(row);
     const year = row.song?.release_year;
-    if (typeof year !== "number") continue;
-    const decade = Math.floor(year / 10) * 10;
-    eraBuckets[decade] = (eraBuckets[decade] ?? 0) + 1;
+    if (typeof year === "number") {
+      const decade = Math.floor(year / 10) * 10;
+      eraBuckets[decade] = (eraBuckets[decade] ?? 0) + 1;
+    }
   }
 
   // ジャンル分布: 不正値はサイレントスキップ (タクソノミ更新時の互換性確保)
