@@ -54,8 +54,10 @@ const SWIPE_THRESHOLD = 110;
 // 色を見せる中継点として使う。
 const SWIPE_HOLD_DISTANCE = 180;
 const SWIPE_OUT_DISTANCE = 700;
+// 画面下の安全領域と操作ボタン群を確保したうえで、残りをカードに使う。
+// 予約高さを実レイアウトに合わせて抑え、カード下の余白をカードサイズへ再配分する。
 const CARD_WIDTH =
-  "min(22rem, calc((100svh - 26.5rem - env(safe-area-inset-bottom)) * 22 / 30))";
+  "min(22rem, calc((100svh - 23.5rem - env(safe-area-inset-bottom)) * 22 / 30))";
 
 // AnimatePresence の custom 経由で受け取った rating に応じ、退場方向を変える。
 // 既存の boxShadow / SwipeOverlay は x,y の motion value に追従しているため、
