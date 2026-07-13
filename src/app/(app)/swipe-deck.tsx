@@ -372,7 +372,7 @@ export function SwipeDeck({
       {current.artist_id &&
       (relatedArtists[current.artist_id]?.length ?? 0) > 0 ? (
         <div
-          className="-my-4 w-full max-w-[22rem]"
+          className="-my-3 w-full max-w-[22rem]"
           style={{ width: CARD_WIDTH }}
         >
           <RelatedArtistsLink
