@@ -371,18 +371,17 @@ export function SwipeDeck({
         </div>
       ) : null}
 
-      {current.artist_id &&
-      (relatedArtists[current.artist_id]?.length ?? 0) > 0 ? (
-        <div
-          className="-my-3 w-full max-w-[22rem]"
-          style={{ width: CARD_WIDTH }}
-        >
+      <div
+        className="-my-3 h-9 w-full max-w-[22rem]"
+        style={{ width: CARD_WIDTH }}
+      >
+        {current.artist_id ? (
           <RelatedArtistsLink
             artistId={current.artist_id}
             artists={relatedArtists[current.artist_id] ?? []}
           />
-        </div>
-      ) : null}
+        ) : null}
+      </div>
 
       {/* カードサイズ: 通常 22rem 幅 × 30rem 高、画面が狭ければ比率を保ちつつ縮小 */}
       {/* width = min(22rem, 利用可能高さ × 22/30) で、aspect-ratio により height は自動算出 */}
