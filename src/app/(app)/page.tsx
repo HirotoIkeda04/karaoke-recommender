@@ -61,7 +61,7 @@ export default async function HomePage() {
   const relatedArtists = await getRelatedArtistPreviews(
     supabase,
     songs.flatMap((song) => (song.artist_id ? [song.artist_id] : [])),
-    3,
+    6,
   );
 
   return (
