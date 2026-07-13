@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 
 import { DumbbellMini } from "@/components/icons/dumbbell-mini";
+import { RelatedArtistsLink } from "@/components/related-artists-link";
 import Link from "next/link";
 import { startTransition, useEffect, useMemo, useState } from "react";
 
@@ -25,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { JacketImage } from "@/components/ui/jacket-image";
 import { triggerHaptic } from "@/lib/haptics";
 import { midiToKaraoke, noteChipColor } from "@/lib/note";
+import type { RelatedArtistPreview } from "@/lib/related-artists";
 import type { Database } from "@/types/database";
 
 import { markSkipped, rateSong, unrateSong } from "./actions";
@@ -43,6 +45,7 @@ interface SwipeDeckProps {
   initialSongs: Song[];
   /** Spotify で聴いたことがある曲の id 一覧 (バッジ表示用、未連携なら空配列) */
   knownSongIds?: string[];
+  relatedArtists?: Record<string, RelatedArtistPreview[]>;
 }
 
 const SWIPE_THRESHOLD = 110;
@@ -51,6 +54,8 @@ const SWIPE_THRESHOLD = 110;
 // 色を見せる中継点として使う。
 const SWIPE_HOLD_DISTANCE = 180;
 const SWIPE_OUT_DISTANCE = 700;
+const CARD_WIDTH =
+  "min(22rem, calc((100svh - 26.5rem - env(safe-area-inset-bottom)) * 22 / 30))";
 
 // AnimatePresence の custom 経由で受け取った rating に応じ、退場方向を変える。
 // 既存の boxShadow / SwipeOverlay は x,y の motion value に追従しているため、
@@ -245,6 +250,7 @@ const RATINGS: ReadonlyArray<{
 export function SwipeDeck({
   initialSongs,
   knownSongIds = [],
+  relatedArtists = {},
 }: SwipeDeckProps) {
   const [queue, setQueue] = useState(initialSongs);
   const [lastAction, setLastAction] = useState<LastAction | null>(null);
@@ -363,14 +369,23 @@ export function SwipeDeck({
         </div>
       ) : null}
 
+      {current.artist_id &&
+      (relatedArtists[current.artist_id]?.length ?? 0) > 0 ? (
+        <div className="w-full max-w-[22rem]" style={{ width: CARD_WIDTH }}>
+          <RelatedArtistsLink
+            artistId={current.artist_id}
+            artists={relatedArtists[current.artist_id] ?? []}
+          />
+        </div>
+      ) : null}
+
       {/* カードサイズ: 通常 22rem 幅 × 30rem 高、画面が狭ければ比率を保ちつつ縮小 */}
       {/* width = min(22rem, 利用可能高さ × 22/30) で、aspect-ratio により height は自動算出 */}
       <div
         className="relative"
         style={{
           aspectRatio: "22 / 30",
-          width:
-            "min(22rem, calc((100svh - 23rem - env(safe-area-inset-bottom)) * 22 / 30))",
+          width: CARD_WIDTH,
         }}
       >
         {/* 後ろのカード (next 1, next 2): 中身も描画して、スワイプ中に
@@ -594,9 +609,11 @@ function SwipeCard({
       return;
     }
     if (ax > ay) {
-      offset.x > 0 ? onSwipeRight() : onSwipeLeft();
+      if (offset.x > 0) onSwipeRight();
+      else onSwipeLeft();
     } else {
-      offset.y > 0 ? onSwipeDown() : onSwipeUp();
+      if (offset.y > 0) onSwipeDown();
+      else onSwipeUp();
     }
   };
 

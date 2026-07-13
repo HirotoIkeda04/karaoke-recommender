@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
 import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
+import { getRelatedArtistPreviews } from "@/lib/related-artists";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
@@ -57,7 +58,17 @@ export default async function HomePage() {
     );
   }
 
+  const relatedArtists = await getRelatedArtistPreviews(
+    supabase,
+    songs.flatMap((song) => (song.artist_id ? [song.artist_id] : [])),
+    3,
+  );
+
   return (
-    <SwipeDeck initialSongs={songs} knownSongIds={Array.from(knownIds)} />
+    <SwipeDeck
+      initialSongs={songs}
+      knownSongIds={Array.from(knownIds)}
+      relatedArtists={relatedArtists}
+    />
   );
 }
