@@ -349,7 +349,7 @@ export function SwipeDeck({
   }
 
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-5 overflow-hidden px-4 py-6">
+    <div className="mx-auto flex max-w-md flex-col items-center gap-5 overflow-hidden px-4 pb-2 pt-6">
       {/* 次の 2 枚のジャケット画像を裏で先読み */}
       {queue.slice(1, 3).map((song) => {
         const preloadSrc = song.image_url_large ?? song.image_url_medium;
