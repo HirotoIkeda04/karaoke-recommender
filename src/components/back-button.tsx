@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -27,6 +27,8 @@ export function BackButton({
 }: BackButtonProps) {
   const router = useRouter();
   const closeSongSheet = useSongSheetClose();
+  const Icon = closeSongSheet ? X : ChevronLeft;
+  const accessibleLabel = closeSongSheet ? "楽曲詳細を閉じる" : label;
 
   const styles =
     variant === "overlay"
@@ -35,8 +37,16 @@ export function BackButton({
 
   if (href) {
     return (
-      <Link href={href} aria-label={label} className={cn(styles, className)}>
-        <ChevronLeft className="size-5" aria-hidden />
+      <Link
+        href={href}
+        aria-label={accessibleLabel}
+        className={cn(
+          styles,
+          className,
+          closeSongSheet && "right-0! left-auto!",
+        )}
+      >
+        <Icon className="size-5" aria-hidden />
       </Link>
     );
   }
@@ -58,10 +68,14 @@ export function BackButton({
     <button
       type="button"
       onClick={onClick}
-      aria-label={label}
-      className={cn(styles, className)}
+      aria-label={accessibleLabel}
+      className={cn(
+        styles,
+        className,
+        closeSongSheet && "right-0! left-auto!",
+      )}
     >
-      <ChevronLeft className="size-5" aria-hidden />
+      <Icon className="size-5" aria-hidden />
     </button>
   );
 }

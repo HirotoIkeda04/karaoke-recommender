@@ -141,14 +141,14 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
                 : "上にスワイプして楽曲詳細を広げる"
             }
             aria-expanded={expanded}
-            className="flex h-7 shrink-0 touch-none cursor-grab items-center justify-center active:cursor-grabbing"
+            className="absolute inset-x-0 top-0 z-20 flex h-10 touch-none cursor-grab items-start justify-center bg-gradient-to-b from-black/35 to-transparent pt-3 active:cursor-grabbing"
             onPointerDown={(event) => dragControls.start(event)}
           >
-            <span className="h-1 w-10 rounded-full bg-zinc-300 dark:bg-zinc-600" />
+            <span className="h-1 w-10 rounded-full bg-white/55 shadow-sm" />
           </button>
           <div
             ref={contentRef}
-            className={`min-h-0 flex-1 overscroll-contain pb-[env(safe-area-inset-bottom)] ${
+            className={`min-h-0 flex-1 overscroll-contain pb-[env(safe-area-inset-bottom)] [--song-detail-leading-padding:0rem] [--song-detail-top-padding:2.5rem] [--song-detail-trailing-padding:2.5rem] ${
               expanded ? "overflow-y-auto" : "overflow-hidden"
             }`}
             onWheel={(event) => {

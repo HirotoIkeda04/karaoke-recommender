@@ -268,7 +268,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
   }
 
   return (
-    <div className="relative">
+    <div className="relative isolate">
       {image ? (
         <div
           aria-hidden
@@ -284,33 +284,30 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
           <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background via-30% to-background to-55%" />
         </div>
       ) : null}
-      <div className="relative mx-auto max-w-md space-y-5 px-4 py-4">
-        <div className="space-y-2">
-          <div className="relative">
-            <BackButton
-              fallbackHref="/songs"
-              className="absolute left-0 -top-2 z-10 ml-0!"
-            />
-            <div className="relative mx-auto mt-2 aspect-square w-3/5 max-w-[14rem] overflow-hidden rounded-xs bg-zinc-200 dark:bg-zinc-800">
-              {image ? (
-                <JacketImage
-                  src={image}
-                  alt={`${song.title} のジャケット`}
-                  fill
-                  sizes="14rem"
-                  priority
-                  className="object-cover"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center text-5xl text-zinc-400">
-                  ♪
-                </div>
-              )}
-            </div>
+      <div className="relative mx-auto max-w-md space-y-5 px-4 pb-4 pt-[var(--song-detail-top-padding,1rem)]">
+        <div className="relative mx-5 flex items-center gap-4 pr-[var(--song-detail-trailing-padding,0rem)] pl-[var(--song-detail-leading-padding,2.5rem)]">
+          <BackButton
+            fallbackHref="/songs"
+            className="absolute left-0 -top-2 z-10 ml-0!"
+          />
+          <div className="relative aspect-square w-[28%] max-w-[6.5rem] shrink-0 overflow-hidden rounded-xs bg-zinc-200 dark:bg-zinc-800">
+            {image ? (
+              <JacketImage
+                src={image}
+                alt={`${song.title} のジャケット`}
+                fill
+                sizes="6.5rem"
+                priority
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-5xl text-zinc-400">
+                ♪
+              </div>
+            )}
           </div>
-
-          <div className="min-w-0 text-center">
-            <h1 className="truncate text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <div className="min-w-0 flex-1 text-left">
+            <h1 className="line-clamp-2 text-2xl leading-tight font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
               {song.title}
             </h1>
             <p className="mt-0.5 truncate text-sm text-zinc-600 dark:text-zinc-400">
@@ -329,32 +326,32 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
           </div>
         </div>
 
-      <div className="flex items-center justify-center gap-3">
-        <Link
-          href={`https://www.uta-net.com/search/?target=song&type=in&Keyword=${encodeURIComponent(song.title)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="歌詞ネットで歌詞を見る"
-          className="grid size-11 shrink-0 place-items-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
-        >
-          <ScrollText className="size-4" aria-hidden />
-        </Link>
-        <RatingControls
-          songId={song.id}
-          initialRating={evaluation?.rating ?? null}
-        />
-        {song.spotify_track_id ? (
+        <div className="flex items-center justify-center gap-3">
           <Link
-            href={`https://open.spotify.com/track/${song.spotify_track_id}`}
+            href={`https://www.uta-net.com/search/?target=song&type=in&Keyword=${encodeURIComponent(song.title)}`}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Spotify で聴く"
+            aria-label="歌詞ネットで歌詞を見る"
             className="grid size-11 shrink-0 place-items-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
           >
-            <Play className="ml-0.5 size-4 fill-current" aria-hidden />
+            <ScrollText className="size-4" aria-hidden />
           </Link>
-        ) : null}
-      </div>
+          <RatingControls
+            songId={song.id}
+            initialRating={evaluation?.rating ?? null}
+          />
+          {song.spotify_track_id ? (
+            <Link
+              href={`https://open.spotify.com/track/${song.spotify_track_id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Spotify で聴く"
+              className="grid size-11 shrink-0 place-items-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
+            >
+              <Play className="ml-0.5 size-4 fill-current" aria-hidden />
+            </Link>
+          ) : null}
+        </div>
 
       <section className="space-y-2">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">

@@ -5,18 +5,18 @@
 export default function Loading() {
   return (
     <div
-      className="relative mx-auto max-w-md space-y-5 px-4 py-4"
+      className="relative mx-auto max-w-md space-y-5 px-4 pb-4 pt-[var(--song-detail-top-padding,1rem)]"
       role="status"
       aria-label="読み込み中"
     >
-      <div className="space-y-2">
-        {/* ジャケット (3/5 幅, max 14rem, 中央寄せ) */}
-        <div className="mx-auto mt-2 aspect-square w-3/5 max-w-[14rem] animate-pulse rounded-xs bg-zinc-200 dark:bg-zinc-800" />
+      <div className="mx-5 flex items-center gap-4">
+        {/* ジャケット (最大 6.5rem, 左寄せ) */}
+        <div className="aspect-square w-[28%] max-w-[6.5rem] shrink-0 animate-pulse rounded-xs bg-zinc-200 dark:bg-zinc-800" />
 
-        {/* 曲名 + アーティスト (中央寄せ) */}
-        <div className="space-y-2 text-center">
-          <div className="mx-auto h-7 w-3/4 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-          <div className="mx-auto h-4 w-1/2 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+        {/* 曲名 + アーティスト (右側、左寄せ) */}
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="h-7 w-3/4 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+          <div className="h-4 w-1/2 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
         </div>
       </div>
 
