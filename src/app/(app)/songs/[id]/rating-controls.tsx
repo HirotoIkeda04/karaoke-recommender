@@ -30,11 +30,16 @@ const RATING_LABELS: Record<Rating, string> = RATINGS.reduce(
 interface RatingControlsProps {
   songId: string;
   initialRating: Rating | null;
+  compact?: boolean;
 }
 
 type Toast = { id: number; message: string };
 
-export function RatingControls({ songId, initialRating }: RatingControlsProps) {
+export function RatingControls({
+  songId,
+  initialRating,
+  compact = false,
+}: RatingControlsProps) {
   const [rating, setRating] = useState<Rating | null>(initialRating);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -93,7 +98,11 @@ export function RatingControls({ songId, initialRating }: RatingControlsProps) {
         onClick={() => setIsOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
-        className={`inline-flex h-11 items-center gap-2 rounded-full pl-14 pr-16 text-sm font-medium transition disabled:opacity-50 ${
+        className={`inline-flex items-center gap-2 rounded-full font-medium transition disabled:opacity-50 ${
+          compact
+            ? "h-9 justify-center px-4 text-xs"
+            : "h-11 pl-14 pr-16 text-sm"
+        } ${
           activeRating
             ? `${activeRating.color} shadow-sm`
             : "bg-white text-zinc-900 hover:bg-zinc-100 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"

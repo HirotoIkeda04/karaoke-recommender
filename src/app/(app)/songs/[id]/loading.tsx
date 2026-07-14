@@ -20,6 +20,16 @@ export default function Loading() {
         </div>
       </div>
 
+      {/* 評価・再生・歌詞ボタン */}
+      <div className="-mr-4 ml-5 flex gap-2 overflow-hidden pr-4">
+        {["w-24", "w-28", "w-28"].map((width, i) => (
+          <div
+            key={i}
+            className={`h-9 ${width} shrink-0 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800`}
+          />
+        ))}
+      </div>
+
       {/* 楽曲情報 section */}
       <section className="space-y-2">
         <div className="h-3 w-16 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
@@ -39,11 +49,6 @@ export default function Loading() {
         </div>
       </section>
 
-      {/* 評価コントロール + Spotify ボタン */}
-      <div className="flex items-center justify-center gap-3">
-        <div className="h-11 w-44 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
-        <div className="size-11 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
-      </div>
     </div>
   );
 }

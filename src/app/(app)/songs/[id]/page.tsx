@@ -326,6 +326,41 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
           </div>
         </div>
 
+        <div
+          aria-label="楽曲の操作"
+          className="-mr-4 ml-5 flex snap-x snap-mandatory gap-2 overflow-x-auto pr-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          <div className="shrink-0 snap-start">
+            <RatingControls
+              songId={song.id}
+              initialRating={evaluation?.rating ?? null}
+              compact
+            />
+          </div>
+          {song.spotify_track_id ? (
+            <Link
+              href={`https://open.spotify.com/track/${song.spotify_track_id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Spotify で再生する"
+              className="inline-flex h-9 shrink-0 snap-start items-center justify-center gap-2 rounded-full bg-zinc-100 px-4 text-xs font-medium text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
+            >
+              <Play className="size-4 fill-current" aria-hidden />
+              <span>再生する</span>
+            </Link>
+          ) : null}
+          <Link
+            href={`https://www.uta-net.com/search/?target=song&type=in&Keyword=${encodeURIComponent(song.title)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="歌詞ネットで歌詞を見る"
+            className="inline-flex h-9 shrink-0 snap-start items-center justify-center gap-2 rounded-full bg-zinc-100 px-4 text-xs font-medium text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
+          >
+            <ScrollText className="size-4" aria-hidden />
+            <span>歌詞を見る</span>
+          </Link>
+        </div>
+
       <section className="space-y-2">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
           楽曲情報
@@ -357,33 +392,6 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
           </div>
         </dl>
       </section>
-
-      <div className="flex items-center justify-center gap-3">
-        <Link
-          href={`https://www.uta-net.com/search/?target=song&type=in&Keyword=${encodeURIComponent(song.title)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="歌詞ネットで歌詞を見る"
-          className="grid size-11 shrink-0 place-items-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
-        >
-          <ScrollText className="size-4" aria-hidden />
-        </Link>
-        <RatingControls
-          songId={song.id}
-          initialRating={evaluation?.rating ?? null}
-        />
-        {song.spotify_track_id ? (
-          <Link
-            href={`https://open.spotify.com/track/${song.spotify_track_id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Spotify で聴く"
-            className="grid size-11 shrink-0 place-items-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
-          >
-            <Play className="ml-0.5 size-4 fill-current" aria-hidden />
-          </Link>
-        ) : null}
-      </div>
 
       <SongLogs songId={song.id} initialLogs={logs} />
 
