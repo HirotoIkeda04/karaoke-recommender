@@ -328,7 +328,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
 
         <div
           aria-label="楽曲の操作"
-          className="-mr-4 ml-5 flex snap-x snap-mandatory gap-2 overflow-x-auto pr-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="-mr-4 ml-4 flex snap-x snap-mandatory gap-2 overflow-x-auto pr-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <div className="shrink-0 snap-start">
             <RatingControls
@@ -343,9 +343,9 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Spotify で再生する"
-              className="inline-flex h-9 shrink-0 snap-start items-center justify-center gap-2 rounded-full bg-zinc-100 px-4 text-xs font-medium text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
+              className="inline-flex h-9 shrink-0 snap-start items-center justify-center gap-2 rounded-full bg-zinc-100/80 px-4 text-xs font-medium text-zinc-700 backdrop-blur-sm transition hover:bg-zinc-200/85 active:bg-zinc-200/85 dark:bg-zinc-800/75 dark:text-zinc-200 dark:hover:bg-zinc-700/80 dark:active:bg-zinc-700/80"
             >
-              <Play className="size-4 fill-current" aria-hidden />
+              <Play className="size-3.5 fill-current" aria-hidden />
               <span>再生する</span>
             </Link>
           ) : null}
@@ -354,7 +354,7 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="歌詞ネットで歌詞を見る"
-            className="inline-flex h-9 shrink-0 snap-start items-center justify-center gap-2 rounded-full bg-zinc-100 px-4 text-xs font-medium text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
+            className="inline-flex h-9 shrink-0 snap-start items-center justify-center gap-2 rounded-full bg-zinc-100/80 px-4 text-xs font-medium text-zinc-700 backdrop-blur-sm transition hover:bg-zinc-200/85 active:bg-zinc-200/85 dark:bg-zinc-800/75 dark:text-zinc-200 dark:hover:bg-zinc-700/80 dark:active:bg-zinc-700/80"
           >
             <ScrollText className="size-4" aria-hidden />
             <span>歌詞を見る</span>

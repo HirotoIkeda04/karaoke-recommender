@@ -46,7 +46,7 @@ export function BackButton({
           closeSongSheet && "right-0! left-auto!",
         )}
       >
-        <Icon className="size-5" aria-hidden />
+        <Icon className={cn(closeSongSheet ? "size-6" : "size-5")} aria-hidden />
       </Link>
     );
   }
@@ -75,7 +75,7 @@ export function BackButton({
         closeSongSheet && "right-0! left-auto!",
       )}
     >
-      <Icon className="size-5" aria-hidden />
+      <Icon className={cn(closeSongSheet ? "size-6" : "size-5")} aria-hidden />
     </button>
   );
 }

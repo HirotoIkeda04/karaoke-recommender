@@ -21,7 +21,7 @@ export default function Loading() {
       </div>
 
       {/* 評価・再生・歌詞ボタン */}
-      <div className="-mr-4 ml-5 flex gap-2 overflow-hidden pr-4">
+      <div className="-mr-4 ml-4 flex gap-2 overflow-hidden pr-4">
         {["w-24", "w-28", "w-28"].map((width, i) => (
           <div
             key={i}

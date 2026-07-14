@@ -15,11 +15,36 @@ const RATINGS: ReadonlyArray<{
   label: string;
   Icon: typeof X;
   color: string;
+  iconColor: string;
 }> = [
-  { value: "hard", label: "苦手", Icon: X, color: "bg-red-500 text-white" },
-  { value: "medium", label: "普通", Icon: Minus, color: "bg-yellow-500 text-white" },
-  { value: "easy", label: "得意", Icon: Check, color: "bg-emerald-500 text-white" },
-  { value: "practicing", label: "練習中", Icon: DumbbellMini, color: "bg-purple-500 text-white" },
+  {
+    value: "hard",
+    label: "苦手",
+    Icon: X,
+    color: "bg-red-500 text-white",
+    iconColor: "text-red-500",
+  },
+  {
+    value: "medium",
+    label: "普通",
+    Icon: Minus,
+    color: "bg-yellow-500 text-white",
+    iconColor: "text-yellow-500",
+  },
+  {
+    value: "easy",
+    label: "得意",
+    Icon: Check,
+    color: "bg-emerald-500 text-white",
+    iconColor: "text-emerald-500",
+  },
+  {
+    value: "practicing",
+    label: "練習中",
+    Icon: DumbbellMini,
+    color: "bg-purple-500 text-white",
+    iconColor: "text-purple-500",
+  },
 ];
 
 const RATING_LABELS: Record<Rating, string> = RATINGS.reduce(
@@ -98,19 +123,17 @@ export function RatingControls({
         onClick={() => setIsOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
-        className={`inline-flex items-center gap-2 rounded-full font-medium transition disabled:opacity-50 ${
-          compact
-            ? "h-9 justify-center px-4 text-xs"
-            : "h-11 pl-14 pr-16 text-sm"
-        } ${
-          activeRating
-            ? `${activeRating.color} shadow-sm`
-            : "bg-white text-zinc-900 hover:bg-zinc-100 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+        className={`inline-flex items-center gap-2 rounded-full bg-zinc-100/80 font-medium text-zinc-700 backdrop-blur-sm transition hover:bg-zinc-200/85 active:bg-zinc-200/85 disabled:opacity-50 dark:bg-zinc-800/75 dark:text-zinc-200 dark:hover:bg-zinc-700/80 dark:active:bg-zinc-700/80 ${
+          compact ? "h-9 justify-center px-4 text-xs" : "h-11 pl-14 pr-16 text-sm"
         }`}
       >
         {activeRating ? (
           <>
-            <activeRating.Icon className="size-4" aria-hidden />
+            <activeRating.Icon
+              className={`size-4 ${activeRating.iconColor}`}
+              strokeWidth={rating === "practicing" ? 2.5 : 4}
+              aria-hidden
+            />
             {activeRating.label}
           </>
         ) : (
