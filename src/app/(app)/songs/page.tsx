@@ -1,12 +1,27 @@
 import { GENRE_CODES, type GenreCode } from "@/lib/genres";
 import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
 import { createClient } from "@/lib/supabase/server";
+import type { Database } from "@/types/database";
 
 import { LiveSearch } from "./live-search";
 
 export const dynamic = "force-dynamic";
 
 type SupabaseServer = Awaited<ReturnType<typeof createClient>>;
+
+type RankingPreviewSong = Pick<
+  Database["public"]["Tables"]["songs"]["Row"],
+  | "id"
+  | "title"
+  | "artist"
+  | "release_year"
+  | "range_low_midi"
+  | "range_high_midi"
+  | "falsetto_max_midi"
+  | "image_url_small"
+  | "image_url_medium"
+  | "duration_ms"
+>;
 
 // 各ジャンルの fame_score 上位曲のジャケット画像 URL を 4 件まで取得。
 // BrowseGrid のカード背景 (2x2 モザイク) に使う。
@@ -69,7 +84,7 @@ export default async function SongsPage() {
   } = await supabase.auth.getSession();
   const userId = session?.user?.id;
 
-  const [knownIds, evalsRes, genreCovers, rankingCovers] = await Promise.all([
+  const [knownIds, evalsRes, genreCovers, rankingPreview] = await Promise.all([
     getUserKnownSongIds(),
     userId
       ? supabase
@@ -78,7 +93,7 @@ export default async function SongsPage() {
           .eq("user_id", userId)
       : Promise.resolve({ data: [] as Array<{ song_id: string; rating: string }> }),
     getGenreCovers(supabase),
-    getRankingCovers(supabase),
+    getRankingPreview(supabase),
   ]);
 
   const ratings: Record<string, string> = {};
@@ -92,22 +107,26 @@ export default async function SongsPage() {
         ratings={ratings}
         knownSongIds={Array.from(knownIds)}
         genreCovers={genreCovers}
-        rankingCovers={rankingCovers}
+        rankingCovers={rankingPreview.covers}
+        rankingPreview={rankingPreview.items}
       />
     </div>
   );
 }
 
-// 今週ランキングの上位曲ジャケットを 4 件まで取得し、Browse の
-// "今週のランキング" カード背景に使う。
-async function getRankingCovers(supabase: SupabaseServer): Promise<string[]> {
+// 今週ランキングの上位 5 曲とジャケットを取得し、Browse の
+// プレビュー一覧と既存の「今週のランキング」カード背景に使う。
+async function getRankingPreview(supabase: SupabaseServer): Promise<{
+  covers: string[];
+  items: Array<{ rank: number; song: RankingPreviewSong }>;
+}> {
   const { data: latest } = await supabase
     .from("weekly_rankings")
     .select("week_start")
     .order("week_start", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (!latest) return [];
+  if (!latest) return { covers: [], items: [] };
   const { data: rankRows } = await supabase
     .from("weekly_rankings")
     .select("song_id, final_rank")
@@ -115,19 +134,29 @@ async function getRankingCovers(supabase: SupabaseServer): Promise<string[]> {
     .order("final_rank", { ascending: true })
     .limit(12);
   const ids = (rankRows ?? []).map((r) => r.song_id);
-  if (ids.length === 0) return [];
+  if (ids.length === 0) return { covers: [], items: [] };
   const { data: songs } = await supabase
     .from("songs")
-    .select("id, image_url_medium, image_url_small")
+    .select(
+      "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, duration_ms",
+    )
     .in("id", ids);
   const byId = new Map(
-    (songs ?? []).map((s) => [s.id, s.image_url_medium ?? s.image_url_small ?? null]),
+    ((songs ?? []) as RankingPreviewSong[]).map((song) => [song.id, song]),
   );
   const covers: string[] = [];
   for (const r of rankRows ?? []) {
-    const url = byId.get(r.song_id);
+    const song = byId.get(r.song_id);
+    const url = song?.image_url_medium ?? song?.image_url_small;
     if (url && !covers.includes(url)) covers.push(url);
     if (covers.length >= 4) break;
   }
-  return covers;
+  const items: Array<{ rank: number; song: RankingPreviewSong }> = [];
+  for (const row of rankRows ?? []) {
+    const song = byId.get(row.song_id);
+    if (!song) continue;
+    items.push({ rank: row.final_rank, song });
+    if (items.length >= 5) break;
+  }
+  return { covers, items };
 }

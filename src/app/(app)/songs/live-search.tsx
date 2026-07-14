@@ -54,6 +54,8 @@ interface LiveSearchProps {
   genreCovers?: Partial<Record<GenreCode, string[]>>;
   /** ランキングカード背景に使う、今週 top 4 曲のジャケット URL */
   rankingCovers?: string[];
+  /** 検索タブに表示する、今週のランキング上位曲 */
+  rankingPreview?: Array<{ rank: number; song: Song }>;
 }
 
 const HIGH_OPTIONS = [
@@ -96,6 +98,7 @@ export function LiveSearch({
   knownSongIds = [],
   genreCovers = {},
   rankingCovers = [],
+  rankingPreview = [],
 }: LiveSearchProps) {
   const [query, setQuery] = useState("");
   const [highMax, setHighMax] = useState("");
@@ -308,7 +311,13 @@ export function LiveSearch({
       </div>
 
       {mode === "browse" ? (
-        <BrowseGrid genreCovers={genreCovers} rankingCovers={rankingCovers} />
+        <BrowseGrid
+          genreCovers={genreCovers}
+          rankingCovers={rankingCovers}
+          rankingPreview={rankingPreview}
+          ratings={ratings}
+          knownSet={knownSet}
+        />
       ) : mode === "history" ? (
         <HistoryList
           history={history}
@@ -342,15 +351,18 @@ export function LiveSearch({
 function BrowseGrid({
   genreCovers,
   rankingCovers,
+  rankingPreview,
+  ratings,
+  knownSet,
 }: {
   genreCovers: Partial<Record<GenreCode, string[]>>;
   rankingCovers: string[];
+  rankingPreview: Array<{ rank: number; song: Song }>;
+  ratings: Record<string, string>;
+  knownSet: Set<string>;
 }) {
   return (
     <section>
-      <h2 className="mb-2 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-        ブラウズを開始
-      </h2>
       <ul className="grid grid-cols-2 gap-2">
         {/* 「今週のランキング」エントリ。col-span-2 で全幅、aspect は
             ジャンルカード半分弱の高さに揃えて視覚的バランスを取る。 */}
@@ -430,6 +442,37 @@ function BrowseGrid({
             </div>
           </Link>
         </li>
+        {rankingPreview.length > 0 ? (
+          <li className="col-span-2 rounded-lg bg-zinc-50 px-2 py-3 dark:bg-zinc-900/70">
+            <div className="mb-1 flex items-center justify-between px-2">
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                今週のランキング
+              </h3>
+              <Link
+                href="/rankings"
+                className="text-xs font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              >
+                もっと見る ›
+              </Link>
+            </div>
+            <ol className="space-y-0.5">
+              {rankingPreview.map(({ rank, song }) => (
+                <li key={song.id} className="flex items-center gap-1">
+                  <span className="w-6 shrink-0 text-right text-sm font-bold tabular-nums text-zinc-500 dark:text-zinc-400">
+                    {rank}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <SongCard
+                      song={song}
+                      rating={ratings[song.id] ?? null}
+                      isKnown={knownSet.has(song.id)}
+                    />
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </li>
+        ) : null}
         {/* 「年代別J-POP」エントリ。col-span-2 で全幅。視覚的にランキング
             カードと並ぶ。色は元の j_pop カードと同じピンク/ローズ系を踏襲。 */}
         <li className="col-span-2">
@@ -794,4 +837,3 @@ function ResultsList({
     </div>
   );
 }
-
