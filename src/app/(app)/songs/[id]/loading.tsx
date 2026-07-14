@@ -20,12 +20,6 @@ export default function Loading() {
         </div>
       </div>
 
-      {/* 評価コントロール + Spotify ボタン */}
-      <div className="flex items-center justify-center gap-3">
-        <div className="h-11 w-44 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
-        <div className="size-11 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
-      </div>
-
       {/* 楽曲情報 section */}
       <section className="space-y-2">
         <div className="h-3 w-16 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
@@ -44,6 +38,12 @@ export default function Loading() {
           ))}
         </div>
       </section>
+
+      {/* 評価コントロール + Spotify ボタン */}
+      <div className="flex items-center justify-center gap-3">
+        <div className="h-11 w-44 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
+        <div className="size-11 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
+      </div>
     </div>
   );
 }

@@ -326,33 +326,6 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-3">
-          <Link
-            href={`https://www.uta-net.com/search/?target=song&type=in&Keyword=${encodeURIComponent(song.title)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="歌詞ネットで歌詞を見る"
-            className="grid size-11 shrink-0 place-items-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
-          >
-            <ScrollText className="size-4" aria-hidden />
-          </Link>
-          <RatingControls
-            songId={song.id}
-            initialRating={evaluation?.rating ?? null}
-          />
-          {song.spotify_track_id ? (
-            <Link
-              href={`https://open.spotify.com/track/${song.spotify_track_id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Spotify で聴く"
-              className="grid size-11 shrink-0 place-items-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
-            >
-              <Play className="ml-0.5 size-4 fill-current" aria-hidden />
-            </Link>
-          ) : null}
-        </div>
-
       <section className="space-y-2">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
           楽曲情報
@@ -384,6 +357,33 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
           </div>
         </dl>
       </section>
+
+      <div className="flex items-center justify-center gap-3">
+        <Link
+          href={`https://www.uta-net.com/search/?target=song&type=in&Keyword=${encodeURIComponent(song.title)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="歌詞ネットで歌詞を見る"
+          className="grid size-11 shrink-0 place-items-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
+        >
+          <ScrollText className="size-4" aria-hidden />
+        </Link>
+        <RatingControls
+          songId={song.id}
+          initialRating={evaluation?.rating ?? null}
+        />
+        {song.spotify_track_id ? (
+          <Link
+            href={`https://open.spotify.com/track/${song.spotify_track_id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Spotify で聴く"
+            className="grid size-11 shrink-0 place-items-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
+          >
+            <Play className="ml-0.5 size-4 fill-current" aria-hidden />
+          </Link>
+        ) : null}
+      </div>
 
       <SongLogs songId={song.id} initialLogs={logs} />
 
