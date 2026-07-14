@@ -8,6 +8,7 @@ Wikipedia API はモックする。重点は「曲名が別主題の有名記事
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -18,6 +19,7 @@ from fetch_wikipedia_fame import (
     _is_disambiguation_page,
     _is_song_article,
     _last_completed_month_timestamp,
+    _previous_month_timestamp,
     _title_similar,
 )
 
@@ -74,6 +76,9 @@ class TestTitleVariants:
     def test_pageviews_period_ends_at_last_completed_month(self) -> None:
         now = datetime(2026, 7, 14, 12, 0, tzinfo=timezone.utc)
         assert _last_completed_month_timestamp(now) == "2026060100"
+
+    def test_previous_pageviews_month_handles_year_boundary(self) -> None:
+        assert _previous_month_timestamp("2026010100") == "2025120100"
 
     def test_dual_a_side_article_contains_catalog_title(self) -> None:
         assert _title_similar("truth", "Truth/風の向こうへ")
@@ -199,3 +204,29 @@ class TestResolveWithVerification:
             client._resolve_with_verification("truth", "truth", "嵐")
             == "Truth/風の向こうへ"
         )
+
+
+class TestTotalPageviews:
+    def test_retries_with_earlier_end_month_after_404(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        first = MagicMock(status_code=404)
+        second = MagicMock(status_code=200)
+        second.json.return_value = {
+            "items": [{"views": 120}, {"views": 30}]
+        }
+        session = MagicMock()
+        session.get.side_effect = [first, second]
+        client = WikipediaClient(session=session)
+        monkeypatch.setattr(client, "_throttle_pageviews", lambda: None)
+        monkeypatch.setattr(
+            "fetch_wikipedia_fame._last_completed_month_timestamp",
+            lambda: "2026060100",
+        )
+
+        assert client.total_pageviews("北の漁場") == 150
+        assert session.get.call_count == 2
+        first_url = session.get.call_args_list[0].args[0]
+        second_url = session.get.call_args_list[1].args[0]
+        assert first_url.endswith("/2026060100")
+        assert second_url.endswith("/2026050100")

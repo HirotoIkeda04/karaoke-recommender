@@ -112,11 +112,58 @@
   },
   {
     "artist": "美空ひばり",
-    "limit": 5,
+    "limit": 8,
     "required_top_titles": [
       "川の流れのように",
       "愛燦燦",
-      "お祭りマンボ"
+      "お祭りマンボ",
+      "みだれ髪",
+      "港町十三番地",
+      "柔",
+      "真赤な太陽",
+      "悲しい酒"
+    ]
+  },
+  {
+    "artist": "八代亜紀",
+    "limit": 4,
+    "required_top_titles": [
+      "舟唄",
+      "愛の終着駅"
+    ]
+  },
+  {
+    "artist": "吉幾三",
+    "limit": 6,
+    "required_top_titles": [
+      "酒よ",
+      "雪國",
+      "酔歌"
+    ]
+  },
+  {
+    "artist": "川中美幸",
+    "limit": 6,
+    "required_top_titles": [
+      "二輪草",
+      "ふたり酒"
+    ]
+  },
+  {
+    "artist": "北島三郎",
+    "limit": 5,
+    "required_top_titles": [
+      "まつり",
+      "北の漁場"
+    ]
+  },
+  {
+    "artist": "都はるみ",
+    "limit": 5,
+    "required_top_titles": [
+      "北の宿から",
+      "大阪しぐれ",
+      "好きになった人"
     ]
   }
 ]

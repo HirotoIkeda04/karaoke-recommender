@@ -46,6 +46,9 @@ SEARCH_ENDPOINT = "https://ja.wikipedia.org/w/api.php"
 REQUEST_TIMEOUT_SEC = 15
 # Pageviews API は 100 req/sec まで許容されるが、行儀よく 5 req/sec に。
 PAGEVIEWS_INTERVAL_SEC = 0.2
+# 記事単位で直近月の系列だけ欠け、長い期間指定が 404 になる場合がある。
+# 全期間の取得を諦めず、終端を最大 12 か月だけ後退させる。
+PAGEVIEWS_MAX_FALLBACK_MONTHS = 12
 # Search API は 200 req/sec が公称だが、こちらも 5 req/sec に。
 SEARCH_INTERVAL_SEC = 0.2
 
@@ -84,6 +87,15 @@ def _last_completed_month_timestamp(now: datetime | None = None) -> str:
         microsecond=0,
     )
     previous_month = first_of_current_month - timedelta(days=1)
+    return previous_month.strftime("%Y%m0100")
+
+
+def _previous_month_timestamp(timestamp: str) -> str:
+    """Pageviews の月初 timestamp を 1 か月前へ進める。"""
+    month_start = datetime.strptime(timestamp, "%Y%m%d%H").replace(
+        tzinfo=timezone.utc
+    )
+    previous_month = month_start - timedelta(days=1)
     return previous_month.strftime("%Y%m0100")
 
 
@@ -472,7 +484,8 @@ class WikipediaClient:
     def total_pageviews(self, article: str) -> int:
         """記事の全期間累計閲覧数を取得 (2015-07 〜 直近の完了月)。
 
-        404 や空レスポンスは 0 を返す。
+        直近月の系列欠落による 404 は終端を最大 12 か月後退して再取得する。
+        それでも 404 の場合は PageviewsUnavailableError を raise する。
         ConnectionError 等の一過性エラーはリトライ後 TransientFetchError を raise。
         """
         # 月次APIに当月途中の日付を渡すと、当月データがまだ無い記事だけ404に
@@ -480,54 +493,84 @@ class WikipediaClient:
         through = _last_completed_month_timestamp()
         # Pageviews API はスペースをアンダースコアに変換した形式で要求する
         article_path = quote(article.replace(" ", "_"), safe="")
-        url = PAGEVIEWS_ENDPOINT.format(
-            article=article_path,
-            from_=PAGEVIEWS_FROM,
-            to=through,
+        for fallback_months in range(PAGEVIEWS_MAX_FALLBACK_MONTHS + 1):
+            url = PAGEVIEWS_ENDPOINT.format(
+                article=article_path,
+                from_=PAGEVIEWS_FROM,
+                to=through,
+            )
+            for attempt in range(MAX_RETRIES):
+                self._throttle_pageviews()
+                try:
+                    resp = self.session.get(url, timeout=REQUEST_TIMEOUT_SEC)
+                except (requests.ConnectionError, requests.Timeout) as e:
+                    wait = RETRY_BACKOFF_BASE_SEC * (2**attempt)
+                    logger.warning(
+                        "pageviews transient error for %r "
+                        "(attempt %d/%d, sleep %.1fs): %s",
+                        article,
+                        attempt + 1,
+                        MAX_RETRIES,
+                        wait,
+                        e,
+                    )
+                    time.sleep(wait)
+                    continue
+                except requests.RequestException as e:
+                    logger.warning("pageviews failed for %r: %s", article, e)
+                    return 0
+                if resp.status_code == 404:
+                    break
+                if resp.status_code in _TRANSIENT_HTTP_STATUSES:
+                    wait = RETRY_BACKOFF_BASE_SEC * (2**attempt)
+                    retry_after = resp.headers.get("Retry-After")
+                    if retry_after and retry_after.isdigit():
+                        wait = max(wait, float(retry_after))
+                    logger.warning(
+                        "pageviews HTTP %d for %r "
+                        "(attempt %d/%d, sleep %.1fs)",
+                        resp.status_code,
+                        article,
+                        attempt + 1,
+                        MAX_RETRIES,
+                        wait,
+                    )
+                    time.sleep(wait)
+                    continue
+                if resp.status_code != 200:
+                    logger.warning(
+                        "pageviews %d for %r: %s",
+                        resp.status_code,
+                        article,
+                        resp.text[:200],
+                    )
+                    return 0
+                try:
+                    data = resp.json()
+                except ValueError:
+                    return 0
+                items = data.get("items", [])
+                if fallback_months:
+                    logger.warning(
+                        "pageviews for %r ended %d month(s) early at %s",
+                        article,
+                        fallback_months,
+                        through,
+                    )
+                return sum(int(i.get("views") or 0) for i in items)
+            else:
+                raise TransientFetchError(
+                    f"pageviews {article!r} after {MAX_RETRIES} retries"
+                )
+
+            if fallback_months == PAGEVIEWS_MAX_FALLBACK_MONTHS:
+                break
+            through = _previous_month_timestamp(through)
+
+        raise PageviewsUnavailableError(
+            f"pageviews unavailable for resolved article {article!r} "
+            f"after {PAGEVIEWS_MAX_FALLBACK_MONTHS} fallback month(s)"
         )
-        for attempt in range(MAX_RETRIES):
-            self._throttle_pageviews()
-            try:
-                resp = self.session.get(url, timeout=REQUEST_TIMEOUT_SEC)
-            except (requests.ConnectionError, requests.Timeout) as e:
-                wait = RETRY_BACKOFF_BASE_SEC * (2 ** attempt)
-                logger.warning(
-                    "pageviews transient error for %r (attempt %d/%d, sleep %.1fs): %s",
-                    article, attempt + 1, MAX_RETRIES, wait, e,
-                )
-                time.sleep(wait)
-                continue
-            except requests.RequestException as e:
-                logger.warning("pageviews failed for %r: %s", article, e)
-                return 0
-            if resp.status_code == 404:
-                raise PageviewsUnavailableError(
-                    f"pageviews unavailable for resolved article {article!r}"
-                )
-            if resp.status_code in _TRANSIENT_HTTP_STATUSES:
-                wait = RETRY_BACKOFF_BASE_SEC * (2 ** attempt)
-                retry_after = resp.headers.get("Retry-After")
-                if retry_after and retry_after.isdigit():
-                    wait = max(wait, float(retry_after))
-                logger.warning(
-                    "pageviews HTTP %d for %r (attempt %d/%d, sleep %.1fs)",
-                    resp.status_code, article, attempt + 1, MAX_RETRIES, wait,
-                )
-                time.sleep(wait)
-                continue
-            if resp.status_code != 200:
-                logger.warning(
-                    "pageviews %d for %r: %s",
-                    resp.status_code, article, resp.text[:200],
-                )
-                return 0
-            try:
-                data = resp.json()
-            except ValueError:
-                return 0
-            items = data.get("items", [])
-            return sum(int(i.get("views") or 0) for i in items)
-        raise TransientFetchError(f"pageviews {article!r} after {MAX_RETRIES} retries")
 
     # -- 高水準 API ----------------------------------------------------------
 
