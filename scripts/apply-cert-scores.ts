@@ -16,11 +16,31 @@ import { resolve } from "node:path";
 import { createAdminClient } from "../src/lib/supabase/admin";
 
 interface CertCacheEntry {
+  song_id?: string;
   title: string;
   artist: string;
   article: string | null;
   cert_score: number;
   cert_label: string;
+}
+
+function parseArgs() {
+  const args = process.argv.slice(2);
+  let input = resolve(process.cwd(), "scraper/output/cert_cache.jsonl");
+  let dryRun = false;
+  for (let index = 0; index < args.length; index++) {
+    if (args[index] === "--input") {
+      const value = args[index + 1];
+      if (!value) throw new Error("--input requires a path");
+      input = resolve(process.cwd(), value);
+      index++;
+    } else if (args[index] === "--dry-run") {
+      dryRun = true;
+    } else {
+      throw new Error(`unknown argument: ${args[index]}`);
+    }
+  }
+  return { input, dryRun };
 }
 
 function loadCache(path: string): CertCacheEntry[] {
@@ -39,9 +59,9 @@ function loadCache(path: string): CertCacheEntry[] {
 }
 
 async function main() {
-  const cachePath = resolve(process.cwd(), "scraper/output/cert_cache.jsonl");
-  const cache = loadCache(cachePath);
-  console.log(`loaded ${cache.length} cert cache entries`);
+  const { input, dryRun } = parseArgs();
+  const cache = loadCache(input);
+  console.log(`loaded ${cache.length} cert cache entries from ${input}`);
 
   const supabase = createAdminClient();
   const now = new Date().toISOString();
@@ -51,11 +71,10 @@ async function main() {
   let errors = 0;
 
   for (const [i, entry] of cache.entries()) {
-    const { data: rows, error: selErr } = await supabase
-      .from("songs")
-      .select("id")
-      .eq("title", entry.title)
-      .eq("artist", entry.artist);
+    const baseQuery = supabase.from("songs").select("id");
+    const { data: rows, error: selErr } = entry.song_id
+      ? await baseQuery.eq("id", entry.song_id)
+      : await baseQuery.eq("title", entry.title).eq("artist", entry.artist);
 
     if (selErr) {
       console.error(
@@ -71,6 +90,10 @@ async function main() {
     }
 
     const ids = rows.map((r) => r.id);
+    if (dryRun) {
+      updated += ids.length;
+      continue;
+    }
     // migration 043 を DB に適用 + `pnpm db:types` で再生成するまでは
     // cert_score / cert_label / cert_updated_at が生成型に存在しないため、
     // 型キャストで通す。マイグレーション適用後はこのキャストを外せる。
@@ -101,8 +124,9 @@ async function main() {
 
   const certPositive = cache.filter((e) => e.cert_score > 0).length;
   console.log(
-    `\ndone. cache_entries=${cache.length} (cert>0: ${certPositive}) ` +
-      `updated_rows=${updated} songs_missing=${songsMissing} errors=${errors}`,
+    `\n${dryRun ? "dry-run" : "done"}. cache_entries=${cache.length} ` +
+      `(cert>0: ${certPositive}) ${dryRun ? "would_update_rows" : "updated_rows"}=` +
+      `${updated} songs_missing=${songsMissing} errors=${errors}`,
   );
   if (errors > 0) process.exit(1);
 }

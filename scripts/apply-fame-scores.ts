@@ -16,11 +16,31 @@ import { resolve } from "node:path";
 import { createAdminClient } from "../src/lib/supabase/admin";
 
 interface FameCacheEntry {
+  song_id?: string;
   title: string;
   artist: string;
   article: string | null;
   total_views: number;
   fame_score: number;
+}
+
+function parseArgs() {
+  const args = process.argv.slice(2);
+  let input = resolve(process.cwd(), "scraper/output/fame_cache.jsonl");
+  let dryRun = false;
+  for (let index = 0; index < args.length; index++) {
+    if (args[index] === "--input") {
+      const value = args[index + 1];
+      if (!value) throw new Error("--input requires a path");
+      input = resolve(process.cwd(), value);
+      index++;
+    } else if (args[index] === "--dry-run") {
+      dryRun = true;
+    } else {
+      throw new Error(`unknown argument: ${args[index]}`);
+    }
+  }
+  return { input, dryRun };
 }
 
 function loadCache(path: string): FameCacheEntry[] {
@@ -31,7 +51,7 @@ function loadCache(path: string): FameCacheEntry[] {
     if (!trimmed) continue;
     try {
       entries.push(JSON.parse(trimmed));
-    } catch (e) {
+    } catch {
       console.warn(`skip malformed cache line: ${trimmed.slice(0, 100)}`);
     }
   }
@@ -39,12 +59,9 @@ function loadCache(path: string): FameCacheEntry[] {
 }
 
 async function main() {
-  const cachePath = resolve(
-    process.cwd(),
-    "scraper/output/fame_cache.jsonl",
-  );
-  const cache = loadCache(cachePath);
-  console.log(`loaded ${cache.length} cache entries`);
+  const { input, dryRun } = parseArgs();
+  const cache = loadCache(input);
+  console.log(`loaded ${cache.length} cache entries from ${input}`);
 
   const supabase = createAdminClient();
   const now = new Date().toISOString();
@@ -54,12 +71,11 @@ async function main() {
   let errors = 0;
 
   for (const [i, entry] of cache.entries()) {
-    // (title, artist) で songs を引く。重複は許容して全部更新。
-    const { data: rows, error: selErr } = await supabase
-      .from("songs")
-      .select("id")
-      .eq("title", entry.title)
-      .eq("artist", entry.artist);
+    // 新形式は song_id で厳密突合。旧キャッシュは title/artist にフォールバック。
+    const baseQuery = supabase.from("songs").select("id");
+    const { data: rows, error: selErr } = entry.song_id
+      ? await baseQuery.eq("id", entry.song_id)
+      : await baseQuery.eq("title", entry.title).eq("artist", entry.artist);
 
     if (selErr) {
       console.error(`[${i + 1}] select failed for ${entry.title} / ${entry.artist}:`, selErr);
@@ -72,6 +88,10 @@ async function main() {
     }
 
     const ids = rows.map((r) => r.id);
+    if (dryRun) {
+      updated += ids.length;
+      continue;
+    }
     const { error: updErr } = await supabase
       .from("songs")
       .update({
@@ -98,7 +118,8 @@ async function main() {
   }
 
   console.log(
-    `\ndone. cache_entries=${cache.length} updated_rows=${updated} ` +
+    `\n${dryRun ? "dry-run" : "done"}. cache_entries=${cache.length} ` +
+      `${dryRun ? "would_update_rows" : "updated_rows"}=${updated} ` +
       `songs_missing=${songsMissing} errors=${errors}`,
   );
   if (errors > 0) process.exit(1);

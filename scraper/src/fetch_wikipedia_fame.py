@@ -23,7 +23,7 @@ import math
 import re
 import time
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from difflib import SequenceMatcher
 from urllib.parse import quote
 
@@ -53,10 +53,15 @@ SEARCH_INTERVAL_SEC = 0.2
 # キャッシュ汚染を防ぐ (キャッシュは「確証ある結果」のみが入るべき)。
 MAX_RETRIES = 3
 RETRY_BACKOFF_BASE_SEC = 2.0
+_TRANSIENT_HTTP_STATUSES = frozenset({429, 500, 502, 503, 504})
 
 
 class TransientFetchError(Exception):
     """ネットワーク一過性エラー (リトライ後も失敗)。fame_for() からエスカレート。"""
+
+
+class PageviewsUnavailableError(Exception):
+    """記事は解決できたが、指定期間の Pageviews 系列を取得できない。"""
 
 # 集計開始 (Pageviews API の下限)
 PAGEVIEWS_FROM = "2015070100"
@@ -66,6 +71,20 @@ MIN_TITLE_SIMILARITY = 0.5
 
 # 記事タイトル末尾の disambiguator `(...)` を切り出す正規表現
 _RE_DISAMBIG = re.compile(r"\s*[（(]([^）)]*)[）)]\s*$")
+
+
+def _last_completed_month_timestamp(now: datetime | None = None) -> str:
+    """月次 Pageviews API の終端として、直近の完了月初を返す。"""
+    current = now or datetime.now(timezone.utc)
+    first_of_current_month = current.replace(
+        day=1,
+        hour=0,
+        minute=0,
+        second=0,
+        microsecond=0,
+    )
+    previous_month = first_of_current_month - timedelta(days=1)
+    return previous_month.strftime("%Y%m0100")
 
 
 def _strip_disambig(article_title: str) -> tuple[str, str | None]:
@@ -318,6 +337,17 @@ class WikipediaClient:
             except requests.RequestException as e:
                 logger.warning("wikipedia %s failed: %s", label, e)
                 return None
+            if resp.status_code in _TRANSIENT_HTTP_STATUSES:
+                wait = RETRY_BACKOFF_BASE_SEC * (2 ** attempt)
+                retry_after = resp.headers.get("Retry-After")
+                if retry_after and retry_after.isdigit():
+                    wait = max(wait, float(retry_after))
+                logger.warning(
+                    "wikipedia %s HTTP %d (attempt %d/%d, sleep %.1fs)",
+                    label, resp.status_code, attempt + 1, MAX_RETRIES, wait,
+                )
+                time.sleep(wait)
+                continue
             if resp.status_code != 200:
                 return None
             try:
@@ -440,18 +470,20 @@ class WikipediaClient:
     # -- Pageviews ----------------------------------------------------------
 
     def total_pageviews(self, article: str) -> int:
-        """記事の全期間累計閲覧数を取得 (2015-07 〜 今日)。
+        """記事の全期間累計閲覧数を取得 (2015-07 〜 直近の完了月)。
 
         404 や空レスポンスは 0 を返す。
         ConnectionError 等の一過性エラーはリトライ後 TransientFetchError を raise。
         """
-        today = datetime.now(timezone.utc).strftime("%Y%m%d00")
+        # 月次APIに当月途中の日付を渡すと、当月データがまだ無い記事だけ404に
+        # なり、実在記事を views=0 と誤判定する。完了済みの前月までに固定する。
+        through = _last_completed_month_timestamp()
         # Pageviews API はスペースをアンダースコアに変換した形式で要求する
         article_path = quote(article.replace(" ", "_"), safe="")
         url = PAGEVIEWS_ENDPOINT.format(
             article=article_path,
             from_=PAGEVIEWS_FROM,
-            to=today,
+            to=through,
         )
         for attempt in range(MAX_RETRIES):
             self._throttle_pageviews()
@@ -469,7 +501,20 @@ class WikipediaClient:
                 logger.warning("pageviews failed for %r: %s", article, e)
                 return 0
             if resp.status_code == 404:
-                return 0
+                raise PageviewsUnavailableError(
+                    f"pageviews unavailable for resolved article {article!r}"
+                )
+            if resp.status_code in _TRANSIENT_HTTP_STATUSES:
+                wait = RETRY_BACKOFF_BASE_SEC * (2 ** attempt)
+                retry_after = resp.headers.get("Retry-After")
+                if retry_after and retry_after.isdigit():
+                    wait = max(wait, float(retry_after))
+                logger.warning(
+                    "pageviews HTTP %d for %r (attempt %d/%d, sleep %.1fs)",
+                    resp.status_code, article, attempt + 1, MAX_RETRIES, wait,
+                )
+                time.sleep(wait)
+                continue
             if resp.status_code != 200:
                 logger.warning(
                     "pageviews %d for %r: %s",

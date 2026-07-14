@@ -7,13 +7,18 @@ Wikipedia API はモックする。重点は「曲名が別主題の有名記事
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 import pytest
 
 from fetch_wikipedia_fame import (
     WikipediaClient,
+    _candidate_titles,
     _clean_artist,
     _is_disambiguation_page,
     _is_song_article,
+    _last_completed_month_timestamp,
+    _title_similar,
 )
 
 
@@ -63,6 +68,23 @@ class TestCategoryHelpers:
 
     def test_normal_page_is_not_disambiguation(self) -> None:
         assert not _is_disambiguation_page(["Category:2018年のシングル"])
+
+
+class TestTitleVariants:
+    def test_pageviews_period_ends_at_last_completed_month(self) -> None:
+        now = datetime(2026, 7, 14, 12, 0, tzinfo=timezone.utc)
+        assert _last_completed_month_timestamp(now) == "2026060100"
+
+    def test_dual_a_side_article_contains_catalog_title(self) -> None:
+        assert _title_similar("truth", "Truth/風の向こうへ")
+
+    def test_middle_dot_is_ignored_for_matching(self) -> None:
+        assert _title_similar("A・RA・SHI", "A・RA・SHI")
+
+    def test_artist_qualified_candidates_precede_bare_title(self) -> None:
+        candidates = _candidate_titles("One Love", "嵐")
+        assert candidates[0] == "One Love (嵐の曲)"
+        assert candidates[-1] == "One Love"
 
 
 class TestResolveWithVerification:
@@ -162,4 +184,18 @@ class TestResolveWithVerification:
         assert (
             client._resolve_with_verification("Lemon", "Lemon", "米津玄師")
             is None
+        )
+
+    def test_dual_a_side_canonical_title_accepted(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        client = self._client_returning(
+            monkeypatch,
+            canonical="Truth/風の向こうへ",
+            extract="『truth/風の向こうへ』は、嵐の通算23枚目となるシングル。",
+            categories=["Category:2008年のダブルA面シングル", "Category:嵐の楽曲"],
+        )
+        assert (
+            client._resolve_with_verification("truth", "truth", "嵐")
+            == "Truth/風の向こうへ"
         )

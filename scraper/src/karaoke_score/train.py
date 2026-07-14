@@ -351,10 +351,12 @@ def genre_vocabulary(
 def build_feature_matrix(
     rows: Sequence[FeatureRow],
 ) -> tuple[np.ndarray, list[str], list[str]]:
+    # Spotify popularity は 2026-02 以降の Dev Mode API では新規補完できず、
+    # 現カタログでも全件 NULL のため学習から除外する。export JSONL には監査用に
+    # 残すが、安定して再取得できる特徴だけで学習する。
     numeric_keys = [
         "fame_score",
         "cert_score",
-        "spotify_popularity",
         "release_year",
         "duration_ms",
         "range_low_midi",
@@ -364,9 +366,8 @@ def build_feature_matrix(
         "artist_max_fame_score",
         "artist_mean_fame_score",
         "artist_max_cert_score",
-        "artist_max_spotify_popularity",
-        "artist_mean_spotify_popularity",
     ]
+    missing_indicator_keys = [*numeric_keys, "fame_views"]
     song_genres = genre_vocabulary(rows, "genres")
     artist_genres = genre_vocabulary(rows, "artist_genres")
 
@@ -375,6 +376,7 @@ def build_feature_matrix(
         "fame_views_log1p",
         "song_age",
         "range_width",
+        *[f"{key}_missing" for key in missing_indicator_keys],
         *[f"song_genre_{index:02d}" for index in range(len(song_genres))],
         *[f"artist_genre_{index:02d}" for index in range(len(artist_genres))],
     ]
@@ -383,6 +385,7 @@ def build_feature_matrix(
         "fame_views_log1p",
         "song_age",
         "range_width",
+        *[f"{key}_missing" for key in missing_indicator_keys],
         *[f"song_genre:{genre}" for genre in song_genres],
         *[f"artist_genre:{genre}" for genre in artist_genres],
     ]
@@ -398,6 +401,10 @@ def build_feature_matrix(
         low = optional_number(row, "range_low_midi")
         high = optional_number(row, "range_high_midi")
         values.append(high - low if not math.isnan(low) and not math.isnan(high) else math.nan)
+        values.extend(
+            float(math.isnan(optional_number(row, key)))
+            for key in missing_indicator_keys
+        )
         row_song_genres = set(row.values.get("genres", []))
         row_artist_genres = set(row.values.get("artist_genres", []))
         values.extend(float(genre in row_song_genres) for genre in song_genres)
