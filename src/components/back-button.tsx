@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
+import { useSongSheetClose } from "@/components/song-sheet-close-context";
 
 interface BackButtonProps {
   /** 固定の戻り先を指定するモード。指定時は <Link> を出す */
@@ -25,6 +26,7 @@ export function BackButton({
   variant = "default",
 }: BackButtonProps) {
   const router = useRouter();
+  const closeSongSheet = useSongSheetClose();
 
   const styles =
     variant === "overlay"
@@ -41,6 +43,10 @@ export function BackButton({
 
   // history が浅い (直接アクセス・共有リンク) 場合は fallbackHref に push
   const onClick = () => {
+    if (closeSongSheet) {
+      closeSongSheet();
+      return;
+    }
     if (typeof window !== "undefined" && window.history.length > 2) {
       router.back();
     } else {

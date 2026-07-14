@@ -1,8 +1,9 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Home, LibraryBig, Search, Users } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSelectedLayoutSegment } from "next/navigation";
 
 import { triggerHaptic } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
@@ -16,10 +17,16 @@ const ITEMS = [
 
 export function AppBottomNav() {
   const pathname = usePathname();
+  const songSheetSegment = useSelectedLayoutSegment("songSheet");
+  const songSheetOpen = songSheetSegment === "songs";
 
   return (
-    <nav
+    <motion.nav
       className="fixed inset-x-0 bottom-0 z-10 bg-linear-to-b from-black/55 to-black px-2 pt-1 backdrop-blur-md"
+      initial={false}
+      animate={{ y: songSheetOpen ? "100%" : 0 }}
+      transition={{ duration: 0.32, ease: [0.32, 0.72, 0, 1] }}
+      aria-hidden={songSheetOpen}
       // ホームインジケータ領域を避けつつ、最低限の bottom padding を確保
       style={{
         paddingBottom: "max(0.25rem, env(safe-area-inset-bottom))",
@@ -63,6 +70,6 @@ export function AppBottomNav() {
           );
         })}
       </ul>
-    </nav>
+    </motion.nav>
   );
 }

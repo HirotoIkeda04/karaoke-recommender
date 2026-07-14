@@ -7,8 +7,10 @@ import { createClient } from "@/lib/supabase/server";
 
 export default async function AppLayout({
   children,
+  songSheet,
 }: {
   children: React.ReactNode;
+  songSheet: React.ReactNode;
 }) {
   const supabase = await createClient();
   const {
@@ -30,6 +32,7 @@ export default async function AppLayout({
         {children}
       </main>
       <AppBottomNav />
+      {songSheet}
       <InstallPrompt />
     </div>
   );
