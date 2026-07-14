@@ -10,6 +10,7 @@ import { motion, useDragControls } from "framer-motion";
 import { useRouter } from "next/navigation";
 
 import { SongSheetCloseProvider } from "@/components/song-sheet-close-context";
+import { SongSheetScrollProvider } from "@/components/song-sheet-scroll-context";
 
 const SHEET_TRANSITION = {
   duration: 0.32,
@@ -24,6 +25,7 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
   const touchStartYRef = useRef<number | null>(null);
   const [closing, setClosing] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const close = useCallback(() => {
     setClosing(true);
@@ -81,6 +83,7 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
 
   return (
     <SongSheetCloseProvider close={close}>
+      <SongSheetScrollProvider scrollProgress={scrollProgress}>
       <div className="fixed inset-0 z-40">
         <motion.button
           type="button"
@@ -156,6 +159,11 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
                 expand();
               }
             }}
+            onScroll={(event) => {
+              setScrollProgress(
+                Math.min(event.currentTarget.scrollTop / 64, 1),
+              );
+            }}
             onTouchStart={(event) => {
               touchStartYRef.current = event.touches[0]?.clientY ?? null;
             }}
@@ -181,6 +189,7 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
           </div>
         </motion.div>
       </div>
+      </SongSheetScrollProvider>
     </SongSheetCloseProvider>
   );
 }

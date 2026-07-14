@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { BackButton } from "@/components/back-button";
 import { SongCard } from "@/components/song-card";
 import { JacketImage } from "@/components/ui/jacket-image";
+import { SongFloatingHeader } from "@/components/song-floating-header";
 import { midiToKaraoke, noteChipColor } from "@/lib/note";
 import { fetchAllPaginated } from "@/lib/supabase/paginate";
 import { createClient } from "@/lib/supabase/server";
@@ -285,6 +286,13 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         </div>
       ) : null}
       <div className="relative mx-auto max-w-md space-y-5 px-4 pb-4 pt-[var(--song-detail-top-padding,1rem)]">
+        <SongFloatingHeader
+          title={song.title}
+          artist={song.artist}
+          artistId={song.artist_id}
+          releaseYear={song.release_year}
+          image={image}
+        />
         <div className="relative mx-5 flex items-center gap-4 pr-[var(--song-detail-trailing-padding,0rem)] pl-[var(--song-detail-leading-padding,2.5rem)]">
           <BackButton
             fallbackHref="/songs"
