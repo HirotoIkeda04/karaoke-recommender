@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useSelectedLayoutSegment } from "next/navigation";
 
 import { triggerHaptic } from "@/lib/haptics";
+import { isSongSheetOpen } from "@/lib/song-sheet-route";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
@@ -18,7 +19,7 @@ const ITEMS = [
 export function AppBottomNav() {
   const pathname = usePathname();
   const songSheetSegment = useSelectedLayoutSegment("songSheet");
-  const songSheetOpen = songSheetSegment === "songs";
+  const songSheetOpen = isSongSheetOpen(pathname, songSheetSegment);
 
   return (
     <motion.nav
