@@ -9,6 +9,8 @@ dependencies = [
     "lxml>=5.0",
     "python-dotenv>=1.0",
     "rapidfuzz>=3.9",
+    "lightgbm>=4.6.0",
+    "scikit-learn>=1.6.1",
 ]
 
 [dependency-groups]

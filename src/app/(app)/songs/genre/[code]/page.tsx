@@ -15,7 +15,7 @@ interface GenrePageProps {
 }
 
 // ジャンルあたりの楽曲件数上限。
-// fame_score (Wikipedia pageviews 由来の人気度) を主キーに並べるため、
+// karaoke_score (公式ランキング掲載実績からの予測値) を主キーに並べるため、
 // まずは 500 件で頭打ち。仮想化を入れるなら緩められる。
 const SONG_LIMIT = 500;
 
@@ -39,7 +39,7 @@ export default async function GenreSongsPage({ params }: GenrePageProps) {
     .filter((id): id is string => !!id);
 
   const songSelect =
-    "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, duration_ms, fame_score, spotify_popularity";
+    "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, duration_ms, karaoke_score, fame_score, spotify_popularity";
 
   const [byArtistRes, byTagRes] = await Promise.all([
     artistIds.length > 0
@@ -47,6 +47,7 @@ export default async function GenreSongsPage({ params }: GenrePageProps) {
           .from("songs")
           .select(songSelect)
           .in("artist_id", artistIds)
+          .order("karaoke_score", { ascending: false, nullsFirst: false })
           .order("fame_score", { ascending: false, nullsFirst: false })
           .order("spotify_popularity", { ascending: false, nullsFirst: false })
           .order("release_year", { ascending: false, nullsFirst: false })
@@ -57,6 +58,7 @@ export default async function GenreSongsPage({ params }: GenrePageProps) {
       .from("songs")
       .select(songSelect)
       .contains("genres", [code])
+      .order("karaoke_score", { ascending: false, nullsFirst: false })
       .order("fame_score", { ascending: false, nullsFirst: false })
       .order("spotify_popularity", { ascending: false, nullsFirst: false })
       .order("release_year", { ascending: false, nullsFirst: false })
@@ -65,14 +67,18 @@ export default async function GenreSongsPage({ params }: GenrePageProps) {
   ]);
 
   const error = byArtistRes.error ?? byTagRes.error;
-  // id で dedupe して、人気順 (fame_score → spotify_popularity → year → title)
-  // で並べ直す。NULL は最後に押しやる。
+  // id で dedupe して、人気順
+  // (karaoke_score → fame_score → spotify_popularity → year → title)
+  // で並べ直す。karaoke_score が NULL の曲同士は従来のキーへフォールバックする。
   type Row = NonNullable<typeof byTagRes.data>[number];
   const merged = new Map<string, Row>();
   for (const r of byArtistRes.data ?? []) merged.set(r.id, r);
   for (const r of byTagRes.data ?? []) merged.set(r.id, r);
   const songs = Array.from(merged.values())
     .sort((a, b) => {
+      const ak = a.karaoke_score ?? -Infinity;
+      const bk = b.karaoke_score ?? -Infinity;
+      if (ak !== bk) return bk - ak;
       const af = a.fame_score ?? -Infinity;
       const bf = b.fame_score ?? -Infinity;
       if (af !== bf) return bf - af;
