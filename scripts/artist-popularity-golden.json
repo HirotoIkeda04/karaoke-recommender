@@ -9,5 +9,114 @@
       "truth",
       "Monster"
     ]
+  },
+  {
+    "artist": "B'z",
+    "limit": 10,
+    "required_top_titles": [
+      "LOVE PHANTOM",
+      "ultra soul",
+      "イチブトゼンブ"
+    ]
+  },
+  {
+    "artist": "Mr.Children",
+    "limit": 10,
+    "required_top_titles": [
+      "Tomorrow never knows",
+      "HANABI",
+      "innocent world",
+      "Sign"
+    ]
+  },
+  {
+    "artist": "サザンオールスターズ",
+    "limit": 10,
+    "required_top_titles": [
+      "TSUNAMI",
+      "希望の轍",
+      "真夏の果実"
+    ]
+  },
+  {
+    "artist": "スピッツ",
+    "limit": 10,
+    "required_top_titles": [
+      "ロビンソン",
+      "空も飛べるはず",
+      "チェリー"
+    ]
+  },
+  {
+    "artist": "SMAP",
+    "limit": 10,
+    "required_top_titles": [
+      "世界に一つだけの花",
+      "夜空ノムコウ",
+      "らいおんハート"
+    ]
+  },
+  {
+    "artist": "宇多田ヒカル",
+    "limit": 10,
+    "required_top_titles": [
+      "First Love",
+      "Automatic",
+      "Beautiful World"
+    ]
+  },
+  {
+    "artist": "浜崎あゆみ",
+    "limit": 15,
+    "required_top_titles": [
+      "M",
+      "SEASONS",
+      "Voyage"
+    ]
+  },
+  {
+    "artist": "back number",
+    "limit": 10,
+    "required_top_titles": [
+      "高嶺の花子さん",
+      "クリスマスソング",
+      "水平線"
+    ]
+  },
+  {
+    "artist": "Official髭男dism",
+    "limit": 10,
+    "required_top_titles": [
+      "Pretender",
+      "I LOVE...",
+      "Subtitle"
+    ]
+  },
+  {
+    "artist": "YOASOBI",
+    "limit": 10,
+    "required_top_titles": [
+      "夜に駆ける",
+      "アイドル",
+      "群青"
+    ]
+  },
+  {
+    "artist": "中島みゆき",
+    "limit": 10,
+    "required_top_titles": [
+      "糸",
+      "地上の星",
+      "時代"
+    ]
+  },
+  {
+    "artist": "美空ひばり",
+    "limit": 5,
+    "required_top_titles": [
+      "川の流れのように",
+      "愛燦燦",
+      "お祭りマンボ"
+    ]
   }
 ]

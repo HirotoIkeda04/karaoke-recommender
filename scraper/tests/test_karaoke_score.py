@@ -1,6 +1,9 @@
+import numpy as np
+
 from karaoke_score.train import (
     FeatureRow,
     build_feature_matrix,
+    graded_training_labels,
     normalized_pair,
     parse_dam_html,
     parse_joysound_table_html,
@@ -46,6 +49,14 @@ def test_normalized_pair_handles_nfkc_feat_spaces_and_symbols() -> None:
         "abc",
         "mrsgreenapple",
     )
+
+
+def test_graded_training_labels_preserve_zero_and_order_positive_relevance() -> None:
+    labels = graded_training_labels(np.asarray([0.0, 0.01, 0.02, 0.03, 0.1]))
+
+    assert labels[0] == 0
+    assert all(1 <= label <= 4 for label in labels[1:])
+    assert list(labels[1:]) == sorted(labels[1:])
 
 
 def test_parse_dam_html_pairs_nearby_artist() -> None:

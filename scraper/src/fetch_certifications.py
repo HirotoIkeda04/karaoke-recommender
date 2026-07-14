@@ -1,9 +1,10 @@
-"""日本語 Wikipedia から RIAJ 認定 (ゴールド/プラチナ/ミリオン/ダイヤモンド) を抽出する。
+"""Wikipedia と RIAJ 公式検索から認定レベルを抽出する。
 
 設計方針 (2026-05-04 議論より):
     - fame_cache.jsonl で解決済みの article 名を再利用する (再探索しない)。
-    - 抽出元: 記事末の認定テーブル (例: "!認定 (RIAJ)" 表) と
-              {{Single}} infobox の Certification フィールド。
+    - 抽出元1: 記事末の認定テーブル (例: "!認定 (RIAJ)" 表) と
+               {{Single}} infobox の Certification フィールド。
+    - 抽出元2: RIAJ 公式ストリーミング認定検索。曲記事が無い楽曲も補完する。
     - 連続値ではなく 0..6 の段階値 (cert_score) を出力する。
         0 = 認定なし
         1 = ゴールド (10万)
@@ -45,6 +46,7 @@ USER_AGENT = (
     "(RIAJ certification extraction; mailto:hiroto.lalapalooza.ikeda@gmail.com)"
 )
 WIKI_API = "https://ja.wikipedia.org/w/api.php"
+RIAJ_STREAMING_API = "https://www.riaj.or.jp/f/data/api/StProducts/index.json"
 REQUEST_TIMEOUT_SEC = 15
 RATE_LIMIT_SEC = 0.3  # 行儀よく ~3 req/sec
 
@@ -67,6 +69,18 @@ CERT_RULES: list[tuple[str, int]] = [
     (r"ゴールド", 1),
 ]
 
+# 既存 cert_score の尺度に RIAJ ストリーミング認定を対応させる。
+# シルバーは現行スキーマの下限 (1=ゴールド) 未満なので 0 とする。
+RIAJ_STREAMING_SCORES: dict[str, int] = {
+    "シルバー": 0,
+    "ゴールド": 1,
+    "プラチナ": 2,
+    "ダブル・プラチナ": 3,
+    "トリプル・プラチナ": 4,
+    "ダイヤモンド": 5,
+    "ダブル・ダイヤモンド": 6,
+}
+
 
 @dataclass
 class CertResult:
@@ -79,6 +93,7 @@ class CertResult:
 
 
 # ---------- Cache I/O ----------
+
 
 def _load_fame_cache(path: Path = FAME_CACHE_PATH) -> list[dict]:
     if not path.exists():
@@ -142,6 +157,7 @@ def _write_cert_cache(path: Path, results: Iterable[CertResult]) -> None:
 
 # ---------- Extraction ----------
 
+
 def _haystacks(wikitext: str) -> list[str]:
     """認定が記載されうるセクションを抽出。
 
@@ -179,6 +195,49 @@ def extract_cert(wikitext: str) -> tuple[int, str]:
     return best, label
 
 
+def _match_key(value: str) -> str:
+    """公式検索結果の全半角・空白・記号差を吸収する厳密突合キー。"""
+    normalized = unicodedata.normalize("NFKC", value).casefold()
+    return re.sub(r"[^\w぀-ゟ゠-ヿ一-鿿]+", "", normalized)
+
+
+def parse_riaj_streaming_cert(
+    payload: dict,
+    title: str,
+    artist: str,
+) -> tuple[int, str]:
+    """RIAJ 検索応答から title/artist 完全一致の最強認定だけを返す。"""
+    expected_title = _match_key(title)
+    expected_artist = _match_key(artist)
+    best_score = 0
+    best_label = ""
+    results = payload.get("results", [])
+    if not isinstance(results, list):
+        return best_score, best_label
+    for row in results:
+        if not isinstance(row, dict):
+            continue
+        product = row.get("StProduct", {})
+        certification = row.get("StCert", {})
+        if not isinstance(product, dict) or not isinstance(certification, dict):
+            continue
+        result_title = product.get("name")
+        result_artist = product.get("artist")
+        label = certification.get("name")
+        if not all(isinstance(value, str) for value in (result_title, result_artist, label)):
+            continue
+        if (
+            _match_key(result_title) != expected_title
+            or _match_key(result_artist) != expected_artist
+        ):
+            continue
+        score = RIAJ_STREAMING_SCORES.get(label, 0)
+        if score > best_score:
+            best_score = score
+            best_label = label
+    return best_score, best_label
+
+
 # ---------- Wikipedia API ----------
 
 MAX_RETRIES = 3
@@ -211,7 +270,7 @@ def _request_with_retry(session: requests.Session, params: dict) -> dict | None:
                 type(e).__name__,
             )
         if attempt < MAX_RETRIES - 1:
-            time.sleep(RETRY_BACKOFF_BASE_SEC * (2 ** attempt))
+            time.sleep(RETRY_BACKOFF_BASE_SEC * (2**attempt))
     return None
 
 
@@ -261,7 +320,52 @@ def fetch_wikitexts_batch(articles: list[str], session: requests.Session) -> dic
     return out
 
 
+def fetch_riaj_streaming_cert(
+    title: str,
+    artist: str,
+    session: requests.Session,
+) -> tuple[int, str] | None:
+    """RIAJ 公式検索を照会。通信失敗は None、認定なしは (0, "")。"""
+    for attempt in range(MAX_RETRIES):
+        try:
+            response = session.get(
+                RIAJ_STREAMING_API,
+                params={"n_name": title, "n_artist": artist},
+                headers={"User-Agent": USER_AGENT},
+                timeout=REQUEST_TIMEOUT_SEC,
+            )
+            if response.status_code == 200:
+                payload = response.json()
+                if not isinstance(payload, dict) or not payload.get("success"):
+                    logger.warning(
+                        "RIAJ streaming response was not successful: %s / %s",
+                        title,
+                        artist,
+                    )
+                    return None
+                return parse_riaj_streaming_cert(payload, title, artist)
+            logger.warning(
+                "RIAJ streaming HTTP %d (attempt %d): %s / %s",
+                response.status_code,
+                attempt + 1,
+                title,
+                artist,
+            )
+        except (requests.Timeout, requests.ConnectionError, ValueError) as error:
+            logger.warning(
+                "RIAJ streaming error (attempt %d): %s / %s: %s",
+                attempt + 1,
+                title,
+                artist,
+                type(error).__name__,
+            )
+        if attempt < MAX_RETRIES - 1:
+            time.sleep(RETRY_BACKOFF_BASE_SEC * (2**attempt))
+    return None
+
+
 # ---------- Driver ----------
+
 
 def _normalize(value: str) -> str:
     return unicodedata.normalize("NFKC", value).casefold().strip()
@@ -315,17 +419,17 @@ def run(
     if limit is not None:
         todo = todo[:limit]
 
-    # 記事なしは即決 (API 不要)
+    # Wikipedia 記事なしでも RIAJ 公式ストリーミング認定から補完する。
     no_article: list[dict] = [e for e in todo if not e.get("article")]
     with_article: list[dict] = [e for e in todo if e.get("article")]
     logger.info(
-        "split: no_article=%d (cert=0 即決), with_article=%d (要 API)",
-        len(no_article), len(with_article),
+        "split: no_article=%d, with_article=%d",
+        len(no_article),
+        len(with_article),
     )
 
     session = requests.Session()
-    processed = 0
-    cert_positive = 0
+    results_this_run: dict[tuple[str, str], CertResult] = {}
 
     for entry in no_article:
         result = CertResult(
@@ -336,8 +440,7 @@ def run(
             "",
             song_id=entry.get("song_id"),
         )
-        existing[(entry["title"], entry["artist"])] = result
-        processed += 1
+        results_this_run[(entry["title"], entry["artist"])] = result
 
     # article 名重複の dedupe (同じ article を 2 度引かない)
     article_to_entries: dict[str, list[dict]] = {}
@@ -364,21 +467,58 @@ def run(
                     label,
                     song_id=entry.get("song_id"),
                 )
-                existing[(entry["title"], entry["artist"])] = result
-                processed += 1
-                if score > 0:
-                    cert_positive += 1
+                results_this_run[(entry["title"], entry["artist"])] = result
         logger.info(
-            "batch %d/%d done: processed=%d, cert>0=%d",
+            "Wikipedia batch %d/%d done: resolved=%d",
             (batch_start // BATCH_SIZE) + 1,
             (len(unique_articles) + BATCH_SIZE - 1) // BATCH_SIZE,
-            processed,
-            cert_positive,
+            len(results_this_run),
         )
 
+    riaj_unavailable = 0
+    for index, entry in enumerate(todo, start=1):
+        riaj = fetch_riaj_streaming_cert(entry["title"], entry["artist"], session)
+        time.sleep(RATE_LIMIT_SEC)
+        key = (entry["title"], entry["artist"])
+        if riaj is None:
+            riaj_unavailable += 1
+            continue
+        score, label = riaj
+        current = results_this_run.get(key)
+        if current is None or score > current.cert_score:
+            results_this_run[key] = CertResult(
+                entry["title"],
+                entry["artist"],
+                entry.get("article"),
+                score,
+                label,
+                song_id=entry.get("song_id"),
+            )
+        logger.info(
+            "RIAJ streaming %d/%d: %s / %s -> %s",
+            index,
+            len(todo),
+            entry["title"],
+            entry["artist"],
+            label or "none",
+        )
+
+    for key, result in results_this_run.items():
+        prior = existing.get(key)
+        if prior is not None and prior.cert_score > result.cert_score:
+            continue
+        existing[key] = result
+
+    processed = len(results_this_run)
+    cert_positive = sum(result.cert_score > 0 for result in results_this_run.values())
+
     logger.info(
-        "done. todo=%d, processed=%d, cert>0_this_run=%d, total_in_cache=%d",
-        len(todo), processed, cert_positive, len(existing),
+        "done. todo=%d, processed=%d, cert>0_this_run=%d, riaj_unavailable=%d, total_in_cache=%d",
+        len(todo),
+        processed,
+        cert_positive,
+        riaj_unavailable,
+        len(existing),
     )
     if dry_run:
         logger.info("dry-run: cert cache was not written")
@@ -389,7 +529,7 @@ def run(
 
 def main() -> None:
     p = argparse.ArgumentParser(
-        description="日本語 Wikipedia から RIAJ 認定を抽出して cert_cache.jsonl に出力する"
+        description="Wikipedia と RIAJ 公式検索から認定を抽出して cert_cache.jsonl に出力する"
     )
     p.add_argument("--limit", type=int, default=None, help="最大処理件数 (テスト用)")
     p.add_argument("--force", action="store_true", help="既存キャッシュを無視して再取得")

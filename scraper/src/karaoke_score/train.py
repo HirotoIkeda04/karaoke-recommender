@@ -22,7 +22,7 @@ import sys
 import time
 import unicodedata
 from collections import Counter, defaultdict
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -45,10 +45,7 @@ DEFAULT_FEATURES_PATH = SCRAPER_ROOT / "output" / "karaoke_features.jsonl"
 DEFAULT_SCORES_PATH = SCRAPER_ROOT / "output" / "karaoke_scores.jsonl"
 DEFAULT_MODEL_PATH = SCRAPER_ROOT / "output" / "karaoke_model.txt"
 
-USER_AGENT = (
-    "karaoke-recommender-research/0.1 "
-    "(hiroto.lalapalooza.ikeda@gmail.com)"
-)
+USER_AGENT = "karaoke-recommender-research/0.1 (hiroto.lalapalooza.ikeda@gmail.com)"
 FETCH_INTERVAL_SECONDS = 2.0
 REQUEST_TIMEOUT_SECONDS = 30
 MAX_GENRES_PER_SCOPE = 64
@@ -142,10 +139,28 @@ class FeatureRow:
 
 @dataclass(frozen=True)
 class EvaluationRow:
+    label_scope: str
     direction: str
     scorer: str
     spearman: float
     ndcg50: float
+
+
+@dataclass
+class AppearanceData:
+    """取得ページから導いたラベル候補。プロセス外へは保存しない。"""
+
+    all_raw: Counter[RankingPair]
+    all_normalized: Counter[RankingPair]
+    general_normalized: Counter[RankingPair]
+    specialist_normalized: Counter[RankingPair]
+
+
+@dataclass(frozen=True)
+class LabelStrategy:
+    name: str
+    dam: Mapping[RankingPair, float]
+    joysound: Mapping[RankingPair, float]
 
 
 def strip_anime_suffix(title: str) -> str:
@@ -158,9 +173,7 @@ def clean_html_text(value: str) -> str:
 
 def parse_dam_html(page_html: str) -> list[RankingPair]:
     title_pattern = re.compile(r'<h4 class="p-song__title">([\s\S]*?)</h4>')
-    artist_pattern = re.compile(
-        r'<div class="p-song__artist">([\s\S]*?)</div>'
-    )
+    artist_pattern = re.compile(r'<div class="p-song__artist">([\s\S]*?)</div>')
     songs: list[RankingPair] = []
     for title_match in title_pattern.finditer(page_html):
         nearby = page_html[title_match.end() : title_match.end() + 600]
@@ -178,9 +191,7 @@ def parse_joysound_table_html(page_html: str) -> list[RankingPair]:
     soup = BeautifulSoup(page_html, "lxml")
     songs: list[RankingPair] = []
     for title_cell in soup.select("td.jp-page-sl-cell-song"):
-        artist_cell = title_cell.find_next_sibling(
-            "td", class_="jp-page-sl-cell-artist"
-        )
+        artist_cell = title_cell.find_next_sibling("td", class_="jp-page-sl-cell-artist")
         if artist_cell is None:
             continue
         title = strip_anime_suffix(title_cell.get_text(" ", strip=True))
@@ -235,14 +246,19 @@ def normalized_pair(title: str, artist: str) -> RankingPair:
 
 def fetch_appearances(
     service: str,
-    pages: Sequence[tuple[str, Parser]],
-) -> Counter[RankingPair]:
-    """URL ごとの掲載を1回として数える。戻り値はプロセス外に保存しない。"""
+    pages: Sequence[tuple[str, Parser, str]],
+) -> AppearanceData:
+    """ページ別ラベルを集計する。戻り値はプロセス外に保存しない。"""
     session = requests.Session()
     session.headers.update({"User-Agent": USER_AGENT})
-    appearances: Counter[RankingPair] = Counter()
+    all_raw: Counter[RankingPair] = Counter()
+    all_normalized: Counter[RankingPair] = Counter()
+    general_normalized: Counter[RankingPair] = Counter()
+    specialist_normalized: Counter[RankingPair] = Counter()
 
-    for index, (url, parser) in enumerate(pages):
+    for index, (url, parser, scope) in enumerate(pages):
+        if scope not in {"general", "specialist"}:
+            raise ValueError(f"unknown ranking scope: {scope}")
         print(f"fetching {service} {index + 1}/{len(pages)} ...", end="", flush=True)
         try:
             response = session.get(url, timeout=REQUEST_TIMEOUT_SECONDS)
@@ -250,24 +266,38 @@ def fetch_appearances(
                 print(f" HTTP {response.status_code} (skip)")
             else:
                 page_pairs = {
-                    normalized_pair(title, artist)
-                    for title, artist in parser(response.text)
+                    normalized_pair(title, artist) for title, artist in parser(response.text)
                 }
                 page_pairs.discard(("", ""))
+                page_pairs = {pair for pair in page_pairs if pair[0] and pair[1]}
+                page_weight = 1.0 / len(page_pairs) if page_pairs else 0.0
+                scoped_normalized = (
+                    general_normalized if scope == "general" else specialist_normalized
+                )
                 for pair in page_pairs:
-                    if pair[0] and pair[1]:
-                        appearances[pair] += 1
-                print(f" {len(page_pairs)} songs")
+                    all_raw[pair] += 1
+                    all_normalized[pair] += page_weight
+                    scoped_normalized[pair] += page_weight
+                print(f" {len(page_pairs)} songs ({scope})")
         except requests.RequestException as error:
             print(f" error: {error}")
 
         if index + 1 < len(pages):
             time.sleep(FETCH_INTERVAL_SECONDS)
 
-    if not appearances:
+    if not all_raw:
         raise RuntimeError(f"{service}: no ranking songs could be fetched")
-    print(f"{service}: {len(appearances)} unique normalized songs in memory")
-    return appearances
+    print(
+        f"{service}: {len(all_raw)} unique normalized songs in memory "
+        f"(general={len(general_normalized)}, "
+        f"specialist={len(specialist_normalized)})"
+    )
+    return AppearanceData(
+        all_raw=all_raw,
+        all_normalized=all_normalized,
+        general_normalized=general_normalized,
+        specialist_normalized=specialist_normalized,
+    )
 
 
 def load_features(path: Path) -> list[FeatureRow]:
@@ -304,7 +334,7 @@ def load_features(path: Path) -> list[FeatureRow]:
 
 
 def match_appearances(
-    rows: Sequence[FeatureRow], appearances: Counter[RankingPair]
+    rows: Sequence[FeatureRow], appearances: Mapping[RankingPair, float]
 ) -> tuple[np.ndarray, int]:
     catalog_index: dict[RankingPair, list[int]] = defaultdict(list)
     for index, row in enumerate(rows):
@@ -331,9 +361,7 @@ def optional_number(row: FeatureRow, key: str) -> float:
     return float(value)
 
 
-def genre_vocabulary(
-    rows: Sequence[FeatureRow], key: str
-) -> list[str]:
+def genre_vocabulary(rows: Sequence[FeatureRow], key: str) -> list[str]:
     counter: Counter[str] = Counter()
     for row in rows:
         values = row.values.get(key, [])
@@ -402,8 +430,7 @@ def build_feature_matrix(
         high = optional_number(row, "range_high_midi")
         values.append(high - low if not math.isnan(low) and not math.isnan(high) else math.nan)
         values.extend(
-            float(math.isnan(optional_number(row, key)))
-            for key in missing_indicator_keys
+            float(math.isnan(optional_number(row, key))) for key in missing_indicator_keys
         )
         row_song_genres = set(row.values.get("genres", []))
         row_artist_genres = set(row.values.get("artist_genres", []))
@@ -413,24 +440,35 @@ def build_feature_matrix(
     return np.asarray(matrix, dtype=np.float64), safe_feature_names, display_feature_names
 
 
+def graded_training_labels(relevance: np.ndarray) -> np.ndarray:
+    """連続 relevance を LightGBM 用の0..4段階ラベルへ変換する。"""
+    labels = np.zeros(len(relevance), dtype=np.int32)
+    positives = relevance[relevance > 0]
+    if len(positives) == 0:
+        return labels
+    boundaries = np.unique(np.quantile(positives, [0.5, 0.75, 0.9]))
+    labels[relevance > 0] = np.digitize(relevance[relevance > 0], boundaries, right=True) + 1
+    return labels
+
+
 def train_model(
     matrix: np.ndarray,
     relevance: np.ndarray,
     feature_names: Sequence[str],
 ) -> lgb.LGBMRanker:
-    labels = relevance > 0
-    positive_count = int(labels.sum())
-    negative_count = len(labels) - positive_count
+    training_labels = graded_training_labels(relevance)
+    positive_count = int((training_labels > 0).sum())
+    negative_count = len(training_labels) - positive_count
     if positive_count == 0 or negative_count == 0:
         raise ValueError(
             f"training needs both classes: positive={positive_count}, negative={negative_count}"
         )
-    max_relevance = int(relevance.max())
+    max_relevance = int(training_labels.max())
     model = lgb.LGBMRanker(
         objective="lambdarank",
         metric="ndcg",
         eval_at=(50,),
-        label_gain=[float(value) for value in range(max_relevance + 1)],
+        label_gain=[0.0, 1.0, 3.0, 7.0, 15.0][: max_relevance + 1],
         n_estimators=450,
         learning_rate=0.025,
         num_leaves=15,
@@ -447,8 +485,8 @@ def train_model(
     )
     model.fit(
         matrix,
-        relevance.astype(np.int32),
-        group=[len(relevance)],
+        training_labels,
+        group=[len(training_labels)],
         feature_name=list(feature_names),
     )
     return model
@@ -467,6 +505,7 @@ def calculate_metrics(truth: np.ndarray, scores: np.ndarray) -> tuple[float, flo
 
 
 def evaluate_direction(
+    label_scope: str,
     direction: str,
     matrix: np.ndarray,
     feature_names: Sequence[str],
@@ -484,25 +523,29 @@ def evaluate_direction(
     results: list[EvaluationRow] = []
     for name, scores in scorers.items():
         spearman, ndcg50 = calculate_metrics(truth_relevance, scores)
-        results.append(EvaluationRow(direction, name, spearman, ndcg50))
+        results.append(EvaluationRow(label_scope, direction, name, spearman, ndcg50))
     return results
 
 
 def print_evaluation_table(results: Iterable[EvaluationRow]) -> None:
-    print("\nHoldout evaluation (graded relevance = ranking-page appearance count)")
-    print("| direction | scorer | Spearman | NDCG@50 |")
-    print("|---|---|---:|---:|")
+    print("\nHoldout evaluation (labels remain in memory only)")
+    print("| label scope | direction | scorer | Spearman | NDCG@50 |")
+    print("|---|---|---|---:|---:|")
     for result in results:
         print(
-            f"| {result.direction} | {result.scorer} | "
+            f"| {result.label_scope} | {result.direction} | {result.scorer} | "
             f"{result.spearman:+.4f} | {result.ndcg50:.4f} |"
         )
 
 
-def evaluation_passed(results: Sequence[EvaluationRow]) -> bool:
+def evaluation_passed(results: Sequence[EvaluationRow], label_scope: str) -> bool:
     by_direction: dict[str, dict[str, EvaluationRow]] = defaultdict(dict)
     for result in results:
+        if result.label_scope != label_scope:
+            continue
         by_direction[result.direction][result.scorer] = result
+    if len(by_direction) != 2:
+        return False
     for scorers in by_direction.values():
         model = scorers["model"]
         for baseline_name in ("fame_score", "fame_score + cert_score"):
@@ -583,34 +626,51 @@ def main() -> None:
     matrix, feature_names, display_feature_names = build_feature_matrix(rows)
     print(f"loaded catalog features: {len(rows)} songs, {matrix.shape[1]} model features")
 
-    dam_pages = [(url, parse_dam_html) for url in DAM_URLS]
+    dam_general_urls = set(DAM_URLS[:4])
+    dam_pages = [
+        (
+            url,
+            parse_dam_html,
+            "general" if url in dam_general_urls else "specialist",
+        )
+        for url in DAM_URLS
+    ]
+    joysound_general_urls = set(JOYSOUND_TABLE_URLS[:11])
     joysound_pages = [
-        *[(url, parse_joysound_table_html) for url in JOYSOUND_TABLE_URLS],
-        (JOYSOUND_THIRTY_URL, parse_joysound_thirty_html),
+        *[
+            (
+                url,
+                parse_joysound_table_html,
+                "general" if url in joysound_general_urls else "specialist",
+            )
+            for url in JOYSOUND_TABLE_URLS
+        ],
+        (JOYSOUND_THIRTY_URL, parse_joysound_thirty_html, "general"),
     ]
     dam_appearances = fetch_appearances("DAM", dam_pages)
     joysound_appearances = fetch_appearances("JOYSOUND", joysound_pages)
-
-    dam_relevance, dam_matched = match_appearances(rows, dam_appearances)
-    joysound_relevance, joysound_matched = match_appearances(rows, joysound_appearances)
-    print(
-        f"DAM match: {dam_matched}/{len(dam_appearances)} "
-        f"({dam_matched / len(dam_appearances):.1%})"
-    )
-    print(
-        f"JOYSOUND match: {joysound_matched}/{len(joysound_appearances)} "
-        f"({joysound_matched / len(joysound_appearances):.1%})"
-    )
-
-    dam_positive = int((dam_relevance > 0).sum())
-    joysound_positive = int((joysound_relevance > 0).sum())
-    combined_relevance = dam_relevance + joysound_relevance
-    combined_positive = int((combined_relevance > 0).sum())
-    print(
-        f"catalog labels: DAM positive={dam_positive}, "
-        f"JOYSOUND positive={joysound_positive}, combined positive={combined_positive}, "
-        f"negative={len(rows) - combined_positive}"
-    )
+    strategies = [
+        LabelStrategy(
+            "all/raw-count",
+            dam_appearances.all_raw,
+            joysound_appearances.all_raw,
+        ),
+        LabelStrategy(
+            "all/page-normalized",
+            dam_appearances.all_normalized,
+            joysound_appearances.all_normalized,
+        ),
+        LabelStrategy(
+            "general/page-normalized",
+            dam_appearances.general_normalized,
+            joysound_appearances.general_normalized,
+        ),
+        LabelStrategy(
+            "specialist/page-normalized",
+            dam_appearances.specialist_normalized,
+            joysound_appearances.specialist_normalized,
+        ),
+    ]
 
     fame_scores = np.nan_to_num(
         np.asarray([optional_number(row, "fame_score") for row in rows]), nan=0.0
@@ -618,35 +678,84 @@ def main() -> None:
     cert_scores = np.nan_to_num(
         np.asarray([optional_number(row, "cert_score") for row in rows]), nan=0.0
     )
-    results = [
-        *evaluate_direction(
-            "DAM -> JOYSOUND",
-            matrix,
-            feature_names,
+    results: list[EvaluationRow] = []
+    relevance_by_strategy: dict[str, tuple[np.ndarray, np.ndarray]] = {}
+    for strategy in strategies:
+        dam_relevance, dam_matched = match_appearances(rows, strategy.dam)
+        joysound_relevance, joysound_matched = match_appearances(rows, strategy.joysound)
+        relevance_by_strategy[strategy.name] = (
             dam_relevance,
             joysound_relevance,
-            fame_scores,
-            cert_scores,
-        ),
-        *evaluate_direction(
-            "JOYSOUND -> DAM",
-            matrix,
-            feature_names,
-            joysound_relevance,
-            dam_relevance,
-            fame_scores,
-            cert_scores,
-        ),
-    ]
+        )
+        dam_positive = int((dam_relevance > 0).sum())
+        joysound_positive = int((joysound_relevance > 0).sum())
+        combined_positive = int(((dam_relevance + joysound_relevance) > 0).sum())
+        print(
+            f"{strategy.name} match: "
+            f"DAM={dam_matched}/{len(strategy.dam)} "
+            f"({dam_matched / len(strategy.dam):.1%}), "
+            f"JOYSOUND={joysound_matched}/{len(strategy.joysound)} "
+            f"({joysound_matched / len(strategy.joysound):.1%})"
+        )
+        print(
+            f"{strategy.name} catalog labels: DAM positive={dam_positive}, "
+            f"JOYSOUND positive={joysound_positive}, "
+            f"combined positive={combined_positive}, "
+            f"negative={len(rows) - combined_positive}"
+        )
+        results.extend(
+            evaluate_direction(
+                strategy.name,
+                "DAM -> JOYSOUND",
+                matrix,
+                feature_names,
+                dam_relevance,
+                joysound_relevance,
+                fame_scores,
+                cert_scores,
+            )
+        )
+        results.extend(
+            evaluate_direction(
+                strategy.name,
+                "JOYSOUND -> DAM",
+                matrix,
+                feature_names,
+                joysound_relevance,
+                dam_relevance,
+                fame_scores,
+                cert_scores,
+            )
+        )
     print_evaluation_table(results)
-    if not evaluation_passed(results):
+
+    candidate_scopes = [
+        "general/page-normalized",
+        "all/page-normalized",
+        "all/raw-count",
+    ]
+    selected_scope = next(
+        (scope for scope in candidate_scopes if evaluation_passed(results, scope)),
+        None,
+    )
+    diagnostic_scope = selected_scope or "general/page-normalized"
+    diagnostic_dam, diagnostic_joysound = relevance_by_strategy[diagnostic_scope]
+    final_model = train_model(
+        matrix,
+        diagnostic_dam + diagnostic_joysound,
+        feature_names,
+    )
+    print(f"\nfeature-importance label scope: {diagnostic_scope}")
+    print_feature_importance(final_model, display_feature_names)
+
+    if selected_scope is None:
         raise RuntimeError(
             "evaluation gate failed: model must beat both baselines on Spearman and "
-            "NDCG@50 in both holdout directions; model and predictions were not written"
+            "NDCG@50 in both holdout directions for a non-specialist candidate; "
+            "model and predictions were not written"
         )
 
-    final_model = train_model(matrix, combined_relevance, feature_names)
-    print_feature_importance(final_model, display_feature_names)
+    print(f"\nselected final label scope: {selected_scope}")
     write_outputs(rows, final_model, matrix, args.scores, args.model)
     print(f"\nwrote model weights: {args.model}")
     print(f"wrote predictions: {args.scores} ({len(rows)} songs)")
