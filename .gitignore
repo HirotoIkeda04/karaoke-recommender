@@ -38,6 +38,9 @@ yarn-error.log*
 # claude code local state
 .claude/
 
+# Codex task worktrees
+/.codex/worktrees/
+
 # supabase CLI local cache
 /supabase/.temp/
 

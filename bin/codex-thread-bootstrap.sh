@@ -11,84 +11,89 @@ die() {
   exit 1
 }
 
-has_worktree_changes() {
-  ! git diff --quiet ||
-    ! git diff --cached --quiet ||
-    test -n "$(git ls-files --others --exclude-standard)"
+operation_in_progress() {
+  local state state_path
+
+  for state in rebase-merge rebase-apply MERGE_HEAD CHERRY_PICK_HEAD REVERT_HEAD BISECT_LOG sequencer; do
+    state_path="$(git rev-parse --git-path "$state")"
+    if test -e "$state_path"; then
+      printf '%s\n' "$state"
+      return 0
+    fi
+  done
+
+  return 1
 }
 
-repo_root="$(git rev-parse --show-toplevel 2>/dev/null)" ||
+fetch_origin() {
+  local attempt
+
+  for attempt in 1 2 3; do
+    if git fetch origin --prune; then
+      return 0
+    fi
+
+    if test "$attempt" -lt 3; then
+      log "Fetch attempt $attempt failed, possibly because another thread held a ref lock; retrying..."
+      sleep "$attempt"
+    fi
+  done
+
+  die "Fetching origin failed three times. Rerun the bootstrap; do not use the shared checkout."
+}
+
+initial_root="$(git rev-parse --show-toplevel 2>/dev/null)" ||
   die "Run this command inside the repository."
-cd "$repo_root"
+cd "$initial_root"
 
 git remote get-url origin >/dev/null 2>&1 ||
   die "The origin remote is not configured."
 
+active_operation="$(operation_in_progress || true)"
+if test -n "$active_operation"; then
+  die "The initial checkout has an unfinished Git operation ($active_operation). Resolve it before starting another thread."
+fi
+
 log "Fetching origin and pruning deleted branches..."
-git fetch origin --prune
+fetch_origin
 
 git show-ref --verify --quiet refs/remotes/origin/main ||
   die "origin/main was not found after fetch."
 
-branch="$(git symbolic-ref --quiet --short HEAD || true)"
-
-if test -z "$branch"; then
-  if has_worktree_changes; then
-    die "Detached HEAD has local changes. Create a recovery branch before synchronizing."
-  fi
-  log "Detached HEAD is clean; moving it to the latest origin/main."
-  git switch --detach origin/main
-  log "Ready at $(git rev-parse --short HEAD)."
-  exit 0
+common_dir="$(git rev-parse --path-format=absolute --git-common-dir)"
+if test "$(basename "$common_dir")" != ".git"; then
+  die "Expected a non-bare repository with a .git common directory."
 fi
 
-if test "$branch" = "main"; then
-  if has_worktree_changes; then
-    recovery_branch="codex/recovered-main-$(date +%Y%m%d-%H%M%S)"
-    log "main has local changes; preserving them on $recovery_branch."
-    git switch -c "$recovery_branch"
-    branch="$recovery_branch"
-  else
-    log "Fast-forwarding main to origin/main..."
-    git merge --ff-only origin/main
-    log "main is current at $(git rev-parse --short HEAD)."
-    exit 0
-  fi
+primary_root="$(dirname "$common_dir")"
+worktree_parent="${CODEX_WORKTREE_ROOT:-$primary_root/.codex/worktrees}"
+mkdir -p "$worktree_parent"
+
+raw_label="${1:-thread}"
+label="$(printf '%s' "$raw_label" | tr '[:upper:] ' '[:lower:]-' | tr -cd 'a-z0-9._-' | cut -c1-40)"
+if test -z "$label"; then
+  label="thread"
 fi
 
-if git merge-base --is-ancestor origin/main HEAD; then
-  log "$branch already contains the latest origin/main."
-  exit 0
+timestamp="$(date +%Y%m%d-%H%M%S)"
+suffix="$label-$timestamp-$$"
+branch="codex/$suffix"
+worktree_path="$worktree_parent/$suffix"
+counter=0
+
+while git show-ref --verify --quiet "refs/heads/$branch" || test -e "$worktree_path"; do
+  counter=$((counter + 1))
+  suffix="$label-$timestamp-$$-$counter"
+  branch="codex/$suffix"
+  worktree_path="$worktree_parent/$suffix"
+done
+
+log "Creating isolated worktree $worktree_path from origin/main..."
+if ! git worktree add --no-track -b "$branch" "$worktree_path" origin/main; then
+  die "Worktree creation failed, possibly because another thread held a Git lock. Rerun the bootstrap."
 fi
 
-if ! has_worktree_changes; then
-  log "Rebasing clean branch $branch onto origin/main..."
-  git rebase origin/main
-  log "$branch is current at $(git rev-parse --short HEAD)."
-  exit 0
-fi
-
-stash_message="codex-thread-bootstrap:$branch:$(date +%s):$$"
-log "Temporarily stashing local work before rebasing $branch..."
-git stash push --include-untracked --message "$stash_message" >/dev/null
-
-if ! git rebase origin/main; then
-  log "Rebase failed; aborting and restoring the original worktree."
-  git rebase --abort >/dev/null 2>&1 || true
-  if git stash apply stash@{0}; then
-    git stash drop stash@{0} >/dev/null
-  else
-    log "The original work remains in stash@{0}; resolve the restore conflict before continuing."
-  fi
-  exit 2
-fi
-
-log "Restoring local work on top of the updated branch..."
-if git stash apply stash@{0}; then
-  git stash drop stash@{0} >/dev/null
-  log "$branch now includes origin/main and all local work was restored."
-  exit 0
-fi
-
-log "Restore conflicts need resolution. The safety copy remains in stash@{0}."
-exit 3
+log "Created $branch at $(git -C "$worktree_path" rev-parse --short HEAD)."
+log "Continue this thread only in the worktree printed below."
+printf 'CODEX_THREAD_WORKTREE=%s\n' "$worktree_path"
+printf 'CODEX_THREAD_BRANCH=%s\n' "$branch"
