@@ -109,16 +109,18 @@ export default async function SongsPage() {
         genreCovers={genreCovers}
         rankingCovers={rankingPreview.covers}
         rankingPreview={rankingPreview.items}
+        recommendations={rankingPreview.recommendations}
       />
     </div>
   );
 }
 
-// 今週ランキングの上位 5 曲とジャケットを取得し、Browse の
-// プレビュー一覧と既存の「今週のランキング」カード背景に使う。
+// 今週ランキングの上位 5 曲とジャケットを Browse に使い、最大 100 曲を
+// 検索前の条件付きおすすめ候補としてクライアントへ渡す。
 async function getRankingPreview(supabase: SupabaseServer): Promise<{
   covers: string[];
   items: Array<{ rank: number; song: RankingPreviewSong }>;
+  recommendations: RankingPreviewSong[];
 }> {
   const { data: latest } = await supabase
     .from("weekly_rankings")
@@ -126,15 +128,17 @@ async function getRankingPreview(supabase: SupabaseServer): Promise<{
     .order("week_start", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (!latest) return { covers: [], items: [] };
+  if (!latest) return { covers: [], items: [], recommendations: [] };
   const { data: rankRows } = await supabase
     .from("weekly_rankings")
     .select("song_id, final_rank")
     .eq("week_start", latest.week_start)
     .order("final_rank", { ascending: true })
-    .limit(12);
+    .limit(100);
   const ids = (rankRows ?? []).map((r) => r.song_id);
-  if (ids.length === 0) return { covers: [], items: [] };
+  if (ids.length === 0) {
+    return { covers: [], items: [], recommendations: [] };
+  }
   const { data: songs } = await supabase
     .from("songs")
     .select(
@@ -152,11 +156,12 @@ async function getRankingPreview(supabase: SupabaseServer): Promise<{
     if (covers.length >= 4) break;
   }
   const items: Array<{ rank: number; song: RankingPreviewSong }> = [];
+  const recommendations: RankingPreviewSong[] = [];
   for (const row of rankRows ?? []) {
     const song = byId.get(row.song_id);
     if (!song) continue;
-    items.push({ rank: row.final_rank, song });
-    if (items.length >= 5) break;
+    recommendations.push(song);
+    if (items.length < 5) items.push({ rank: row.final_rank, song });
   }
-  return { covers, items };
+  return { covers, items, recommendations };
 }

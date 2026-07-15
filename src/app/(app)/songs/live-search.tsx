@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ArtistRow, type ArtistRowData } from "@/components/artist-row";
+import { DecadeChips } from "@/components/decade-chips";
 import { SongCard } from "@/components/song-card";
 import { JacketImage } from "@/components/ui/jacket-image";
 import {
@@ -56,6 +57,8 @@ interface LiveSearchProps {
   rankingCovers?: string[];
   /** 検索タブに表示する、今週のランキング上位曲 */
   rankingPreview?: Array<{ rank: number; song: Song }>;
+  /** 検索前の条件付きおすすめに使う、ランキング順の候補曲 */
+  recommendations?: Song[];
 }
 
 const HIGH_OPTIONS = [
@@ -93,36 +96,105 @@ const GENRE_OVERLAY: Record<GenreCode, string> = {
 
 const DEBOUNCE_MS = 200;
 
+type SearchMode = "browse" | "search-empty" | "search-results";
+
+function matchesSongFilters(
+  song: Song,
+  highMinMidi: number | null,
+  highMaxMidi: number | null,
+  selectedDecades: number[],
+): boolean {
+  if (
+    highMinMidi != null &&
+    (song.range_high_midi == null || song.range_high_midi < highMinMidi)
+  ) {
+    return false;
+  }
+  if (
+    highMaxMidi != null &&
+    (song.range_high_midi == null || song.range_high_midi > highMaxMidi)
+  ) {
+    return false;
+  }
+  if (selectedDecades.length === 0) return true;
+  if (song.release_year == null) return false;
+  return selectedDecades.some(
+    (start) => song.release_year! >= start && song.release_year! <= start + 9,
+  );
+}
+
 export function LiveSearch({
   ratings,
   knownSongIds = [],
   genreCovers = {},
   rankingCovers = [],
   rankingPreview = [],
+  recommendations = [],
 }: LiveSearchProps) {
   const [query, setQuery] = useState("");
   const [highMax, setHighMax] = useState("");
   const [highMin, setHighMin] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
-  const [history, setHistory] = useState<RecentItem[]>([]);
+  const [selectedDecades, setSelectedDecades] = useState<number[]>([]);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [history, setHistory] = useState<RecentItem[]>(() => loadHistory());
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState<string | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const blurTimerRef = useRef<number | null>(null);
+  const isSearchOpenRef = useRef(false);
   const supabase = useMemo(() => createClient(), []);
 
   const knownSet = useMemo(() => new Set(knownSongIds), [knownSongIds]);
+  const highMinMidi = (highMin ? karaokeToMidi(highMin) : null) ?? null;
+  const highMaxMidi = (highMax ? karaokeToMidi(highMax) : null) ?? null;
 
-  // 初期マウント時に履歴を読み込む (SSR では window 不在)
-  useEffect(() => {
-    setHistory(loadHistory());
-  }, []);
+  const filteredRecommendations = useMemo(
+    () =>
+      recommendations
+        .filter((song) =>
+          matchesSongFilters(
+            song,
+            highMinMidi,
+            highMaxMidi,
+            selectedDecades,
+          ),
+        )
+        .slice(0, 50),
+    [recommendations, highMinMidi, highMaxMidi, selectedDecades],
+  );
 
-  // BottomNav の検索タブ再タップで input にフォーカス + 履歴表示
+  const filteredResults = useMemo<SearchResponse | null>(() => {
+    if (!results) return null;
+    return {
+      ...results,
+      songs: results.songs.filter((song) =>
+        matchesSongFilters(
+          song,
+          highMinMidi,
+          highMaxMidi,
+          selectedDecades,
+        ),
+      ),
+    };
+  }, [results, highMinMidi, highMaxMidi, selectedDecades]);
+
+  // BottomNav の検索タブ再タップで、検索トップと検索モードを切り替える。
   useEffect(() => {
     const handler = () => {
+      if (isSearchOpenRef.current) {
+        isSearchOpenRef.current = false;
+        setIsSearchOpen(false);
+        setQuery("");
+        setResults(null);
+        setLoading(false);
+        setErrMsg(null);
+        inputRef.current?.blur();
+        return;
+      }
+
+      isSearchOpenRef.current = true;
+      setIsSearchOpen(true);
       const el = inputRef.current;
       if (!el) return;
       el.focus();
@@ -133,20 +205,16 @@ export function LiveSearch({
         // 一部ブラウザでは search input に select 不可 — 黙殺
       }
     };
-    window.addEventListener("app:focus-search", handler);
-    return () => window.removeEventListener("app:focus-search", handler);
+    window.addEventListener("app:toggle-search", handler);
+    return () => window.removeEventListener("app:toggle-search", handler);
   }, []);
 
   const trimmedQ = query.trim();
+  const hasQueryInput = query.length > 0;
 
   // サーバー検索 (debounce + AbortController で多重発火を抑制)
   useEffect(() => {
-    if (trimmedQ.length === 0) {
-      setResults(null);
-      setLoading(false);
-      setErrMsg(null);
-      return;
-    }
+    if (trimmedQ.length === 0) return;
     const ctrl = new AbortController();
     const timer = window.setTimeout(async () => {
       setLoading(true);
@@ -176,13 +244,28 @@ export function LiveSearch({
     };
   }, [trimmedQ, highMin, highMax, supabase]);
 
-  // モード判定: 入力あり=results / フォーカス中=history / それ以外=browse
-  const mode: "browse" | "history" | "results" =
-    trimmedQ.length > 0 ? "results" : isFocused ? "history" : "browse";
+  // 検索タブを「通常」「検索を開いた未入力」「検索を開いた入力あり」の
+  // 3 状態に分ける。空白も入力として扱い、入力あり画面を維持する。
+  const mode: SearchMode = hasQueryInput
+    ? "search-results"
+    : isSearchOpen
+      ? "search-empty"
+      : "browse";
 
   const handleClear = useCallback(() => {
     setQuery("");
+    setResults(null);
+    setLoading(false);
+    setErrMsg(null);
     inputRef.current?.focus();
+  }, []);
+
+  const handleQueryChange = useCallback((nextQuery: string) => {
+    setQuery(nextQuery);
+    if (nextQuery.trim().length > 0) return;
+    setResults(nextQuery.length > 0 ? { artists: [], songs: [] } : null);
+    setLoading(false);
+    setErrMsg(null);
   }, []);
 
   const handleSelectSong = useCallback((s: Song) => {
@@ -215,24 +298,19 @@ export function LiveSearch({
     [],
   );
 
-  // input ↔ filter 間で focus が移動しても browse に戻らないよう
-  // 同じスコープ内の onFocus/onBlur で扱う (React の focus は bubble する)。
-  // BrowseGrid のジャンル <Link> はこのスコープ外に置くことで、
-  // Link が focus を取った瞬間に mode="history" へ遷移して unmount される
-  // ことを防ぐ。
+  const handleToggleDecade = useCallback((start: number) => {
+    setSelectedDecades((previous) =>
+      previous.includes(start)
+        ? previous.filter((decade) => decade !== start)
+        : [...previous, start],
+    );
+  }, []);
+
+  // 検索欄を一度開いたら、このページを離れるまで検索状態を維持する。
+  // フォーカス解除では閉じないため、モバイルのキーボード開閉にも影響されない。
   const onFilterFocus = () => {
-    if (blurTimerRef.current !== null) {
-      window.clearTimeout(blurTimerRef.current);
-      blurTimerRef.current = null;
-    }
-    setIsFocused(true);
-  };
-  const onFilterBlur = () => {
-    // 履歴項目タップ時に Link が unmount されないよう mode 切り替えを遅延
-    blurTimerRef.current = window.setTimeout(() => {
-      setIsFocused(false);
-      blurTimerRef.current = null;
-    }, 200);
+    isSearchOpenRef.current = true;
+    setIsSearchOpen(true);
   };
 
   return (
@@ -240,74 +318,98 @@ export function LiveSearch({
       <div
         className="space-y-4"
         onFocus={onFilterFocus}
-        onBlur={onFilterBlur}
       >
-      {/* 検索バー本体: 右側に検索アイコン or クリアボタン */}
-      <div className="relative">
-        <Search
-          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-500 dark:text-zinc-400"
-          aria-hidden
-        />
-        <input
-          ref={inputRef}
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="楽曲・アーティストを検索"
-          autoComplete="off"
-          autoCapitalize="off"
-          autoCorrect="off"
-          spellCheck={false}
-          // search 型ネイティブの clear ボタンは UI が分散するので非表示
-          className="w-full rounded-lg bg-zinc-100 py-2 pl-9 pr-9 text-sm placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-pink-500 dark:bg-zinc-800 dark:placeholder:text-zinc-400 [&::-webkit-search-cancel-button]:hidden"
-        />
-        {query.length > 0 ? (
-          <button
-            type="button"
-            onClick={handleClear}
-            // mousedown で input から blur する前にクリックを処理
-            onMouseDown={(e) => e.preventDefault()}
-            aria-label="検索文字列をクリア"
-            className="absolute right-2 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full text-zinc-500 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-700"
-          >
-            <X className="size-3.5" aria-hidden />
-          </button>
-        ) : null}
-      </div>
-
-      {/* 高音域フィルタ: results / history どちらの状態でも有効。
-          値が設定されているときは browse でも表示し続ける (解除導線確保) */}
-      {mode !== "browse" || highMin || highMax ? (
-        <div className="flex items-center gap-2 text-sm">
-          <select
-            value={highMin}
-            onChange={(e) => setHighMin(e.target.value)}
-            aria-label="最高音の下限"
-            className="flex-1 rounded bg-zinc-100 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 dark:bg-zinc-800"
-          >
-            {HIGH_OPTIONS.map((v) => (
-              <option key={`min-${v}`} value={v}>
-                {v || "—"}
-              </option>
-            ))}
-          </select>
-          <span className="shrink-0 whitespace-nowrap text-xs text-zinc-500 dark:text-zinc-400">
-            ≤ 最高音 ≤
-          </span>
-          <select
-            value={highMax}
-            onChange={(e) => setHighMax(e.target.value)}
-            aria-label="最高音の上限"
-            className="flex-1 rounded bg-zinc-100 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 dark:bg-zinc-800"
-          >
-            {HIGH_OPTIONS.map((v) => (
-              <option key={`max-${v}`} value={v}>
-                {v || "—"}
-              </option>
-            ))}
-          </select>
+        {/* 検索バー本体: 右側に検索アイコン or クリアボタン */}
+        <div className="relative">
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-500 dark:text-zinc-400"
+            aria-hidden
+          />
+          <input
+            ref={inputRef}
+            type="search"
+            value={query}
+            onChange={(e) => handleQueryChange(e.target.value)}
+            placeholder="楽曲・アーティストを検索"
+            autoComplete="off"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
+            // search 型ネイティブの clear ボタンは UI が分散するので非表示
+            className="w-full rounded-lg bg-zinc-100 py-2 pl-9 pr-9 text-sm placeholder:text-zinc-500 focus:outline-none dark:bg-zinc-800 dark:placeholder:text-zinc-400 [&::-webkit-search-cancel-button]:hidden"
+          />
+          {query.length > 0 ? (
+            <button
+              type="button"
+              onClick={handleClear}
+              // mousedown で input から blur する前にクリックを処理
+              onMouseDown={(e) => e.preventDefault()}
+              aria-label="検索文字列をクリア"
+              className="absolute right-2 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full text-zinc-500 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-700"
+            >
+              <X className="size-3.5" aria-hidden />
+            </button>
+          ) : null}
         </div>
-      ) : null}
+
+        {mode === "search-empty" ? (
+          <>
+            <HistoryList
+              history={history.slice(0, 3)}
+              onRemove={handleRemoveHistory}
+              onSelectSong={handleSelectSong}
+              onSelectArtist={handleSelectArtist}
+              ratings={ratings}
+              knownSet={knownSet}
+            />
+            <PitchSearch
+              highMin={highMin}
+              highMax={highMax}
+              onHighMinChange={setHighMin}
+              onHighMaxChange={setHighMax}
+            />
+            <DecadeChips
+              selected={selectedDecades}
+              onToggle={handleToggleDecade}
+            />
+            <RecommendationList
+              recommendations={filteredRecommendations}
+              hasActiveFilters={Boolean(
+                highMin || highMax || selectedDecades.length > 0
+              )}
+              ratings={ratings}
+              knownSet={knownSet}
+              onSelectSong={handleSelectSong}
+            />
+          </>
+        ) : mode === "search-results" ? (
+          <>
+            <PitchSearch
+              highMin={highMin}
+              highMax={highMax}
+              onHighMinChange={setHighMin}
+              onHighMaxChange={setHighMax}
+            />
+            <DecadeChips
+              selected={selectedDecades}
+              onToggle={handleToggleDecade}
+            />
+            <section>
+              <h2 className="mb-2 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                検索結果
+              </h2>
+              <ResultsList
+                loading={loading}
+                errMsg={errMsg}
+                results={filteredResults}
+                ratings={ratings}
+                knownSet={knownSet}
+                onSelectSong={handleSelectSong}
+                onSelectArtist={handleSelectArtist}
+              />
+            </section>
+          </>
+        ) : null}
       </div>
 
       {mode === "browse" ? (
@@ -318,26 +420,51 @@ export function LiveSearch({
           ratings={ratings}
           knownSet={knownSet}
         />
-      ) : mode === "history" ? (
-        <HistoryList
-          history={history}
-          onRemove={handleRemoveHistory}
-          onSelectSong={(s) => handleSelectSong(s)}
-          onSelectArtist={(a) => handleSelectArtist(a)}
-          ratings={ratings}
-          knownSet={knownSet}
-        />
-      ) : (
-        <ResultsList
-          loading={loading}
-          errMsg={errMsg}
-          results={results}
-          ratings={ratings}
-          knownSet={knownSet}
-          onSelectSong={handleSelectSong}
-          onSelectArtist={handleSelectArtist}
-        />
-      )}
+      ) : null}
+    </div>
+  );
+}
+
+function PitchSearch({
+  highMin,
+  highMax,
+  onHighMinChange,
+  onHighMaxChange,
+}: {
+  highMin: string;
+  highMax: string;
+  onHighMinChange: (value: string) => void;
+  onHighMaxChange: (value: string) => void;
+}) {
+  return (
+    <div className="flex items-center gap-2 text-sm">
+      <select
+        value={highMin}
+        onChange={(e) => onHighMinChange(e.target.value)}
+        aria-label="最高音の下限"
+        className="flex-1 rounded bg-zinc-100 px-2 py-1.5 text-sm focus:outline-none dark:bg-zinc-800"
+      >
+        {HIGH_OPTIONS.map((v) => (
+          <option key={`min-${v}`} value={v}>
+            {v || "—"}
+          </option>
+        ))}
+      </select>
+      <span className="shrink-0 whitespace-nowrap text-xs text-zinc-500 dark:text-zinc-400">
+        ≤ 最高音 ≤
+      </span>
+      <select
+        value={highMax}
+        onChange={(e) => onHighMaxChange(e.target.value)}
+        aria-label="最高音の上限"
+        className="flex-1 rounded bg-zinc-100 px-2 py-1.5 text-sm focus:outline-none dark:bg-zinc-800"
+      >
+        {HIGH_OPTIONS.map((v) => (
+          <option key={`max-${v}`} value={v}>
+            {v || "—"}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
@@ -671,85 +798,111 @@ function HistoryList({
   ratings: Record<string, string>;
   knownSet: Set<string>;
 }) {
-  if (history.length === 0) {
-    return (
-      <p className="px-2 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
-        最近の検索はまだありません
-      </p>
-    );
-  }
   return (
     <section>
       <h2 className="mb-2 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-        最近
+        最近検索したもの
       </h2>
-      <ul>
-        {history.map((item) => (
-          <li
-            key={`${item.type}:${item.id}`}
-            className="flex items-center gap-1"
-          >
-            <div
-              className="min-w-0 flex-1"
-              onClickCapture={
-                item.type === "song"
-                  ? () =>
-                      onSelectSong({
-                        id: item.id,
-                        title: item.title,
-                        artist: item.artist,
-                        release_year: null,
-                        range_low_midi: null,
-                        range_high_midi: null,
-                        falsetto_max_midi: null,
-                        image_url_small: item.image,
-                        image_url_medium: null,
-                        duration_ms: null,
-                      })
-                  : undefined
-              }
+      {history.length > 0 ? (
+        <ul>
+          {history.map((item) => (
+            <li
+              key={`${item.type}:${item.id}`}
+              className="flex items-center gap-1"
             >
-              {item.type === "song" ? (
-                <SongCard
-                  song={{
-                    id: item.id,
-                    title: item.title,
-                    artist: item.artist,
-                    release_year: null,
-                    range_low_midi: null,
-                    range_high_midi: null,
-                    falsetto_max_midi: null,
-                    image_url_small: item.image,
-                    image_url_medium: null,
-                    duration_ms: null,
-                  }}
-                  rating={ratings[item.id] ?? null}
-                  isKnown={knownSet.has(item.id)}
-                />
-              ) : (
-                <ArtistRow
-                  artist={{
-                    id: item.id,
-                    name: item.name,
-                    song_count: null,
-                    image_url: item.image,
-                  }}
-                  onSelect={onSelectArtist}
-                />
-              )}
-            </div>
-            <button
-              type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={(e) => onRemove(e, item.type, item.id)}
-              aria-label="履歴から削除"
-              className="grid size-8 shrink-0 place-items-center rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
-            >
-              <X className="size-4" aria-hidden />
-            </button>
-          </li>
-        ))}
-      </ul>
+              <div className="min-w-0 flex-1">
+                {item.type === "song" ? (
+                  <SongCard
+                    song={{
+                      id: item.id,
+                      title: item.title,
+                      artist: item.artist,
+                      release_year: null,
+                      range_low_midi: null,
+                      range_high_midi: null,
+                      falsetto_max_midi: null,
+                      image_url_small: item.image,
+                      image_url_medium: null,
+                      duration_ms: null,
+                    }}
+                    rating={ratings[item.id] ?? null}
+                    isKnown={knownSet.has(item.id)}
+                    onSelect={onSelectSong}
+                  />
+                ) : (
+                  <ArtistRow
+                    artist={{
+                      id: item.id,
+                      name: item.name,
+                      song_count: null,
+                      image_url: item.image,
+                    }}
+                    onSelect={onSelectArtist}
+                  />
+                )}
+              </div>
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={(e) => onRemove(e, item.type, item.id)}
+                aria-label="履歴から削除"
+                className="grid size-8 shrink-0 place-items-center rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+              >
+                <X className="size-4" aria-hidden />
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="px-2 py-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
+          最近の検索はまだありません
+        </p>
+      )}
+    </section>
+  );
+}
+
+// ============================================================================
+// Recommendations: 検索前に表示するおすすめ楽曲
+// ============================================================================
+function RecommendationList({
+  recommendations,
+  hasActiveFilters,
+  ratings,
+  knownSet,
+  onSelectSong,
+}: {
+  recommendations: Song[];
+  hasActiveFilters: boolean;
+  ratings: Record<string, string>;
+  knownSet: Set<string>;
+  onSelectSong: (song: Song) => void;
+}) {
+  return (
+    <section>
+      <h2 className="mb-2 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+        おすすめ
+      </h2>
+      {recommendations.length > 0 ? (
+        <ul>
+          {recommendations.map((song) => (
+            <li key={song.id}>
+              <SongCard
+                song={song}
+                rating={ratings[song.id] ?? null}
+                isKnown={knownSet.has(song.id)}
+                onSelect={onSelectSong}
+              />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="px-2 py-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
+          {hasActiveFilters
+            ? "条件に合うおすすめはありません"
+            : "おすすめを準備中です"}
+        </p>
+      )}
     </section>
   );
 }
@@ -823,11 +976,12 @@ function ResultsList({
           </h2>
           <ul>
             {songs.map((s) => (
-              <li key={s.id} onClickCapture={() => onSelectSong(s)}>
+              <li key={s.id}>
                 <SongCard
                   song={s}
                   rating={ratings[s.id] ?? null}
                   isKnown={knownSet.has(s.id)}
+                  onSelect={onSelectSong}
                 />
               </li>
             ))}

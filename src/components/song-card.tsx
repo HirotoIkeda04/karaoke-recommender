@@ -53,6 +53,8 @@ interface SongCardProps {
   isKnown?: boolean;
   /** false にすると曲詳細ページへのリンクを張らない (フレンドのライブラリ閲覧時など) */
   linkable?: boolean;
+  /** 曲詳細へのクライアント遷移時に実行するフック (検索履歴の保存など) */
+  onSelect?: (song: Song) => void;
 }
 
 export function SongCard({
@@ -60,6 +62,7 @@ export function SongCard({
   rating,
   isKnown = false,
   linkable = true,
+  onSelect,
 }: SongCardProps) {
   const badge = rating ? RATING_BADGE[rating] : null;
   const image = song.image_url_small ?? song.image_url_medium;
@@ -73,23 +76,8 @@ export function SongCard({
         }
       : null;
 
-  const Wrapper = linkable
-    ? ({ children }: { children: React.ReactNode }) => (
-        <Link
-          href={`/songs/${song.id}`}
-          className="flex items-center gap-3 rounded-md p-2 transition hover:bg-zinc-100 active:bg-zinc-100 dark:hover:bg-zinc-800/60 dark:active:bg-zinc-800/60"
-        >
-          {children}
-        </Link>
-      )
-    : ({ children }: { children: React.ReactNode }) => (
-        <div className="flex items-center gap-3 rounded-md p-2">
-          {children}
-        </div>
-      );
-
-  return (
-    <Wrapper>
+  const content = (
+    <>
       <div className="relative size-12 shrink-0 overflow-hidden rounded-xs bg-white dark:bg-zinc-900">
         {image ? (
           <JacketImage
@@ -159,6 +147,20 @@ export function SongCard({
           ) : null}
         </div>
       </div>
-    </Wrapper>
+    </>
+  );
+
+  if (!linkable) {
+    return <div className="flex items-center gap-3 rounded-md p-2">{content}</div>;
+  }
+
+  return (
+    <Link
+      href={`/songs/${song.id}`}
+      onNavigate={onSelect ? () => onSelect(song) : undefined}
+      className="flex items-center gap-3 rounded-md p-2 transition hover:bg-zinc-100 active:bg-zinc-100 dark:hover:bg-zinc-800/60 dark:active:bg-zinc-800/60"
+    >
+      {content}
+    </Link>
   );
 }

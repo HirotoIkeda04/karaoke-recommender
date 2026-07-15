@@ -44,13 +44,12 @@ export function AppBottomNav() {
             item.href === "/"
               ? pathname === "/"
               : pathname.startsWith(item.href);
-          // 検索タブを既に開いている時は遷移ではなく、検索 input を focus させる
-          // (Spotify と同じ操作感: タブ再タップ = 検索開始)
+          // 検索トップでは検索モードを開き、検索モードでは検索トップへ戻す。
           const onClick = (e: React.MouseEvent) => {
             triggerHaptic();
             if (item.href === "/songs" && pathname === "/songs") {
               e.preventDefault();
-              window.dispatchEvent(new CustomEvent("app:focus-search"));
+              window.dispatchEvent(new CustomEvent("app:toggle-search"));
             }
           };
           return (
