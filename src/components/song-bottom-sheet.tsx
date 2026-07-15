@@ -21,11 +21,24 @@ const SHEET_TRANSITION = {
   ease: [0.32, 0.72, 0, 1] as [number, number, number, number],
 };
 
+const SCROLL_HANDOFF_DISTANCE = 8;
+const COLLAPSE_DISTANCE = 56;
+const COLLAPSE_VELOCITY = 500;
+
+function findTouch(touches: TouchList, identifier: number) {
+  for (let index = 0; index < touches.length; index += 1) {
+    const touch = touches.item(index);
+    if (touch?.identifier === identifier) return touch;
+  }
+  return null;
+}
+
 export function SongBottomSheet({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const animationControls = useAnimationControls();
   const dragControls = useDragControls();
   const sheetRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [closing, setClosing] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -70,6 +83,124 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
     expanded,
     viewportHeight,
   ]);
+
+  useEffect(() => {
+    const content = contentRef.current;
+    if (!content || !expanded) return;
+
+    let gesture: {
+      identifier: number;
+      handoffX: number;
+      handoffY: number | null;
+      lastY: number;
+      lastTimestamp: number;
+      velocityY: number;
+      dragY: number;
+      draggingSheet: boolean;
+    } | null = null;
+
+    const onTouchStart = (event: TouchEvent) => {
+      if (event.touches.length !== 1) {
+        gesture = null;
+        return;
+      }
+
+      const touch = event.touches.item(0);
+      if (!touch) return;
+
+      gesture = {
+        identifier: touch.identifier,
+        handoffX: touch.clientX,
+        handoffY: content.scrollTop <= 0 ? touch.clientY : null,
+        lastY: touch.clientY,
+        lastTimestamp: event.timeStamp,
+        velocityY: 0,
+        dragY: 0,
+        draggingSheet: false,
+      };
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      if (!gesture) return;
+
+      const touch = findTouch(event.touches, gesture.identifier);
+      if (!touch) return;
+
+      const elapsed = Math.max(event.timeStamp - gesture.lastTimestamp, 1);
+      gesture.velocityY = ((touch.clientY - gesture.lastY) / elapsed) * 1000;
+      gesture.lastY = touch.clientY;
+      gesture.lastTimestamp = event.timeStamp;
+
+      if (!gesture.draggingSheet && content.scrollTop > 0) {
+        gesture.handoffY = null;
+        return;
+      }
+
+      if (gesture.handoffY === null) {
+        gesture.handoffX = touch.clientX;
+        gesture.handoffY = touch.clientY;
+        return;
+      }
+
+      const deltaX = touch.clientX - gesture.handoffX;
+      const deltaY = touch.clientY - gesture.handoffY;
+
+      if (!gesture.draggingSheet) {
+        if (
+          deltaY <= SCROLL_HANDOFF_DISTANCE ||
+          deltaY <= Math.abs(deltaX)
+        ) {
+          return;
+        }
+        gesture.draggingSheet = true;
+      }
+
+      event.preventDefault();
+      gesture.dragY = Math.min(Math.max(deltaY, 0), collapsedOffset);
+      animationControls.set({ y: gesture.dragY });
+    };
+
+    const finishTouch = (event: TouchEvent, cancelled = false) => {
+      if (!gesture) return;
+
+      if (gesture.draggingSheet) {
+        event.preventDefault();
+        if (event.timeStamp - gesture.lastTimestamp > 100) {
+          gesture.velocityY = 0;
+        }
+        const shouldCollapse =
+          !cancelled &&
+          (gesture.dragY >= COLLAPSE_DISTANCE ||
+            gesture.velocityY >= COLLAPSE_VELOCITY);
+
+        if (shouldCollapse) {
+          setExpanded(false);
+        } else {
+          void animationControls.start({
+            y: 0,
+            transition: SHEET_TRANSITION,
+          });
+        }
+      }
+
+      gesture = null;
+    };
+
+    const onTouchEnd = (event: TouchEvent) => finishTouch(event);
+    const onTouchCancel = (event: TouchEvent) => finishTouch(event, true);
+
+    content.addEventListener("touchstart", onTouchStart, { passive: true });
+    content.addEventListener("touchmove", onTouchMove, { passive: false });
+    content.addEventListener("touchend", onTouchEnd, { passive: false });
+    content.addEventListener("touchcancel", onTouchCancel, { passive: false });
+
+    return () => {
+      content.removeEventListener("touchstart", onTouchStart);
+      content.removeEventListener("touchmove", onTouchMove);
+      content.removeEventListener("touchend", onTouchEnd);
+      content.removeEventListener("touchcancel", onTouchCancel);
+    };
+  }, [animationControls, collapsedOffset, expanded]);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -188,6 +319,7 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
             <span className="h-1 w-10 rounded-full bg-white/55 shadow-sm" />
           </button>
           <div
+            ref={contentRef}
             className={`min-h-0 flex-1 overscroll-contain pb-[env(safe-area-inset-bottom)] [--song-detail-leading-padding:0rem] [--song-detail-top-padding:2.5rem] [--song-detail-trailing-padding:2.5rem] ${
               expanded ? "overflow-y-auto" : "touch-none overflow-hidden"
             }`}
