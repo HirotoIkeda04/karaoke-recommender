@@ -43,7 +43,7 @@ fetch_origin() {
 }
 
 repo_root="$(git rev-parse --show-toplevel 2>/dev/null)" ||
-  die "Run this command inside the thread's worktree."
+  die "Run this command inside the fixed implementation worktree."
 cd "$repo_root"
 
 git remote get-url origin >/dev/null 2>&1 ||
@@ -58,7 +58,7 @@ branch="$(git symbolic-ref --quiet --short HEAD || true)"
 case "$branch" in
   codex/*) ;;
   "") die "Detached HEAD is not a Codex task branch." ;;
-  *) die "Refusing to update $branch. Run this only on the current thread's codex/* branch." ;;
+  *) die "Refusing to update $branch. Run this only on the fixed implementation worktree's codex/* branch." ;;
 esac
 
 if test -n "$(git status --porcelain=v1 --untracked-files=normal)"; then
