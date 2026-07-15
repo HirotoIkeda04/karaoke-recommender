@@ -143,6 +143,7 @@ export function LiveSearch({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const isSearchOpenRef = useRef(false);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const supabase = useMemo(() => createClient(), []);
 
   const knownSet = useMemo(() => new Set(knownSongIds), [knownSongIds]);
@@ -208,6 +209,53 @@ export function LiveSearch({
     window.addEventListener("app:toggle-search", handler);
     return () => window.removeEventListener("app:toggle-search", handler);
   }, []);
+
+  // 未入力の検索欄にフォーカスしたまま下へスクロールし始めたら、
+  // モバイルのソフトウェアキーボードを閉じる。横スクロールは対象外にする。
+  useEffect(() => {
+    const handleTouchStart = (event: TouchEvent) => {
+      const touch = event.touches[0];
+      touchStartRef.current = touch
+        ? { x: touch.clientX, y: touch.clientY }
+        : null;
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      const start = touchStartRef.current;
+      const touch = event.touches[0];
+      if (
+        !start ||
+        !touch ||
+        query.length > 0 ||
+        document.activeElement !== inputRef.current
+      ) {
+        return;
+      }
+
+      const deltaX = touch.clientX - start.x;
+      const deltaY = start.y - touch.clientY;
+      if (deltaY > 10 && deltaY > Math.abs(deltaX)) {
+        inputRef.current?.blur();
+        touchStartRef.current = null;
+      }
+    };
+
+    const clearTouchStart = () => {
+      touchStartRef.current = null;
+    };
+
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", clearTouchStart, { passive: true });
+    window.addEventListener("touchcancel", clearTouchStart, { passive: true });
+
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", clearTouchStart);
+      window.removeEventListener("touchcancel", clearTouchStart);
+    };
+  }, [query]);
 
   const trimmedQ = query.trim();
   const hasQueryInput = query.length > 0;
