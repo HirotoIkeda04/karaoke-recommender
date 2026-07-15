@@ -24,6 +24,7 @@ const SHEET_TRANSITION = {
 const SCROLL_HANDOFF_DISTANCE = 8;
 const COLLAPSE_DISTANCE = 56;
 const COLLAPSE_VELOCITY = 500;
+const CLOSE_DISTANCE_RATIO = 0.35;
 
 function findTouch(touches: TouchList, identifier: number) {
   for (let index = 0; index < touches.length; index += 1) {
@@ -156,7 +157,7 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
       }
 
       event.preventDefault();
-      gesture.dragY = Math.min(Math.max(deltaY, 0), collapsedOffset);
+      gesture.dragY = Math.min(Math.max(deltaY, 0), viewportHeight);
       animationControls.set({ y: gesture.dragY });
     };
 
@@ -168,12 +169,17 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
         if (event.timeStamp - gesture.lastTimestamp > 100) {
           gesture.velocityY = 0;
         }
+        const shouldClose =
+          !cancelled &&
+          gesture.dragY >= viewportHeight * CLOSE_DISTANCE_RATIO;
         const shouldCollapse =
           !cancelled &&
           (gesture.dragY >= COLLAPSE_DISTANCE ||
             gesture.velocityY >= COLLAPSE_VELOCITY);
 
-        if (shouldCollapse) {
+        if (shouldClose) {
+          close();
+        } else if (shouldCollapse) {
           setExpanded(false);
         } else {
           void animationControls.start({
@@ -200,7 +206,7 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
       content.removeEventListener("touchend", onTouchEnd);
       content.removeEventListener("touchcancel", onTouchCancel);
     };
-  }, [animationControls, collapsedOffset, expanded]);
+  }, [animationControls, close, expanded, viewportHeight]);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
