@@ -71,6 +71,12 @@ fetch_origin
 git show-ref --verify --quiet refs/remotes/origin/main ||
   die "origin/main was not found after fetch."
 
+remote_ref="refs/remotes/origin/$branch"
+if git show-ref --verify --quiet "$remote_ref" &&
+  ! git merge-base --is-ancestor "$remote_ref" HEAD; then
+  die "origin/$branch contains commits that are not in this worktree. Reconcile that remote work before rebasing; refusing to make a force-push look safe."
+fi
+
 if git merge-base --is-ancestor origin/main HEAD; then
   log "$branch already contains the latest origin/main."
 else
@@ -84,7 +90,6 @@ else
   log "$branch is current at $(git rev-parse --short HEAD)."
 fi
 
-remote_ref="refs/remotes/origin/$branch"
 if ! git show-ref --verify --quiet "$remote_ref"; then
   log "This branch is not published. First push: git push -u origin $branch"
 elif git merge-base --is-ancestor "$remote_ref" HEAD; then
