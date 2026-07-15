@@ -41,7 +41,7 @@ export function SongFloatingHeader({
         />
       ) : null}
       <div className="relative z-10 mx-auto max-w-md px-4">
-        <p className="truncate text-sm font-semibold text-white">
+        <p className="truncate text-base font-semibold text-white">
           {title}
         </p>
         <p className="truncate text-xs text-white/80">

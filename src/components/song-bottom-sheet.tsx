@@ -42,6 +42,7 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [closing, setClosing] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [draggingSheet, setDraggingSheet] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
 
@@ -154,6 +155,7 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
           return;
         }
         gesture.draggingSheet = true;
+        setDraggingSheet(true);
       }
 
       event.preventDefault();
@@ -166,6 +168,7 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
 
       if (gesture.draggingSheet) {
         event.preventDefault();
+        setDraggingSheet(false);
         if (event.timeStamp - gesture.lastTimestamp > 100) {
           gesture.velocityY = 0;
         }
@@ -256,7 +259,9 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
 
   return (
     <SongSheetCloseProvider close={close}>
-      <SongSheetScrollProvider scrollProgress={scrollProgress}>
+      <SongSheetScrollProvider
+        scrollProgress={expanded && !draggingSheet ? scrollProgress : 0}
+      >
       <div className="fixed inset-0 z-40">
         <motion.button
           type="button"
@@ -292,7 +297,9 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
           dragConstraints={{ top: 0, bottom: viewportHeight }}
           dragElastic={{ top: 0.04, bottom: 0 }}
           dragMomentum={false}
+          onDragStart={() => setDraggingSheet(true)}
           onDragEnd={(_, info) => {
+            setDraggingSheet(false);
             if (info.offset.y > 90 || info.velocity.y > 700) {
               close();
               return;
