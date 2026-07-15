@@ -21,11 +21,12 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const dragControls = useDragControls();
   const sheetRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const touchStartYRef = useRef<number | null>(null);
   const [closing, setClosing] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [viewportHeight, setViewportHeight] = useState(0);
+
+  const collapsedOffset = viewportHeight * 0.25;
 
   const close = useCallback(() => {
     setClosing(true);
@@ -33,6 +34,21 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
 
   const expand = useCallback(() => {
     setExpanded(true);
+  }, []);
+
+  useEffect(() => {
+    const updateViewportHeight = () => {
+      setViewportHeight(window.visualViewport?.height ?? window.innerHeight);
+    };
+
+    updateViewportHeight();
+    window.addEventListener("resize", updateViewportHeight);
+    window.visualViewport?.addEventListener("resize", updateViewportHeight);
+
+    return () => {
+      window.removeEventListener("resize", updateViewportHeight);
+      window.visualViewport?.removeEventListener("resize", updateViewportHeight);
+    };
   }, []);
 
   useEffect(() => {
@@ -101,7 +117,7 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
           aria-modal="true"
           aria-label="楽曲詳細"
           tabIndex={-1}
-          className="absolute inset-x-0 bottom-0 mx-auto flex max-h-[calc(100dvh-2.5rem)] w-full max-w-xl flex-col overflow-hidden rounded-t-3xl bg-background shadow-[0_-12px_48px_rgba(0,0,0,0.35)] outline-none"
+          className="absolute inset-x-0 bottom-0 mx-auto flex h-[90dvh] max-h-[90dvh] w-full max-w-xl flex-col overflow-hidden rounded-t-3xl bg-background shadow-[0_-12px_48px_rgba(0,0,0,0.35)] outline-none"
           onKeyDownCapture={(event) => {
             if (
               !expanded &&
@@ -111,26 +127,25 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
               expand();
             }
           }}
-          initial={{ y: "100%", height: "65dvh" }}
+          initial={{ y: "100%" }}
           animate={{
-            y: closing ? "100%" : 0,
-            height: expanded ? "calc(100dvh - 2.5rem)" : "65dvh",
+            y: closing ? "100%" : expanded ? 0 : "25dvh",
           }}
           transition={SHEET_TRANSITION}
           drag="y"
           dragControls={dragControls}
           dragListener={false}
-          dragConstraints={{ top: 0, bottom: 0 }}
-          dragElastic={{ top: 0.18, bottom: 0.22 }}
+          dragConstraints={{ top: 0, bottom: collapsedOffset }}
+          dragElastic={{ top: 0.04, bottom: 0.12 }}
           onDragEnd={(_, info) => {
-            if (
-              !expanded &&
-              (info.offset.y < -40 || info.velocity.y < -500)
-            ) {
+            if (info.offset.y > 90 || info.velocity.y > 700) {
+              close();
+              return;
+            }
+            if (!expanded && (info.offset.y < -16 || info.velocity.y < -200)) {
               expand();
               return;
             }
-            if (info.offset.y > 90 || info.velocity.y > 700) close();
           }}
           onAnimationComplete={() => {
             if (closing) router.back();
@@ -150,10 +165,12 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
             <span className="h-1 w-10 rounded-full bg-white/55 shadow-sm" />
           </button>
           <div
-            ref={contentRef}
             className={`min-h-0 flex-1 overscroll-contain pb-[env(safe-area-inset-bottom)] [--song-detail-leading-padding:0rem] [--song-detail-top-padding:2.5rem] [--song-detail-trailing-padding:2.5rem] ${
-              expanded ? "overflow-y-auto" : "overflow-hidden"
+              expanded ? "overflow-y-auto" : "touch-none overflow-hidden"
             }`}
+            onPointerDown={(event) => {
+              if (!expanded) dragControls.start(event);
+            }}
             onWheel={(event) => {
               if (!expanded && event.deltaY > 0) {
                 expand();
@@ -163,26 +180,6 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
               setScrollProgress(
                 Math.min(event.currentTarget.scrollTop / 64, 1),
               );
-            }}
-            onTouchStart={(event) => {
-              touchStartYRef.current = event.touches[0]?.clientY ?? null;
-            }}
-            onTouchMove={(event) => {
-              const startY = touchStartYRef.current;
-              const currentY = event.touches[0]?.clientY;
-              if (
-                !expanded &&
-                startY != null &&
-                currentY != null &&
-                startY - currentY > 12
-              ) {
-                contentRef.current?.scrollTo({ top: 0 });
-                expand();
-                touchStartYRef.current = null;
-              }
-            }}
-            onTouchEnd={() => {
-              touchStartYRef.current = null;
             }}
           >
             {children}

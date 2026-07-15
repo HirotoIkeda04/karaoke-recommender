@@ -24,7 +24,7 @@ export function SongFloatingHeader({
   return (
     <div
       aria-hidden={scrollProgress === 0}
-      className="pointer-events-none fixed inset-x-0 top-10 z-30 mx-auto max-w-xl overflow-hidden rounded-t-3xl border-b border-white/10 bg-background pb-4 pt-2 shadow-lg"
+      className="pointer-events-none fixed inset-x-0 top-[10dvh] z-30 mx-auto max-w-xl overflow-hidden rounded-t-3xl border-b border-white/10 bg-background pb-4 pt-2 shadow-lg"
       style={{
         opacity: scrollProgress,
         pointerEvents: scrollProgress > 0.1 ? "auto" : "none",
