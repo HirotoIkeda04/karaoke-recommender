@@ -6,7 +6,11 @@ import {
   useRef,
   useState,
 } from "react";
-import { motion, useDragControls } from "framer-motion";
+import {
+  motion,
+  useAnimationControls,
+  useDragControls,
+} from "framer-motion";
 import { useRouter } from "next/navigation";
 
 import { SongSheetCloseProvider } from "@/components/song-sheet-close-context";
@@ -19,6 +23,7 @@ const SHEET_TRANSITION = {
 
 export function SongBottomSheet({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const animationControls = useAnimationControls();
   const dragControls = useDragControls();
   const sheetRef = useRef<HTMLDivElement>(null);
   const [closing, setClosing] = useState(false);
@@ -50,6 +55,21 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
       window.visualViewport?.removeEventListener("resize", updateViewportHeight);
     };
   }, []);
+
+  useEffect(() => {
+    if (viewportHeight === 0) return;
+
+    void animationControls.start({
+      y: closing ? viewportHeight : expanded ? 0 : collapsedOffset,
+      transition: SHEET_TRANSITION,
+    });
+  }, [
+    animationControls,
+    closing,
+    collapsedOffset,
+    expanded,
+    viewportHeight,
+  ]);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -128,15 +148,13 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
             }
           }}
           initial={{ y: "100%" }}
-          animate={{
-            y: closing ? "100%" : expanded ? 0 : "25dvh",
-          }}
-          transition={SHEET_TRANSITION}
+          animate={animationControls}
           drag="y"
           dragControls={dragControls}
           dragListener={false}
-          dragConstraints={{ top: 0, bottom: collapsedOffset }}
-          dragElastic={{ top: 0.04, bottom: 0.12 }}
+          dragConstraints={{ top: 0, bottom: viewportHeight }}
+          dragElastic={{ top: 0.04, bottom: 0 }}
+          dragMomentum={false}
           onDragEnd={(_, info) => {
             if (info.offset.y > 90 || info.velocity.y > 700) {
               close();
@@ -146,6 +164,11 @@ export function SongBottomSheet({ children }: { children: React.ReactNode }) {
               expand();
               return;
             }
+
+            void animationControls.start({
+              y: expanded ? 0 : collapsedOffset,
+              transition: SHEET_TRANSITION,
+            });
           }}
           onAnimationComplete={() => {
             if (closing) router.back();
