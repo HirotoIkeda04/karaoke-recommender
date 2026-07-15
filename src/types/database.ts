@@ -47,6 +47,30 @@ export type Database = {
         }
         Relationships: []
       }
+      browse_snapshots: {
+        Row: {
+          genre_covers: Json
+          id: string
+          ranking_covers: Json
+          ranking_preview: Json
+          updated_at: string
+        }
+        Insert: {
+          genre_covers?: Json
+          id: string
+          ranking_covers?: Json
+          ranking_preview?: Json
+          updated_at?: string
+        }
+        Update: {
+          genre_covers?: Json
+          id?: string
+          ranking_covers?: Json
+          ranking_preview?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       evaluations: {
         Row: {
           created_at: string
@@ -772,6 +796,10 @@ export type Database = {
           voice_falsetto_max_midi: number
         }[]
       }
+      get_search_recommendations: {
+        Args: { p_limit?: number }
+        Returns: Json
+      }
       get_unrated_songs: {
         Args: { p_limit?: number; p_popular_only?: boolean }
         Returns: {
@@ -893,6 +921,7 @@ export type Database = {
         }[]
       }
       normalize_artist_name: { Args: { name: string }; Returns: string }
+      refresh_browse_snapshot: { Args: never; Returns: undefined }
       search_songs_and_artists: {
         Args: {
           p_artist_limit?: number

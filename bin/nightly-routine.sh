@@ -4,7 +4,9 @@
 # ----------------------------------------------------------------------------
 # 1 セッション内で Spotify quota (500 call/夜) を超えない範囲で:
 #   1. match:dam --max-new 400  (fame_cache 候補曲を Spotify と紐付け)
-#   2. backfill:spotify-metadata --max 100  (既存 matched 曲のメタ補完)
+#   2. backfill:itunes-metadata --order fame --limit 500  (メタ補完)
+#   3. fetch:weekly-rankings  (月曜のみ)
+#   4. refresh:browse-snapshot  (検索タブの共有データを再計算)
 #
 # 累計 ~500 call → quota の安全境界内。
 #
@@ -87,6 +89,10 @@ if [ "$DOW" = "1" ]; then
 else
   echo "===== [$(date +%H:%M:%S)] fetch:weekly-rankings skipped (DOW=$DOW, not Monday) =====" | tee -a "$LOG_FILE"
 fi
+
+# Step 4: 検索タブの共有ブラウズデータを1行JSONへ事前計算
+run_step "refresh:browse-snapshot" \
+  node --import tsx scripts/refresh-browse-snapshot.ts
 
 echo "=========================================" | tee -a "$LOG_FILE"
 echo "nightly routine end: $(date)" | tee -a "$LOG_FILE"

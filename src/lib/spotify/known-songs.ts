@@ -9,17 +9,29 @@
 
 import { createClient } from "@/lib/supabase/server";
 
-export async function getUserKnownSongIds(): Promise<Set<string>> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return new Set();
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
+
+export async function getUserKnownSongIds(
+  existingClient?: SupabaseServerClient,
+  existingUserId?: string | null,
+): Promise<Set<string>> {
+  const supabase = existingClient ?? (await createClient());
+  let userId = existingUserId;
+
+  // 呼び出し元がすでにセッションを読んでいる場合は、そのIDを再利用する。
+  // RLSが auth.uid() と照合するため、Cookie由来のIDだけで他人の行は読めない。
+  if (userId === undefined) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    userId = user?.id ?? null;
+  }
+  if (!userId) return new Set();
 
   const { data } = await supabase
     .from("user_known_songs")
     .select("song_id")
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
 
   return new Set((data ?? []).map((r) => r.song_id));
 }

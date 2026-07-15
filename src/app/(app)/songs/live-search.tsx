@@ -57,8 +57,6 @@ interface LiveSearchProps {
   rankingCovers?: string[];
   /** 検索タブに表示する、今週のランキング上位曲 */
   rankingPreview?: Array<{ rank: number; song: Song }>;
-  /** 検索前の条件付きおすすめに使う、ランキング順の候補曲 */
-  recommendations?: Song[];
 }
 
 const HIGH_OPTIONS = [
@@ -95,6 +93,7 @@ const GENRE_OVERLAY: Record<GenreCode, string> = {
 };
 
 const DEBOUNCE_MS = 200;
+const RECOMMENDATION_LIMIT = 20;
 
 type SearchMode = "browse" | "search-empty" | "search-results";
 
@@ -129,7 +128,6 @@ export function LiveSearch({
   genreCovers = {},
   rankingCovers = [],
   rankingPreview = [],
-  recommendations = [],
 }: LiveSearchProps) {
   const [query, setQuery] = useState("");
   const [highMax, setHighMax] = useState("");
@@ -140,11 +138,17 @@ export function LiveSearch({
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState<string | null>(null);
+  const [recommendations, setRecommendations] = useState<Song[]>([]);
+  const [recommendationsLoading, setRecommendationsLoading] = useState(false);
+  const [recommendationsError, setRecommendationsError] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const isSearchOpenRef = useRef(false);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
-  const supabase = useMemo(() => createClient(), []);
+  const queryRef = useRef(query);
+  const recommendationsRequestedRef = useRef(false);
+  const recommendationsAbortRef = useRef<AbortController | null>(null);
+  const [supabase] = useState(() => createClient());
 
   const knownSet = useMemo(() => new Set(knownSongIds), [knownSongIds]);
   const highMinMidi = (highMin ? karaokeToMidi(highMin) : null) ?? null;
@@ -161,7 +165,7 @@ export function LiveSearch({
             selectedDecades,
           ),
         )
-        .slice(0, 50),
+        .slice(0, RECOMMENDATION_LIMIT),
     [recommendations, highMinMidi, highMaxMidi, selectedDecades],
   );
 
@@ -180,6 +184,54 @@ export function LiveSearch({
     };
   }, [results, highMinMidi, highMaxMidi, selectedDecades]);
 
+  useEffect(() => {
+    queryRef.current = query;
+  }, [query]);
+
+  const loadRecommendations = useCallback(() => {
+    if (recommendationsRequestedRef.current) return;
+
+    recommendationsRequestedRef.current = true;
+    const ctrl = new AbortController();
+    recommendationsAbortRef.current = ctrl;
+    setRecommendationsLoading(true);
+    setRecommendationsError(false);
+
+    void (async () => {
+      try {
+        const { data, error } = await supabase
+          .rpc("get_search_recommendations", {
+            p_limit: RECOMMENDATION_LIMIT,
+          })
+          .abortSignal(ctrl.signal);
+        if (ctrl.signal.aborted) return;
+        if (error || !Array.isArray(data)) {
+          recommendationsRequestedRef.current = false;
+          setRecommendationsError(true);
+          return;
+        }
+        setRecommendations(data as unknown as Song[]);
+      } catch {
+        if (!ctrl.signal.aborted) {
+          recommendationsRequestedRef.current = false;
+          setRecommendationsError(true);
+        }
+      } finally {
+        if (recommendationsAbortRef.current === ctrl) {
+          recommendationsAbortRef.current = null;
+        }
+        if (!ctrl.signal.aborted) setRecommendationsLoading(false);
+      }
+    })();
+  }, [supabase]);
+
+  useEffect(
+    () => () => {
+      recommendationsAbortRef.current?.abort();
+    },
+    [],
+  );
+
   // BottomNav の検索タブ再タップで、検索トップと検索モードを切り替える。
   useEffect(() => {
     const handler = () => {
@@ -196,6 +248,7 @@ export function LiveSearch({
 
       isSearchOpenRef.current = true;
       setIsSearchOpen(true);
+      loadRecommendations();
       const el = inputRef.current;
       if (!el) return;
       el.focus();
@@ -208,7 +261,7 @@ export function LiveSearch({
     };
     window.addEventListener("app:toggle-search", handler);
     return () => window.removeEventListener("app:toggle-search", handler);
-  }, []);
+  }, [loadRecommendations]);
 
   // 未入力の検索欄にフォーカスしたまま下へスクロールし始めたら、
   // モバイルのソフトウェアキーボードを閉じる。横スクロールは対象外にする。
@@ -226,7 +279,7 @@ export function LiveSearch({
       if (
         !start ||
         !touch ||
-        query.length > 0 ||
+        queryRef.current.length > 0 ||
         document.activeElement !== inputRef.current
       ) {
         return;
@@ -255,7 +308,7 @@ export function LiveSearch({
       window.removeEventListener("touchend", clearTouchStart);
       window.removeEventListener("touchcancel", clearTouchStart);
     };
-  }, [query]);
+  }, []);
 
   const trimmedQ = query.trim();
   const hasQueryInput = query.length > 0;
@@ -359,6 +412,7 @@ export function LiveSearch({
   const onFilterFocus = () => {
     isSearchOpenRef.current = true;
     setIsSearchOpen(true);
+    loadRecommendations();
   };
 
   return (
@@ -422,6 +476,8 @@ export function LiveSearch({
             />
             <RecommendationList
               recommendations={filteredRecommendations}
+              loading={recommendationsLoading}
+              hasError={recommendationsError}
               hasActiveFilters={Boolean(
                 highMin || highMax || selectedDecades.length > 0
               )}
@@ -915,12 +971,16 @@ function HistoryList({
 // ============================================================================
 function RecommendationList({
   recommendations,
+  loading,
+  hasError,
   hasActiveFilters,
   ratings,
   knownSet,
   onSelectSong,
 }: {
   recommendations: Song[];
+  loading: boolean;
+  hasError: boolean;
   hasActiveFilters: boolean;
   ratings: Record<string, string>;
   knownSet: Set<string>;
@@ -944,6 +1004,14 @@ function RecommendationList({
             </li>
           ))}
         </ul>
+      ) : loading ? (
+        <p className="px-2 py-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
+          おすすめを読み込み中…
+        </p>
+      ) : hasError ? (
+        <p className="px-2 py-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
+          おすすめを読み込めませんでした
+        </p>
       ) : (
         <p className="px-2 py-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
           {hasActiveFilters

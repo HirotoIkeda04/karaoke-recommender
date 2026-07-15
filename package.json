@@ -43,6 +43,7 @@
     "dump:top-artists": "node --env-file=.env.local --import tsx scripts/dump-top-artists.ts",
     "ingest:related-artists": "node --env-file=.env.local --import tsx scripts/ingest-related-artists.ts",
     "fetch:weekly-rankings": "node --env-file=.env.local --import tsx scripts/fetch-weekly-rankings.ts",
+    "refresh:browse-snapshot": "node --env-file=.env.local --import tsx scripts/refresh-browse-snapshot.ts",
     "friends:activity": "node --env-file=.env.local --import tsx scripts/friends-activity.ts"
   },
   "dependencies": {

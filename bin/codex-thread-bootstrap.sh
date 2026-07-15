@@ -90,14 +90,14 @@ new_branch_name() {
   printf '%s\n' "$branch"
 }
 
-previous_merge_confirmed=0
-if test "${1:-}" = "--previous-merged"; then
-  previous_merge_confirmed=1
+start_new_task=0
+if test "${1:-}" = "--new-task"; then
+  start_new_task=1
   shift
 fi
 
 if test "$#" -gt 1; then
-  die "Usage: git show origin/main:bin/codex-thread-bootstrap.sh | bash -s -- [--previous-merged] [task-label]"
+  die "Usage: git show origin/main:bin/codex-thread-bootstrap.sh | bash -s -- [--new-task] [task-label]"
 fi
 
 task_label="${1:-implementation}"
@@ -163,21 +163,24 @@ if worktree_is_registered "$worktree_path"; then
     *) die "The fixed implementation worktree is on $branch, not a codex/* branch. Repair it before starting implementation." ;;
   esac
 
+  reuse_existing=0
   if test -n "$(git -C "$worktree_path" status --porcelain=v1 --untracked-files=normal)"; then
-    die "The fixed implementation worktree contains uncommitted changes. Another implementation thread may be active; continue there or finish it first."
-  fi
-
-  if ! git merge-base --is-ancestor "$branch" origin/main; then
-    if test "$previous_merge_confirmed" -ne 1; then
-      die "The fixed implementation branch $branch is not contained in origin/main. Continue or merge it first. If its PR was squash- or rebase-merged, rerun with --previous-merged only after explicit user confirmation."
+    if test "$start_new_task" -eq 1; then
+      die "Cannot start a new task while the fixed worktree has uncommitted changes."
     fi
-    log "Previous squash/rebase merge was explicitly confirmed; preserving $branch and starting from origin/main."
+    reuse_existing=1
+    log "Unfinished changes found; continuing $branch in $worktree_path."
+  elif ! git merge-base --is-ancestor "$branch" origin/main && test "$start_new_task" -ne 1; then
+    reuse_existing=1
+    log "Unmerged commits found; continuing $branch in $worktree_path."
   fi
 
-  branch="$(new_branch_name "$task_label")"
-  log "Reusing fixed implementation worktree $worktree_path..."
-  if ! git -C "$worktree_path" switch --no-track -c "$branch" origin/main; then
-    die "Could not switch the fixed implementation worktree to a fresh branch."
+  if test "$reuse_existing" -eq 0; then
+    branch="$(new_branch_name "$task_label")"
+    log "Starting a fresh branch from origin/main in $worktree_path..."
+    if ! git -C "$worktree_path" switch --no-track -c "$branch" origin/main; then
+      die "Could not switch the fixed implementation worktree to a fresh branch."
+    fi
   fi
 else
   test ! -e "$worktree_path" ||
@@ -191,8 +194,11 @@ else
 fi
 
 log "Implementation worktree ready on $branch at $(git -C "$worktree_path" rev-parse --short HEAD)."
-if test -f "$primary_root/.env.local" && test ! -f "$worktree_path/.env.local"; then
-  log ".env.local was not copied. Configure it once in the fixed worktree; privileged secrets must not be duplicated automatically."
+if test -f "$primary_root/.env.local" && test ! -e "$worktree_path/.env.local" && test ! -L "$worktree_path/.env.local"; then
+  ln -s "$primary_root/.env.local" "$worktree_path/.env.local"
+  log "Linked .env.local from the primary checkout."
+elif test ! -e "$worktree_path/.env.local" && test ! -L "$worktree_path/.env.local"; then
+  log "No .env.local was found in the primary checkout. Configure it before auth/data-dependent verification."
 fi
 log "Continue implementation only in the fixed worktree printed below."
 printf 'CODEX_IMPLEMENTATION_WORKTREE=%s\n' "$worktree_path"
