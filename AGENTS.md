@@ -27,11 +27,13 @@ Classify a Codex thread before doing local project work:
   and wait until the fixed implementation worktree is available.
 
 At the start of an implementation thread, before inspecting project files,
-making an implementation plan, or editing anything, run this exactly once from
-the initial checkout:
+making an implementation plan, or editing anything, fetch `origin` and run the
+bootstrap script from `origin/main` exactly once from the initial checkout. Do
+not run the possibly stale copy from the checked-out branch:
 
 ```bash
-bash bin/codex-thread-bootstrap.sh
+git fetch origin --prune
+git show origin/main:bin/codex-thread-bootstrap.sh | bash -s --
 ```
 
 This step is mandatory for implementation. It fetches `origin` and creates or
@@ -45,6 +47,9 @@ implementation work in the `CODEX_IMPLEMENTATION_WORKTREE` path printed by the
 script; do not inspect or modify project files in the initial checkout. If
 sandbox or network restrictions block the command, rerun it with the required
 approval. If it still fails, stop instead of falling back to a shared checkout.
+After bootstrap, verify that `CODEX_IMPLEMENTATION_WORKTREE` is an absolute,
+existing path outside the initial repository. A path inside the repository,
+including `.codex/worktrees/...`, is invalid: stop instead of using it.
 
 Follow these rules for all Codex thread work:
 
@@ -63,12 +68,18 @@ Follow these rules for all Codex thread work:
 - Git cannot prove ancestry after a squash or rebase merge. In that case, only
   after the user explicitly confirms the pull request is merged, start the next
   implementation with
-  `bash bin/codex-thread-bootstrap.sh --previous-merged [task-label]`. This keeps
-  the old branch and switches the fixed worktree to a fresh branch from
-  `origin/main`.
+  `git fetch origin --prune`, then
+  `git show origin/main:bin/codex-thread-bootstrap.sh | bash -s -- --previous-merged [task-label]`.
+  This keeps the old branch and switches the fixed worktree to a fresh branch
+  from `origin/main`.
 - Keep `.env.local` only in the fixed implementation worktree and configure it
   once with owner-only permissions. Do not copy privileged secrets into
   planning checkouts or temporary worktrees.
+- Before starting a development server or an auth/data-dependent test, verify
+  that the fixed implementation worktree has its required `.env.local`. If it
+  is missing, stop and ask the user to configure it. Never substitute dummy
+  service URLs or keys, borrow another worktree's server or environment, or
+  copy secrets from the initial checkout merely to continue verification.
 - Never use `git stash` for automated synchronization. Stashes are shared by all
   worktrees in the repository and can be applied or dropped by the wrong thread.
 - Before pushing or opening a pull request, commit all intended changes. A WIP

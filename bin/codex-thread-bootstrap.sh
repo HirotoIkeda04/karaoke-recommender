@@ -43,6 +43,22 @@ fetch_origin() {
   die "Fetching origin failed three times. Rerun the bootstrap; do not use the shared checkout."
 }
 
+verify_bootstrap_is_current() {
+  local script_source expected_blob actual_blob
+
+  script_source="${BASH_SOURCE[0]:-}"
+  if test -z "$script_source" || test ! -f "$script_source"; then
+    return 0
+  fi
+
+  expected_blob="$(git rev-parse 'origin/main:bin/codex-thread-bootstrap.sh')" ||
+    die "Could not resolve the bootstrap script from origin/main."
+  actual_blob="$(git hash-object "$script_source")"
+  if test "$actual_blob" != "$expected_blob"; then
+    die "This bootstrap script is stale. Run: git show origin/main:bin/codex-thread-bootstrap.sh | bash -s --"
+  fi
+}
+
 worktree_is_registered() {
   local target="$1"
 
@@ -81,7 +97,7 @@ if test "${1:-}" = "--previous-merged"; then
 fi
 
 if test "$#" -gt 1; then
-  die "Usage: bash bin/codex-thread-bootstrap.sh [--previous-merged] [task-label]"
+  die "Usage: git show origin/main:bin/codex-thread-bootstrap.sh | bash -s -- [--previous-merged] [task-label]"
 fi
 
 task_label="${1:-implementation}"
@@ -103,6 +119,8 @@ fetch_origin
 
 git show-ref --verify --quiet refs/remotes/origin/main ||
   die "origin/main was not found after fetch."
+
+verify_bootstrap_is_current
 
 common_dir="$(git rev-parse --path-format=absolute --git-common-dir)"
 if test "$(basename "$common_dir")" != ".git"; then
