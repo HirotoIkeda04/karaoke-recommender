@@ -1,11 +1,12 @@
 "use client";
 
-import { CalendarRange, Search, TrendingUp, X } from "lucide-react";
+import { Search, TrendingUp, X } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ArtistRow, type ArtistRowData } from "@/components/artist-row";
 import { DecadeChips } from "@/components/decade-chips";
+import { PitchRangePicker } from "@/components/pitch-range-picker";
 import { SongCard } from "@/components/song-card";
 import { JacketImage } from "@/components/ui/jacket-image";
 import {
@@ -58,18 +59,6 @@ interface LiveSearchProps {
   /** 検索タブに表示する、今週のランキング上位曲 */
   rankingPreview?: Array<{ rank: number; song: Song }>;
 }
-
-const HIGH_OPTIONS = [
-  "",
-  "mid2C",
-  "mid2E",
-  "mid2G",
-  "hiA",
-  "hiC",
-  "hiD",
-  "hiE",
-  "hiF",
-];
 
 // 各ジャンルカードに被せる暗色グラデーション。
 // ジャンル識別性を保ちつつ、カラオケ向けに眩しすぎないよう *-950 系の
@@ -464,11 +453,13 @@ export function LiveSearch({
               ratings={ratings}
               knownSet={knownSet}
             />
-            <PitchSearch
-              highMin={highMin}
-              highMax={highMax}
-              onHighMinChange={setHighMin}
-              onHighMaxChange={setHighMax}
+            <PitchRangePicker
+              min={highMin}
+              max={highMax}
+              onChange={(min, max) => {
+                setHighMin(min);
+                setHighMax(max);
+              }}
             />
             <DecadeChips
               selected={selectedDecades}
@@ -488,11 +479,13 @@ export function LiveSearch({
           </>
         ) : mode === "search-results" ? (
           <>
-            <PitchSearch
-              highMin={highMin}
-              highMax={highMax}
-              onHighMinChange={setHighMin}
-              onHighMaxChange={setHighMax}
+            <PitchRangePicker
+              min={highMin}
+              max={highMax}
+              onChange={(min, max) => {
+                setHighMin(min);
+                setHighMax(max);
+              }}
             />
             <DecadeChips
               selected={selectedDecades}
@@ -525,50 +518,6 @@ export function LiveSearch({
           knownSet={knownSet}
         />
       ) : null}
-    </div>
-  );
-}
-
-function PitchSearch({
-  highMin,
-  highMax,
-  onHighMinChange,
-  onHighMaxChange,
-}: {
-  highMin: string;
-  highMax: string;
-  onHighMinChange: (value: string) => void;
-  onHighMaxChange: (value: string) => void;
-}) {
-  return (
-    <div className="flex items-center gap-2 text-sm">
-      <select
-        value={highMin}
-        onChange={(e) => onHighMinChange(e.target.value)}
-        aria-label="最高音の下限"
-        className="flex-1 rounded bg-zinc-100 px-2 py-1.5 text-sm focus:outline-none dark:bg-zinc-800"
-      >
-        {HIGH_OPTIONS.map((v) => (
-          <option key={`min-${v}`} value={v}>
-            {v || "—"}
-          </option>
-        ))}
-      </select>
-      <span className="shrink-0 whitespace-nowrap text-xs text-zinc-500 dark:text-zinc-400">
-        ≤ 最高音 ≤
-      </span>
-      <select
-        value={highMax}
-        onChange={(e) => onHighMaxChange(e.target.value)}
-        aria-label="最高音の上限"
-        className="flex-1 rounded bg-zinc-100 px-2 py-1.5 text-sm focus:outline-none dark:bg-zinc-800"
-      >
-        {HIGH_OPTIONS.map((v) => (
-          <option key={`max-${v}`} value={v}>
-            {v || "—"}
-          </option>
-        ))}
-      </select>
     </div>
   );
 }
@@ -704,81 +653,7 @@ function BrowseGrid({
             </ol>
           </li>
         ) : null}
-        {/* 「年代別J-POP」エントリ。col-span-2 で全幅。視覚的にランキング
-            カードと並ぶ。色は元の j_pop カードと同じピンク/ローズ系を踏襲。 */}
-        <li className="col-span-2">
-          <Link
-            href="/songs/genre/j_pop"
-            className="relative flex aspect-[16/5] items-center overflow-hidden rounded-lg bg-zinc-900 px-4 py-3 transition active:scale-[0.98]"
-          >
-            {(genreCovers.j_pop ?? []).length > 0 ? (
-              <div
-                className="absolute inset-0 grid grid-cols-4"
-                aria-hidden
-              >
-                {[0, 1, 2, 3].map((i) => {
-                  const covers = genreCovers.j_pop ?? [];
-                  const src = covers[i] ?? covers[i % Math.max(covers.length, 1)];
-                  return (
-                    <div key={i} className="relative bg-zinc-800">
-                      {src ? (
-                        <JacketImage
-                          src={src}
-                          alt=""
-                          fill
-                          sizes="(max-width: 640px) 25vw, 12vw"
-                          className="object-cover"
-                        />
-                      ) : null}
-                    </div>
-                  );
-                })}
-              </div>
-            ) : null}
-            <div
-              className="absolute inset-0 bg-gradient-to-br from-pink-950/88 via-rose-950/45 to-black/30"
-              aria-hidden
-            />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 rounded-lg"
-              style={{
-                padding: "2px",
-                background: "rgba(255,255,255,0.18)",
-                backdropFilter: "blur(20px) brightness(1.2) saturate(1.4)",
-                WebkitBackdropFilter:
-                  "blur(20px) brightness(1.2) saturate(1.4)",
-                WebkitMask:
-                  "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
-                WebkitMaskComposite: "xor",
-                mask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
-                maskComposite: "exclude",
-              }}
-            />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{
-                backdropFilter: "blur(10px)",
-                WebkitBackdropFilter: "blur(10px)",
-                maskImage:
-                  "linear-gradient(135deg, black 0%, black 25%, transparent 80%)",
-                WebkitMaskImage:
-                  "linear-gradient(135deg, black 0%, black 25%, transparent 80%)",
-              }}
-            />
-            <div className="relative z-10 flex items-center gap-2">
-              <CalendarRange
-                className="size-4 text-pink-200 drop-shadow-md"
-                aria-hidden
-              />
-              <span className="text-sm font-extrabold leading-tight tracking-tight text-zinc-100 drop-shadow-md">
-                年代別J-POP
-              </span>
-            </div>
-          </Link>
-        </li>
-        {BROWSE_GENRE_CODES.filter((c) => c !== "j_pop").map((code) => {
+        {BROWSE_GENRE_CODES.filter((code) => code !== "j_pop").map((code) => {
           const covers = genreCovers[code] ?? [];
           return (
             <li key={code}>

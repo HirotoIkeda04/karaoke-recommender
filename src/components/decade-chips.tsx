@@ -62,7 +62,7 @@ export function DecadeChips({ selected, onToggle }: DecadeChipsProps) {
           next == null || (active && selectedSet.has(next.start)) ? "" : "mr-2";
         const tone = active
           ? "bg-zinc-100 font-semibold text-zinc-900 dark:bg-zinc-50 dark:text-zinc-950"
-          : "border border-zinc-300 bg-transparent font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800";
+          : "bg-zinc-200 font-medium text-zinc-700 hover:bg-zinc-300 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700";
 
         return (
           <motion.button

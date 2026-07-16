@@ -36,6 +36,18 @@ const REVERSE_NOTE_TABLE: Record<number, string> = Object.fromEntries(
   Object.entries(NOTE_TABLE).map(([k, v]) => [v, k]),
 );
 
+export interface KaraokeNoteOption {
+  notation: string;
+  midi: number;
+}
+
+/** MIDI 順に並んだ、アプリが扱える全カラオケ音名。 */
+export const KARAOKE_NOTE_OPTIONS: readonly KaraokeNoteOption[] = Object.entries(
+  NOTE_TABLE,
+)
+  .map(([notation, midi]) => ({ notation, midi }))
+  .sort((a, b) => a.midi - b.midi);
+
 export function midiToKaraoke(midi: number | null | undefined): string {
   if (midi == null) return "—";
   const rounded = Math.round(midi);
