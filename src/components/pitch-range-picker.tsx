@@ -8,13 +8,13 @@ import { createPortal } from "react-dom";
 import { KARAOKE_NOTE_OPTIONS, karaokeToMidi } from "@/lib/note";
 
 const WHEEL_ITEM_HEIGHT = 44;
+const DEFAULT_WHEEL_NOTATION = "hiA";
 const SHEET_TRANSITION = {
   duration: 0.24,
   ease: [0.32, 0.72, 0, 1] as [number, number, number, number],
 };
 
 const WHEEL_OPTIONS = [
-  { notation: "", midi: null, label: "指定なし" },
   ...[...KARAOKE_NOTE_OPTIONS].reverse().map((note) => ({
     ...note,
     label: note.notation,
@@ -44,12 +44,15 @@ function PitchWheel({
   const wheelId = useId();
   const wheelRef = useRef<HTMLDivElement>(null);
   const settleTimerRef = useRef<number | null>(null);
+  const userScrollingRef = useRef(false);
+  const wheelValue = value || DEFAULT_WHEEL_NOTATION;
   const selectedIndex = Math.max(
     0,
-    WHEEL_OPTIONS.findIndex((option) => option.notation === value),
+    WHEEL_OPTIONS.findIndex((option) => option.notation === wheelValue),
   );
 
   useEffect(() => {
+    userScrollingRef.current = false;
     if (settleTimerRef.current != null) {
       window.clearTimeout(settleTimerRef.current);
       settleTimerRef.current = null;
@@ -92,18 +95,23 @@ function PitchWheel({
         {label}
       </p>
       <div className="relative h-[220px] overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-900">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-2 top-1/2 z-0 h-11 -translate-y-1/2 rounded-xl border-y border-zinc-300 bg-white/80 dark:border-zinc-600 dark:bg-zinc-700/80"
-        />
+        {value ? (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-2 top-1/2 z-0 h-11 -translate-y-1/2 rounded-xl border-y border-zinc-300 bg-white/80 dark:border-zinc-600 dark:bg-zinc-700/80"
+          />
+        ) : null}
         <div
           ref={wheelRef}
           role="listbox"
           tabIndex={0}
           aria-label={label}
-          aria-activedescendant={`${wheelId}-${selectedIndex}`}
+          aria-activedescendant={
+            value ? `${wheelId}-${selectedIndex}` : undefined
+          }
           className="relative z-10 h-full snap-y snap-mandatory overflow-y-auto overscroll-contain py-[88px] outline-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           onScroll={(event) => {
+            if (!userScrollingRef.current) return;
             const element = event.currentTarget;
             if (settleTimerRef.current != null) {
               window.clearTimeout(settleTimerRef.current);
@@ -120,6 +128,15 @@ function PitchWheel({
               if (next && next.notation !== value) onChange(next.notation);
             }, 100);
           }}
+          onWheel={() => {
+            userScrollingRef.current = true;
+          }}
+          onTouchStart={() => {
+            userScrollingRef.current = true;
+          }}
+          onPointerDown={() => {
+            userScrollingRef.current = true;
+          }}
           onKeyDown={(event) => {
             if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
             event.preventDefault();
@@ -127,7 +144,7 @@ function PitchWheel({
           }}
         >
           {WHEEL_OPTIONS.map((option, index) => {
-            const selected = index === selectedIndex;
+            const selected = option.notation === value;
             return (
               <button
                 key={option.notation || "unset"}
@@ -135,6 +152,7 @@ function PitchWheel({
                 type="button"
                 role="option"
                 tabIndex={-1}
+                aria-label={option.label}
                 aria-selected={selected}
                 className={`flex h-11 w-full snap-center snap-always items-center justify-center px-2 text-sm transition ${
                   selected
@@ -157,6 +175,18 @@ function PitchWheel({
           className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-16 bg-gradient-to-t from-zinc-100 to-transparent dark:from-zinc-900"
         />
       </div>
+      <button
+        type="button"
+        aria-pressed={!value}
+        className={`mt-2 flex h-11 w-full items-center justify-center rounded-2xl text-sm transition active:scale-[0.98] ${
+          !value
+            ? "bg-zinc-300 font-bold text-zinc-950 dark:bg-zinc-700 dark:text-zinc-50"
+            : "bg-zinc-100 font-medium text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
+        }`}
+        onClick={() => onChange("")}
+      >
+        指定なし
+      </button>
     </div>
   );
 }
@@ -272,9 +302,6 @@ export function PitchRangePicker({ min, max, onChange }: PitchRangePickerProps) 
                 <h2 id={titleId} className="text-base font-bold text-zinc-950 dark:text-zinc-50">
                   最高音の範囲
                 </h2>
-                <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-                  半音単位で下限と上限を選択
-                </p>
               </div>
               <button
                 type="button"
@@ -294,20 +321,10 @@ export function PitchRangePicker({ min, max, onChange }: PitchRangePickerProps) 
               <PitchWheel label="上限" value={draftMax} onChange={changeDraftMax} />
             </div>
 
-            <div className="mt-5 grid grid-cols-[1fr_2fr] gap-2">
+            <div className="mt-5">
               <button
                 type="button"
-                className="rounded-xl bg-zinc-100 px-4 py-3 text-sm font-semibold text-zinc-700 active:scale-[0.98] dark:bg-zinc-800 dark:text-zinc-200"
-                onClick={() => {
-                  setDraftMin("");
-                  setDraftMax("");
-                }}
-              >
-                リセット
-              </button>
-              <button
-                type="button"
-                className="rounded-xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white active:scale-[0.98] dark:bg-zinc-50 dark:text-zinc-950"
+                className="w-full rounded-xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white active:scale-[0.98] dark:bg-zinc-50 dark:text-zinc-950"
                 onClick={() => {
                   onChange(draftMin, draftMax);
                   close();
@@ -330,7 +347,7 @@ export function PitchRangePicker({ min, max, onChange }: PitchRangePickerProps) 
         type="button"
         aria-haspopup="dialog"
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-3 rounded-xl bg-zinc-100 px-3 py-2.5 text-left transition active:scale-[0.99] dark:bg-zinc-800"
+        className="flex w-full items-center justify-between gap-3 rounded-2xl bg-zinc-100 px-3 py-2.5 text-left transition active:scale-[0.99] dark:bg-zinc-800"
         onClick={openPicker}
       >
         <span className="flex min-w-0 items-baseline gap-2">

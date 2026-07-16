@@ -797,7 +797,12 @@ export type Database = {
         }[]
       }
       get_search_recommendations: {
-        Args: { p_limit?: number }
+        Args: {
+          p_decades?: number[]
+          p_high_max_midi?: number
+          p_high_min_midi?: number
+          p_limit?: number
+        }
         Returns: Json
       }
       get_unrated_songs: {

@@ -82,9 +82,27 @@ const GENRE_OVERLAY: Record<GenreCode, string> = {
 };
 
 const DEBOUNCE_MS = 200;
-const RECOMMENDATION_LIMIT = 20;
+const RECOMMENDATION_LIMIT = 50;
 
 type SearchMode = "browse" | "search-empty" | "search-results";
+
+interface RecommendationFilters {
+  highMinMidi: number | null;
+  highMaxMidi: number | null;
+  selectedDecades: number[];
+}
+
+function recommendationCacheKey({
+  highMinMidi,
+  highMaxMidi,
+  selectedDecades,
+}: RecommendationFilters): string {
+  return [
+    highMinMidi ?? "",
+    highMaxMidi ?? "",
+    [...selectedDecades].sort((a, b) => a - b).join(","),
+  ].join("|");
+}
 
 function matchesSongFilters(
   song: Song,
@@ -135,7 +153,7 @@ export function LiveSearch({
   const isSearchOpenRef = useRef(false);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const queryRef = useRef(query);
-  const recommendationsRequestedRef = useRef(false);
+  const recommendationsCacheRef = useRef(new Map<string, Song[]>());
   const recommendationsAbortRef = useRef<AbortController | null>(null);
   const [supabase] = useState(() => createClient());
 
@@ -177,42 +195,86 @@ export function LiveSearch({
     queryRef.current = query;
   }, [query]);
 
-  const loadRecommendations = useCallback(() => {
-    if (recommendationsRequestedRef.current) return;
+  const loadRecommendations = useCallback((filters: RecommendationFilters) => {
+    const sortedDecades = [...filters.selectedDecades].sort((a, b) => a - b);
+    const cacheKey = recommendationCacheKey({
+      ...filters,
+      selectedDecades: sortedDecades,
+    });
+    const cached = recommendationsCacheRef.current.get(cacheKey);
 
-    recommendationsRequestedRef.current = true;
+    recommendationsAbortRef.current?.abort();
+    if (cached) {
+      recommendationsAbortRef.current = null;
+      setRecommendations(cached);
+      setRecommendationsLoading(false);
+      setRecommendationsError(false);
+      return;
+    }
+
     const ctrl = new AbortController();
     recommendationsAbortRef.current = ctrl;
     setRecommendationsLoading(true);
     setRecommendationsError(false);
 
+    const rpcArgs: Database["public"]["Functions"]["get_search_recommendations"]["Args"] = {
+      p_limit: RECOMMENDATION_LIMIT,
+    };
+    if (sortedDecades.length > 0) rpcArgs.p_decades = sortedDecades;
+    if (filters.highMaxMidi != null) {
+      rpcArgs.p_high_max_midi = filters.highMaxMidi;
+    }
+    if (filters.highMinMidi != null) {
+      rpcArgs.p_high_min_midi = filters.highMinMidi;
+    }
+
     void (async () => {
       try {
         const { data, error } = await supabase
-          .rpc("get_search_recommendations", {
-            p_limit: RECOMMENDATION_LIMIT,
-          })
+          .rpc("get_search_recommendations", rpcArgs)
           .abortSignal(ctrl.signal);
         if (ctrl.signal.aborted) return;
         if (error || !Array.isArray(data)) {
-          recommendationsRequestedRef.current = false;
           setRecommendationsError(true);
           return;
         }
-        setRecommendations(data as unknown as Song[]);
+        const nextRecommendations = data as unknown as Song[];
+        recommendationsCacheRef.current.set(cacheKey, nextRecommendations);
+        setRecommendations(nextRecommendations);
       } catch {
         if (!ctrl.signal.aborted) {
-          recommendationsRequestedRef.current = false;
           setRecommendationsError(true);
         }
       } finally {
         if (recommendationsAbortRef.current === ctrl) {
           recommendationsAbortRef.current = null;
+          setRecommendationsLoading(false);
         }
-        if (!ctrl.signal.aborted) setRecommendationsLoading(false);
       }
     })();
   }, [supabase]);
+
+  // 絞り込み条件を DB 側へ渡し、条件適用後の候補を最大50曲取得する。
+  // 連続タップは短くまとめ、切り替え前の結果は新しい結果が届くまで保持する。
+  useEffect(() => {
+    if (!isSearchOpen || queryRef.current.length > 0) return;
+
+    const timer = window.setTimeout(() => {
+      loadRecommendations({
+        highMinMidi,
+        highMaxMidi,
+        selectedDecades,
+      });
+    }, 120);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    highMaxMidi,
+    highMinMidi,
+    isSearchOpen,
+    loadRecommendations,
+    selectedDecades,
+  ]);
 
   useEffect(
     () => () => {
@@ -237,7 +299,6 @@ export function LiveSearch({
 
       isSearchOpenRef.current = true;
       setIsSearchOpen(true);
-      loadRecommendations();
       const el = inputRef.current;
       if (!el) return;
       el.focus();
@@ -250,7 +311,7 @@ export function LiveSearch({
     };
     window.addEventListener("app:toggle-search", handler);
     return () => window.removeEventListener("app:toggle-search", handler);
-  }, [loadRecommendations]);
+  }, []);
 
   // 未入力の検索欄にフォーカスしたまま下へスクロールし始めたら、
   // モバイルのソフトウェアキーボードを閉じる。横スクロールは対象外にする。
@@ -401,7 +462,6 @@ export function LiveSearch({
   const onFilterFocus = () => {
     isSearchOpenRef.current = true;
     setIsSearchOpen(true);
-    loadRecommendations();
   };
 
   return (
@@ -427,7 +487,7 @@ export function LiveSearch({
             autoCorrect="off"
             spellCheck={false}
             // search 型ネイティブの clear ボタンは UI が分散するので非表示
-            className="w-full rounded-lg bg-zinc-100 py-2 pl-9 pr-9 text-sm placeholder:text-zinc-500 focus:outline-none dark:bg-zinc-800 dark:placeholder:text-zinc-400 [&::-webkit-search-cancel-button]:hidden"
+            className="w-full rounded-2xl bg-zinc-100 py-2 pl-9 pr-9 text-sm placeholder:text-zinc-500 focus:outline-none dark:bg-zinc-800 dark:placeholder:text-zinc-400 [&::-webkit-search-cancel-button]:hidden"
           />
           {query.length > 0 ? (
             <button
@@ -453,18 +513,20 @@ export function LiveSearch({
               ratings={ratings}
               knownSet={knownSet}
             />
-            <PitchRangePicker
-              min={highMin}
-              max={highMax}
-              onChange={(min, max) => {
-                setHighMin(min);
-                setHighMax(max);
-              }}
-            />
-            <DecadeChips
-              selected={selectedDecades}
-              onToggle={handleToggleDecade}
-            />
+            <div className="space-y-3">
+              <PitchRangePicker
+                min={highMin}
+                max={highMax}
+                onChange={(min, max) => {
+                  setHighMin(min);
+                  setHighMax(max);
+                }}
+              />
+              <DecadeChips
+                selected={selectedDecades}
+                onToggle={handleToggleDecade}
+              />
+            </div>
             <RecommendationList
               recommendations={filteredRecommendations}
               loading={recommendationsLoading}
@@ -479,18 +541,20 @@ export function LiveSearch({
           </>
         ) : mode === "search-results" ? (
           <>
-            <PitchRangePicker
-              min={highMin}
-              max={highMax}
-              onChange={(min, max) => {
-                setHighMin(min);
-                setHighMax(max);
-              }}
-            />
-            <DecadeChips
-              selected={selectedDecades}
-              onToggle={handleToggleDecade}
-            />
+            <div className="space-y-3">
+              <PitchRangePicker
+                min={highMin}
+                max={highMax}
+                onChange={(min, max) => {
+                  setHighMin(min);
+                  setHighMax(max);
+                }}
+              />
+              <DecadeChips
+                selected={selectedDecades}
+                onToggle={handleToggleDecade}
+              />
+            </div>
             <section>
               <h2 className="mb-2 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
                 検索結果
