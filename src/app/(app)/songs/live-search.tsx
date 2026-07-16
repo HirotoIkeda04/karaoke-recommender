@@ -610,6 +610,52 @@ function BrowseGrid({
     (_, pageIndex) =>
       rankingPreview.slice(pageIndex * 5, (pageIndex + 1) * 5)
   );
+  const [rankingPage, setRankingPage] = useState(0);
+  const rankingPointerStartRef = useRef<{
+    pointerId: number;
+    x: number;
+    y: number;
+  } | null>(null);
+  const rankingDidSwipeRef = useRef(false);
+
+  const handleRankingPointerDown = (
+    event: React.PointerEvent<HTMLLIElement>
+  ) => {
+    rankingDidSwipeRef.current = false;
+    rankingPointerStartRef.current = {
+      pointerId: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handleRankingPointerUp = (
+    event: React.PointerEvent<HTMLLIElement>
+  ) => {
+    const start = rankingPointerStartRef.current;
+    rankingPointerStartRef.current = null;
+    if (!start || start.pointerId !== event.pointerId) return;
+
+    const deltaX = event.clientX - start.x;
+    const deltaY = event.clientY - start.y;
+    if (Math.abs(deltaX) < 40 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+
+    rankingDidSwipeRef.current = true;
+    setRankingPage((current) =>
+      deltaX < 0
+        ? Math.min(current + 1, rankingPages.length - 1)
+        : Math.max(current - 1, 0)
+    );
+    window.setTimeout(() => {
+      rankingDidSwipeRef.current = false;
+    }, 0);
+  };
+
+  const handleRankingPointerCancel = () => {
+    rankingPointerStartRef.current = null;
+    rankingDidSwipeRef.current = false;
+  };
 
   return (
     <section>
@@ -693,7 +739,18 @@ function BrowseGrid({
           </Link>
         </li>
         {rankingPreview.length > 0 ? (
-          <li className="col-span-2 py-3">
+          <li
+            className="col-span-2 touch-pan-y select-none py-3"
+            onPointerDown={handleRankingPointerDown}
+            onPointerUp={handleRankingPointerUp}
+            onPointerCancel={handleRankingPointerCancel}
+            onClickCapture={(event) => {
+              if (!rankingDidSwipeRef.current) return;
+              event.preventDefault();
+              event.stopPropagation();
+              rankingDidSwipeRef.current = false;
+            }}
+          >
             <div className="mb-1 flex items-center justify-between px-2">
               <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
                 今週のランキング
@@ -706,16 +763,22 @@ function BrowseGrid({
               </Link>
             </div>
             <div
-              className="-mx-2 snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              className="-mx-2 overflow-hidden"
               role="region"
+              aria-roledescription="カルーセル"
               aria-label="今週のランキング 1位から50位"
             >
-              <div className="flex">
-                {rankingPages.map((page) => (
+              <div
+                className="flex transition-transform duration-300 ease-out motion-reduce:transition-none"
+                style={{ transform: `translate3d(-${rankingPage * 100}%, 0, 0)` }}
+              >
+                {rankingPages.map((page, pageIndex) => (
                   <ol
                     key={page[0].rank}
-                    className="min-w-full shrink-0 snap-start snap-always space-y-0.5 px-2"
+                    className="min-w-full shrink-0 space-y-0.5 px-2"
                     aria-label={`${page[0].rank}位から${page[page.length - 1].rank}位`}
+                    aria-hidden={rankingPage !== pageIndex}
+                    inert={rankingPage !== pageIndex}
                   >
                     {page.map(({ rank, song }) => (
                       <li key={song.id} className="flex items-center gap-1">
@@ -734,6 +797,31 @@ function BrowseGrid({
                   </ol>
                 ))}
               </div>
+            </div>
+            <div
+              className="mt-1 flex justify-center"
+              role="group"
+              aria-label="ランキングの表示範囲"
+            >
+              {rankingPages.map((page, pageIndex) => (
+                <button
+                  key={page[0].rank}
+                  type="button"
+                  className="grid size-5 place-items-center rounded-full"
+                  aria-label={`${page[0].rank}位から${page[page.length - 1].rank}位を表示`}
+                  aria-current={pageIndex === rankingPage ? "true" : undefined}
+                  onClick={() => setRankingPage(pageIndex)}
+                >
+                  <span
+                    className={`size-1.5 rounded-full transition-colors ${
+                      pageIndex === rankingPage
+                        ? "bg-zinc-700 dark:bg-zinc-200"
+                        : "bg-zinc-300 dark:bg-zinc-700"
+                    }`}
+                    aria-hidden
+                  />
+                </button>
+              ))}
             </div>
           </li>
         ) : null}
