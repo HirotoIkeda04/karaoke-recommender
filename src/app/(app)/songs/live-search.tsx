@@ -605,6 +605,12 @@ function BrowseGrid({
   ratings: Record<string, string>;
   knownSet: Set<string>;
 }) {
+  const rankingPages = Array.from(
+    { length: Math.ceil(rankingPreview.length / 5) },
+    (_, pageIndex) =>
+      rankingPreview.slice(pageIndex * 5, (pageIndex + 1) * 5)
+  );
+
   return (
     <section>
       <ul className="grid grid-cols-2 gap-2">
@@ -687,7 +693,7 @@ function BrowseGrid({
           </Link>
         </li>
         {rankingPreview.length > 0 ? (
-          <li className="col-span-2 rounded-lg bg-zinc-50 px-2 py-3 dark:bg-zinc-900/70">
+          <li className="col-span-2 py-3">
             <div className="mb-1 flex items-center justify-between px-2">
               <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
                 今週のランキング
@@ -699,22 +705,36 @@ function BrowseGrid({
                 もっと見る ›
               </Link>
             </div>
-            <ol className="space-y-0.5">
-              {rankingPreview.map(({ rank, song }) => (
-                <li key={song.id} className="flex items-center gap-1">
-                  <span className="w-6 shrink-0 text-right text-sm font-bold tabular-nums text-zinc-500 dark:text-zinc-400">
-                    {rank}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <SongCard
-                      song={song}
-                      rating={ratings[song.id] ?? null}
-                      isKnown={knownSet.has(song.id)}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ol>
+            <div
+              className="-mx-2 snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              role="region"
+              aria-label="今週のランキング 1位から50位"
+            >
+              <div className="flex">
+                {rankingPages.map((page) => (
+                  <ol
+                    key={page[0].rank}
+                    className="min-w-full shrink-0 snap-start snap-always space-y-0.5 px-2"
+                    aria-label={`${page[0].rank}位から${page[page.length - 1].rank}位`}
+                  >
+                    {page.map(({ rank, song }) => (
+                      <li key={song.id} className="flex items-center gap-1">
+                        <span className="w-6 shrink-0 text-right text-sm font-bold tabular-nums text-zinc-500 dark:text-zinc-400">
+                          {rank}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <SongCard
+                            song={song}
+                            rating={ratings[song.id] ?? null}
+                            isKnown={knownSet.has(song.id)}
+                          />
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                ))}
+              </div>
+            </div>
           </li>
         ) : null}
         {BROWSE_GENRE_CODES.filter((code) => code !== "j_pop").map((code) => {

@@ -2,6 +2,7 @@
 
 import { Check, Minus, X } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 
 import { DumbbellMini } from "@/components/icons/dumbbell-mini";
 import type { Database } from "@/types/database";
@@ -145,69 +146,72 @@ export function RatingControls({
         <p className="mt-2 text-xs text-red-600 dark:text-red-400">{error}</p>
       ) : null}
 
-      {isOpen ? (
-        <div
-          className="fixed inset-0 z-50"
-          role="dialog"
-          aria-modal="true"
-          aria-label="評価を選択"
-        >
-          <button
-            type="button"
-            aria-label="閉じる"
-            onClick={() => setIsOpen(false)}
-            className="absolute inset-0 animate-in fade-in bg-black/60"
-          />
-          <div className="absolute inset-x-0 bottom-0 animate-in slide-in-from-bottom rounded-t-3xl bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl dark:bg-zinc-900">
-            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-            <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-              評価を選択
-            </h3>
-            <ul className="space-y-1">
-              {RATINGS.map((r) => {
-                const active = rating === r.value;
-                return (
-                  <li key={r.value}>
-                    <button
-                      type="button"
-                      onClick={() => handleSelect(r.value)}
-                      disabled={isPending}
-                      aria-pressed={active}
-                      className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition disabled:opacity-50 ${
-                        active
-                          ? "bg-zinc-100 dark:bg-zinc-800"
-                          : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                      }`}
-                    >
-                      <span
-                        className={`grid size-8 place-items-center rounded-full ${r.color}`}
+      {isOpen && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              className="fixed inset-0 z-50"
+              role="dialog"
+              aria-modal="true"
+              aria-label="評価を選択"
+            >
+              <button
+                type="button"
+                aria-label="閉じる"
+                onClick={() => setIsOpen(false)}
+                className="absolute inset-0 animate-in fade-in bg-black/60"
+              />
+              <div className="absolute inset-x-0 bottom-0 animate-in slide-in-from-bottom rounded-t-3xl bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl dark:bg-zinc-900">
+                <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                  評価を選択
+                </h3>
+                <ul className="space-y-1">
+                  {RATINGS.map((r) => {
+                    const active = rating === r.value;
+                    return (
+                      <li key={r.value}>
+                        <button
+                          type="button"
+                          onClick={() => handleSelect(r.value)}
+                          disabled={isPending}
+                          aria-pressed={active}
+                          className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition disabled:opacity-50 ${
+                            active
+                              ? "bg-zinc-100 dark:bg-zinc-800"
+                              : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                          }`}
+                        >
+                          <span
+                            className={`grid size-8 place-items-center rounded-full ${r.color}`}
+                          >
+                            <r.Icon className="size-4" aria-hidden />
+                          </span>
+                          <span className="flex-1 text-left">{r.label}</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                  {rating ? (
+                    <li className="mt-2 border-t border-zinc-200 pt-2 dark:border-zinc-800">
+                      <button
+                        type="button"
+                        onClick={handleClear}
+                        disabled={isPending}
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/30"
                       >
-                        <r.Icon className="size-4" aria-hidden />
-                      </span>
-                      <span className="flex-1 text-left">{r.label}</span>
-                    </button>
-                  </li>
-                );
-              })}
-              {rating ? (
-                <li className="mt-2 border-t border-zinc-200 pt-2 dark:border-zinc-800">
-                  <button
-                    type="button"
-                    onClick={handleClear}
-                    disabled={isPending}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/30"
-                  >
-                    <span className="grid size-8 place-items-center rounded-full bg-red-100 text-red-600 dark:bg-red-950/50 dark:text-red-400">
-                      <X className="size-4" aria-hidden />
-                    </span>
-                    <span className="flex-1 text-left">評価を取り消す</span>
-                  </button>
-                </li>
-              ) : null}
-            </ul>
-          </div>
-        </div>
-      ) : null}
+                        <span className="grid size-8 place-items-center rounded-full bg-red-100 text-red-600 dark:bg-red-950/50 dark:text-red-400">
+                          <X className="size-4" aria-hidden />
+                        </span>
+                        <span className="flex-1 text-left">評価を取り消す</span>
+                      </button>
+                    </li>
+                  ) : null}
+                </ul>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
 
       {toast ? (
         <div
