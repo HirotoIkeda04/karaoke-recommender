@@ -52,7 +52,7 @@ interface LiveSearchProps {
   ratings: Record<string, string>;
   /** Spotify で聴いたことがある song_id 一覧 */
   knownSongIds?: string[];
-  /** ジャンルカード背景に使う、各ジャンル top 4 曲のジャケット URL */
+  /** ジャンルカード右下の丸い画像に使う、各ジャンル top 4 曲のジャケット URL */
   genreCovers?: Partial<Record<GenreCode, string[]>>;
   /** ランキングカード背景に使う、今週 top 4 曲のジャケット URL */
   rankingCovers?: string[];
@@ -60,26 +60,29 @@ interface LiveSearchProps {
   rankingPreview?: Array<{ rank: number; song: Song }>;
 }
 
-// 各ジャンルカードに被せる暗色グラデーション。
-// ジャンル識別性を保ちつつ、カラオケ向けに眩しすぎないよう *-950 系の
-// 深い色で from を作り、to は黒に向けて薄れさせてジャケ写を覗かせる。
-// 暗くしすぎるとジャケが潰れるので、from/via/to はジャケが透ける程度の
-// 中間不透明度に。Tailwind の JIT が拾えるよう必ず完全なクラス名で書く。
-const GENRE_OVERLAY: Record<GenreCode, string> = {
-  j_pop: "from-pink-950/88 via-rose-950/45 to-black/25",
-  j_rock: "from-orange-950/88 via-red-950/45 to-black/25",
-  anison: "from-sky-950/88 via-indigo-950/45 to-black/25",
-  vocaloid_utaite: "from-cyan-950/88 via-teal-950/45 to-black/25",
-  idol_female: "from-fuchsia-950/88 via-pink-950/45 to-black/25",
-  idol_male: "from-blue-950/88 via-indigo-950/45 to-black/25",
-  rnb_soul: "from-amber-950/88 via-yellow-950/45 to-black/25",
-  hiphop: "from-zinc-900/92 via-zinc-950/55 to-black/25",
-  enka_kayo: "from-red-950/88 via-rose-950/45 to-black/25",
-  western: "from-emerald-950/88 via-green-950/45 to-black/25",
-  kpop: "from-purple-950/88 via-violet-950/45 to-black/25",
-  game_bgm: "from-lime-950/88 via-emerald-950/45 to-black/25",
-  other: "from-slate-900/92 via-slate-950/55 to-black/25",
+// 写真に色を被せず、ジャンルごとの落ち着いた単色をカード全面に使う。
+const GENRE_CARD_COLORS: Record<GenreCode, string> = {
+  j_pop: "#8b3f5c",
+  j_rock: "#844234",
+  anison: "#405b91",
+  vocaloid_utaite: "#286c72",
+  idol_female: "#994769",
+  idol_male: "#465b8c",
+  rnb_soul: "#79583c",
+  hiphop: "#595442",
+  enka_kayo: "#74434d",
+  western: "#426b59",
+  kpop: "#684f82",
+  game_bgm: "#5a7047",
+  other: "#525c68",
 };
+
+const GENRE_COVER_BUBBLES = [
+  { size: 64, right: -10, bottom: -10, zIndex: 4 },
+  { size: 50, right: 43, bottom: 3, zIndex: 3 },
+  { size: 40, right: 8, bottom: 45, zIndex: 2 },
+  { size: 34, right: 53, bottom: 45, zIndex: 1 },
+] as const;
 
 const DEBOUNCE_MS = 200;
 const RECOMMENDATION_LIMIT = 50;
@@ -588,9 +591,8 @@ export function LiveSearch({
 
 // ============================================================================
 // Browse: ジャンルカードグリッド
-//   - 各ジャンルのランキング上位曲 (fame_score 降順) のジャケットを 2x2 モザイク
-//     で背景に敷き、暗いグラデーションを重ねてタイトルを白文字で乗せる。
-//   - covers が空のジャンルは zinc-900 のフラット背景にフォールバック。
+//   - ジャンル固有の単色を背景にし、上位曲のジャケットを右下へ円形に重ねる。
+//   - covers が空でも単色カードとして成立させる。
 // ============================================================================
 function BrowseGrid({
   genreCovers,
@@ -820,91 +822,38 @@ function BrowseGrid({
             <li key={code}>
               <Link
                 href={`/songs/genre/${code}`}
-                className="relative flex aspect-[16/10] items-start overflow-hidden rounded-lg bg-zinc-900 pl-4 pr-3 pt-4 pb-3 transition active:scale-[0.98]"
+                className="relative flex aspect-video items-start overflow-hidden rounded-lg pl-4 pr-3 pt-4 pb-3 transition active:scale-[0.98]"
+                style={{ backgroundColor: GENRE_CARD_COLORS[code] }}
               >
                 {covers.length > 0 ? (
-                  // Bento 配置: 左列は a (上 2/3) + d (下 1/3)、
-                  // 右列は b (上 1/2) + c (下 1/2)。
-                  // 左右で seam の高さがずれることで安定しすぎない構図に。
-                  // 6 等分の行で、a=1-4, d=5-6, b=1-3, c=4-6 を割り当てる。
-                  <div
-                    className="absolute inset-0 grid"
-                    style={{
-                      gridTemplateColumns: "3fr 2fr",
-                      gridTemplateRows: "repeat(6, 1fr)",
-                      gridTemplateAreas:
-                        '"a b" "a b" "a b" "a c" "d c" "d c"',
-                    }}
-                    aria-hidden
-                  >
-                    {(["a", "b", "c", "d"] as const).map((area, i) => {
-                      const src = covers[i] ?? covers[i % covers.length];
+                  <div className="absolute inset-0" aria-hidden>
+                    {covers.slice(0, 4).map((src, index) => {
+                      const bubble = GENRE_COVER_BUBBLES[index];
                       return (
                         <div
-                          key={area}
-                          className="relative bg-zinc-800"
-                          style={{ gridArea: area }}
+                          key={src}
+                          className="absolute overflow-hidden rounded-full bg-black/15 ring-2 ring-black/10"
+                          style={{
+                            width: bubble.size,
+                            height: bubble.size,
+                            right: bubble.right,
+                            bottom: bubble.bottom,
+                            zIndex: bubble.zIndex,
+                          }}
                         >
-                          {src ? (
-                            <JacketImage
-                              src={src}
-                              alt=""
-                              fill
-                              sizes="(max-width: 640px) 30vw, 15vw"
-                              className="object-cover"
-                            />
-                          ) : null}
+                          <JacketImage
+                            src={src}
+                            alt=""
+                            fill
+                            sizes={`${bubble.size}px`}
+                            className="object-cover"
+                          />
                         </div>
                       );
                     })}
                   </div>
                 ) : null}
-                {/* ジャンル別の暗色グラデーションで識別性 + 可読性を確保 */}
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${GENRE_OVERLAY[code]}`}
-                  aria-hidden
-                />
-                {/* ガラス風 2px リム: padding=2px で枠の太さを定義し、
-                    border-box と content-box の mask を exclude 合成で
-                    中央をくり抜く。backdrop-filter は枠部分にのみ効くため、
-                    swipe-deck カードと同じ「内側 2px だけガラス」になる。
-                    static カードなので clip-path 二重描画は不要。 */}
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 rounded-lg"
-                  style={{
-                    padding: "2px",
-                    background: "rgba(255,255,255,0.18)",
-                    backdropFilter:
-                      "blur(20px) brightness(1.2) saturate(1.4)",
-                    WebkitBackdropFilter:
-                      "blur(20px) brightness(1.2) saturate(1.4)",
-                    WebkitMask:
-                      "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
-                    WebkitMaskComposite: "xor",
-                    mask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
-                    maskComposite: "exclude",
-                  }}
-                />
-                {/* 左上 → 右下方向の勾配 blur。
-                    backdrop-filter で全面に blur を効かせつつ、
-                    mask-image の linear-gradient(135deg, black, transparent)
-                    で左上だけ不透明・右下に向けて透明にすることで、
-                    結果として「左上が強い blur, 右下はシャープ」のグラデ
-                    blur に見える。 */}
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0"
-                  style={{
-                    backdropFilter: "blur(10px)",
-                    WebkitBackdropFilter: "blur(10px)",
-                    maskImage:
-                      "linear-gradient(135deg, black 0%, black 25%, transparent 80%)",
-                    WebkitMaskImage:
-                      "linear-gradient(135deg, black 0%, black 25%, transparent 80%)",
-                  }}
-                />
-                <span className="relative z-10 text-sm font-extrabold leading-tight tracking-tight text-zinc-200 drop-shadow-md">
+                <span className="relative z-10 max-w-[58%] text-sm font-extrabold leading-tight tracking-tight text-white">
                   {GENRE_LABELS[code]}
                 </span>
               </Link>
