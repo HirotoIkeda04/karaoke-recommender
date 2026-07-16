@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { BackButton } from "@/components/back-button";
 import { SongCard } from "@/components/song-card";
+import { rankGenreSongs } from "@/lib/genre-ranking";
 import { GENRE_LABELS, isGenreCode } from "@/lib/genres";
 import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
 import { createClient } from "@/lib/supabase/server";
@@ -13,8 +14,8 @@ interface GenrePageProps {
 }
 
 // ジャンルあたりの楽曲件数上限。
-// karaoke_score (公式ランキング掲載実績からの予測値) を主キーに並べるため、
-// まずは 500 件で頭打ち。仮想化を入れるなら緩められる。
+// 複合スコアで並べた後、まずは 500 件で頭打ち。
+// 仮想化を入れるなら緩められる。
 const SONG_LIMIT = 500;
 
 export default async function GenreSongsPage({ params }: GenrePageProps) {
@@ -37,7 +38,7 @@ export default async function GenreSongsPage({ params }: GenrePageProps) {
     .filter((id): id is string => !!id);
 
   const songSelect =
-    "id, title, artist, release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, duration_ms, karaoke_score, fame_score, spotify_popularity";
+    "id, title, artist, artist_id, release_year, original_release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, duration_ms, karaoke_score, fame_score, cert_score, spotify_popularity, dam_request_no, spotify_track_id";
 
   const [byArtistRes, byTagRes] = await Promise.all([
     artistIds.length > 0
@@ -65,30 +66,16 @@ export default async function GenreSongsPage({ params }: GenrePageProps) {
   ]);
 
   const error = byArtistRes.error ?? byTagRes.error;
-  // id で dedupe して、人気順
-  // (karaoke_score → fame_score → spotify_popularity → year → title)
-  // で並べ直す。karaoke_score が NULL の曲同士は従来のキーへフォールバックする。
+  // id で dedupe して、予測値だけでなく実データの裏付け・知名度・認定・
+  // 新しさを含む表示順位へ並べ直す。上位は同一アーティストに偏らせない。
   type Row = NonNullable<typeof byTagRes.data>[number];
   const merged = new Map<string, Row>();
   for (const r of byArtistRes.data ?? []) merged.set(r.id, r);
   for (const r of byTagRes.data ?? []) merged.set(r.id, r);
-  const songs = Array.from(merged.values())
-    .sort((a, b) => {
-      const ak = a.karaoke_score ?? -Infinity;
-      const bk = b.karaoke_score ?? -Infinity;
-      if (ak !== bk) return bk - ak;
-      const af = a.fame_score ?? -Infinity;
-      const bf = b.fame_score ?? -Infinity;
-      if (af !== bf) return bf - af;
-      const ap = a.spotify_popularity ?? -Infinity;
-      const bp = b.spotify_popularity ?? -Infinity;
-      if (ap !== bp) return bp - ap;
-      const ay = a.release_year ?? -Infinity;
-      const by = b.release_year ?? -Infinity;
-      if (ay !== by) return by - ay;
-      return a.title.localeCompare(b.title);
-    })
-    .slice(0, SONG_LIMIT);
+  const songs = rankGenreSongs(
+    Array.from(merged.values()),
+    new Date().getUTCFullYear(),
+  ).slice(0, SONG_LIMIT);
 
   // 自分のレーティングと Spotify 既知曲を ID 集合で取得して
   // SongCard のバッジ表示に使う

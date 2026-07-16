@@ -16,7 +16,14 @@
 | id | uuid | 主キー |
 | title | text | 曲名 |
 | artist | text | アーティスト名 |
-| release_year | int | リリース年 |
+| release_year | int | 現行のメタデータ出典が返すリリース年(再発・再配信年の場合あり) |
+| original_release_year | smallint | 厳密照合で確定した原発売年 |
+| original_release_year_source | text | 原発売年の参照先(例: musicbrainz) |
+| original_release_year_source_id | text | 参照先の安定 ID |
+| original_release_year_updated_at | timestamptz | 原発売年を確定した日時 |
+| original_release_year_check_status | text | 照合結果(matched / conflict / not_found / error) |
+| original_release_year_checked_at | timestamptz | 最終照合日時 |
+| original_release_year_check_details | jsonb | 出典ごとの候補年・未確定理由 |
 | range_low_midi | int | 地声最低音(MIDI) |
 | range_high_midi | int | 地声最高音(MIDI) |
 | falsetto_max_midi | int | 裏声最高音(MIDI)、なければ NULL |
@@ -31,6 +38,7 @@
 - **音域を MIDI 番号で持つ**: サイト間の表記揺れを吸収でき、数値比較で音域判定が可能。UI 表示時に逆変換する
 - **is_popular フラグ**: 有名曲絞り込み用。当面はカラ音の太字を採用
 - **Spotify track ID は UNIQUE**: 同一曲の重複登録を防ぐ
+- **原発売年は別カラム**: iTunes / Spotify 等のアルバム再発年を `release_year` から消さず、原曲の年と出典を独立して監査できるようにする
 
 **制約**
 
@@ -216,6 +224,39 @@ export interface Database {
 ```
 
 これをアプリ側で使うと、DB スキーマ変更時にコンパイルエラーで検知できる。
+
+### 原発売年の補完
+
+`backfill:original-release-years` は Wikidata の公表日と
+MusicBrainz recording search の `first-release-date` を照合する。
+同名の再録・再収録が複数返るため、曲名と歌手名が
+正規化後に完全一致する候補だけを使う。現行年から5年を超える
+大幅な補正は、両サービスが同じ年を返した場合だけ採用する。
+二つの出典が食い違う場合と不確実な候補は更新しない。
+
+```bash
+# ジャンル別上位50曲のカバー率を確認
+pnpm backfill:original-release-years --report
+
+# dry-run(標準)
+pnpm backfill:original-release-years --limit 20
+
+# 結果確認後に書き込む
+pnpm backfill:original-release-years --limit 100 --apply
+
+# conflict / not_found / error を再照合
+pnpm backfill:original-release-years --limit 25 --retry --apply
+```
+
+MusicBrainz の公開 API 制限に合わせ、スクリプトは単スレッドで
+1.2 秒ごとに照会する。全13ジャンルの表示スコア上位100曲を
+順位ごとにラウンドロビンして対象化し、複数ジャンル所属曲は ID で
+重複排除する。照合結果を status と details に保存するため、通常実行では
+確認済みの未確定曲を再照会しない。`release_year` を上書きせず、
+確定時だけ `original_release_year` と出典 ID を更新する。
+
+ジャンルランキングの新しさ加点は、確定済みなら
+`original_release_year`、未照合なら `release_year` を使う。
 
 ---
 

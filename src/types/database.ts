@@ -432,6 +432,13 @@ export type Database = {
           karaoke_score: number | null
           last_spotify_attempt_at: string | null
           match_status: Database["public"]["Enums"]["song_match_status"]
+          original_release_year: number | null
+          original_release_year_check_details: Json | null
+          original_release_year_check_status: string | null
+          original_release_year_checked_at: string | null
+          original_release_year_source: string | null
+          original_release_year_source_id: string | null
+          original_release_year_updated_at: string | null
           range_high_midi: number | null
           range_low_midi: number | null
           release_year: number | null
@@ -470,6 +477,13 @@ export type Database = {
           karaoke_score?: number | null
           last_spotify_attempt_at?: string | null
           match_status?: Database["public"]["Enums"]["song_match_status"]
+          original_release_year?: number | null
+          original_release_year_check_details?: Json | null
+          original_release_year_check_status?: string | null
+          original_release_year_checked_at?: string | null
+          original_release_year_source?: string | null
+          original_release_year_source_id?: string | null
+          original_release_year_updated_at?: string | null
           range_high_midi?: number | null
           range_low_midi?: number | null
           release_year?: number | null
@@ -508,6 +522,13 @@ export type Database = {
           karaoke_score?: number | null
           last_spotify_attempt_at?: string | null
           match_status?: Database["public"]["Enums"]["song_match_status"]
+          original_release_year?: number | null
+          original_release_year_check_details?: Json | null
+          original_release_year_check_status?: string | null
+          original_release_year_checked_at?: string | null
+          original_release_year_source?: string | null
+          original_release_year_source_id?: string | null
+          original_release_year_updated_at?: string | null
           range_high_midi?: number | null
           range_low_midi?: number | null
           release_year?: number | null
