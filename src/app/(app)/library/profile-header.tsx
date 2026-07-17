@@ -1,10 +1,9 @@
+import { Settings } from "lucide-react";
 import Link from "next/link";
 
 import type { GenreCode } from "@/lib/genres";
 import { iconBackgroundStyle } from "@/lib/icon-color";
 import { midiToKaraoke } from "@/lib/note";
-
-import { SignOutButton } from "@/components/sign-out-button";
 
 import { EraDistribution } from "./era-distribution";
 import { FriendStatusButton } from "./friend-status-button";
@@ -138,7 +137,13 @@ export function ProfileHeader({
             プロフィールを編集
           </Link>
           <ShareProfileButton />
-          <SignOutButton />
+          <Link
+            href="/settings/account"
+            aria-label="アカウント設定"
+            className="flex h-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 px-3 text-zinc-700 hover:bg-zinc-300 active:bg-zinc-300 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:active:bg-zinc-800"
+          >
+            <Settings className="size-4" aria-hidden />
+          </Link>
         </div>
       ) : friendUserId ? (
         <div className="flex gap-2">
