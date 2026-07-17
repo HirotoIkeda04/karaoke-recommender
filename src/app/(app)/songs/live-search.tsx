@@ -78,10 +78,11 @@ const GENRE_CARD_COLORS: Record<GenreCode, string> = {
 };
 
 const GENRE_COVER_BUBBLES = [
-  { size: 64, right: -10, bottom: -10, zIndex: 4 },
-  { size: 50, right: 43, bottom: 3, zIndex: 3 },
-  { size: 40, right: 8, bottom: 45, zIndex: 2 },
-  { size: 34, right: 53, bottom: 45, zIndex: 1 },
+  { size: 48, right: -8, bottom: -6, zIndex: 5 },
+  { size: 48, right: 27, bottom: 4, zIndex: 4 },
+  { size: 48, right: 62, bottom: -2, zIndex: 3 },
+  { size: 48, right: 8, bottom: 38, zIndex: 2 },
+  { size: 48, right: 43, bottom: 42, zIndex: 1 },
 ] as const;
 
 const DEBOUNCE_MS = 200;
@@ -827,18 +828,19 @@ function BrowseGrid({
               >
                 {covers.length > 0 ? (
                   <div className="absolute inset-0" aria-hidden>
-                    {covers.slice(0, 4).map((src, index) => {
+                    {covers.slice(0, 5).map((src, index) => {
                       const bubble = GENRE_COVER_BUBBLES[index];
                       return (
                         <div
                           key={src}
-                          className="absolute overflow-hidden rounded-full bg-black/15 ring-2 ring-black/10"
+                          className="absolute overflow-hidden rounded-full border-[3px] border-solid bg-black/15"
                           style={{
                             width: bubble.size,
                             height: bubble.size,
                             right: bubble.right,
                             bottom: bubble.bottom,
                             zIndex: bubble.zIndex,
+                            borderColor: GENRE_CARD_COLORS[code],
                           }}
                         >
                           <JacketImage

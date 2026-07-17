@@ -92,8 +92,8 @@ const getCachedBrowseSnapshot = unstable_cache(
       rankingPreview: parsed.data.ranking_preview,
     };
   },
-  // v2: ランキングプレビューを5件から50件へ拡張したため、旧キャッシュを破棄する。
-  ["songs-browse-snapshot-v2"],
+  // v3: ジャンルカバーを4枚から5枚へ拡張したため、旧キャッシュを破棄する。
+  ["songs-browse-snapshot-v3"],
   {
     revalidate: 3600,
     tags: ["songs-browse-snapshot"],
