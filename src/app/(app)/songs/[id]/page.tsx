@@ -30,7 +30,7 @@ type SimilarSong = Pick<
 >;
 
 const SIMILAR_RANGE_WINDOW = 12;
-const SIMILAR_RANGE_LIMIT = 5;
+const SIMILAR_RANGE_LIMIT = 10;
 const RATED_SIMILAR_LIMIT = 2;
 // fame_score は日本語 Wikipedia 累計 pageviews の log10。5.0 ≈ 10 万 view で
 // 「かなりの有名曲」の目安。これ未満は同アーティスト曲のみ候補にする。
