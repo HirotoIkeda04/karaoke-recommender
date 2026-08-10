@@ -12,12 +12,24 @@ export default function Loading() {
       role="status"
       aria-label="読み込み中"
     >
+      {/* 組ごとのカルーセル (サムネイル行) */}
+      <div className="flex h-14 w-full items-center justify-center gap-4">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className={`animate-pulse rounded-xl bg-zinc-200 dark:bg-zinc-800 ${
+              i === 1 ? "size-14" : "size-11"
+            }`}
+          />
+        ))}
+      </div>
+
       {/* レコード盤 */}
       <div
         className="animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800"
         style={{
           width:
-            "min(19rem, calc(100vw - 5rem), max(8rem, calc(100svh - 26.5rem - env(safe-area-inset-bottom))))",
+            "min(19rem, calc(100vw - 5rem), max(8rem, calc(100svh - 31.5rem - env(safe-area-inset-bottom))))",
           aspectRatio: "1 / 1",
         }}
       />

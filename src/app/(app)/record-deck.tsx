@@ -26,12 +26,12 @@ const ROTATION_MS = 6000;
 
 /**
  * ディスク径。横幅いっぱい (左右 2.5rem マージン) を基本に、
- * 縦に収まらない小さい画面ではヘッダー + 曲情報 + ボタン群 + ナビの
- * 予約分 (約 26.5rem) を引いた残りへ縮める。上限 19rem。
+ * 縦に収まらない小さい画面ではヘッダー + 組カルーセル + 曲情報 +
+ * ボタン群 + ナビの予約分 (約 31.5rem) を引いた残りへ縮める。上限 19rem。
  * loading.tsx の skeleton と式を揃えること。
  */
 const DISC_SIZE =
-  "min(19rem, calc(100vw - 5rem), max(8rem, calc(100svh - 26.5rem - env(safe-area-inset-bottom))))";
+  "min(19rem, calc(100vw - 5rem), max(8rem, calc(100svh - 31.5rem - env(safe-area-inset-bottom))))";
 
 /**
  * カルーセルの隣接ディスク間隔 (自身の幅に対する %)。
@@ -231,13 +231,66 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
         ) : null;
       })}
 
-      {/* バナーは overlay 配置 (flex フローに入れると縦予算 26.5rem が崩れ、
+      {/* バナーは overlay 配置 (flex フローに入れると縦予算 31.5rem が崩れ、
           下段ボタンが固定ナビの裏に隠れるため) */}
       {error ? (
         <div className="absolute inset-x-4 top-2 z-20 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
           {error}
         </div>
       ) : null}
+
+      {/* 組ごとのカルーセル: 各組のシード曲ジャケット。現在の組が中央に来る。
+          組の切替アニメーションと独立させるため、下の AnimatePresence の外に置く */}
+      <div
+        role="group"
+        aria-roledescription="カルーセル"
+        aria-label="デッキ内の組"
+        className="relative h-14 w-full"
+      >
+        {groups.map((groupSongs, index) => {
+          const seed = groupSongs[0];
+          if (!seed) return null;
+          const delta = index - position.group;
+          const isActive = delta === 0;
+          const thumbSrc = seed.image_url_medium ?? seed.image_url_large;
+          return (
+            <motion.div
+              key={seed.id}
+              aria-hidden={!isActive}
+              initial={false}
+              animate={{
+                x: `${delta * 130}%`,
+                scale: isActive ? 1 : 0.8,
+                opacity: Math.abs(delta) > 3 ? 0 : isActive ? 1 : 0.45,
+              }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="absolute left-1/2 top-0 -ml-7 size-14"
+              style={{ zIndex: isActive ? 10 : 0 }}
+            >
+              <div
+                className={`relative size-full overflow-hidden rounded-xl bg-zinc-800 ${
+                  isActive ? "ring-2 ring-white/70" : ""
+                }`}
+              >
+                {thumbSrc ? (
+                  <JacketImage
+                    src={thumbSrc}
+                    alt={isActive ? `${seed.artist} の組` : ""}
+                    fill
+                    sizes="3.5rem"
+                    className="object-cover"
+                    draggable={false}
+                  />
+                ) : (
+                  <div className="flex size-full items-center justify-center text-lg text-zinc-500">
+                    ♪
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
 
       {/* 組単位で左へ流れる。中は曲単位のカルーセル + 曲情報 */}
       <AnimatePresence mode="wait" initial={false}>
