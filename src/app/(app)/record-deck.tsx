@@ -33,8 +33,12 @@ const ROTATION_MS = 6000;
 const DISC_SIZE =
   "min(19rem, calc(100vw - 5rem), max(8rem, calc(100svh - 26.5rem - env(safe-area-inset-bottom))))";
 
-/** カルーセルの隣接ディスク間隔 (自身の幅に対する %) */
-const SLIDE_OFFSET_PERCENT = 112;
+/**
+ * カルーセルの隣接ディスク間隔 (自身の幅に対する %)。
+ * 100% 未満にして前後のディスクを画面端から覗かせ、カルーセルであることを
+ * 見せる (scale 0.82 縮小と z-index 層で、現在の盤の後ろへ滑り込む)。
+ */
+const SLIDE_OFFSET_PERCENT = 84;
 
 /** デッキ内の現在位置。group = 組 (アーティスト)、song = 組内の曲順 */
 interface DeckPosition {
@@ -268,6 +272,9 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
                   }}
                   transition={{ type: "spring", stiffness: 260, damping: 30 }}
                   className="absolute inset-0"
+                  // 現在の盤を最前面に。隣の盤は縮小したまま端から覗き、
+                  // スライド時は現在の盤の後ろへ滑り込む
+                  style={{ zIndex: isActive ? 10 : Math.abs(delta) === 1 ? 5 : 0 }}
                 >
                   <RecordDisc
                     song={song}
