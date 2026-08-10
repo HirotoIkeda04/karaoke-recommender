@@ -148,3 +148,13 @@
   unicode-range: U+0020-024F, U+1E00-1EFF, U+2000-206F;
   size-adjust: 120%;
 }
+/* ホームのレコード盤回転。1 周 = 1 曲の表示時間で、record-deck.tsx が
+   animationiteration イベントを使って周回ごとに次の曲へ送る。 */
+@keyframes record-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
