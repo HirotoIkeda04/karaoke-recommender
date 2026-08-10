@@ -17,7 +17,7 @@ export default function Loading() {
         {[0, 1, 2].map((i) => (
           <div
             key={i}
-            className={`animate-pulse rounded-xl bg-zinc-200 dark:bg-zinc-800 ${
+            className={`animate-pulse bg-zinc-200 dark:bg-zinc-800 ${
               i === 1 ? "size-14" : "size-11"
             }`}
           />
@@ -29,7 +29,7 @@ export default function Loading() {
         className="animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800"
         style={{
           width:
-            "min(19rem, calc(100vw - 5rem), max(8rem, calc(100svh - 31.5rem - env(safe-area-inset-bottom))))",
+            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 31.5rem - env(safe-area-inset-bottom))))",
           aspectRatio: "1 / 1",
         }}
       />

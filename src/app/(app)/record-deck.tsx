@@ -25,20 +25,20 @@ type Rating = Database["public"]["Enums"]["rating_type"];
 const ROTATION_MS = 6000;
 
 /**
- * ディスク径。横幅いっぱい (左右 2.5rem マージン) を基本に、
+ * ディスク径。横幅いっぱい (左右 1.75rem マージン) を基本に、
  * 縦に収まらない小さい画面ではヘッダー + 組カルーセル + 曲情報 +
- * ボタン群 + ナビの予約分 (約 31.5rem) を引いた残りへ縮める。上限 19rem。
+ * ボタン群 + ナビの予約分 (約 31.5rem) を引いた残りへ縮める。上限 20rem。
  * loading.tsx の skeleton と式を揃えること。
  */
 const DISC_SIZE =
-  "min(19rem, calc(100vw - 5rem), max(8rem, calc(100svh - 31.5rem - env(safe-area-inset-bottom))))";
+  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 31.5rem - env(safe-area-inset-bottom))))";
 
 /**
  * カルーセルの隣接ディスク間隔 (自身の幅に対する %)。
  * 100% 未満にして前後のディスクを画面端から覗かせ、カルーセルであることを
- * 見せる (scale 0.82 縮小と z-index 層で、現在の盤の後ろへ滑り込む)。
+ * 見せる (scale 0.7 縮小と z-index 層で、現在の盤の後ろへ滑り込む)。
  */
-const SLIDE_OFFSET_PERCENT = 84;
+const SLIDE_OFFSET_PERCENT = 80;
 
 /** デッキ内の現在位置。group = 組 (アーティスト)、song = 組内の曲順 */
 interface DeckPosition {
@@ -267,11 +267,8 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
               className="absolute left-1/2 top-0 -ml-7 size-14"
               style={{ zIndex: isActive ? 10 : 0 }}
             >
-              <div
-                className={`relative size-full overflow-hidden rounded-xl bg-zinc-800 ${
-                  isActive ? "ring-2 ring-white/70" : ""
-                }`}
-              >
+              {/* 角丸・枠線なしの素のジャケット。現在の組は scale と不透明度で示す */}
+              <div className="relative size-full overflow-hidden bg-zinc-800">
                 {thumbSrc ? (
                   <JacketImage
                     src={thumbSrc}
@@ -320,7 +317,7 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
                   initial={false}
                   animate={{
                     x: `${delta * SLIDE_OFFSET_PERCENT}%`,
-                    scale: isActive ? 1 : 0.82,
+                    scale: isActive ? 1 : 0.7,
                     opacity: Math.abs(delta) > 1 ? 0 : isActive ? 1 : 0.45,
                   }}
                   transition={{ type: "spring", stiffness: 260, damping: 30 }}
