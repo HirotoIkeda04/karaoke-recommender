@@ -1,9 +1,17 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, FastForward, Minus, SkipForward, Undo2, X } from "lucide-react";
+import {
+  Check,
+  FastForward,
+  Minus,
+  Play,
+  SkipForward,
+  Undo2,
+  X,
+} from "lucide-react";
 import Link from "next/link";
-import { startTransition, useEffect, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 
 import { DumbbellMini } from "@/components/icons/dumbbell-mini";
 import { Button } from "@/components/ui/button";
@@ -21,8 +29,21 @@ type Rating = Database["public"]["Enums"]["rating_type"];
  * レコード 1 周の時間 (ms) = 1 曲の表示時間。
  * 回転アニメーション (globals.css の record-spin) の周期であり、
  * animationiteration イベント経由で次の曲への自動送りも司る。
+ * 試聴もこの周期に合わせた頭出しスニペット (曲送りで音源ごと切替)。
  */
 const ROTATION_MS = 6000;
+
+/** スニペット終端のフェードアウト長 (秒)。iOS Safari は volume 変更が
+ *  効かないため、そこではハードカットに劣化する (仕様)。 */
+const AUDIO_FADE_SEC = 0.8;
+
+/**
+ * 再生アンロック用の極小無音 WAV。iOS Safari は「ユーザー操作中に play()
+ * した <audio> 要素」だけが以後のプログラム再生を許可されるため、タップ時
+ * に音源が無い曲でもこれを一度鳴らして要素をアンロックしておく。
+ */
+const SILENT_WAV =
+  "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
 
 /**
  * ディスク径。横幅いっぱい (左右 1.75rem マージン) を基本に、
@@ -103,9 +124,24 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
   const [position, setPosition] = useState<DeckPosition>({ group: 0, song: 0 });
   const [lastAction, setLastAction] = useState<LastAction | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // 試聴 ON/OFF (ユーザーの意思)。ON でも音源が無い曲は無音で回る。
+  const [audioOn, setAudioOn] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  // 再生中の曲 id。タップ起点の再生と曲送り effect の二重再生を防ぐ。
+  const playingSongIdRef = useRef<string | null>(null);
 
   const group = groups[position.group];
   const current = group?.[position.song];
+
+  // AnimatePresence の退場ツリー (組遷移中 0.2 秒残る) のボタンは古い
+  // props を凍結したままタップできてしまう。ハンドラが常に実状態で動ける
+  // よう、最新の current / audioOn をコミット後に ref へ同期しておく。
+  const currentRef = useRef(current);
+  const audioOnRef = useRef(audioOn);
+  useEffect(() => {
+    currentRef.current = current;
+    audioOnRef.current = audioOn;
+  });
 
   // ホームにいる間は body スクロールをロック (回転中の誤スクロール防止)。
   useEffect(() => {
@@ -115,6 +151,108 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
       document.body.style.overflow = prev;
     };
   }, []);
+
+  /** <audio> 要素を遅延生成する。スニペット終端はフェードアウト */
+  const ensureAudio = (): HTMLAudioElement => {
+    if (audioRef.current) return audioRef.current;
+    const el = new Audio();
+    el.preload = "auto";
+    el.addEventListener("timeupdate", () => {
+      const remain = ROTATION_MS / 1000 - el.currentTime;
+      try {
+        el.volume = remain < AUDIO_FADE_SEC ? Math.max(0, remain / AUDIO_FADE_SEC) : 1;
+      } catch {
+        // iOS Safari は volume 変更不可 (ハードカットに劣化)
+      }
+    });
+    audioRef.current = el;
+    return el;
+  };
+
+  const playSnippet = (audio: HTMLAudioElement, song: Song) => {
+    const src = song.itunes_preview_url;
+    playingSongIdRef.current = song.id;
+    if (!src) {
+      audio.pause();
+      return;
+    }
+    audio.src = src;
+    try {
+      audio.volume = 1;
+    } catch {
+      /* iOS */
+    }
+    void audio.play().catch(() => {
+      // 自動再生ブロック等。無音で回転は続くので UI は止めない
+    });
+  };
+
+  // 曲が変わったら試聴音源を差し替える (タップ起点の再生分はスキップ)
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audioOn || !audio) return;
+    if (!current) {
+      audio.pause();
+      playingSongIdRef.current = null;
+      return;
+    }
+    if (playingSongIdRef.current === current.id) return;
+    playSnippet(audio, current);
+     
+  }, [audioOn, current]);
+
+  // バックグラウンドでは試聴を止める。Android は放置すると裏で音が流れ
+  // 続け、iOS は OS に止められた後で無音のままになるため、復帰時は
+  // 現在の曲を頭から再生し直す (回転は次の周回で自然に再同期する)。
+  useEffect(() => {
+    const onVisibility = () => {
+      const audio = audioRef.current;
+      if (!audio) return;
+      if (document.hidden) {
+        audio.pause();
+      } else if (audioOn && current) {
+        playSnippet(audio, current);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+     
+  }, [audioOn, current]);
+
+  // アンマウント時に音を止める
+  useEffect(() => {
+    return () => {
+      audioRef.current?.pause();
+    };
+  }, []);
+
+  /**
+   * レコードタップで試聴の再生/停止を切り替える。
+   * iOS Safari はユーザー操作中に play() した要素しか以後のプログラム再生を
+   * 許さないため、初回タップでは必ずこのハンドラ内 (ジェスチャ文脈) で
+   * play() を呼ぶ。音源が無い曲でも無音 WAV でアンロックしておく。
+   * state は closure ではなく ref から読む (退場ツリーからの stale タップ対策)。
+   */
+  const handleToggleAudio = () => {
+    const song = currentRef.current;
+    if (!song) return;
+    triggerHaptic();
+    const audio = ensureAudio();
+    if (audioOnRef.current) {
+      audio.pause();
+      playingSongIdRef.current = null;
+      setAudioOn(false);
+      return;
+    }
+    setAudioOn(true);
+    if (song.itunes_preview_url) {
+      playSnippet(audio, song);
+    } else {
+      playingSongIdRef.current = song.id;
+      audio.src = SILENT_WAV;
+      void audio.play().catch(() => {});
+    }
+  };
 
   /**
    * from の次の曲 (組の末尾なら次の組の先頭) へ進む。
@@ -323,14 +461,29 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
                   transition={{ type: "spring", stiffness: 260, damping: 30 }}
                   className="absolute inset-0"
                   // 現在の盤を最前面に。隣の盤は縮小したまま端から覗き、
-                  // スライド時は現在の盤の後ろへ滑り込む
-                  style={{ zIndex: isActive ? 10 : Math.abs(delta) === 1 ? 5 : 0 }}
+                  // スライド時は現在の盤の後ろへ滑り込む。
+                  // タップは現在の盤だけが受ける (端から覗く盤は素通し)
+                  style={{
+                    zIndex: isActive ? 10 : Math.abs(delta) === 1 ? 5 : 0,
+                    pointerEvents: isActive ? "auto" : "none",
+                  }}
                 >
-                  <RecordDisc
-                    song={song}
-                    active={isActive}
-                    onRotationEnd={() => advance(position)}
-                  />
+                  <button
+                    type="button"
+                    onClick={isActive ? handleToggleAudio : undefined}
+                    disabled={!isActive}
+                    aria-label={
+                      audioOn ? "試聴を停止する" : "この曲を試聴する"
+                    }
+                    className="block h-full w-full cursor-pointer"
+                  >
+                    <RecordDisc
+                      song={song}
+                      active={isActive}
+                      showPlayHint={isActive && !audioOn}
+                      onRotationEnd={() => advance(position)}
+                    />
+                  </button>
                 </motion.div>
               );
             })}
@@ -435,6 +588,8 @@ interface RecordDiscProps {
   song: Song;
   /** 現在再生位置のディスクのみ回転し、1 周ごとに onRotationEnd を呼ぶ */
   active: boolean;
+  /** 試聴 OFF の時に「タップで再生」の再生アイコンを中央に重ねる */
+  showPlayHint?: boolean;
   onRotationEnd: () => void;
 }
 
@@ -445,7 +600,12 @@ interface RecordDiscProps {
  * 不変であり、overflow-hidden との組み合わせでも輪郭が乱れない。
  * 光沢は光源固定に見せるため回転体の外に置く。
  */
-function RecordDisc({ song, active, onRotationEnd }: RecordDiscProps) {
+function RecordDisc({
+  song,
+  active,
+  showPlayHint = false,
+  onRotationEnd,
+}: RecordDiscProps) {
   const src = song.image_url_large ?? song.image_url_medium;
   return (
     <div className="relative h-full w-full">
@@ -524,6 +684,17 @@ function RecordDisc({ song, active, onRotationEnd }: RecordDiscProps) {
             "0 0 0 2px rgba(255,255,255,0.35), inset 0 1px 3px rgba(0,0,0,0.9)",
         }}
       />
+      {/* 「タップで試聴」ヒント。再生中は消してレコードだけ見せる */}
+      {showPlayHint ? (
+        <div
+          aria-hidden
+          className="absolute inset-0 flex items-center justify-center"
+        >
+          <span className="flex size-12 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm">
+            <Play className="ml-0.5 size-5 fill-current" />
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 }

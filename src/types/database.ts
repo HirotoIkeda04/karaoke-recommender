@@ -429,6 +429,9 @@ export type Database = {
           image_url_medium: string | null
           image_url_small: string | null
           is_popular: boolean
+          itunes_preview_checked_at: string | null
+          itunes_preview_url: string | null
+          itunes_track_id: number | null
           karaoke_score: number | null
           last_spotify_attempt_at: string | null
           match_status: Database["public"]["Enums"]["song_match_status"]
@@ -474,6 +477,9 @@ export type Database = {
           image_url_medium?: string | null
           image_url_small?: string | null
           is_popular?: boolean
+          itunes_preview_checked_at?: string | null
+          itunes_preview_url?: string | null
+          itunes_track_id?: number | null
           karaoke_score?: number | null
           last_spotify_attempt_at?: string | null
           match_status?: Database["public"]["Enums"]["song_match_status"]
@@ -519,6 +525,9 @@ export type Database = {
           image_url_medium?: string | null
           image_url_small?: string | null
           is_popular?: boolean
+          itunes_preview_checked_at?: string | null
+          itunes_preview_url?: string | null
+          itunes_track_id?: number | null
           karaoke_score?: number | null
           last_spotify_attempt_at?: string | null
           match_status?: Database["public"]["Enums"]["song_match_status"]
