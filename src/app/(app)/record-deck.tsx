@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, animate, motion, useMotionValue } from "framer-motion";
 import {
   Check,
   FastForward,
@@ -154,9 +154,12 @@ interface RecordDeckProps {
   initialGroups: Song[][];
 }
 
-/** 下スワイプで楽曲ページを開くしきい値 (指の移動量 px / 速度 px/s) */
-const SWIPE_OPEN_DISTANCE = 110;
-const SWIPE_OPEN_VELOCITY = 600;
+/** 下スワイプで楽曲ページを開くしきい値 (指の移動量 px) */
+const SWIPE_OPEN_DISTANCE = 80;
+/** 下ドラッグと判定するまでの遊び (px)。横優勢の動きは無視する */
+const SWIPE_START_SLOP = 12;
+/** ドラッグ中の視覚的な追従率 (ゴム紐風の減衰) */
+const SWIPE_FOLLOW_RATIO = 0.55;
 
 export function RecordDeck({ initialGroups }: RecordDeckProps) {
   const router = useRouter();
@@ -314,6 +317,10 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
      
   }, [sheetOpen]);
 
+  // 下スワイプの視覚追従 (ゴム紐風)。カルーセル全体をこの分だけ沈める
+  const swipeY = useMotionValue(0);
+  const carouselRef = useRef<HTMLDivElement | null>(null);
+
   /**
    * レコードの下スワイプで現在の曲のページへ連続遷移する。
    * iOS の自動再生制限を確実に越えるため、フル尺再生はこのジェスチャ
@@ -331,6 +338,82 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
     }
     router.push(`/songs/${song.id}?via=deck`);
   };
+  const handleOpenSongPageRef = useRef(handleOpenSongPage);
+  useEffect(() => {
+    handleOpenSongPageRef.current = handleOpenSongPage;
+  });
+
+  // 下スワイプの検出。framer の pointer ベース drag は実機タッチで発火しない
+  // 事例があったため、楽曲シート/GOALS の shorts と同じ「手動 TouchEvent +
+  // non-passive リスナー」の実績パターンで実装する (React の JSX ハンドラは
+  // touchmove が passive 登録になり preventDefault できない点にも注意)。
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+
+    let start: { id: number; x: number; y: number } | null = null;
+    let dragging = false;
+
+    const onTouchStart = (event: TouchEvent) => {
+      if (event.touches.length !== 1) {
+        start = null;
+        return;
+      }
+      const t = event.touches[0];
+      start = { id: t.identifier, x: t.clientX, y: t.clientY };
+      dragging = false;
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      if (!start) return;
+      const t = event.touches[0];
+      if (!t || t.identifier !== start.id) return;
+      const dy = t.clientY - start.y;
+      const dx = t.clientX - start.x;
+      if (!dragging) {
+        // 下方向が明確に優勢になってからドラッグ開始
+        if (dy < SWIPE_START_SLOP || dy <= Math.abs(dx)) return;
+        dragging = true;
+        dragActiveRef.current = true;
+      }
+      event.preventDefault();
+      swipeY.set(Math.max(0, dy) * SWIPE_FOLLOW_RATIO);
+    };
+
+    const finish = (event: TouchEvent, cancelled = false) => {
+      if (!start) return;
+      const t = event.changedTouches[0];
+      const dy = (t?.clientY ?? start.y) - start.y;
+      start = null;
+      if (!dragging) return;
+      dragging = false;
+      dragActiveRef.current = false;
+      event.preventDefault();
+      void animate(swipeY, 0, {
+        type: "spring",
+        stiffness: 400,
+        damping: 32,
+      });
+      if (!cancelled && dy >= SWIPE_OPEN_DISTANCE) {
+        handleOpenSongPageRef.current();
+      }
+    };
+
+    const onTouchEnd = (event: TouchEvent) => finish(event);
+    const onTouchCancel = (event: TouchEvent) => finish(event, true);
+
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd, { passive: false });
+    el.addEventListener("touchcancel", onTouchCancel, { passive: false });
+
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("touchcancel", onTouchCancel);
+    };
+  }, [swipeY]);
 
   // バックグラウンドでは試聴を止める。Android は放置すると裏で音が流れ
   // 続け、iOS は OS に止められた後で無音のままになるため、復帰時は
@@ -584,27 +667,12 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
               上書きするため、祖先で none を宣言して交差で実効 none にする */}
           <div className="w-full touch-none">
           <motion.div
+            ref={carouselRef}
             role="group"
             aria-roledescription="カルーセル"
             aria-label="同じアーティストの楽曲 (下にスワイプで楽曲ページ)"
             className="relative mx-auto"
-            style={{ width: DISC_SIZE, height: DISC_SIZE }}
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0, bottom: 0.6 }}
-            dragMomentum={false}
-            onDragStart={() => {
-              dragActiveRef.current = true;
-            }}
-            onDragEnd={(_, info) => {
-              dragActiveRef.current = false;
-              if (
-                info.offset.y > SWIPE_OPEN_DISTANCE ||
-                info.velocity.y > SWIPE_OPEN_VELOCITY
-              ) {
-                handleOpenSongPage();
-              }
-            }}
+            style={{ width: DISC_SIZE, height: DISC_SIZE, y: swipeY }}
           >
             {group.map((song, index) => {
               const delta = index - position.song;
