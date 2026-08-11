@@ -641,6 +641,93 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
   );
 }
 
+/** 抽出済みの代表色キャッシュ (ジャケット URL → CSS color) */
+const vinylColorCache = new Map<string, string>();
+
+function clamp(v: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, v));
+}
+
+/**
+ * ジャケット画像からカラーヴァイナル用の代表色を表示時に抽出する。
+ * 縮小 canvas の彩度重み付き平均で色相を決め、暗い背景で映えるよう
+ * 明度・彩度をレコード盤らしいパステル寄りにクランプする。
+ * 無彩色ジャケットには色を発明しない (彩度は持ち上げすぎない)。
+ * CORS で読めない画像は null のまま (呼び出し側が無彩色 fallback)。
+ */
+function useVinylColor(src: string | null): string | null {
+  // 抽出完了時に再レンダーを起こすためのバージョンカウンタ。
+  // 色自体は render 時にキャッシュから読む (effect 内の同期 setState を避ける)
+  const [, setVersion] = useState(0);
+
+  useEffect(() => {
+    if (!src || vinylColorCache.has(src)) return;
+    let cancelled = false;
+    const img = new window.Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      try {
+        const SIZE = 24;
+        const canvas = document.createElement("canvas");
+        canvas.width = SIZE;
+        canvas.height = SIZE;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, SIZE, SIZE);
+        const { data } = ctx.getImageData(0, 0, SIZE, SIZE);
+        // 彩度で重み付けした平均 RGB (単純平均だと濁った茶色に寄る)
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        let w = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          const R = data[i];
+          const G = data[i + 1];
+          const B = data[i + 2];
+          const mx = Math.max(R, G, B);
+          const mn = Math.min(R, G, B);
+          const sat = mx === 0 ? 0 : (mx - mn) / mx;
+          const wt = 0.15 + sat;
+          r += R * wt;
+          g += G * wt;
+          b += B * wt;
+          w += wt;
+        }
+        r = r / w / 255;
+        g = g / w / 255;
+        b = b / w / 255;
+        // RGB → HSL
+        const mx = Math.max(r, g, b);
+        const mn = Math.min(r, g, b);
+        const l = (mx + mn) / 2;
+        const d = mx - mn;
+        let h = 0;
+        let s = 0;
+        if (d > 0) {
+          s = d / (1 - Math.abs(2 * l - 1));
+          if (mx === r) h = ((g - b) / d) % 6;
+          else if (mx === g) h = (b - r) / d + 2;
+          else h = (r - g) / d + 4;
+          h = (h * 60 + 360) % 360;
+        }
+        const result = `hsl(${Math.round(h)}, ${Math.round(
+          clamp(s * 1.2 + 0.05, 0, 0.6) * 100,
+        )}%, ${Math.round(clamp(l, 0.5, 0.72) * 100)}%)`;
+        vinylColorCache.set(src, result);
+        if (!cancelled) setVersion((v) => v + 1);
+      } catch {
+        // CORS 汚染 (getImageData 不可) 等。fallback の無彩色のままにする
+      }
+    };
+    img.src = src;
+    return () => {
+      cancelled = true;
+    };
+  }, [src]);
+
+  return src ? (vinylColorCache.get(src) ?? null) : null;
+}
+
 interface RecordDiscProps {
   song: Song;
   /** 現在再生位置のディスクのみ回転し、1 周ごとに onRotationEnd を呼ぶ */
@@ -650,16 +737,18 @@ interface RecordDiscProps {
 
 /**
  * ジャケット写真を表示時に CSS でレコード盤へ加工する。
- * 盤面全体にジャケットを敷き、溝 (同心円リング) / ラベル境界 / 光沢 /
- * センターホールをレイヤーで重ねる。回転体は正円なのでシルエットが
- * 不変であり、overflow-hidden との組み合わせでも輪郭が乱れない。
- * 光沢は光源固定に見せるため回転体の外に置く。
+ * 中央のラベル (直径 52%) にだけジャケットを置き、外周はジャケットから
+ * 抽出した代表色のカラーヴァイナルとして表現する。溝 / ラベル境界 /
+ * 光沢 / センターホールをレイヤーで重ねる。回転体は正円なので
+ * シルエットが不変であり、overflow-hidden との組み合わせでも輪郭が
+ * 乱れない。光沢は光源固定に見せるため回転体の外に置く。
  */
 function RecordDisc({ song, active, onRotationEnd }: RecordDiscProps) {
   const src = song.image_url_large ?? song.image_url_medium;
+  const vinylColor = useVinylColor(src);
   return (
     <div className="relative h-full w-full">
-      {/* 回転体: ジャケット + 溝 + ラベル境界 */}
+      {/* 回転体: 代表色の盤面 + 溝 + 中央ラベル (ジャケット) */}
       <div
         className="absolute inset-0 overflow-hidden rounded-full"
         style={{
@@ -669,39 +758,54 @@ function RecordDisc({ song, active, onRotationEnd }: RecordDiscProps) {
         }}
         onAnimationIteration={active ? onRotationEnd : undefined}
       >
-        {src ? (
-          <JacketImage
-            src={src}
-            alt={`${song.title} のジャケット`}
-            fill
-            sizes="19rem"
-            loading="eager"
-            className="object-cover brightness-[0.92] saturate-[0.95]"
-            draggable={false}
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-zinc-800 text-4xl text-zinc-500">
-            ♪
-          </div>
-        )}
-        {/* 溝: 1px 間隔の同心円リング。ラベル部 (中心 28%) と最外周は mask で除く */}
+        {/* 盤面: ジャケットの代表色 (抽出完了までは無彩色) */}
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            backgroundColor: vinylColor ?? "#3f3f46",
+            transition: "background-color 0.5s ease",
+          }}
+        />
+        {/* 溝: 1px 間隔の同心円リング。ラベル部 (中心 52%) と最外周は mask で除く */}
         <div
           aria-hidden
           className="absolute inset-0"
           style={{
             background:
-              "repeating-radial-gradient(circle at center, rgba(0,0,0,0.42) 0px, rgba(0,0,0,0.42) 0.8px, rgba(255,255,255,0.05) 1.6px, rgba(0,0,0,0.16) 2.6px, rgba(0,0,0,0.16) 4px)",
+              "repeating-radial-gradient(circle at center, rgba(0,0,0,0.30) 0px, rgba(0,0,0,0.30) 0.8px, rgba(255,255,255,0.07) 1.6px, rgba(0,0,0,0.10) 2.6px, rgba(0,0,0,0.10) 4px)",
             maskImage:
-              "radial-gradient(circle closest-side at center, transparent 0%, transparent 26%, black 30%, black 96%, transparent 99%)",
+              "radial-gradient(circle closest-side at center, transparent 0%, transparent 51%, black 55%, black 96%, transparent 99%)",
             WebkitMaskImage:
-              "radial-gradient(circle closest-side at center, transparent 0%, transparent 26%, black 30%, black 96%, transparent 99%)",
+              "radial-gradient(circle closest-side at center, transparent 0%, transparent 51%, black 55%, black 96%, transparent 99%)",
           }}
         />
+        {/* 中央ラベル: ジャケット写真 */}
+        <div
+          className="absolute overflow-hidden rounded-full bg-zinc-800"
+          style={{ inset: "24%" }}
+        >
+          {src ? (
+            <JacketImage
+              src={src}
+              alt={`${song.title} のジャケット`}
+              fill
+              sizes="10.5rem"
+              loading="eager"
+              className="object-cover"
+              draggable={false}
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-3xl text-zinc-500">
+              ♪
+            </div>
+          )}
+        </div>
         {/* ラベルの外周リング */}
         <div
           aria-hidden
           className="absolute rounded-full border border-white/25"
-          style={{ inset: "36%" }}
+          style={{ inset: "24%" }}
         />
       </div>
 
