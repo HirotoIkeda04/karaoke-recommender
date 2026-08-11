@@ -191,7 +191,13 @@ function loadProcessedSongIds(): Set<string> {
   if (!existsSync(CACHE_PATH)) return set;
   for (const ln of readFileSync(CACHE_PATH, "utf8").split("\n").filter(Boolean)) {
     try {
-      set.add((JSON.parse(ln) as CacheRecord).song_id);
+      const rec = JSON.parse(ln) as CacheRecord;
+      // レート制限/通信エラーはログとして残すが「処理済み」とは見なさず、
+      // 次回実行で再挑戦させる (matched / no_match だけを resume 対象にする)
+      if (rec.reason === "rate_limited" || rec.reason?.startsWith("error")) {
+        continue;
+      }
+      set.add(rec.song_id);
     } catch {
       /* skip malformed */
     }
@@ -304,6 +310,8 @@ async function main() {
       order === "fame"
         ? query.order("fame_score", { ascending: false, nullsFirst: false })
         : query.order("created_at", { ascending: false });
+    // 同値の並びが頁間で揺れて取りこぼさないよう PK で安定化
+    query = query.order("id", { ascending: true });
     const { data, error } = await query.range(offset, offset + PAGE - 1);
     if (error) throw error;
     const rows = (data ?? []) as Array<SongRow & { created_at: string }>;
@@ -335,6 +343,7 @@ async function main() {
   let matched = 0;
   let unmatched = 0;
   let rateLimited = 0;
+  let updateFailed = 0;
 
   for (const song of queue) {
     const cleanArtist = song.artist
@@ -369,11 +378,15 @@ async function main() {
     }
 
     if (!response) {
-      appendCache({
-        song_id: song.id,
-        matched: false,
-        reason: giveUpReason ?? "rate_limited",
-      });
+      // dry-run はキャッシュを書かない (本実行がその曲を飛ばしてしまうため)。
+      // rate_limited/error は書いても resume 対象外なので次回再挑戦される。
+      if (!dryRun) {
+        appendCache({
+          song_id: song.id,
+          matched: false,
+          reason: giveUpReason ?? "rate_limited",
+        });
+      }
       unmatched++;
       processedN++;
       await sleep(PER_REQUEST_INTERVAL_MS);
@@ -382,7 +395,9 @@ async function main() {
 
     const match = pickBestMatch(song.title, song.artist, response.results);
     if (!match) {
-      appendCache({ song_id: song.id, matched: false, reason: "no_match" });
+      if (!dryRun) {
+        appendCache({ song_id: song.id, matched: false, reason: "no_match" });
+      }
       unmatched++;
     } else {
       const r = match.result;
@@ -401,14 +416,27 @@ async function main() {
         updates.image_url_large = resizeArtwork(r.artworkUrl100, 1200);
       }
       if (Object.keys(updates).length > 0 && !dryRun) {
-        await supabase.from("songs").update(updates).eq("id", song.id);
+        const { error: updErr } = await supabase
+          .from("songs")
+          .update(updates)
+          .eq("id", song.id);
+        if (updErr) {
+          // 書けなかった曲はキャッシュに刻まず次回実行でやり直す
+          console.warn(`update failed for ${song.id}: ${updErr.message}`);
+          updateFailed++;
+          processedN++;
+          await sleep(PER_REQUEST_INTERVAL_MS);
+          continue;
+        }
       }
-      appendCache({
-        song_id: song.id,
-        matched: true,
-        title: r.trackName,
-        artist: r.artistName,
-      });
+      if (!dryRun) {
+        appendCache({
+          song_id: song.id,
+          matched: true,
+          title: r.trackName,
+          artist: r.artistName,
+        });
+      }
       matched++;
     }
     processedN++;
@@ -423,7 +451,7 @@ async function main() {
   console.log("\n=== summary ===");
   console.log(
     JSON.stringify(
-      { processed: processedN, matched, unmatched, rateLimited },
+      { processed: processedN, matched, unmatched, rateLimited, updateFailed },
       null,
       2,
     ),
