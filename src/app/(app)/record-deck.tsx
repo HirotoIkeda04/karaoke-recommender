@@ -661,9 +661,11 @@ function clamp(v: number, min: number, max: number): number {
 
 /**
  * ジャケット画像からカラーヴァイナル用の代表色を表示時に抽出する。
- * 縮小 canvas の彩度重み付き平均で色相を決め、暗い背景で映えるよう
- * 明度・彩度をレコード盤らしいパステル寄りにクランプする。
- * 無彩色ジャケットには色を発明しない (彩度は持ち上げすぎない)。
+ * 全体平均だと複数の色が混ざった中間色に濁るため、色相ヒストグラム
+ * (15° × 24 bin) で最も優勢な色域を選び、その bin 内の加重平均だけで
+ * 色を決める = 画像の「支配色」。彩度が全体的に無い画像 (モノクロ) は
+ * 色を発明せず明度のみのグレーにする。暗い背景で映えるよう明度は
+ * レコード盤らしい範囲にクランプする。
  * CORS で読めない画像は null のまま (呼び出し側が無彩色 fallback)。
  */
 function useVinylColor(src: string | null): string | null {
@@ -686,44 +688,80 @@ function useVinylColor(src: string | null): string | null {
         if (!ctx) return;
         ctx.drawImage(img, 0, 0, SIZE, SIZE);
         const { data } = ctx.getImageData(0, 0, SIZE, SIZE);
-        // 彩度で重み付けした平均 RGB (単純平均だと濁った茶色に寄る)
-        let r = 0;
-        let g = 0;
-        let b = 0;
-        let w = 0;
+        // 色相ヒストグラム: 有彩色ピクセルを 15° 刻みの bin に投票させる。
+        // 重みは彩度 × 中明度寄り (白飛び・黒潰れの寄与を抑える)。
+        // 色相は角度なので bin 内はベクトル平均で合成する。
+        const BINS = 24;
+        const binW = new Array<number>(BINS).fill(0);
+        const binX = new Array<number>(BINS).fill(0);
+        const binY = new Array<number>(BINS).fill(0);
+        const binS = new Array<number>(BINS).fill(0);
+        const binL = new Array<number>(BINS).fill(0);
+        let greyL = 0;
+        let greyN = 0;
         for (let i = 0; i < data.length; i += 4) {
-          const R = data[i];
-          const G = data[i + 1];
-          const B = data[i + 2];
-          const mx = Math.max(R, G, B);
-          const mn = Math.min(R, G, B);
-          const sat = mx === 0 ? 0 : (mx - mn) / mx;
-          const wt = 0.15 + sat;
-          r += R * wt;
-          g += G * wt;
-          b += B * wt;
-          w += wt;
-        }
-        r = r / w / 255;
-        g = g / w / 255;
-        b = b / w / 255;
-        // RGB → HSL
-        const mx = Math.max(r, g, b);
-        const mn = Math.min(r, g, b);
-        const l = (mx + mn) / 2;
-        const d = mx - mn;
-        let h = 0;
-        let s = 0;
-        if (d > 0) {
-          s = d / (1 - Math.abs(2 * l - 1));
+          const r = data[i] / 255;
+          const g = data[i + 1] / 255;
+          const b = data[i + 2] / 255;
+          const mx = Math.max(r, g, b);
+          const mn = Math.min(r, g, b);
+          const l = (mx + mn) / 2;
+          const d = mx - mn;
+          const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+          greyL += l;
+          greyN++;
+          // 無彩色・極端な明暗は色相の投票に加えない
+          if (s < 0.18 || l < 0.08 || l > 0.95) continue;
+          let h = 0;
           if (mx === r) h = ((g - b) / d) % 6;
           else if (mx === g) h = (b - r) / d + 2;
           else h = (r - g) / d + 4;
           h = (h * 60 + 360) % 360;
+          const wt = s * (1 - Math.abs(l - 0.5));
+          const bin = Math.floor(h / (360 / BINS)) % BINS;
+          const rad = (h * Math.PI) / 180;
+          binW[bin] += wt;
+          binX[bin] += wt * Math.cos(rad);
+          binY[bin] += wt * Math.sin(rad);
+          binS[bin] += wt * s;
+          binL[bin] += wt * l;
         }
-        const result = `hsl(${Math.round(h)}, ${Math.round(
-          clamp(s * 1.2 + 0.05, 0, 0.6) * 100,
-        )}%, ${Math.round(clamp(l, 0.5, 0.72) * 100)}%)`;
+        // 隣接 bin と合算して優勢な色域を選ぶ (bin 境界で票が割れるのを防ぐ)
+        let best = -1;
+        let bestScore = 0;
+        for (let i = 0; i < BINS; i++) {
+          const score =
+            binW[(i + BINS - 1) % BINS] + binW[i] + binW[(i + 1) % BINS];
+          if (score > bestScore) {
+            bestScore = score;
+            best = i;
+          }
+        }
+        // 有彩色の票が実質無い画像はモノクロ扱い (色を発明しない)
+        const totalPixels = data.length / 4;
+        let result: string;
+        if (best < 0 || bestScore < totalPixels * 0.02) {
+          const l = greyN > 0 ? greyL / greyN : 0.55;
+          result = `hsl(0, 0%, ${Math.round(clamp(l, 0.45, 0.7) * 100)}%)`;
+        } else {
+          const idxs = [(best + BINS - 1) % BINS, best, (best + 1) % BINS];
+          let w = 0;
+          let x = 0;
+          let y = 0;
+          let s = 0;
+          let l = 0;
+          for (const i of idxs) {
+            w += binW[i];
+            x += binX[i];
+            y += binY[i];
+            s += binS[i];
+            l += binL[i];
+          }
+          const h = (Math.atan2(y, x) * (180 / Math.PI) + 360) % 360;
+          result = `hsl(${Math.round(h)}, ${Math.round(
+            clamp((s / w) * 1.1, 0.15, 0.7) * 100,
+          )}%, ${Math.round(clamp(l / w, 0.5, 0.72) * 100)}%)`;
+        }
         vinylColorCache.set(src, result);
         if (!cancelled) setVersion((v) => v + 1);
       } catch {
