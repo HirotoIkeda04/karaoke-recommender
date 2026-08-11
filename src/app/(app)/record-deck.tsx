@@ -577,7 +577,12 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
           className="flex w-full flex-col items-center gap-6"
         >
           {/* ジャケットのカルーセル (遷移ボタンなし。回転完了 or スキップで進む)。
-              下ドラッグで指に追従して沈み、しきい値で現在の曲のページへ遷移する */}
+              下ドラッグで指に追従して沈み、しきい値で現在の曲のページへ遷移する。
+              外側の touch-none 必須: 無いと実機のタッチがブラウザのスクロール/
+              pull-to-refresh に横取りされ、framer の drag が発火しない。
+              framer は drag 要素自体の inline touch-action を pan-x で強制
+              上書きするため、祖先で none を宣言して交差で実効 none にする */}
+          <div className="w-full touch-none">
           <motion.div
             role="group"
             aria-roledescription="カルーセル"
@@ -638,6 +643,7 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
               );
             })}
           </motion.div>
+          </div>
 
           {/* 曲順 + 楽曲名 / アーティスト名 */}
           <AnimatePresence mode="popLayout" initial={false}>
