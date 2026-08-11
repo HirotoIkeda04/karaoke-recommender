@@ -5,9 +5,10 @@ import {
   Check,
   FastForward,
   Minus,
-  Play,
   SkipForward,
   Undo2,
+  Volume2,
+  VolumeX,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -57,9 +58,24 @@ const DISC_SIZE =
 /**
  * カルーセルの隣接ディスク間隔 (自身の幅に対する %)。
  * 100% 未満にして前後のディスクを画面端から覗かせ、カルーセルであることを
- * 見せる (scale 0.7 縮小と z-index 層で、現在の盤の後ろへ滑り込む)。
+ * 見せる (scale 0.65 縮小と z-index 層で、現在の盤の後ろへ滑り込む)。
  */
 const SLIDE_OFFSET_PERCENT = 80;
+
+/**
+ * 組カルーセルの間隔 (サムネイル幅に対する %)。中央から外側へ向かう
+ * 区間ごとの間隔で、中央ほど疎 (現行の 130%)、外側ほど密に詰める。
+ */
+const GROUP_THUMB_GAPS = [130, 100, 82, 70] as const;
+
+/** 組サムネイルの中央からのオフセット (%)。区間幅を累積する */
+function groupThumbOffset(delta: number): number {
+  let x = 0;
+  for (let i = 0; i < Math.abs(delta); i++) {
+    x += GROUP_THUMB_GAPS[Math.min(i, GROUP_THUMB_GAPS.length - 1)];
+  }
+  return Math.sign(delta) * x;
+}
 
 /** デッキ内の現在位置。group = 組 (アーティスト)、song = 組内の曲順 */
 interface DeckPosition {
@@ -124,11 +140,14 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
   const [position, setPosition] = useState<DeckPosition>({ group: 0, song: 0 });
   const [lastAction, setLastAction] = useState<LastAction | null>(null);
   const [error, setError] = useState<string | null>(null);
-  // 試聴 ON/OFF (ユーザーの意思)。ON でも音源が無い曲は無音で回る。
-  const [audioOn, setAudioOn] = useState(false);
+  // 試聴 ON/OFF (ユーザーの意思)。デフォルト ON。ON でも音源が無い曲は
+  // 無音で回る。ブラウザに自動再生をブロックされた場合は
+  // needsGestureRetryRef を立て、最初の画面操作で再生を再試行する。
+  const [audioOn, setAudioOn] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   // 再生中の曲 id。タップ起点の再生と曲送り effect の二重再生を防ぐ。
   const playingSongIdRef = useRef<string | null>(null);
+  const needsGestureRetryRef = useRef(false);
 
   const group = groups[position.group];
   const current = group?.[position.song];
@@ -182,15 +201,50 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
     } catch {
       /* iOS */
     }
-    void audio.play().catch(() => {
-      // 自動再生ブロック等。無音で回転は続くので UI は止めない
-    });
+    void audio.play().then(
+      () => {
+        needsGestureRetryRef.current = false;
+      },
+      (err: unknown) => {
+        // pause() や src 差し替えによる自己中断 (AbortError) は正常系なので
+        // 無視する。自動再生ブロック (NotAllowedError) の時だけ、次の
+        // ユーザー操作 (ジェスチャ文脈) での再試行を予約する。
+        if ((err as DOMException)?.name === "NotAllowedError") {
+          needsGestureRetryRef.current = true;
+        }
+      },
+    );
   };
 
-  // 曲が変わったら試聴音源を差し替える (タップ起点の再生分はスキップ)
+  // 自動再生がブロックされた場合の復帰: 最初の画面操作 (どこでも) の
+  // ジェスチャ文脈内で play() し直す。pointerdown で活性化しない環境の
+  // ために click でも試み、成功するまでフラグは playSnippet 側で立ち直る。
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audioOn || !audio) return;
+    const retryOnGesture = () => {
+      if (!needsGestureRetryRef.current || !audioOnRef.current) return;
+      const song = currentRef.current;
+      if (!song) return;
+      needsGestureRetryRef.current = false;
+      const audio = ensureAudio();
+      // 既に現在の曲が鳴っているなら (stale フラグ) 頭出しし直さない
+      if (playingSongIdRef.current === song.id && !audio.paused) return;
+      playSnippet(audio, song);
+    };
+    document.addEventListener("pointerdown", retryOnGesture, true);
+    document.addEventListener("click", retryOnGesture, true);
+    return () => {
+      document.removeEventListener("pointerdown", retryOnGesture, true);
+      document.removeEventListener("click", retryOnGesture, true);
+    };
+     
+  }, []);
+
+  // 曲が変わったら試聴音源を差し替える (タップ起点の再生分はスキップ)。
+  // デフォルト ON なので初回マウントでもここから再生を試みる
+  // (ブロックされたら上のジェスチャ再試行に委ねる)。
+  useEffect(() => {
+    if (!audioOn) return;
+    const audio = ensureAudio();
     if (!current) {
       audio.pause();
       playingSongIdRef.current = null;
@@ -198,7 +252,7 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
     }
     if (playingSongIdRef.current === current.id) return;
     playSnippet(audio, current);
-     
+
   }, [audioOn, current]);
 
   // バックグラウンドでは試聴を止める。Android は放置すると裏で音が流れ
@@ -397,13 +451,14 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
               aria-hidden={!isActive}
               initial={false}
               animate={{
-                x: `${delta * 130}%`,
+                x: `${groupThumbOffset(delta)}%`,
                 scale: isActive ? 1 : 0.8,
                 opacity: Math.abs(delta) > 3 ? 0 : isActive ? 1 : 0.45,
               }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               className="absolute left-1/2 top-0 -ml-7 size-14"
-              style={{ zIndex: isActive ? 10 : 0 }}
+              // 密に詰めた外側は中央寄りのサムネイルが上に重なるようにする
+              style={{ zIndex: 10 - Math.abs(delta) }}
             >
               {/* 角丸・枠線なしの素のジャケット。現在の組は scale と不透明度で示す */}
               <div className="relative size-full overflow-hidden bg-zinc-800">
@@ -427,8 +482,22 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
         })}
       </div>
 
-      {/* 組単位で左へ流れる。中は曲単位のカルーセル + 曲情報 */}
-      <AnimatePresence mode="wait" initial={false}>
+      {/* 組単位で左へ流れる。中は曲単位のカルーセル + 曲情報。
+          消音トグルは組遷移で消えないよう AnimatePresence の外に重ねる */}
+      <div className="relative w-full">
+        <button
+          type="button"
+          onClick={handleToggleAudio}
+          aria-label={audioOn ? "試聴を停止する" : "試聴を再生する"}
+          className="absolute right-1 top-0 z-20 flex size-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition hover:bg-black/60 active:bg-black/70"
+        >
+          {audioOn ? (
+            <Volume2 className="size-5" aria-hidden />
+          ) : (
+            <VolumeX className="size-5" aria-hidden />
+          )}
+        </button>
+        <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={position.group}
           initial={{ x: 72, opacity: 0 }}
@@ -455,35 +524,22 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
                   initial={false}
                   animate={{
                     x: `${delta * SLIDE_OFFSET_PERCENT}%`,
-                    scale: isActive ? 1 : 0.7,
+                    scale: isActive ? 1 : 0.65,
                     opacity: Math.abs(delta) > 1 ? 0 : isActive ? 1 : 0.45,
                   }}
                   transition={{ type: "spring", stiffness: 260, damping: 30 }}
                   className="absolute inset-0"
                   // 現在の盤を最前面に。隣の盤は縮小したまま端から覗き、
-                  // スライド時は現在の盤の後ろへ滑り込む。
-                  // タップは現在の盤だけが受ける (端から覗く盤は素通し)
+                  // スライド時は現在の盤の後ろへ滑り込む
                   style={{
                     zIndex: isActive ? 10 : Math.abs(delta) === 1 ? 5 : 0,
-                    pointerEvents: isActive ? "auto" : "none",
                   }}
                 >
-                  <button
-                    type="button"
-                    onClick={isActive ? handleToggleAudio : undefined}
-                    disabled={!isActive}
-                    aria-label={
-                      audioOn ? "試聴を停止する" : "この曲を試聴する"
-                    }
-                    className="block h-full w-full cursor-pointer"
-                  >
-                    <RecordDisc
-                      song={song}
-                      active={isActive}
-                      showPlayHint={isActive && !audioOn}
-                      onRotationEnd={() => advance(position)}
-                    />
-                  </button>
+                  <RecordDisc
+                    song={song}
+                    active={isActive}
+                    onRotationEnd={() => advance(position)}
+                  />
                 </motion.div>
               );
             })}
@@ -528,7 +584,8 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
             </motion.div>
           </AnimatePresence>
         </motion.div>
-      </AnimatePresence>
+        </AnimatePresence>
+      </div>
 
       {/* 4 評価ボタン (丸いアイコンボタン + ラベル) */}
       <div className="grid w-full grid-cols-[repeat(4,3.5rem)] justify-around">
@@ -588,8 +645,6 @@ interface RecordDiscProps {
   song: Song;
   /** 現在再生位置のディスクのみ回転し、1 周ごとに onRotationEnd を呼ぶ */
   active: boolean;
-  /** 試聴 OFF の時に「タップで再生」の再生アイコンを中央に重ねる */
-  showPlayHint?: boolean;
   onRotationEnd: () => void;
 }
 
@@ -600,12 +655,7 @@ interface RecordDiscProps {
  * 不変であり、overflow-hidden との組み合わせでも輪郭が乱れない。
  * 光沢は光源固定に見せるため回転体の外に置く。
  */
-function RecordDisc({
-  song,
-  active,
-  showPlayHint = false,
-  onRotationEnd,
-}: RecordDiscProps) {
+function RecordDisc({ song, active, onRotationEnd }: RecordDiscProps) {
   const src = song.image_url_large ?? song.image_url_medium;
   return (
     <div className="relative h-full w-full">
@@ -684,17 +734,6 @@ function RecordDisc({
             "0 0 0 2px rgba(255,255,255,0.35), inset 0 1px 3px rgba(0,0,0,0.9)",
         }}
       />
-      {/* 「タップで試聴」ヒント。再生中は消してレコードだけ見せる */}
-      {showPlayHint ? (
-        <div
-          aria-hidden
-          className="absolute inset-0 flex items-center justify-center"
-        >
-          <span className="flex size-12 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm">
-            <Play className="ml-0.5 size-5 fill-current" />
-          </span>
-        </div>
-      ) : null}
     </div>
   );
 }
