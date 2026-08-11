@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { startTransition, useEffect, useRef, useState } from "react";
 
 import { DumbbellMini } from "@/components/icons/dumbbell-mini";
@@ -153,7 +154,17 @@ interface RecordDeckProps {
   initialGroups: Song[][];
 }
 
+/** 下スワイプで楽曲ページを開くしきい値 (指の移動量 px / 速度 px/s) */
+const SWIPE_OPEN_DISTANCE = 110;
+const SWIPE_OPEN_VELOCITY = 600;
+
 export function RecordDeck({ initialGroups }: RecordDeckProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  // RecordDeck はホーム (/) でのみマウントされるので、マウントされたまま
+  // pathname が /songs/[id] になっていれば、楽曲ページ/シートが上に
+  // 開いている (intercepting route) と判定できる。
+  const sheetOpen = /^\/songs\/[^/]+\/?$/.test(pathname);
   const [groups] = useState(initialGroups);
   const [position, setPosition] = useState<DeckPosition>({ group: 0, song: 0 });
   const [lastAction, setLastAction] = useState<LastAction | null>(null);
@@ -166,6 +177,11 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
   // 再生中の曲 id。タップ起点の再生と曲送り effect の二重再生を防ぐ。
   const playingSongIdRef = useRef<string | null>(null);
   const needsGestureRetryRef = useRef(false);
+  // 楽曲ページが開いている間のフル尺再生モード (6 秒フェード/カット無効)。
+  // handleOpenSongPage で立ててから遷移するため「遷移待ちの間」も true。
+  const fullModeRef = useRef(false);
+  // 下ドラッグ中フラグ。ドラッグ最中の回転一周で勝手に曲が進むのを防ぐ
+  const dragActiveRef = useRef(false);
 
   const group = groups[position.group];
   const current = group?.[position.song];
@@ -195,6 +211,8 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
     const el = new Audio();
     el.preload = "auto";
     el.addEventListener("timeupdate", () => {
+      // フル尺モード (楽曲ページ表示中) はフェード/カットせず最後まで流す
+      if (fullModeRef.current) return;
       const remain = ROTATION_MS / 1000 - el.currentTime;
       try {
         el.volume = remain < AUDIO_FADE_SEC ? Math.max(0, remain / AUDIO_FADE_SEC) : 1;
@@ -272,6 +290,47 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
     playSnippet(audio, current);
 
   }, [audioOn, current]);
+
+  // 楽曲ページ (下スワイプ/リンクで /songs/[id] がホームの上に開いた状態) の
+  // 開閉に合わせてフル尺モードを切り替える。開いたら現在の曲を頭から
+  // フル尺で再生し直し、閉じたら 6 秒スニペットのデッキ再生に戻る。
+  // 回転は active={... && !sheetOpen} で止まるため自動送りも起きない。
+  useEffect(() => {
+    if (sheetOpen) {
+      // 下スワイプ経由はジェスチャ文脈内 (handleOpenSongPage) で再生済み
+      if (fullModeRef.current) return;
+      fullModeRef.current = true;
+      const song = currentRef.current;
+      if (audioOnRef.current && song?.itunes_preview_url) {
+        playSnippet(ensureAudio(), song);
+      }
+    } else if (fullModeRef.current) {
+      fullModeRef.current = false;
+      const song = currentRef.current;
+      if (audioOnRef.current && song) {
+        playSnippet(ensureAudio(), song);
+      }
+    }
+     
+  }, [sheetOpen]);
+
+  /**
+   * レコードの下スワイプで現在の曲のページへ連続遷移する。
+   * iOS の自動再生制限を確実に越えるため、フル尺再生はこのジェスチャ
+   * 文脈内で開始してから遷移する。
+   */
+  const handleOpenSongPage = () => {
+    // 遷移待ちの間の再入 (連続ドラッグ) を無視する
+    if (fullModeRef.current) return;
+    const song = currentRef.current;
+    if (!song) return;
+    triggerHaptic();
+    fullModeRef.current = true;
+    if (audioOnRef.current && song.itunes_preview_url) {
+      playSnippet(ensureAudio(), song);
+    }
+    router.push(`/songs/${song.id}?via=deck`);
+  };
 
   // バックグラウンドでは試聴を止める。Android は放置すると裏で音が流れ
   // 続け、iOS は OS に止められた後で無音のままになるため、復帰時は
@@ -517,13 +576,30 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
           transition={{ duration: 0.2, ease: "easeOut" }}
           className="flex w-full flex-col items-center gap-6"
         >
-          {/* ジャケットのカルーセル (遷移ボタンなし。回転完了 or スキップで進む) */}
-          <div
+          {/* ジャケットのカルーセル (遷移ボタンなし。回転完了 or スキップで進む)。
+              下ドラッグで指に追従して沈み、しきい値で現在の曲のページへ遷移する */}
+          <motion.div
             role="group"
             aria-roledescription="カルーセル"
-            aria-label="同じアーティストの楽曲"
+            aria-label="同じアーティストの楽曲 (下にスワイプで楽曲ページ)"
             className="relative mx-auto"
             style={{ width: DISC_SIZE, height: DISC_SIZE }}
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.6 }}
+            dragMomentum={false}
+            onDragStart={() => {
+              dragActiveRef.current = true;
+            }}
+            onDragEnd={(_, info) => {
+              dragActiveRef.current = false;
+              if (
+                info.offset.y > SWIPE_OPEN_DISTANCE ||
+                info.velocity.y > SWIPE_OPEN_VELOCITY
+              ) {
+                handleOpenSongPage();
+              }
+            }}
           >
             {group.map((song, index) => {
               const delta = index - position.song;
@@ -548,13 +624,20 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
                 >
                   <RecordDisc
                     song={song}
-                    active={isActive}
-                    onRotationEnd={() => advance(position)}
+                    // 楽曲ページ表示中は回転を止める (= 6 秒送りも停止し、
+                    // ページ側のフル尺再生を邪魔しない)
+                    active={isActive && !sheetOpen}
+                    // ドラッグ中・遷移待ちの間は一周しても曲を進めない
+                    // (進むと開くページと音が現在の表示とズレる)
+                    onRotationEnd={() => {
+                      if (dragActiveRef.current || fullModeRef.current) return;
+                      advance(position);
+                    }}
                   />
                 </motion.div>
               );
             })}
-          </div>
+          </motion.div>
 
           {/* 曲順 + 楽曲名 / アーティスト名 */}
           <AnimatePresence mode="popLayout" initial={false}>
