@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, animate, motion, useMotionValue } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Check,
   FastForward,
@@ -13,7 +13,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { startTransition, useEffect, useRef, useState } from "react";
+import {
+  startTransition,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { DumbbellMini } from "@/components/icons/dumbbell-mini";
 import { Button } from "@/components/ui/button";
@@ -154,12 +160,8 @@ interface RecordDeckProps {
   initialGroups: Song[][];
 }
 
-/** 下スワイプで楽曲ページを開くしきい値 (指の移動量 px) */
-const SWIPE_OPEN_DISTANCE = 80;
-/** 下ドラッグと判定するまでの遊び (px)。横優勢の動きは無視する */
-const SWIPE_START_SLOP = 12;
-/** ドラッグ中の視覚的な追従率 (ゴム紐風の減衰) */
-const SWIPE_FOLLOW_RATIO = 0.55;
+/** カバーが「引き出され始めた」とみなすスクロール露出量 (px)。回転送り抑制用 */
+const COVER_ENGAGE_PX = 8;
 
 export function RecordDeck({ initialGroups }: RecordDeckProps) {
   const router = useRouter();
@@ -317,17 +319,12 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
      
   }, [sheetOpen]);
 
-  // 下スワイプの視覚追従 (ゴム紐風)。カルーセル全体をこの分だけ沈める
-  const swipeY = useMotionValue(0);
-  const carouselRef = useRef<HTMLDivElement | null>(null);
-
   /**
-   * レコードの下スワイプで現在の曲のページへ連続遷移する。
-   * iOS の自動再生制限を確実に越えるため、フル尺再生はこのジェスチャ
-   * 文脈内で開始してから遷移する。
+   * 下スワイプで現在の曲のページへ連続遷移する。
+   * 音源要素は既にアンロック済みなのでフル尺再生をここで開始してから遷移。
    */
   const handleOpenSongPage = () => {
-    // 遷移待ちの間の再入 (連続ドラッグ) を無視する
+    // 遷移待ちの間の再入を無視する
     if (fullModeRef.current) return;
     const song = currentRef.current;
     if (!song) return;
@@ -343,77 +340,38 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
     handleOpenSongPageRef.current = handleOpenSongPage;
   });
 
-  // 下スワイプの検出。framer の pointer ベース drag は実機タッチで発火しない
-  // 事例があったため、楽曲シート/GOALS の shorts と同じ「手動 TouchEvent +
-  // non-passive リスナー」の実績パターンで実装する (React の JSX ハンドラは
-  // touchmove が passive 登録になり preventDefault できない点にも注意)。
-  useEffect(() => {
-    const el = carouselRef.current;
-    if (!el) return;
+  // 下スワイプ = ネイティブスクロール。
+  // ホームを縦 2 面のスクロールスナップ ([カバー][デッキ]) にし、初期位置を
+  // デッキ面 (最下部) に置く。指を下へ動かすとスクロールが上がり、上の
+  // カバー (楽曲ページのプレビュー) が sticky なデッキの上に 1:1 で被さる。
+  // ジェスチャ処理をブラウザに任せるため、pointer/touch 実装のような
+  // 発火しない系の不具合が構造的に起きない (framer drag → 手動 TouchEvent の
+  // 2 方式が実機で発火しなかった経緯からの転換)。
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
 
-    let start: { id: number; x: number; y: number } | null = null;
-    let dragging = false;
+  // 初期位置とシートを閉じた後の復帰: デッキ面 (最下部) へスナップ。
+  // useLayoutEffect でペイント前に行い、カバーが一瞬見えるのを防ぐ。
+  useLayoutEffect(() => {
+    const sc = scrollerRef.current;
+    if (!sc || sheetOpen) return;
+    sc.scrollTop = sc.scrollHeight - sc.clientHeight;
+    dragActiveRef.current = false;
+  }, [sheetOpen]);
 
-    const onTouchStart = (event: TouchEvent) => {
-      if (event.touches.length !== 1) {
-        start = null;
-        return;
-      }
-      const t = event.touches[0];
-      start = { id: t.identifier, x: t.clientX, y: t.clientY };
-      dragging = false;
-    };
-
-    const onTouchMove = (event: TouchEvent) => {
-      if (!start) return;
-      const t = event.touches[0];
-      if (!t || t.identifier !== start.id) return;
-      const dy = t.clientY - start.y;
-      const dx = t.clientX - start.x;
-      if (!dragging) {
-        // 下方向が明確に優勢になってからドラッグ開始
-        if (dy < SWIPE_START_SLOP || dy <= Math.abs(dx)) return;
-        dragging = true;
-        dragActiveRef.current = true;
-      }
-      event.preventDefault();
-      swipeY.set(Math.max(0, dy) * SWIPE_FOLLOW_RATIO);
-    };
-
-    const finish = (event: TouchEvent, cancelled = false) => {
-      if (!start) return;
-      const t = event.changedTouches[0];
-      const dy = (t?.clientY ?? start.y) - start.y;
-      start = null;
-      if (!dragging) return;
-      dragging = false;
-      dragActiveRef.current = false;
-      event.preventDefault();
-      void animate(swipeY, 0, {
-        type: "spring",
-        stiffness: 400,
-        damping: 32,
-      });
-      if (!cancelled && dy >= SWIPE_OPEN_DISTANCE) {
-        handleOpenSongPageRef.current();
-      }
-    };
-
-    const onTouchEnd = (event: TouchEvent) => finish(event);
-    const onTouchCancel = (event: TouchEvent) => finish(event, true);
-
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchmove", onTouchMove, { passive: false });
-    el.addEventListener("touchend", onTouchEnd, { passive: false });
-    el.addEventListener("touchcancel", onTouchCancel, { passive: false });
-
-    return () => {
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchmove", onTouchMove);
-      el.removeEventListener("touchend", onTouchEnd);
-      el.removeEventListener("touchcancel", onTouchCancel);
-    };
-  }, [swipeY]);
+  const handleCoverScroll = () => {
+    const sc = scrollerRef.current;
+    if (!sc) return;
+    const max = sc.scrollHeight - sc.clientHeight;
+    if (max <= 0) return;
+    const revealed = max - sc.scrollTop;
+    // カバーを引き出している間は回転一周による自動送りを止める
+    // (進むと開くページと表示中の曲がズレるため)
+    dragActiveRef.current = revealed > COVER_ENGAGE_PX;
+    // ほぼ開き切ったら遷移 (スナップで自然に上端まで到達する)
+    if (revealed >= max - COVER_ENGAGE_PX) {
+      handleOpenSongPageRef.current();
+    }
+  };
 
   // バックグラウンドでは試聴を止める。Android は放置すると裏で音が流れ
   // 続け、iOS は OS に止められた後で無音のままになるため、復帰時は
@@ -564,11 +522,65 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
   }
 
   const nextGroup = groups[position.group + 1];
+  const coverSrc = current.image_url_large ?? current.image_url_medium;
 
-  // overflow-clip: transform で外側に置いた隣のディスクが overflow-hidden だと
-  // スクロール可能領域を作ってしまい、フォーカス移動等の scrollIntoView で
-  // レイアウト全体が横にずれる。clip はスクロール自体を不可能にする。
   return (
+    // 縦 2 面のスクロールスナップ: [カバー (楽曲ページのプレビュー)][デッキ]。
+    // 初期位置はデッキ面。指を下に動かす = ネイティブスクロールでカバーが
+    // sticky なデッキの上へ 1:1 で被さり、開き切ると実ページへ遷移する。
+    <div
+      ref={scrollerRef}
+      onScroll={handleCoverScroll}
+      className="relative h-dvh snap-y snap-mandatory overflow-y-auto overscroll-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
+      {/* カバー: 現在の曲のプレビュー面。遷移後は実ページ (z-40) が上に載る */}
+      <div className="relative z-20 flex h-dvh snap-start snap-always flex-col items-center justify-center gap-6 bg-background px-8">
+        <div className="relative w-full max-w-xs overflow-hidden rounded-xl bg-zinc-800" style={{ aspectRatio: "1 / 1" }}>
+          {coverSrc ? (
+            <JacketImage
+              src={coverSrc}
+              alt={`${current.title} のジャケット`}
+              fill
+              sizes="20rem"
+              className="object-cover"
+              draggable={false}
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-4xl text-zinc-500">
+              ♪
+            </div>
+          )}
+        </div>
+        <div className="text-center">
+          <h2
+            className="line-clamp-2 text-2xl font-bold"
+            style={{
+              fontFamily:
+                '"LatinUpscale", var(--font-geist-sans), system-ui, sans-serif',
+            }}
+          >
+            {current.title}
+          </h2>
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+            {current.artist}
+          </p>
+        </div>
+      </div>
+
+      {/* デッキ面のスナップアンカー。sticky なデッキ自身に snap-start を
+          付けるとピン留めでスナップ計算が縮退し、mandatory スナップが常に
+          カバー面 (scrollTop 0) へ引き戻してしまうため、位置が不変の
+          不可視要素でスナップ点だけを定義する */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-0 top-[100dvh] h-dvh w-px snap-start snap-always"
+      />
+
+      {/* デッキ面: sticky bottom でピン留めし、カバーが上へ被さってくる */}
+      <div className="sticky bottom-0 z-10 h-dvh bg-background">
+    {/* overflow-clip: transform で外側に置いた隣のディスクが overflow-hidden だと
+        スクロール可能領域を作ってしまい、フォーカス移動等の scrollIntoView で
+        レイアウト全体が横にずれる。clip はスクロール自体を不可能にする。 */}
     <div className="relative mx-auto flex max-w-md select-none flex-col items-center gap-6 overflow-clip px-4 pb-2 pt-8">
       {/* 次の組の先頭ジャケットを裏で先読み (現在の組は全ディスクが即ロードされる) */}
       {(nextGroup ?? []).slice(0, 2).map((song) => {
@@ -659,20 +671,13 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
           transition={{ duration: 0.2, ease: "easeOut" }}
           className="flex w-full flex-col items-center gap-6"
         >
-          {/* ジャケットのカルーセル (遷移ボタンなし。回転完了 or スキップで進む)。
-              下ドラッグで指に追従して沈み、しきい値で現在の曲のページへ遷移する。
-              外側の touch-none 必須: 無いと実機のタッチがブラウザのスクロール/
-              pull-to-refresh に横取りされ、framer の drag が発火しない。
-              framer は drag 要素自体の inline touch-action を pan-x で強制
-              上書きするため、祖先で none を宣言して交差で実効 none にする */}
-          <div className="w-full touch-none">
+          {/* ジャケットのカルーセル (遷移ボタンなし。回転完了 or スキップで進む) */}
           <motion.div
-            ref={carouselRef}
             role="group"
             aria-roledescription="カルーセル"
             aria-label="同じアーティストの楽曲 (下にスワイプで楽曲ページ)"
             className="relative mx-auto"
-            style={{ width: DISC_SIZE, height: DISC_SIZE, y: swipeY }}
+            style={{ width: DISC_SIZE, height: DISC_SIZE }}
           >
             {group.map((song, index) => {
               const delta = index - position.song;
@@ -711,7 +716,6 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
               );
             })}
           </motion.div>
-          </div>
 
           {/* 曲順 + 楽曲名 / アーティスト名 */}
           <AnimatePresence mode="popLayout" initial={false}>
@@ -804,6 +808,8 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
         >
           <Undo2 className="size-5" />
         </button>
+      </div>
+    </div>
       </div>
     </div>
   );
