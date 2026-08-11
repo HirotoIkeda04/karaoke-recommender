@@ -12,7 +12,7 @@ type Song = Database["public"]["Tables"]["songs"]["Row"];
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
 /** 1 デッキに積む組 (アーティスト) の数 */
-const GROUP_COUNT = 5;
+const GROUP_COUNT = 7;
 /** 組ごとの曲数 (先頭の推薦シード + 未評価の人気順フォロワー) */
 const GROUP_SIZE = 5;
 /** フォロワー候補としてアーティストごとに取得する曲数 (評価済み除外前) */
