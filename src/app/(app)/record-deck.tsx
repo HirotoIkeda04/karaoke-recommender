@@ -84,7 +84,10 @@ function groupThumbOffset(delta: number): number {
 const GROUP_THUMB_TILTS = [0, 32, 58, 80] as const;
 
 /** 組サムネイルの厚み (px)。preserve-3d の側面としてレンダリングされる */
-const GROUP_THUMB_DEPTH_PX = 6;
+const GROUP_THUMB_DEPTH_PX = 4;
+
+/** 組サムネイルの角丸 (px)。ほんの少しだけ丸める */
+const GROUP_THUMB_RADIUS_PX = 2;
 
 function groupThumbTilt(delta: number): number {
   const tilt =
@@ -461,7 +464,6 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
           if (!seed) return null;
           const delta = index - position.group;
           const isActive = delta === 0;
-          const thumbSrc = seed.image_url_medium ?? seed.image_url_large;
           return (
             <motion.div
               key={seed.id}
@@ -485,61 +487,7 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
                 visibility: Math.abs(delta) > 3 ? "hidden" : "visible",
               }}
             >
-              {/* 前面: 角丸・枠線なしの素のジャケット。厚みの半分だけ手前へ */}
-              <div
-                className="absolute inset-0 overflow-hidden bg-zinc-800"
-                style={{
-                  transform: `translateZ(${GROUP_THUMB_DEPTH_PX / 2}px)`,
-                }}
-              >
-                {thumbSrc ? (
-                  <JacketImage
-                    src={thumbSrc}
-                    alt={isActive ? `${seed.artist} の組` : ""}
-                    fill
-                    sizes="3.5rem"
-                    className="object-cover"
-                    draggable={false}
-                  />
-                ) : (
-                  <div className="flex size-full items-center justify-center text-lg text-zinc-500">
-                    ♪
-                  </div>
-                )}
-                {/* 非アクティブの減光 (コンテナの opacity の代替) */}
-                <div
-                  aria-hidden
-                  className="absolute inset-0 bg-black transition-opacity duration-300"
-                  style={{ opacity: isActive ? 0 : 0.55 }}
-                />
-              </div>
-              {/* 背面 (スプリングのオーバーシュート対策の保険) */}
-              <div
-                aria-hidden
-                className="absolute inset-0 bg-zinc-900"
-                style={{
-                  transform: `rotateY(180deg) translateZ(${GROUP_THUMB_DEPTH_PX / 2}px)`,
-                }}
-              />
-              {/* 左右の側面 = 厚み。傾くほど見えてくる背表紙 */}
-              <div
-                aria-hidden
-                className="absolute top-0 h-full bg-zinc-700"
-                style={{
-                  width: GROUP_THUMB_DEPTH_PX,
-                  left: -GROUP_THUMB_DEPTH_PX / 2,
-                  transform: "rotateY(90deg)",
-                }}
-              />
-              <div
-                aria-hidden
-                className="absolute top-0 h-full bg-zinc-800"
-                style={{
-                  width: GROUP_THUMB_DEPTH_PX,
-                  right: -GROUP_THUMB_DEPTH_PX / 2,
-                  transform: "rotateY(90deg)",
-                }}
-              />
+              <GroupThumb seed={seed} isActive={isActive} />
             </motion.div>
           );
         })}
@@ -789,6 +737,88 @@ function useVinylColor(src: string | null): string | null {
   }, [src]);
 
   return src ? (vinylColorCache.get(src) ?? null) : null;
+}
+
+/**
+ * 組カルーセルのサムネイル 1 枚分の面 (前面/背面/左右側面)。
+ * 親の motion.div (preserve-3d) の直下に fragment で面を並べる。
+ * 側面と背面はジャケットの代表色 (レコード盤と同じ抽出) で塗り、
+ * 明度を少し落として厚みの陰影に見せる。
+ */
+function GroupThumb({ seed, isActive }: { seed: Song; isActive: boolean }) {
+  const thumbSrc = seed.image_url_medium ?? seed.image_url_large;
+  const edgeColor = useVinylColor(thumbSrc) ?? "#3f3f46";
+  const edgeStyle = {
+    backgroundColor: edgeColor,
+    borderRadius: GROUP_THUMB_RADIUS_PX,
+    transition: "background-color 0.5s ease",
+  } as const;
+  return (
+    <>
+      {/* 前面: ジャケット。厚みの半分だけ手前へ */}
+      <div
+        className="absolute inset-0 overflow-hidden bg-zinc-800"
+        style={{
+          borderRadius: GROUP_THUMB_RADIUS_PX,
+          transform: `translateZ(${GROUP_THUMB_DEPTH_PX / 2}px)`,
+        }}
+      >
+        {thumbSrc ? (
+          <JacketImage
+            src={thumbSrc}
+            alt={isActive ? `${seed.artist} の組` : ""}
+            fill
+            sizes="3.5rem"
+            className="object-cover"
+            draggable={false}
+          />
+        ) : (
+          <div className="flex size-full items-center justify-center text-lg text-zinc-500">
+            ♪
+          </div>
+        )}
+        {/* 非アクティブの減光 (コンテナの opacity の代替) */}
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-black transition-opacity duration-300"
+          style={{ opacity: isActive ? 0 : 0.55 }}
+        />
+      </div>
+      {/* 背面 (スプリングのオーバーシュート対策の保険) */}
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          ...edgeStyle,
+          filter: "brightness(0.75)",
+          transform: `rotateY(180deg) translateZ(${GROUP_THUMB_DEPTH_PX / 2}px)`,
+        }}
+      />
+      {/* 左右の側面 = 厚み。傾くほど見えてくる背表紙 */}
+      <div
+        aria-hidden
+        className="absolute top-0 h-full"
+        style={{
+          ...edgeStyle,
+          filter: "brightness(0.9)",
+          width: GROUP_THUMB_DEPTH_PX,
+          left: -GROUP_THUMB_DEPTH_PX / 2,
+          transform: "rotateY(90deg)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="absolute top-0 h-full"
+        style={{
+          ...edgeStyle,
+          filter: "brightness(0.8)",
+          width: GROUP_THUMB_DEPTH_PX,
+          right: -GROUP_THUMB_DEPTH_PX / 2,
+          transform: "rotateY(90deg)",
+        }}
+      />
+    </>
+  );
 }
 
 interface RecordDiscProps {
