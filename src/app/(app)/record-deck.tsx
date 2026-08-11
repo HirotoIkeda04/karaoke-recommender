@@ -83,6 +83,9 @@ function groupThumbOffset(delta: number): number {
  */
 const GROUP_THUMB_TILTS = [0, 32, 58, 80] as const;
 
+/** 組サムネイルの厚み (px)。preserve-3d の側面としてレンダリングされる */
+const GROUP_THUMB_DEPTH_PX = 6;
+
 function groupThumbTilt(delta: number): number {
   const tilt =
     GROUP_THUMB_TILTS[Math.min(Math.abs(delta), GROUP_THUMB_TILTS.length - 1)];
@@ -472,11 +475,20 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
               }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               className="absolute left-1/2 top-0 -ml-7 size-14"
-              // 密に詰めた外側は中央寄りのサムネイルが上に重なるようにする
-              style={{ zIndex: 10 - Math.abs(delta) }}
+              // 密に詰めた外側は中央寄りのサムネイルが上に重なるようにする。
+              // preserve-3d で子の側面 (厚み) を 3D 空間に保つ
+              style={{
+                zIndex: 10 - Math.abs(delta),
+                transformStyle: "preserve-3d",
+              }}
             >
-              {/* 角丸・枠線なしの素のジャケット。現在の組は scale と不透明度で示す */}
-              <div className="relative size-full overflow-hidden bg-zinc-800">
+              {/* 前面: 角丸・枠線なしの素のジャケット。厚みの半分だけ手前へ */}
+              <div
+                className="absolute inset-0 overflow-hidden bg-zinc-800"
+                style={{
+                  transform: `translateZ(${GROUP_THUMB_DEPTH_PX / 2}px)`,
+                }}
+              >
                 {thumbSrc ? (
                   <JacketImage
                     src={thumbSrc}
@@ -492,6 +504,33 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
                   </div>
                 )}
               </div>
+              {/* 背面 (スプリングのオーバーシュート対策の保険) */}
+              <div
+                aria-hidden
+                className="absolute inset-0 bg-zinc-900"
+                style={{
+                  transform: `rotateY(180deg) translateZ(${GROUP_THUMB_DEPTH_PX / 2}px)`,
+                }}
+              />
+              {/* 左右の側面 = 厚み。傾くほど見えてくる背表紙 */}
+              <div
+                aria-hidden
+                className="absolute top-0 h-full bg-zinc-700"
+                style={{
+                  width: GROUP_THUMB_DEPTH_PX,
+                  left: -GROUP_THUMB_DEPTH_PX / 2,
+                  transform: "rotateY(90deg)",
+                }}
+              />
+              <div
+                aria-hidden
+                className="absolute top-0 h-full bg-zinc-800"
+                style={{
+                  width: GROUP_THUMB_DEPTH_PX,
+                  right: -GROUP_THUMB_DEPTH_PX / 2,
+                  transform: "rotateY(90deg)",
+                }}
+              />
             </motion.div>
           );
         })}
