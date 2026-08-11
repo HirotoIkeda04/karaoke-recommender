@@ -471,15 +471,18 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
                 x: `${groupThumbOffset(delta)}%`,
                 rotateY: groupThumbTilt(delta),
                 scale: isActive ? 1 : 0.8,
-                opacity: Math.abs(delta) > 3 ? 0 : isActive ? 1 : 0.45,
               }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               className="absolute left-1/2 top-0 -ml-7 size-14"
               // 密に詰めた外側は中央寄りのサムネイルが上に重なるようにする。
-              // preserve-3d で子の側面 (厚み) を 3D 空間に保つ
+              // preserve-3d で子の側面 (厚み) を 3D 空間に保つ。
+              // 注意: このコンテナに opacity < 1 や filter を付けると CSS 仕様で
+              // preserve-3d が平面化され、背面がジャケットに被さって描画が壊れる。
+              // 減光は前面内のオーバーレイ、端の非表示は visibility で行う。
               style={{
                 zIndex: 10 - Math.abs(delta),
                 transformStyle: "preserve-3d",
+                visibility: Math.abs(delta) > 3 ? "hidden" : "visible",
               }}
             >
               {/* 前面: 角丸・枠線なしの素のジャケット。厚みの半分だけ手前へ */}
@@ -503,6 +506,12 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
                     ♪
                   </div>
                 )}
+                {/* 非アクティブの減光 (コンテナの opacity の代替) */}
+                <div
+                  aria-hidden
+                  className="absolute inset-0 bg-black transition-opacity duration-300"
+                  style={{ opacity: isActive ? 0 : 0.55 }}
+                />
               </div>
               {/* 背面 (スプリングのオーバーシュート対策の保険) */}
               <div
