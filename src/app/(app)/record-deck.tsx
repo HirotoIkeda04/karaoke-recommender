@@ -77,6 +77,18 @@ function groupThumbOffset(delta: number): number {
   return Math.sign(delta) * x;
 }
 
+/**
+ * 組サムネイルの Y 軸傾き (deg)。カバーフロー風に、中央は正面 (0°)、
+ * 外側へ行くほど中央を向いて傾き、端はほぼ真横 (80° = 背表紙状の側面)。
+ */
+const GROUP_THUMB_TILTS = [0, 32, 58, 80] as const;
+
+function groupThumbTilt(delta: number): number {
+  const tilt =
+    GROUP_THUMB_TILTS[Math.min(Math.abs(delta), GROUP_THUMB_TILTS.length - 1)];
+  return -Math.sign(delta) * tilt;
+}
+
 /** デッキ内の現在位置。group = 組 (アーティスト)、song = 組内の曲順 */
 interface DeckPosition {
   group: number;
@@ -438,6 +450,8 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
         aria-roledescription="カルーセル"
         aria-label="デッキ内の組"
         className="relative h-14 w-full"
+        // 子の rotateY に奥行きを与える (カバーフロー風の遠近)
+        style={{ perspective: "700px" }}
       >
         {groups.map((groupSongs, index) => {
           const seed = groupSongs[0];
@@ -452,6 +466,7 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
               initial={false}
               animate={{
                 x: `${groupThumbOffset(delta)}%`,
+                rotateY: groupThumbTilt(delta),
                 scale: isActive ? 1 : 0.8,
                 opacity: Math.abs(delta) > 3 ? 0 : isActive ? 1 : 0.45,
               }}
