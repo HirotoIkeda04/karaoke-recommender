@@ -515,10 +515,17 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
               // 注意: このコンテナに opacity < 1 や filter を付けると CSS 仕様で
               // preserve-3d が平面化され、背面がジャケットに被さって描画が壊れる。
               // 減光は前面内のオーバーレイ、端の非表示は visibility で行う。
+              // 非表示は delta 固定数ではなく累積オフセットで判定する
+              // (間隔定数を詰めた時に画面内の項目まで隠れてポップインした反省)。
+              // 430% = 240px は max-w-md の clip 半幅 224px + 投影マージンで、
+              // 可視域内では絶対に切り替わらない。
               style={{
                 zIndex: 10 - Math.abs(delta),
                 transformStyle: "preserve-3d",
-                visibility: Math.abs(delta) > 3 ? "hidden" : "visible",
+                visibility:
+                  Math.abs(groupThumbOffset(delta)) > 430
+                    ? "hidden"
+                    : "visible",
               }}
             >
               <GroupThumb seed={seed} isActive={isActive} />
@@ -852,7 +859,7 @@ function GroupThumb({ seed, isActive }: { seed: Song; isActive: boolean }) {
       style={{
         width: "7rem",
         height: GROUP_THUMB_DEPTH_PX * 2,
-        transform: "translate(-50%, -50%) rotate(-90deg) scale(0.5)",
+        transform: "translate(-50%, -50%) rotate(90deg) scale(0.5)",
         fontSize: 12,
         lineHeight: `${GROUP_THUMB_DEPTH_PX * 2}px`,
       }}
