@@ -65,9 +65,10 @@ const SLIDE_OFFSET_PERCENT = 80;
 
 /**
  * 組カルーセルの間隔 (サムネイル幅に対する %)。中央から外側へ向かう
- * 区間ごとの間隔で、中央ほど疎 (現行の 130%)、外側ほど密に詰める。
+ * 区間ごとの間隔。急角度の背表紙は投影幅が細いので、棚の CD のように
+ * 詰めて並ぶ間隔にしている (中央だけ正面向きのぶん広い)。
  */
-const GROUP_THUMB_GAPS = [130, 100, 82, 70] as const;
+const GROUP_THUMB_GAPS = [88, 54, 42, 38] as const;
 
 /** 組サムネイルの中央からのオフセット (%)。区間幅を累積する */
 function groupThumbOffset(delta: number): number {
@@ -79,13 +80,13 @@ function groupThumbOffset(delta: number): number {
 }
 
 /**
- * 組サムネイルの Y 軸傾き (deg)。カバーフロー風に、中央は正面 (0°)、
- * 外側へ行くほど中央を向いて傾き、端はほぼ真横 (80° = 背表紙状の側面)。
+ * 組サムネイルの Y 軸傾き (deg)。再生中 (中央) だけ正面 (0°)、
+ * それ以外は棚に並んだ CD のように背表紙 (側面) が主役になる急角度。
  */
-const GROUP_THUMB_TILTS = [0, 32, 58, 80] as const;
+const GROUP_THUMB_TILTS = [0, 60, 71, 80] as const;
 
 /** 組サムネイルの厚み (px)。preserve-3d の側面としてレンダリングされる */
-const GROUP_THUMB_DEPTH_PX = 4;
+const GROUP_THUMB_DEPTH_PX = 8;
 
 /** 組サムネイルの角丸 (px)。ほんの少しだけ丸める */
 const GROUP_THUMB_RADIUS_PX = 2;
@@ -815,17 +816,50 @@ function useVinylColor(src: string | null): string | null {
 /**
  * 組カルーセルのサムネイル 1 枚分の面 (前面/背面/左右側面)。
  * 親の motion.div (preserve-3d) の直下に fragment で面を並べる。
- * 側面と背面はジャケットの代表色 (レコード盤と同じ抽出) で塗り、
- * 明度を少し落として厚みの陰影に見せる。
+ * 側面 = 背表紙はジャケットの代表色 (レコード盤と同じ抽出) を黒へ大きく
+ * 落とした暗色で塗り、アーティスト名を背表紙テキストとして載せる。
+ * 左右の面は、傾いた時に外から見える側が表 (正立テキスト) になるよう
+ * rotateY の向きを分けている (左面 -90° / 右面 +90°)。
  */
+/**
+ * 背表紙用に代表色を暗くする。useVinylColor が生成する hsl() 文字列を
+ * 自前でパースして明度だけ落とす (color-mix はまだ全対象ブラウザで
+ * 保証できないため使わない。透明フォールバックで背表紙が消えるのを防ぐ)。
+ */
+function spineColorOf(edgeColor: string): string {
+  const m = /^hsl\((\d+), (\d+)%, (\d+)%\)$/.exec(edgeColor);
+  if (!m) return "#1c1c21";
+  return `hsl(${m[1]}, ${m[2]}%, ${Math.round(Number(m[3]) * 0.38)}%)`;
+}
+
 function GroupThumb({ seed, isActive }: { seed: Song; isActive: boolean }) {
   const thumbSrc = seed.image_url_medium ?? seed.image_url_large;
-  const edgeColor = useVinylColor(thumbSrc) ?? "#3f3f46";
-  const edgeStyle = {
-    backgroundColor: edgeColor,
+  // 厚みが陰として読めるよう、代表色を大きく暗くして背表紙に塗る
+  const spineColor = spineColorOf(useVinylColor(thumbSrc) ?? "#3f3f46");
+  const spineStyle = {
+    backgroundColor: spineColor,
     borderRadius: GROUP_THUMB_RADIUS_PX,
     transition: "background-color 0.5s ease",
+    width: GROUP_THUMB_DEPTH_PX,
   } as const;
+  // 背表紙のアーティスト名: 上から下へ読む縦倒しテキスト (洋書の背文字)。
+  // 面 (厚み × 高さ) の中央に、高さぶんの横書きコンテナを -90° 回転で敷く。
+  // 実効 6px 相当は 12px を scale(0.5) で出す (ブラウザの最小フォント
+  // サイズ設定に 6px 指定がクランプされて面からはみ出すのを防ぐ)。
+  const spineText = (
+    <span
+      className="absolute left-1/2 top-1/2 block overflow-hidden text-ellipsis whitespace-nowrap px-3 text-left font-semibold text-white/70"
+      style={{
+        width: "7rem",
+        height: GROUP_THUMB_DEPTH_PX * 2,
+        transform: "translate(-50%, -50%) rotate(-90deg) scale(0.5)",
+        fontSize: 12,
+        lineHeight: `${GROUP_THUMB_DEPTH_PX * 2}px`,
+      }}
+    >
+      {seed.artist}
+    </span>
+  );
   return (
     <>
       {/* 前面: ジャケット。厚みの半分だけ手前へ */}
@@ -862,8 +896,9 @@ function GroupThumb({ seed, isActive }: { seed: Song; isActive: boolean }) {
         aria-hidden
         className="absolute inset-0"
         style={{
-          ...edgeStyle,
-          filter: "brightness(0.75)",
+          backgroundColor: spineColor,
+          borderRadius: GROUP_THUMB_RADIUS_PX,
+          transition: "background-color 0.5s ease",
           transform: `rotateY(180deg) translateZ(${GROUP_THUMB_DEPTH_PX / 2}px)`,
         }}
       />
@@ -872,24 +907,24 @@ function GroupThumb({ seed, isActive }: { seed: Song; isActive: boolean }) {
         aria-hidden
         className="absolute top-0 h-full"
         style={{
-          ...edgeStyle,
-          filter: "brightness(0.9)",
-          width: GROUP_THUMB_DEPTH_PX,
+          ...spineStyle,
           left: -GROUP_THUMB_DEPTH_PX / 2,
-          transform: "rotateY(90deg)",
+          transform: "rotateY(-90deg)",
         }}
-      />
+      >
+        {spineText}
+      </div>
       <div
         aria-hidden
         className="absolute top-0 h-full"
         style={{
-          ...edgeStyle,
-          filter: "brightness(0.8)",
-          width: GROUP_THUMB_DEPTH_PX,
+          ...spineStyle,
           right: -GROUP_THUMB_DEPTH_PX / 2,
           transform: "rotateY(90deg)",
         }}
-      />
+      >
+        {spineText}
+      </div>
     </>
   );
 }
