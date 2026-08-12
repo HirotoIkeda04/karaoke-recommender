@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 
 import { AppHeader } from "@/components/app-header";
 import { AppBottomNav } from "@/components/app-bottom-nav";
-import { InstallPrompt } from "@/components/install-prompt";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AppLayout({
@@ -33,7 +32,6 @@ export default async function AppLayout({
       </main>
       <AppBottomNav />
       {songSheet}
-      <InstallPrompt />
     </div>
   );
 }
