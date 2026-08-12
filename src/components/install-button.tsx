@@ -11,21 +11,20 @@ type BeforeInstallPromptEvent = Event & {
   }>;
 };
 
-function isIosSafari() {
+function isIosInstallable() {
   if (typeof navigator === "undefined") return false;
   const ua = navigator.userAgent;
   if (!/iPad|iPhone|iPod/.test(ua)) return false;
-  // 標準 Safari のみ対象 (CriOS=Chrome/EdgiOS=Edge/FxiOS=Firefox/LINE/FBAN 等の埋込ブラウザを除外)
-  if (/CriOS|FxiOS|EdgiOS|OPiOS|Line\/|FBAN|FBAV|Instagram|Twitter/i.test(ua)) {
-    return false;
-  }
+  // iOS 16.4+ は Safari 以外 (Chrome/Edge/Firefox 等) でも共有シートから追加できる。
+  // 共有シートを持たない埋込ブラウザ (LINE/FB/Instagram 等) のみ除外する。
+  if (/Line\/|FBAN|FBAV|Instagram|Twitter/i.test(ua)) return false;
   return true;
 }
 
 /**
  * PWA を未インストールの環境でのみ「ホーム画面に追加」ボタンをヘッダー右側に表示する。
  * - Android Chrome / デスクトップ Chromium 系: beforeinstallprompt を捕捉し、タップでネイティブの追加ダイアログを起動
- * - iOS Safari: beforeinstallprompt 非対応のため、タップで共有メニューからの追加手順を案内
+ * - iOS (Safari/Chrome 等、埋込ブラウザ除く): beforeinstallprompt 非対応のため、タップで共有メニューからの追加手順を案内
  * - すでにインストール済み (display-mode: standalone, navigator.standalone): 非表示
  */
 export function InstallButton() {
@@ -49,7 +48,7 @@ export function InstallButton() {
       return;
     }
 
-    if (isIosSafari()) {
+    if (isIosInstallable()) {
       setIos(true);
     }
 
@@ -110,7 +109,7 @@ export function InstallButton() {
         >
           <div className="flex items-start gap-2">
             <p className="min-w-0 flex-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
-              Safari の共有ボタン{" "}
+              共有ボタン{" "}
               <Share className="inline-block size-3.5 -translate-y-px" /> から
               <span className="mx-0.5 font-medium text-zinc-900 dark:text-zinc-100">
                 「ホーム画面に追加」
