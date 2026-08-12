@@ -12,14 +12,8 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import {
-  startTransition,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { usePathname } from "next/navigation";
+import { startTransition, useEffect, useRef, useState } from "react";
 
 import { DumbbellMini } from "@/components/icons/dumbbell-mini";
 import { Button } from "@/components/ui/button";
@@ -160,11 +154,8 @@ interface RecordDeckProps {
   initialGroups: Song[][];
 }
 
-/** カバーが「引き出され始めた」とみなすスクロール露出量 (px)。回転送り抑制用 */
-const COVER_ENGAGE_PX = 8;
 
 export function RecordDeck({ initialGroups }: RecordDeckProps) {
-  const router = useRouter();
   const pathname = usePathname();
   // RecordDeck はホーム (/) でのみマウントされるので、マウントされたまま
   // pathname が /songs/[id] になっていれば、楽曲ページ/シートが上に
@@ -182,11 +173,9 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
   // 再生中の曲 id。タップ起点の再生と曲送り effect の二重再生を防ぐ。
   const playingSongIdRef = useRef<string | null>(null);
   const needsGestureRetryRef = useRef(false);
-  // 楽曲ページが開いている間のフル尺再生モード (6 秒フェード/カット無効)。
-  // handleOpenSongPage で立ててから遷移するため「遷移待ちの間」も true。
+  // 楽曲ページ (シート) が開いている間のフル尺再生モード
+  // (6 秒フェード/カット無効)
   const fullModeRef = useRef(false);
-  // 下ドラッグ中フラグ。ドラッグ最中の回転一周で勝手に曲が進むのを防ぐ
-  const dragActiveRef = useRef(false);
 
   const group = groups[position.group];
   const current = group?.[position.song];
@@ -296,14 +285,12 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
 
   }, [audioOn, current]);
 
-  // 楽曲ページ (下スワイプ/リンクで /songs/[id] がホームの上に開いた状態) の
-  // 開閉に合わせてフル尺モードを切り替える。開いたら現在の曲を頭から
-  // フル尺で再生し直し、閉じたら 6 秒スニペットのデッキ再生に戻る。
+  // 楽曲シート (リンクで /songs/[id] がホームの上に開いた状態) の開閉に
+  // 合わせてフル尺モードを切り替える。開いたら現在の曲を頭からフル尺で
+  // 再生し直し、閉じたら 6 秒スニペットのデッキ再生に戻る。
   // 回転は active={... && !sheetOpen} で止まるため自動送りも起きない。
   useEffect(() => {
     if (sheetOpen) {
-      // 下スワイプ経由はジェスチャ文脈内 (handleOpenSongPage) で再生済み
-      if (fullModeRef.current) return;
       fullModeRef.current = true;
       const song = currentRef.current;
       if (audioOnRef.current && song?.itunes_preview_url) {
@@ -316,63 +303,8 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
         playSnippet(ensureAudio(), song);
       }
     }
-     
+
   }, [sheetOpen]);
-
-  /**
-   * 下スワイプで現在の曲のページへ連続遷移する。
-   * 音源要素は既にアンロック済みなのでフル尺再生をここで開始してから遷移。
-   */
-  const handleOpenSongPage = () => {
-    // 遷移待ちの間の再入を無視する
-    if (fullModeRef.current) return;
-    const song = currentRef.current;
-    if (!song) return;
-    triggerHaptic();
-    fullModeRef.current = true;
-    if (audioOnRef.current && song.itunes_preview_url) {
-      playSnippet(ensureAudio(), song);
-    }
-    router.push(`/songs/${song.id}?via=deck`);
-  };
-  const handleOpenSongPageRef = useRef(handleOpenSongPage);
-  useEffect(() => {
-    handleOpenSongPageRef.current = handleOpenSongPage;
-  });
-
-  // スワイプ = ネイティブスクロール。
-  // ホームを縦 2 面のスクロールスナップ ([デッキ][カバー]) にする。
-  // ボトムシートと同様、指を上へ動かすとカバー (楽曲ページのプレビュー) が
-  // 下から sticky なデッキの上に 1:1 で被さって上がってくる。上端はシートの
-  // 見た目 (角丸/ハンドル) ではなくページとして表示する。
-  // ジェスチャ処理をブラウザに任せるため、pointer/touch 実装のような
-  // 発火しない系の不具合が構造的に起きない (framer drag → 手動 TouchEvent の
-  // 2 方式が実機で発火しなかった経緯からの転換)。
-  const scrollerRef = useRef<HTMLDivElement | null>(null);
-
-  // シートを閉じた後の復帰: デッキ面 (最上部) へ戻す。
-  // useLayoutEffect でペイント前に行い、カバーが一瞬見えるのを防ぐ。
-  useLayoutEffect(() => {
-    const sc = scrollerRef.current;
-    if (!sc || sheetOpen) return;
-    sc.scrollTop = 0;
-    dragActiveRef.current = false;
-  }, [sheetOpen]);
-
-  const handleCoverScroll = () => {
-    const sc = scrollerRef.current;
-    if (!sc) return;
-    const max = sc.scrollHeight - sc.clientHeight;
-    if (max <= 0) return;
-    const revealed = sc.scrollTop;
-    // カバーを引き出している間は回転一周による自動送りを止める
-    // (進むと開くページと表示中の曲がズレるため)
-    dragActiveRef.current = revealed > COVER_ENGAGE_PX;
-    // ほぼ被さり切ったら遷移 (スナップで自然に下端まで到達する)
-    if (revealed >= max - COVER_ENGAGE_PX) {
-      handleOpenSongPageRef.current();
-    }
-  };
 
   // バックグラウンドでは試聴を止める。Android は放置すると裏で音が流れ
   // 続け、iOS は OS に止められた後で無音のままになるため、復帰時は
@@ -523,31 +455,11 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
   }
 
   const nextGroup = groups[position.group + 1];
-  const coverSrc = current.image_url_large ?? current.image_url_medium;
 
+  // overflow-clip: transform で外側に置いた隣のディスクが overflow-hidden だと
+  // スクロール可能領域を作ってしまい、フォーカス移動等の scrollIntoView で
+  // レイアウト全体が横にずれる。clip はスクロール自体を不可能にする。
   return (
-    // 縦 2 面のスクロールスナップ: [カバー (楽曲ページのプレビュー)][デッキ]。
-    // 初期位置はデッキ面。指を下に動かす = ネイティブスクロールでカバーが
-    // sticky なデッキの上へ 1:1 で被さり、開き切ると実ページへ遷移する。
-    <div
-      ref={scrollerRef}
-      onScroll={handleCoverScroll}
-      className="relative h-dvh snap-y snap-mandatory overflow-y-auto overscroll-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-    >
-      {/* デッキ面のスナップアンカー。sticky なデッキ自身に snap-start を
-          付けるとピン留めでスナップ計算が縮退し、mandatory スナップが常に
-          カバー面へ引き寄せてしまうため、位置が不変の不可視要素で
-          スナップ点だけを定義する */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-0 top-0 h-dvh w-px snap-start snap-always"
-      />
-
-      {/* デッキ面: sticky top でピン留めし、カバーが下から被さってくる */}
-      <div className="sticky top-0 z-10 h-dvh bg-background">
-    {/* overflow-clip: transform で外側に置いた隣のディスクが overflow-hidden だと
-        スクロール可能領域を作ってしまい、フォーカス移動等の scrollIntoView で
-        レイアウト全体が横にずれる。clip はスクロール自体を不可能にする。 */}
     <div className="relative mx-auto flex max-w-md select-none flex-col items-center gap-6 overflow-clip px-4 pb-2 pt-8">
       {/* 次の組の先頭ジャケットを裏で先読み (現在の組は全ディスクが即ロードされる) */}
       {(nextGroup ?? []).slice(0, 2).map((song) => {
@@ -642,7 +554,7 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
           <motion.div
             role="group"
             aria-roledescription="カルーセル"
-            aria-label="同じアーティストの楽曲 (下にスワイプで楽曲ページ)"
+            aria-label="同じアーティストの楽曲"
             className="relative mx-auto"
             style={{ width: DISC_SIZE, height: DISC_SIZE }}
           >
@@ -672,12 +584,7 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
                     // 楽曲ページ表示中は回転を止める (= 6 秒送りも停止し、
                     // ページ側のフル尺再生を邪魔しない)
                     active={isActive && !sheetOpen}
-                    // ドラッグ中・遷移待ちの間は一周しても曲を進めない
-                    // (進むと開くページと音が現在の表示とズレる)
-                    onRotationEnd={() => {
-                      if (dragActiveRef.current || fullModeRef.current) return;
-                      advance(position);
-                    }}
+                    onRotationEnd={() => advance(position)}
                   />
                 </motion.div>
               );
@@ -775,46 +682,6 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
         >
           <Undo2 className="size-5" />
         </button>
-      </div>
-    </div>
-      </div>
-
-      {/* カバー: 現在の曲のプレビュー面。下から被さり、遷移後は
-          実ページ (z-40) が上に載る */}
-      <div className="relative z-20 flex h-dvh snap-start snap-always flex-col items-center justify-center gap-6 bg-background px-8">
-        <div
-          className="relative w-full max-w-xs overflow-hidden rounded-xl bg-zinc-800"
-          style={{ aspectRatio: "1 / 1" }}
-        >
-          {coverSrc ? (
-            <JacketImage
-              src={coverSrc}
-              alt={`${current.title} のジャケット`}
-              fill
-              sizes="20rem"
-              className="object-cover"
-              draggable={false}
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-4xl text-zinc-500">
-              ♪
-            </div>
-          )}
-        </div>
-        <div className="text-center">
-          <h2
-            className="line-clamp-2 text-2xl font-bold"
-            style={{
-              fontFamily:
-                '"LatinUpscale", var(--font-geist-sans), system-ui, sans-serif',
-            }}
-          >
-            {current.title}
-          </h2>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            {current.artist}
-          </p>
-        </div>
       </div>
     </div>
   );

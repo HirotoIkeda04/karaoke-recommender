@@ -34,29 +34,14 @@ function findTouch(touches: TouchList, identifier: number) {
   return null;
 }
 
-interface SongBottomSheetProps {
-  children: React.ReactNode;
-  /**
-   * sheet: 従来の下から出るボトムシート (折りたたみ → 展開)。
-   * page:  ホームの下スワイプ用。上からフル画面のページとしてスライドインし、
-   *        角丸・ハンドル・折りたたみ無し。閉じる時は下へスライドアウト
-   *        (ホーム→ページ→復帰まで「下へ進む」動きで統一するため)。
-   */
-  variant?: "sheet" | "page";
-}
-
-export function SongBottomSheet({
-  children,
-  variant = "sheet",
-}: SongBottomSheetProps) {
-  const isPage = variant === "page";
+export function SongBottomSheet({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const animationControls = useAnimationControls();
   const dragControls = useDragControls();
   const sheetRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [closing, setClosing] = useState(false);
-  const [expanded, setExpanded] = useState(isPage);
+  const [expanded, setExpanded] = useState(false);
   const [draggingSheet, setDraggingSheet] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
@@ -89,23 +74,15 @@ export function SongBottomSheet({
   useEffect(() => {
     if (viewportHeight === 0) return;
 
-    // page モードの進入は GOALS の shorts で採用した質感に合わせる
-    // (40px スライド + フェード, 0.3s ease-out)。閉じる時は下方向へ
-    // スライドアウト (ドラッグの物理的な続き)。
     void animationControls.start({
       y: closing ? viewportHeight : expanded ? 0 : collapsedOffset,
-      ...(isPage ? { opacity: closing ? 0 : 1 } : {}),
-      transition:
-        isPage && !closing
-          ? { duration: 0.3, ease: "easeOut" }
-          : SHEET_TRANSITION,
+      transition: SHEET_TRANSITION,
     });
   }, [
     animationControls,
     closing,
     collapsedOffset,
     expanded,
-    isPage,
     viewportHeight,
   ]);
 
@@ -195,14 +172,9 @@ export function SongBottomSheet({
         if (event.timeStamp - gesture.lastTimestamp > 100) {
           gesture.velocityY = 0;
         }
-        // page モードは素早い下フリックでも閉じられるようにする
-        // (デッキ側の開くジェスチャ (距離 or 速度) と対称にする)
         const shouldClose =
           !cancelled &&
-          (gesture.dragY >= viewportHeight * CLOSE_DISTANCE_RATIO ||
-            (isPage &&
-              gesture.velocityY >= COLLAPSE_VELOCITY &&
-              gesture.dragY >= COLLAPSE_DISTANCE));
+          gesture.dragY >= viewportHeight * CLOSE_DISTANCE_RATIO;
         const shouldCollapse =
           !cancelled &&
           (gesture.dragY >= COLLAPSE_DISTANCE ||
@@ -210,8 +182,7 @@ export function SongBottomSheet({
 
         if (shouldClose) {
           close();
-        } else if (shouldCollapse && !isPage) {
-          // page モードに折りたたみ状態は無い (常にフル画面)
+        } else if (shouldCollapse) {
           setExpanded(false);
         } else {
           void animationControls.start({
@@ -238,7 +209,7 @@ export function SongBottomSheet({
       content.removeEventListener("touchend", onTouchEnd);
       content.removeEventListener("touchcancel", onTouchCancel);
     };
-  }, [animationControls, close, expanded, isPage, viewportHeight]);
+  }, [animationControls, close, expanded, viewportHeight]);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -308,11 +279,7 @@ export function SongBottomSheet({
           aria-modal="true"
           aria-label="楽曲詳細"
           tabIndex={-1}
-          className={
-            isPage
-              ? "absolute inset-x-0 bottom-0 mx-auto flex h-[100dvh] max-h-[100dvh] w-full max-w-xl flex-col overflow-hidden bg-background outline-none"
-              : "absolute inset-x-0 bottom-0 mx-auto flex h-[90dvh] max-h-[90dvh] w-full max-w-xl flex-col overflow-hidden rounded-t-3xl bg-background shadow-[0_-12px_48px_rgba(0,0,0,0.35)] outline-none"
-          }
+          className="absolute inset-x-0 bottom-0 mx-auto flex h-[90dvh] max-h-[90dvh] w-full max-w-xl flex-col overflow-hidden rounded-t-3xl bg-background shadow-[0_-12px_48px_rgba(0,0,0,0.35)] outline-none"
           onKeyDownCapture={(event) => {
             if (
               !expanded &&
@@ -322,7 +289,7 @@ export function SongBottomSheet({
               expand();
             }
           }}
-          initial={isPage ? { y: -40, opacity: 0 } : { y: "100%" }}
+          initial={{ y: "100%" }}
           animate={animationControls}
           drag="y"
           dragControls={dragControls}
@@ -337,11 +304,7 @@ export function SongBottomSheet({
               close();
               return;
             }
-            if (
-              !isPage &&
-              !expanded &&
-              (info.offset.y < -16 || info.velocity.y < -200)
-            ) {
+            if (!expanded && (info.offset.y < -16 || info.velocity.y < -200)) {
               expand();
               return;
             }
@@ -355,22 +318,19 @@ export function SongBottomSheet({
             if (closing) router.back();
           }}
         >
-          {/* page モードはハンドル無し (ページとして表示するため) */}
-          {isPage ? null : (
-            <button
-              type="button"
-              aria-label={
-                expanded
-                  ? "下にスワイプして楽曲詳細を閉じる"
-                  : "上にスワイプして楽曲詳細を広げる"
-              }
-              aria-expanded={expanded}
-              className="absolute inset-x-0 top-0 z-20 flex h-10 touch-none cursor-grab items-start justify-center bg-gradient-to-b from-black/35 to-transparent pt-3 active:cursor-grabbing"
-              onPointerDown={(event) => dragControls.start(event)}
-            >
-              <span className="h-1 w-10 rounded-full bg-white/55 shadow-sm" />
-            </button>
-          )}
+          <button
+            type="button"
+            aria-label={
+              expanded
+                ? "下にスワイプして楽曲詳細を閉じる"
+                : "上にスワイプして楽曲詳細を広げる"
+            }
+            aria-expanded={expanded}
+            className="absolute inset-x-0 top-0 z-20 flex h-10 touch-none cursor-grab items-start justify-center bg-gradient-to-b from-black/35 to-transparent pt-3 active:cursor-grabbing"
+            onPointerDown={(event) => dragControls.start(event)}
+          >
+            <span className="h-1 w-10 rounded-full bg-white/55 shadow-sm" />
+          </button>
           <div
             ref={contentRef}
             className={`min-h-0 flex-1 overscroll-contain pb-[env(safe-area-inset-bottom)] [--song-detail-leading-padding:0rem] [--song-detail-top-padding:2.5rem] [--song-detail-trailing-padding:2.5rem] ${
