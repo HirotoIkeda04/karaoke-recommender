@@ -340,21 +340,22 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
     handleOpenSongPageRef.current = handleOpenSongPage;
   });
 
-  // 下スワイプ = ネイティブスクロール。
-  // ホームを縦 2 面のスクロールスナップ ([カバー][デッキ]) にし、初期位置を
-  // デッキ面 (最下部) に置く。指を下へ動かすとスクロールが上がり、上の
-  // カバー (楽曲ページのプレビュー) が sticky なデッキの上に 1:1 で被さる。
+  // スワイプ = ネイティブスクロール。
+  // ホームを縦 2 面のスクロールスナップ ([デッキ][カバー]) にする。
+  // ボトムシートと同様、指を上へ動かすとカバー (楽曲ページのプレビュー) が
+  // 下から sticky なデッキの上に 1:1 で被さって上がってくる。上端はシートの
+  // 見た目 (角丸/ハンドル) ではなくページとして表示する。
   // ジェスチャ処理をブラウザに任せるため、pointer/touch 実装のような
   // 発火しない系の不具合が構造的に起きない (framer drag → 手動 TouchEvent の
   // 2 方式が実機で発火しなかった経緯からの転換)。
   const scrollerRef = useRef<HTMLDivElement | null>(null);
 
-  // 初期位置とシートを閉じた後の復帰: デッキ面 (最下部) へスナップ。
+  // シートを閉じた後の復帰: デッキ面 (最上部) へ戻す。
   // useLayoutEffect でペイント前に行い、カバーが一瞬見えるのを防ぐ。
   useLayoutEffect(() => {
     const sc = scrollerRef.current;
     if (!sc || sheetOpen) return;
-    sc.scrollTop = sc.scrollHeight - sc.clientHeight;
+    sc.scrollTop = 0;
     dragActiveRef.current = false;
   }, [sheetOpen]);
 
@@ -363,11 +364,11 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
     if (!sc) return;
     const max = sc.scrollHeight - sc.clientHeight;
     if (max <= 0) return;
-    const revealed = max - sc.scrollTop;
+    const revealed = sc.scrollTop;
     // カバーを引き出している間は回転一周による自動送りを止める
     // (進むと開くページと表示中の曲がズレるため)
     dragActiveRef.current = revealed > COVER_ENGAGE_PX;
-    // ほぼ開き切ったら遷移 (スナップで自然に上端まで到達する)
+    // ほぼ被さり切ったら遷移 (スナップで自然に下端まで到達する)
     if (revealed >= max - COVER_ENGAGE_PX) {
       handleOpenSongPageRef.current();
     }
@@ -533,51 +534,17 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
       onScroll={handleCoverScroll}
       className="relative h-dvh snap-y snap-mandatory overflow-y-auto overscroll-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
-      {/* カバー: 現在の曲のプレビュー面。遷移後は実ページ (z-40) が上に載る */}
-      <div className="relative z-20 flex h-dvh snap-start snap-always flex-col items-center justify-center gap-6 bg-background px-8">
-        <div className="relative w-full max-w-xs overflow-hidden rounded-xl bg-zinc-800" style={{ aspectRatio: "1 / 1" }}>
-          {coverSrc ? (
-            <JacketImage
-              src={coverSrc}
-              alt={`${current.title} のジャケット`}
-              fill
-              sizes="20rem"
-              className="object-cover"
-              draggable={false}
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-4xl text-zinc-500">
-              ♪
-            </div>
-          )}
-        </div>
-        <div className="text-center">
-          <h2
-            className="line-clamp-2 text-2xl font-bold"
-            style={{
-              fontFamily:
-                '"LatinUpscale", var(--font-geist-sans), system-ui, sans-serif',
-            }}
-          >
-            {current.title}
-          </h2>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            {current.artist}
-          </p>
-        </div>
-      </div>
-
       {/* デッキ面のスナップアンカー。sticky なデッキ自身に snap-start を
           付けるとピン留めでスナップ計算が縮退し、mandatory スナップが常に
-          カバー面 (scrollTop 0) へ引き戻してしまうため、位置が不変の
-          不可視要素でスナップ点だけを定義する */}
+          カバー面へ引き寄せてしまうため、位置が不変の不可視要素で
+          スナップ点だけを定義する */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-0 top-[100dvh] h-dvh w-px snap-start snap-always"
+        className="pointer-events-none absolute left-0 top-0 h-dvh w-px snap-start snap-always"
       />
 
-      {/* デッキ面: sticky bottom でピン留めし、カバーが上へ被さってくる */}
-      <div className="sticky bottom-0 z-10 h-dvh bg-background">
+      {/* デッキ面: sticky top でピン留めし、カバーが下から被さってくる */}
+      <div className="sticky top-0 z-10 h-dvh bg-background">
     {/* overflow-clip: transform で外側に置いた隣のディスクが overflow-hidden だと
         スクロール可能領域を作ってしまい、フォーカス移動等の scrollIntoView で
         レイアウト全体が横にずれる。clip はスクロール自体を不可能にする。 */}
@@ -810,6 +777,44 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
         </button>
       </div>
     </div>
+      </div>
+
+      {/* カバー: 現在の曲のプレビュー面。下から被さり、遷移後は
+          実ページ (z-40) が上に載る */}
+      <div className="relative z-20 flex h-dvh snap-start snap-always flex-col items-center justify-center gap-6 bg-background px-8">
+        <div
+          className="relative w-full max-w-xs overflow-hidden rounded-xl bg-zinc-800"
+          style={{ aspectRatio: "1 / 1" }}
+        >
+          {coverSrc ? (
+            <JacketImage
+              src={coverSrc}
+              alt={`${current.title} のジャケット`}
+              fill
+              sizes="20rem"
+              className="object-cover"
+              draggable={false}
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-4xl text-zinc-500">
+              ♪
+            </div>
+          )}
+        </div>
+        <div className="text-center">
+          <h2
+            className="line-clamp-2 text-2xl font-bold"
+            style={{
+              fontFamily:
+                '"LatinUpscale", var(--font-geist-sans), system-ui, sans-serif',
+            }}
+          >
+            {current.title}
+          </h2>
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+            {current.artist}
+          </p>
+        </div>
       </div>
     </div>
   );
