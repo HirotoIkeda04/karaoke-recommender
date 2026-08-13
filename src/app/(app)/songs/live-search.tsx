@@ -91,38 +91,41 @@ const RECOMMENDATION_LIMIT = 50;
 type SearchMode = "browse" | "search-empty" | "search-results";
 
 interface RecommendationFilters {
-  highMinMidi: number | null;
-  highMaxMidi: number | null;
+  lowMidi: number | null;
+  highMidi: number | null;
   selectedDecades: number[];
 }
 
 function recommendationCacheKey({
-  highMinMidi,
-  highMaxMidi,
+  lowMidi,
+  highMidi,
   selectedDecades,
 }: RecommendationFilters): string {
   return [
-    highMinMidi ?? "",
-    highMaxMidi ?? "",
+    lowMidi ?? "",
+    highMidi ?? "",
     [...selectedDecades].sort((a, b) => a - b).join(","),
   ].join("|");
 }
 
+// 指定した最低音〜最高音の範囲に曲の音域が収まるかで絞り込む。
+//   - 最低音指定時: range_low_midi がそれ未満 (より低い) の曲を除外
+//   - 最高音指定時: range_high_midi がそれ超 (より高い) の曲を除外
 function matchesSongFilters(
   song: Song,
-  highMinMidi: number | null,
-  highMaxMidi: number | null,
+  lowMidi: number | null,
+  highMidi: number | null,
   selectedDecades: number[],
 ): boolean {
   if (
-    highMinMidi != null &&
-    (song.range_high_midi == null || song.range_high_midi < highMinMidi)
+    lowMidi != null &&
+    (song.range_low_midi == null || song.range_low_midi < lowMidi)
   ) {
     return false;
   }
   if (
-    highMaxMidi != null &&
-    (song.range_high_midi == null || song.range_high_midi > highMaxMidi)
+    highMidi != null &&
+    (song.range_high_midi == null || song.range_high_midi > highMidi)
   ) {
     return false;
   }
@@ -141,8 +144,8 @@ export function LiveSearch({
   rankingPreview = [],
 }: LiveSearchProps) {
   const [query, setQuery] = useState("");
-  const [highMax, setHighMax] = useState("");
-  const [highMin, setHighMin] = useState("");
+  const [highNote, setHighNote] = useState("");
+  const [lowNote, setLowNote] = useState("");
   const [selectedDecades, setSelectedDecades] = useState<number[]>([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [history, setHistory] = useState<RecentItem[]>(() => loadHistory());
@@ -162,8 +165,8 @@ export function LiveSearch({
   const [supabase] = useState(() => createClient());
 
   const knownSet = useMemo(() => new Set(knownSongIds), [knownSongIds]);
-  const highMinMidi = (highMin ? karaokeToMidi(highMin) : null) ?? null;
-  const highMaxMidi = (highMax ? karaokeToMidi(highMax) : null) ?? null;
+  const lowMidi = (lowNote ? karaokeToMidi(lowNote) : null) ?? null;
+  const highMidi = (highNote ? karaokeToMidi(highNote) : null) ?? null;
 
   const filteredRecommendations = useMemo(
     () =>
@@ -171,13 +174,13 @@ export function LiveSearch({
         .filter((song) =>
           matchesSongFilters(
             song,
-            highMinMidi,
-            highMaxMidi,
+            lowMidi,
+            highMidi,
             selectedDecades,
           ),
         )
         .slice(0, RECOMMENDATION_LIMIT),
-    [recommendations, highMinMidi, highMaxMidi, selectedDecades],
+    [recommendations, lowMidi, highMidi, selectedDecades],
   );
 
   const filteredResults = useMemo<SearchResponse | null>(() => {
@@ -187,13 +190,13 @@ export function LiveSearch({
       songs: results.songs.filter((song) =>
         matchesSongFilters(
           song,
-          highMinMidi,
-          highMaxMidi,
+          lowMidi,
+          highMidi,
           selectedDecades,
         ),
       ),
     };
-  }, [results, highMinMidi, highMaxMidi, selectedDecades]);
+  }, [results, lowMidi, highMidi, selectedDecades]);
 
   useEffect(() => {
     queryRef.current = query;
@@ -225,11 +228,11 @@ export function LiveSearch({
       p_limit: RECOMMENDATION_LIMIT,
     };
     if (sortedDecades.length > 0) rpcArgs.p_decades = sortedDecades;
-    if (filters.highMaxMidi != null) {
-      rpcArgs.p_high_max_midi = filters.highMaxMidi;
+    if (filters.highMidi != null) {
+      rpcArgs.p_high_midi = filters.highMidi;
     }
-    if (filters.highMinMidi != null) {
-      rpcArgs.p_high_min_midi = filters.highMinMidi;
+    if (filters.lowMidi != null) {
+      rpcArgs.p_low_midi = filters.lowMidi;
     }
 
     void (async () => {
@@ -265,18 +268,18 @@ export function LiveSearch({
 
     const timer = window.setTimeout(() => {
       loadRecommendations({
-        highMinMidi,
-        highMaxMidi,
+        lowMidi,
+        highMidi,
         selectedDecades,
       });
     }, 120);
 
     return () => window.clearTimeout(timer);
   }, [
-    highMaxMidi,
-    highMinMidi,
+    highMidi,
     isSearchOpen,
     loadRecommendations,
+    lowMidi,
     selectedDecades,
   ]);
 
@@ -374,13 +377,13 @@ export function LiveSearch({
     const timer = window.setTimeout(async () => {
       setLoading(true);
       setErrMsg(null);
-      const highMinMidi = (highMin ? karaokeToMidi(highMin) : undefined) ?? undefined;
-      const highMaxMidi = (highMax ? karaokeToMidi(highMax) : undefined) ?? undefined;
+      const lowMidiArg = (lowNote ? karaokeToMidi(lowNote) : undefined) ?? undefined;
+      const highMidiArg = (highNote ? karaokeToMidi(highNote) : undefined) ?? undefined;
       const { data, error } = await supabase
         .rpc("search_songs_and_artists", {
           p_q: trimmedQ,
-          p_high_min_midi: highMinMidi,
-          p_high_max_midi: highMaxMidi,
+          p_low_midi: lowMidiArg,
+          p_high_midi: highMidiArg,
         })
         .abortSignal(ctrl.signal);
       if (ctrl.signal.aborted) return;
@@ -397,7 +400,7 @@ export function LiveSearch({
       ctrl.abort();
       window.clearTimeout(timer);
     };
-  }, [trimmedQ, highMin, highMax, supabase]);
+  }, [trimmedQ, lowNote, highNote, supabase]);
 
   // 検索タブを「通常」「検索を開いた未入力」「検索を開いた入力あり」の
   // 3 状態に分ける。空白も入力として扱い、入力あり画面を維持する。
@@ -519,11 +522,11 @@ export function LiveSearch({
             />
             <div className="space-y-3">
               <PitchRangePicker
-                min={highMin}
-                max={highMax}
-                onChange={(min, max) => {
-                  setHighMin(min);
-                  setHighMax(max);
+                low={lowNote}
+                high={highNote}
+                onChange={(low, high) => {
+                  setLowNote(low);
+                  setHighNote(high);
                 }}
               />
               <DecadeChips
@@ -536,7 +539,7 @@ export function LiveSearch({
               loading={recommendationsLoading}
               hasError={recommendationsError}
               hasActiveFilters={Boolean(
-                highMin || highMax || selectedDecades.length > 0
+                lowNote || highNote || selectedDecades.length > 0
               )}
               ratings={ratings}
               knownSet={knownSet}
@@ -547,11 +550,11 @@ export function LiveSearch({
           <>
             <div className="space-y-3">
               <PitchRangePicker
-                min={highMin}
-                max={highMax}
-                onChange={(min, max) => {
-                  setHighMin(min);
-                  setHighMax(max);
+                low={lowNote}
+                high={highNote}
+                onChange={(low, high) => {
+                  setLowNote(low);
+                  setHighNote(high);
                 }}
               />
               <DecadeChips

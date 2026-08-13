@@ -8,7 +8,9 @@ import { createPortal } from "react-dom";
 import { KARAOKE_NOTE_OPTIONS, karaokeToMidi } from "@/lib/note";
 
 const WHEEL_ITEM_HEIGHT = 44;
-const DEFAULT_WHEEL_NOTATION = "hiA";
+// 未指定時のホイール初期位置。曲データの分布中央付近に合わせる。
+const DEFAULT_LOW_WHEEL_NOTATION = "mid1E";
+const DEFAULT_HIGH_WHEEL_NOTATION = "hiA";
 const SHEET_TRANSITION = {
   duration: 0.24,
   ease: [0.32, 0.72, 0, 1] as [number, number, number, number],
@@ -22,30 +24,32 @@ const WHEEL_OPTIONS = [
 ] as const;
 
 interface PitchRangePickerProps {
-  min: string;
-  max: string;
-  onChange: (min: string, max: string) => void;
+  low: string;
+  high: string;
+  onChange: (low: string, high: string) => void;
 }
 
-function rangeLabel(min: string, max: string) {
-  if (!min && !max) return "範囲を指定";
-  return `${min || "下限なし"} 〜 ${max || "上限なし"}`;
+function rangeLabel(low: string, high: string) {
+  if (!low && !high) return "範囲を指定";
+  return `${low || "下限なし"} 〜 ${high || "上限なし"}`;
 }
 
 function PitchWheel({
   label,
   value,
+  defaultNotation,
   onChange,
 }: {
   label: string;
   value: string;
+  defaultNotation: string;
   onChange: (value: string) => void;
 }) {
   const wheelId = useId();
   const wheelRef = useRef<HTMLDivElement>(null);
   const settleTimerRef = useRef<number | null>(null);
   const userScrollingRef = useRef(false);
-  const wheelValue = value || DEFAULT_WHEEL_NOTATION;
+  const wheelValue = value || defaultNotation;
   const selectedIndex = Math.max(
     0,
     WHEEL_OPTIONS.findIndex((option) => option.notation === wheelValue),
@@ -191,13 +195,13 @@ function PitchWheel({
   );
 }
 
-export function PitchRangePicker({ min, max, onChange }: PitchRangePickerProps) {
+export function PitchRangePicker({ low, high, onChange }: PitchRangePickerProps) {
   const titleId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
-  const [draftMin, setDraftMin] = useState(min);
-  const [draftMax, setDraftMax] = useState(max);
+  const [draftLow, setDraftLow] = useState(low);
+  const [draftHigh, setDraftHigh] = useState(high);
 
   const close = useCallback(() => setOpen(false), []);
 
@@ -244,26 +248,26 @@ export function PitchRangePicker({ min, max, onChange }: PitchRangePickerProps) 
   }, [close, open]);
 
   const openPicker = () => {
-    setDraftMin(min);
-    setDraftMax(max);
+    setDraftLow(low);
+    setDraftHigh(high);
     setOpen(true);
   };
 
-  const changeDraftMin = (notation: string) => {
-    setDraftMin(notation);
-    const nextMin = karaokeToMidi(notation);
-    const currentMax = karaokeToMidi(draftMax);
-    if (nextMin != null && currentMax != null && nextMin > currentMax) {
-      setDraftMax(notation);
+  const changeDraftLow = (notation: string) => {
+    setDraftLow(notation);
+    const nextLow = karaokeToMidi(notation);
+    const currentHigh = karaokeToMidi(draftHigh);
+    if (nextLow != null && currentHigh != null && nextLow > currentHigh) {
+      setDraftHigh(notation);
     }
   };
 
-  const changeDraftMax = (notation: string) => {
-    setDraftMax(notation);
-    const nextMax = karaokeToMidi(notation);
-    const currentMin = karaokeToMidi(draftMin);
-    if (nextMax != null && currentMin != null && nextMax < currentMin) {
-      setDraftMin(notation);
+  const changeDraftHigh = (notation: string) => {
+    setDraftHigh(notation);
+    const nextHigh = karaokeToMidi(notation);
+    const currentLow = karaokeToMidi(draftLow);
+    if (nextHigh != null && currentLow != null && nextHigh < currentLow) {
+      setDraftLow(notation);
     }
   };
 
@@ -279,7 +283,7 @@ export function PitchRangePicker({ min, max, onChange }: PitchRangePickerProps) 
         >
           <button
             type="button"
-            aria-label="最高音の選択を閉じる"
+            aria-label="音域の選択を閉じる"
             className="absolute inset-0 size-full bg-black/65 backdrop-blur-[2px]"
             onClick={close}
           />
@@ -300,7 +304,7 @@ export function PitchRangePicker({ min, max, onChange }: PitchRangePickerProps) 
             <div className="flex items-center justify-between">
               <div>
                 <h2 id={titleId} className="text-base font-bold text-zinc-950 dark:text-zinc-50">
-                  最高音の範囲
+                  音域の範囲
                 </h2>
               </div>
               <button
@@ -314,11 +318,21 @@ export function PitchRangePicker({ min, max, onChange }: PitchRangePickerProps) 
             </div>
 
             <div className="mt-4 flex items-center gap-2">
-              <PitchWheel label="下限" value={draftMin} onChange={changeDraftMin} />
+              <PitchWheel
+                label="最低音"
+                value={draftLow}
+                defaultNotation={DEFAULT_LOW_WHEEL_NOTATION}
+                onChange={changeDraftLow}
+              />
               <span className="mt-6 shrink-0 text-sm font-bold text-zinc-400 dark:text-zinc-500">
                 〜
               </span>
-              <PitchWheel label="上限" value={draftMax} onChange={changeDraftMax} />
+              <PitchWheel
+                label="最高音"
+                value={draftHigh}
+                defaultNotation={DEFAULT_HIGH_WHEEL_NOTATION}
+                onChange={changeDraftHigh}
+              />
             </div>
 
             <div className="mt-5">
@@ -326,7 +340,7 @@ export function PitchRangePicker({ min, max, onChange }: PitchRangePickerProps) 
                 type="button"
                 className="w-full rounded-xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white active:scale-[0.98] dark:bg-zinc-50 dark:text-zinc-950"
                 onClick={() => {
-                  onChange(draftMin, draftMax);
+                  onChange(draftLow, draftHigh);
                   close();
                 }}
               >
@@ -352,10 +366,10 @@ export function PitchRangePicker({ min, max, onChange }: PitchRangePickerProps) 
       >
         <span className="flex min-w-0 items-baseline gap-2">
           <span className="shrink-0 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-            最高音
+            音域
           </span>
           <span className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-            {rangeLabel(min, max)}
+            {rangeLabel(low, high)}
           </span>
         </span>
         <ChevronDown

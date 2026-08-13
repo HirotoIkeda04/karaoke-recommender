@@ -829,9 +829,9 @@ export type Database = {
       get_search_recommendations: {
         Args: {
           p_decades?: number[]
-          p_high_max_midi?: number
-          p_high_min_midi?: number
+          p_high_midi?: number
           p_limit?: number
+          p_low_midi?: number
         }
         Returns: Json
       }
@@ -960,8 +960,8 @@ export type Database = {
       search_songs_and_artists: {
         Args: {
           p_artist_limit?: number
-          p_high_max_midi?: number
-          p_high_min_midi?: number
+          p_high_midi?: number
+          p_low_midi?: number
           p_q: string
           p_song_limit?: number
         }
