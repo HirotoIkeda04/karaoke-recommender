@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Check,
+  Dices,
   FastForward,
   Minus,
   SkipForward,
@@ -22,7 +23,7 @@ import { triggerHaptic } from "@/lib/haptics";
 import { triggerRatingSound } from "@/lib/rating-sound";
 import type { Database } from "@/types/database";
 
-import { markSkipped, rateSong, unrateSong } from "./actions";
+import { markSkipped, rateSong, shuffleDeck, unrateSong } from "./actions";
 
 type Song = Database["public"]["Tables"]["songs"]["Row"];
 type Rating = Database["public"]["Enums"]["rating_type"];
@@ -153,19 +154,29 @@ const RATINGS: ReadonlyArray<{
 interface RecordDeckProps {
   /** 組 (同一アーティストの楽曲群) の配列。各組は [推薦シード, ...人気順] */
   initialGroups: Song[][];
+  /**
+   * cookie に保存すべきデッキトークン。保存済みの内容と同じなら null。
+   * Server Component からは cookie を書けないので、マウント後に
+   * /api/deck へ POST して保存する (次に開いた時に同じデッキが復元される)。
+   */
+  persistToken: string | null;
 }
 
 
-export function RecordDeck({ initialGroups }: RecordDeckProps) {
+export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const pathname = usePathname();
   // RecordDeck はホーム (/) でのみマウントされるので、マウントされたまま
   // pathname が /songs/[id] になっていれば、楽曲ページ/シートが上に
   // 開いている (intercepting route) と判定できる。
   const sheetOpen = /^\/songs\/[^/]+\/?$/.test(pathname);
-  const [groups] = useState(initialGroups);
+  // サーバーから渡された組は初期値としてだけ使う (シャッフル以外では
+  // 差し替えない)。評価のたびに走る revalidatePath でホームが再レンダー
+  // されても、表示中のデッキはそのまま維持される。
+  const [groups, setGroups] = useState(initialGroups);
   const [position, setPosition] = useState<DeckPosition>({ group: 0, song: 0 });
   const [lastAction, setLastAction] = useState<LastAction | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [shuffling, setShuffling] = useState(false);
   // 試聴 ON/OFF (ユーザーの意思)。デフォルト ON。ON でも音源が無い曲は
   // 無音で回る。ブラウザに自動再生をブロックされた場合は
   // needsGestureRetryRef を立て、最初の画面操作で再生を再試行する。
@@ -197,6 +208,21 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
     currentRef.current = current;
     audioOnRef.current = audioOn;
   });
+
+  // 新しく組まれたデッキを cookie に保存する (レンダー中は cookie を
+  // 書けないのでここから)。保存済みと同じ内容なら persistToken は null。
+  // 失敗しても表示中のデッキには影響しない (次回開いた時に組み直しになるだけ)。
+  // keepalive: 表示直後にタブを切り替えられてもこの保存だけは完了させる
+  // (ここで取りこぼすと、まさに切り替え先から戻った時に組み直しになる)。
+  useEffect(() => {
+    if (!persistToken) return;
+    void fetch("/api/deck", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ token: persistToken }),
+      keepalive: true,
+    }).catch(() => {});
+  }, [persistToken]);
 
   // ホームにいる間は body スクロールをロック (回転中の誤スクロール防止)。
   useEffect(() => {
@@ -458,6 +484,29 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
     setPosition({ group: position.group + 1, song: 0 });
   };
 
+  /**
+   * デッキを引き直す。推薦が入れ替わるのは基本ここだけ (あとは TTL 経過)。
+   * サーバー側で cookie も更新されるので、次にホームを開いた時もこの
+   * デッキが復元される。
+   */
+  const handleShuffle = () => {
+    if (shuffling) return;
+    triggerHaptic();
+    setError(null);
+    setShuffling(true);
+    startTransition(async () => {
+      const result = await shuffleDeck();
+      setShuffling(false);
+      if (!result.ok || !result.groups) {
+        setError(result.error ?? "シャッフルに失敗しました");
+        return;
+      }
+      setGroups(result.groups);
+      setPosition({ group: 0, song: 0 });
+      setLastAction(null);
+    });
+  };
+
   const handleUndo = () => {
     if (!lastAction) return;
     triggerHaptic();
@@ -479,15 +528,19 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
       <div className="mx-auto flex min-h-[70dvh] max-w-md flex-col items-center justify-center gap-4 p-8 text-center">
         <h1 className="text-xl font-semibold">このデッキは終了しました 🎉</h1>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          ページを再読込すると次の組が表示されます。
+          「次のデッキへ」で新しい組を引き直せます。
         </p>
         <Button
-          onClick={() => window.location.reload()}
+          onClick={handleShuffle}
+          disabled={shuffling}
           size="lg"
           className="h-14 px-8 text-lg font-bold"
         >
           次のデッキへ
         </Button>
+        {error ? (
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        ) : null}
       </div>
     );
   }
@@ -572,8 +625,20 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
       </div>
 
       {/* 組単位で左へ流れる。中は曲単位のカルーセル + 曲情報。
-          消音トグルは組遷移で消えないよう AnimatePresence の外に重ねる */}
+          シャッフル / 消音トグルは組遷移で消えないよう AnimatePresence の外に重ねる */}
       <div className="relative w-full">
+        <button
+          type="button"
+          onClick={handleShuffle}
+          disabled={shuffling}
+          aria-label="デッキをシャッフルする"
+          className="absolute left-1 top-0 z-20 flex size-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition hover:bg-black/60 active:bg-black/70 disabled:opacity-60"
+        >
+          <Dices
+            className={`size-5 ${shuffling ? "animate-spin" : ""}`}
+            aria-hidden
+          />
+        </button>
         <button
           type="button"
           onClick={handleToggleAudio}

@@ -1,11 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 
+import { DECK_COOKIE, DECK_COOKIE_OPTIONS, buildDeck } from "@/lib/deck";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
 type Rating = Database["public"]["Enums"]["rating_type"];
+type Song = Database["public"]["Tables"]["songs"]["Row"];
 
 export interface RateSongInput {
   songId: string;
@@ -107,4 +110,30 @@ export async function markSkipped(songId: string): Promise<RateSongResult> {
   // skip は library/songs ページに表示されないので、トップだけ revalidate。
   revalidatePath("/");
   return { ok: true };
+}
+
+export interface ShuffleDeckResult {
+  ok: boolean;
+  groups?: Song[][];
+  error?: string;
+}
+
+/**
+ * デッキを組み直す (サイコロボタン)。cookie を無視して新しいシードを引き、
+ * その場で cookie も更新する。返した組をクライアントが差し替えるので、
+ * 画面遷移や再読込は不要。
+ */
+export async function shuffleDeck(): Promise<ShuffleDeckResult> {
+  const supabase = await createClient();
+  const deck = await buildDeck(supabase, null);
+  if (deck.groups.length === 0) {
+    return {
+      ok: false,
+      error: deck.error ?? "他に推薦できる曲がありませんでした",
+    };
+  }
+  if (deck.persistToken) {
+    (await cookies()).set(DECK_COOKIE, deck.persistToken, DECK_COOKIE_OPTIONS);
+  }
+  return { ok: true, groups: deck.groups };
 }
