@@ -170,6 +170,11 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
   // 無音で回る。ブラウザに自動再生をブロックされた場合は
   // needsGestureRetryRef を立て、最初の画面操作で再生を再試行する。
   const [audioOn, setAudioOn] = useState(true);
+  // 実際に音を出せる状態か (自動再生ブロックが解除済みか)。意思 (audioOn)
+  // とは別に持ち、「ON のつもりだがブロックで鳴っていない」間は消音アイコン
+  // を見せて実態と一致させる。play() の成否で needsGestureRetryRef と
+  // 同時に更新される (ref はリスナー用の同期値、これは表示用)。
+  const [audioBlocked, setAudioBlocked] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   // 再生中の曲 id。タップ起点の再生と曲送り effect の二重再生を防ぐ。
   const playingSongIdRef = useRef<string | null>(null);
@@ -237,6 +242,7 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
     void audio.play().then(
       () => {
         needsGestureRetryRef.current = false;
+        setAudioBlocked(false);
       },
       (err: unknown) => {
         // pause() や src 差し替えによる自己中断 (AbortError) は正常系なので
@@ -244,6 +250,7 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
         // ユーザー操作 (ジェスチャ文脈) での再試行を予約する。
         if ((err as DOMException)?.name === "NotAllowedError") {
           needsGestureRetryRef.current = true;
+          setAudioBlocked(true);
         }
       },
     );
@@ -275,6 +282,7 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
         void audio.play().then(
           () => {
             needsGestureRetryRef.current = false;
+            setAudioBlocked(false);
           },
           () => {},
         );
@@ -352,18 +360,22 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
   }, []);
 
   /**
-   * レコードタップで試聴の再生/停止を切り替える。
+   * 音量ボタンで試聴の再生/停止を切り替える。
    * iOS Safari はユーザー操作中に play() した要素しか以後のプログラム再生を
    * 許さないため、初回タップでは必ずこのハンドラ内 (ジェスチャ文脈) で
    * play() を呼ぶ。音源が無い曲でも無音 WAV でアンロックしておく。
-   * state は closure ではなく ref から読む (退場ツリーからの stale タップ対策)。
+   * 分岐は「タップ時にアイコンが何を見せていたか」= 描画済み state で決める
+   * (このボタンは AnimatePresence の外なので closure は常に最新)。ブロック中
+   * (意思 ON だが無音 = 消音アイコン表示) のタップを ref の生値で判定すると、
+   * 直前に走る画面タップ復帰 (retryOnGesture) との競争で停止/再生が
+   * 不安定になる。見えていたアイコンの意味どおりに動かす。
    */
   const handleToggleAudio = () => {
     const song = currentRef.current;
     if (!song) return;
     triggerHaptic();
     const audio = ensureAudio();
-    if (audioOnRef.current) {
+    if (audioOn && !audioBlocked) {
       audio.pause();
       playingSongIdRef.current = null;
       setAudioOn(false);
@@ -375,7 +387,13 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
     } else {
       playingSongIdRef.current = song.id;
       audio.src = SILENT_WAV;
-      void audio.play().catch(() => {});
+      void audio.play().then(
+        () => {
+          needsGestureRetryRef.current = false;
+          setAudioBlocked(false);
+        },
+        () => {},
+      );
     }
   };
 
@@ -559,10 +577,12 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
         <button
           type="button"
           onClick={handleToggleAudio}
-          aria-label={audioOn ? "試聴を停止する" : "試聴を再生する"}
+          aria-label={
+            audioOn && !audioBlocked ? "試聴を停止する" : "試聴を再生する"
+          }
           className="absolute right-1 top-0 z-20 flex size-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition hover:bg-black/60 active:bg-black/70"
         >
-          {audioOn ? (
+          {audioOn && !audioBlocked ? (
             <Volume2 className="size-5" aria-hidden />
           ) : (
             <VolumeX className="size-5" aria-hidden />
