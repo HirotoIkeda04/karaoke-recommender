@@ -173,7 +173,9 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   // 再生中の曲 id。タップ起点の再生と曲送り effect の二重再生を防ぐ。
   const playingSongIdRef = useRef<string | null>(null);
-  const needsGestureRetryRef = useRef(false);
+  // 初期値 true: マウント直後の play() の reject が届く前の素早いタップでも
+  // ジェスチャ再試行が動くようにする (鳴っていれば再試行側の guard が弾く)。
+  const needsGestureRetryRef = useRef(true);
   // 楽曲ページ (シート) が開いている間のフル尺再生モード
   // (6 秒フェード/カット無効)
   const fullModeRef = useRef(false);
@@ -248,26 +250,43 @@ export function RecordDeck({ initialGroups }: RecordDeckProps) {
   };
 
   // 自動再生がブロックされた場合の復帰: 最初の画面操作 (どこでも) の
-  // ジェスチャ文脈内で play() し直す。pointerdown で活性化しない環境の
-  // ために click でも試み、成功するまでフラグは playSnippet 側で立ち直る。
+  // ジェスチャ文脈内で play() し直す。iOS Safari は touchstart 相当
+  // (pointerdown) の間はメディア再生を許可しないため、活性化が期待できる
+  // pointerup と click の両方で試みる。フラグはここでは下ろさず、再生
+  // 成功時に playSnippet 側で下ろす (先に下ろすと、失敗の非同期 reject が
+  // click 通過後にフラグを立て直し、何度タップしても鳴らないループになる)。
+  // pointerup と click が連続して二重に走った場合は、src の差し替えが
+  // 先行の play() を AbortError (無視される正常系) で打ち切るだけで無害。
   useEffect(() => {
     const retryOnGesture = () => {
       if (!needsGestureRetryRef.current || !audioOnRef.current) return;
       const song = currentRef.current;
       if (!song) return;
-      needsGestureRetryRef.current = false;
       const audio = ensureAudio();
       // 既に現在の曲が鳴っているなら (stale フラグ) 頭出しし直さない
       if (playingSongIdRef.current === song.id && !audio.paused) return;
-      playSnippet(audio, song);
+      if (song.itunes_preview_url) {
+        playSnippet(audio, song);
+      } else {
+        // 音源が無い曲でも無音 WAV で要素をアンロックし、以後の曲送りの
+        // プログラム再生 (音源のある曲) が通るようにしておく
+        playingSongIdRef.current = song.id;
+        audio.src = SILENT_WAV;
+        void audio.play().then(
+          () => {
+            needsGestureRetryRef.current = false;
+          },
+          () => {},
+        );
+      }
     };
-    document.addEventListener("pointerdown", retryOnGesture, true);
+    document.addEventListener("pointerup", retryOnGesture, true);
     document.addEventListener("click", retryOnGesture, true);
     return () => {
-      document.removeEventListener("pointerdown", retryOnGesture, true);
+      document.removeEventListener("pointerup", retryOnGesture, true);
       document.removeEventListener("click", retryOnGesture, true);
     };
-     
+
   }, []);
 
   // 曲が変わったら試聴音源を差し替える (タップ起点の再生分はスキップ)。
