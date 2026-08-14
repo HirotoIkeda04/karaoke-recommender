@@ -29,7 +29,7 @@ export default function Loading() {
         className="animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800"
         style={{
           width:
-            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 31.5rem - env(safe-area-inset-bottom))))",
+            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.75rem - env(safe-area-inset-bottom))))",
           aspectRatio: "1 / 1",
         }}
       />

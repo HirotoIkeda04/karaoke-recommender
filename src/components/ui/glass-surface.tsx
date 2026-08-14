@@ -102,7 +102,7 @@ const OPTICS: Record<GlassVariant, Partial<GlassOptics>> = {
  * 値は backdrop-filter: brightness() に渡る係数。
  */
 const DIM: Record<GlassVariant, number | null> = {
-  bar: 0.12,
+  bar: 0.3,
   control: null,
   overlay: null,
 };

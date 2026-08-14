@@ -52,11 +52,13 @@ const SILENT_WAV =
 /**
  * ディスク径。横幅いっぱい (左右 1.75rem マージン) を基本に、
  * 縦に収まらない小さい画面ではヘッダー + 組カルーセル + 曲情報 +
- * ボタン群 + ナビの予約分 (約 31.5rem) を引いた残りへ縮める。上限 20rem。
+ * ボタン群 + ナビの予約分 (約 32.75rem) を引いた残りへ縮める。上限 20rem。
  * loading.tsx の skeleton と式を揃えること。
+ * ナビを浮かせたカプセルにした分 (safe-area 無しの端末で最大 1.25rem)
+ * 予約を 31.5rem から増やしてある。
  */
 const DISC_SIZE =
-  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 31.5rem - env(safe-area-inset-bottom))))";
+  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.75rem - env(safe-area-inset-bottom))))";
 
 /**
  * カルーセルの隣接ディスク間隔 (自身の幅に対する %)。

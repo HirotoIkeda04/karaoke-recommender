@@ -26,7 +26,9 @@ export default async function AppLayout({
     //   100vh のような固定値ではなく現在の表示領域を毎フレーム反映する)
     <div className="flex min-h-dvh flex-col">
       <AppHeader />
-      {/* main の bottom padding: BottomNav の高さ (~5rem) + ホームインジケータ safe-area */}
+      {/* main の bottom padding: 浮いた BottomNav (バー 4rem + 下の余白
+          max(0.75rem, safe-area)) を必ず上回る値。5rem + safe-area なら
+          safe-area の有無どちらでも 0.25rem 以上のクリアランスが残る。 */}
       <main className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))]">
         {children}
       </main>
