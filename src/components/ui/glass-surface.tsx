@@ -35,22 +35,27 @@ type GlassVariant = "bar" | "control" | "overlay";
 
 /**
  * ダーク UI (背景 #121212) 前提のチューニング。
- * brightness は正で白ヴェール / 負で黒ヴェール。
- * このアプリは dark 固定でアイコンが白なので、明るいジャケット画像が背後に
- * 来ても白が飛ばないよう、面積の大きい bar は黒ヴェール側に振る。逆に小さな
- * control は暗い背景の上で「浮いている」ことが伝わる必要があるので白側。
+ * ライブラリの `brightness` は「乗せるヴェールの不透明度」(正で白 / 負で黒) で、
+ * 背景色に依らず一定量を足し引きする。これだけだと二律背反になる:
+ *   黒ヴェール … 明るい背景でも白アイコンが読めるが、暗い背景ではただの黒帯。
+ *   白ヴェール … 暗い背景で「浮いたガラス」に見えるが、白い背景では溶けて消える。
+ * ボトムナビは常時表示で背後が何でも起こり得るので、下に敷いた dim 層の
+ * `backdrop-filter: brightness()` (乗算) で先に背景を沈めてから白ヴェールを
+ * 乗せる。乗算は明るい背景ほど強く効くので、
+ *   #121212 → やや明るい (= 背景から浮く)  /  白 → 中間グレー (= アイコンが読める)
+ * の両立になる。これは iOS のダーク系マテリアルの振る舞いに近い。
  */
 const OPTICS: Record<GlassVariant, Partial<GlassOptics>> = {
   // ボトムナビのような横長で面積の大きいバー。
   // 屈折を強くすると縁で背景が伸びて安っぽくなるので、ブラーと彩度を主役にする。
   bar: {
-    frost: 18,
-    saturate: 1.8,
-    brightness: -0.55,
-    specular: 0.85,
-    sheen: 0.26,
-    sheenWidth: 12,
-    glow: 0.07,
+    frost: 20,
+    saturate: 1.9,
+    brightness: 0.1,
+    specular: 1.1,
+    sheen: 0.4,
+    sheenWidth: 14,
+    glow: 0.1,
     depth: 0.4,
     curvature: 0.2,
     bend: 0.3,
@@ -92,6 +97,16 @@ const OPTICS: Record<GlassVariant, Partial<GlassOptics>> = {
   },
 };
 
+/**
+ * ガラスの下に敷く乗算の減光層 (variant ごと、null なら敷かない)。
+ * 値は backdrop-filter: brightness() に渡る係数。
+ */
+const DIM: Record<GlassVariant, number | null> = {
+  bar: 0.12,
+  control: null,
+  overlay: null,
+};
+
 interface GlassSurfaceProps {
   variant?: GlassVariant;
   /** 角丸 (px)。ピル / 正円は 9999 を渡す。 */
@@ -104,28 +119,47 @@ export function GlassSurface({
   radius = 9999,
   className,
 }: GlassSurfaceProps) {
+  const dim = DIM[variant];
   return (
-    <Glass
-      aria-hidden
-      className={className}
-      radius={radius}
-      optics={OPTICS[variant]}
-      style={{
-        // <Glass> の既定は display:inline-block なので、必ず style 側で上書きする
-        // (インラインスタイルなので className では勝てない)。
-        display: "block",
-        position: "absolute",
-        inset: 0,
-        borderRadius: radius,
-        pointerEvents: "none",
-      }}
-    >
-      {/* <Glass> は children が null だと material (backdrop-filter) モードに
-          入らず、背後を複製して屈折させるコピーモードへ落ちる。コピーモードの
-          ラッパーは width:fit-content なので、中身が無いこの使い方だと幅 0 に
-          潰れてガラスが一切描かれない。ダミーの子を 1 つ置いて material を
-          選ばせる (display:none なのでレイアウトにも描画にも影響しない)。 */}
-      <span aria-hidden style={{ display: "none" }} />
-    </Glass>
+    <>
+      {dim != null ? (
+        // ガラスより先に置くことで背面に入り、ガラスの backdrop-filter は
+        // この層が減光した結果をサンプリングする (backdrop-filter は描画順に
+        // 合成されるので重ねられる)。
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: radius,
+            pointerEvents: "none",
+            backdropFilter: `brightness(${dim})`,
+            WebkitBackdropFilter: `brightness(${dim})`,
+          }}
+        />
+      ) : null}
+      <Glass
+        aria-hidden
+        className={className}
+        radius={radius}
+        optics={OPTICS[variant]}
+        style={{
+          // <Glass> の既定は display:inline-block なので、必ず style 側で上書きする
+          // (インラインスタイルなので className では勝てない)。
+          display: "block",
+          position: "absolute",
+          inset: 0,
+          borderRadius: radius,
+          pointerEvents: "none",
+        }}
+      >
+        {/* <Glass> は children が null だと material (backdrop-filter) モードに
+            入らず、背後を複製して屈折させるコピーモードへ落ちる。コピーモードの
+            ラッパーは width:fit-content なので、中身が無いこの使い方だと幅 0 に
+            潰れてガラスが一切描かれない。ダミーの子を 1 つ置いて material を
+            選ばせる (display:none なのでレイアウトにも描画にも影響しない)。 */}
+        <span aria-hidden style={{ display: "none" }} />
+      </Glass>
+    </>
   );
 }
