@@ -18,6 +18,7 @@ import { startTransition, useEffect, useRef, useState } from "react";
 
 import { DumbbellMini } from "@/components/icons/dumbbell-mini";
 import { Button } from "@/components/ui/button";
+import { GlassSurface } from "@/components/ui/glass-surface";
 import { JacketImage } from "@/components/ui/jacket-image";
 import { triggerHaptic } from "@/lib/haptics";
 import { triggerRatingSound } from "@/lib/rating-sound";
@@ -632,10 +633,13 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           onClick={handleShuffle}
           disabled={shuffling}
           aria-label="デッキをシャッフルする"
-          className="absolute left-1 top-0 z-20 flex size-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition hover:bg-black/60 active:bg-black/70 disabled:opacity-60"
+          // bg-black/30 はガラスの下に敷く色。ジャケット画像が明るいと白アイコンが
+          // 飛ぶので、屈折させる背景そのものを一段暗くしてコントラストを確保する。
+          className="absolute left-1 top-0 z-20 flex size-10 items-center justify-center rounded-full bg-black/45 text-white transition active:brightness-90 disabled:opacity-60"
         >
+          <GlassSurface variant="overlay" />
           <Dices
-            className={`size-5 ${shuffling ? "animate-spin" : ""}`}
+            className={`relative size-5 ${shuffling ? "animate-spin" : ""}`}
             aria-hidden
           />
         </button>
@@ -645,12 +649,13 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           aria-label={
             audioOn && !audioBlocked ? "試聴を停止する" : "試聴を再生する"
           }
-          className="absolute right-1 top-0 z-20 flex size-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition hover:bg-black/60 active:bg-black/70"
+          className="absolute right-1 top-0 z-20 flex size-10 items-center justify-center rounded-full bg-black/45 text-white transition active:brightness-90"
         >
+          <GlassSurface variant="overlay" />
           {audioOn && !audioBlocked ? (
-            <Volume2 className="size-5" aria-hidden />
+            <Volume2 className="relative size-5" aria-hidden />
           ) : (
-            <VolumeX className="size-5" aria-hidden />
+            <VolumeX className="relative size-5" aria-hidden />
           )}
         </button>
         <AnimatePresence mode="wait" initial={false}>
@@ -716,8 +721,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
               <h2
                 className="line-clamp-1 text-xl font-semibold"
                 style={{
-                  fontFamily:
-                    '"LatinUpscale", var(--font-geist-sans), system-ui, sans-serif',
+                  fontFamily: '"LatinUpscale", var(--font-sans)',
                 }}
               >
                 <span className="mr-2 font-mono text-base text-zinc-500 dark:text-zinc-400">
@@ -772,27 +776,30 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         <button
           type="button"
           onClick={handleSkipSong}
-          className="flex h-14 items-center justify-center gap-1.5 rounded-full bg-zinc-100 text-sm font-medium text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-300 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+          className="relative flex h-14 items-center justify-center gap-1.5 rounded-full text-sm font-medium text-zinc-700 transition active:brightness-90 dark:text-zinc-100"
         >
-          <SkipForward className="size-4" aria-hidden />
-          1曲スキップ
+          <GlassSurface variant="control" />
+          <SkipForward className="relative size-4" aria-hidden />
+          <span className="relative">1曲スキップ</span>
         </button>
         <button
           type="button"
           onClick={handleSkipGroup}
-          className="flex h-14 items-center justify-center gap-1.5 rounded-full bg-zinc-100 text-sm font-medium text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-300 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+          className="relative flex h-14 items-center justify-center gap-1.5 rounded-full text-sm font-medium text-zinc-700 transition active:brightness-90 dark:text-zinc-100"
         >
-          <FastForward className="size-4" aria-hidden />
-          次の組へ
+          <GlassSurface variant="control" />
+          <FastForward className="relative size-4" aria-hidden />
+          <span className="relative">次の組へ</span>
         </button>
         <button
           type="button"
           onClick={handleUndo}
           disabled={!lastAction}
-          className="mx-auto flex size-14 items-center justify-center rounded-full bg-zinc-100 text-zinc-700 transition hover:bg-zinc-200 active:bg-zinc-300 disabled:opacity-30 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+          className="relative mx-auto flex size-14 items-center justify-center rounded-full text-zinc-700 transition active:brightness-90 disabled:opacity-30 dark:text-zinc-100"
           aria-label="直前の操作を取り消して戻る"
         >
-          <Undo2 className="size-5" />
+          <GlassSurface variant="control" />
+          <Undo2 className="relative size-5" />
         </button>
       </div>
     </div>

@@ -8,7 +8,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -48,7 +48,26 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* iOS 準拠のフォントスタック。
+ * @theme inline 側は `--font-sans: var(--font-sans)` と自己参照しているだけなので、
+ * ここで :root に実体を定義しないと font-family が空になり、ブラウザ既定フォントに
+ * 落ちる (以前はこの状態だった)。
+ *
+ *   -apple-system / BlinkMacSystemFont : iOS・macOS では SF Pro そのものに解決される。
+ *                                        実機 (PWA の主ターゲット) はここで確定。
+ *   var(--font-inter)                  : Android / Windows 向けの SF Pro 代替。
+ *   Hiragino Sans 以降                  : 日本語グリフのフォールバック。Inter に無い
+ *                                        文字だけがここへ落ちる (文字単位フォールバック)。
+ * mono も同様に SF Mono → Geist Mono の順にする。 */
 :root {
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    var(--font-inter), "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN",
+    "Noto Sans JP", Meiryo, system-ui, sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", var(--font-geist-mono), Menlo,
+    monospace;
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -144,7 +163,9 @@
    この face で描画され、それ以外は次のフォールバックに回る。 */
 @font-face {
   font-family: "LatinUpscale";
-  src: local("Helvetica Neue"), local("Helvetica"), local("Arial");
+  src:
+    local("SF Pro Text"), local("Helvetica Neue"), local("Helvetica"),
+    local("Inter"), local("Arial");
   unicode-range: U+0020-024F, U+1E00-1EFF, U+2000-206F;
   size-adjust: 120%;
 }

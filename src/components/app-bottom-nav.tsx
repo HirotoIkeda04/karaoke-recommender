@@ -5,6 +5,7 @@ import { Home, LibraryBig, Search, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSelectedLayoutSegment } from "next/navigation";
 
+import { GlassSurface } from "@/components/ui/glass-surface";
 import { triggerHaptic } from "@/lib/haptics";
 import { isSongSheetOpen } from "@/lib/song-sheet-route";
 import { cn } from "@/lib/utils";
@@ -23,7 +24,9 @@ export function AppBottomNav() {
 
   return (
     <motion.nav
-      className="fixed inset-x-0 bottom-0 z-10 bg-linear-to-b from-black/55 to-black px-2 pt-1 backdrop-blur-md"
+      // 背景は GlassSurface が持つので、ここでは不透明色を敷かない
+      // (敷くとガラスが背後を拾えず、ライブラリも警告を出す)。
+      className="fixed inset-x-0 bottom-0 z-10 px-2 pt-1"
       initial={false}
       animate={{ y: songSheetOpen ? "100%" : 0 }}
       transition={{ duration: 0.32, ease: [0.32, 0.72, 0, 1] }}
@@ -33,11 +36,16 @@ export function AppBottomNav() {
         paddingBottom: "max(0.25rem, env(safe-area-inset-bottom))",
       }}
     >
+      {/* バー全面のガラス。ul にも relative を付けて両方を「配置済み要素」に
+          揃えてあるので、あとは DOM 順で前後が決まる (先に置いたガラスが背面)。
+          radius 0 = 画面幅いっぱいの角なしバー (iOS のタブバーと同じ矩形)。 */}
+      <GlassSurface variant="bar" radius={0} />
+
       {/* grid grid-cols-4 で 4 タブを必ず等分。
           各タブの中心が画面の 1/8, 3/8, 5/8, 7/8 に常に固定される。
           ※ プロフィール (旧「音域」タブ) は /library に集約。
             フレンド管理は /library のプロフィール内リンクから /friends へ遷移。 */}
-      <ul className="mx-auto grid max-w-md grid-cols-4">
+      <ul className="relative mx-auto grid max-w-md grid-cols-4">
         {ITEMS.map((item) => {
           const Icon = item.icon;
           const active =
