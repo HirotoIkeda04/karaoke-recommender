@@ -976,11 +976,12 @@ function RecordDisc({ song, active, onRotationEnd }: RecordDiscProps) {
   return (
     <div className="relative h-full w-full">
       {/* 回転体: 代表色の盤面 + 溝 + 中央ラベル (ジャケット)。
-          正円の切り抜きは rounded-full + overflow-hidden ではなく clip-path で
-          行う。隣の盤 (opacity 0.45 + transform で合成レイヤー化) では
-          iOS WebKit が border-radius の子クリップを落とし、盤面色やラベル
-          画像が四角いまま描画されることがある。clip-path は合成後も維持され、
-          回転にも不変。 */}
+          隣の盤 (opacity 0.45 + transform で合成レイヤー化) では iOS WebKit が
+          「祖先による子のクリップ」を落とすことがある。rounded-full +
+          overflow-hidden だけでなく、この clip-path も iOS 18 では落ちる。
+          そのため祖先のクリップはあくまで第一線とし、四角く塗る子レイヤー
+          (盤面色 / ラベル / img) はそれぞれ自分自身の rounded-full で正円を
+          自衛する。clip-path は回転 transform に不変なのでここに残す。 */}
       <div
         className="absolute inset-0"
         style={{
@@ -992,10 +993,13 @@ function RecordDisc({ song, active, onRotationEnd }: RecordDiscProps) {
         }}
         onAnimationIteration={active ? onRotationEnd : undefined}
       >
-        {/* 盤面: ジャケットの代表色 (抽出完了までは無彩色) */}
+        {/* 盤面: ジャケットの代表色 (抽出完了までは無彩色)。
+            rounded-full は自衛: iOS 18 の WebKit は合成レイヤー化した隣の盤で
+            親の clip-path による子クリップも落とすため、四角く塗る層は
+            自分自身の角丸で正円を保証する (溝レイヤーが自前 mask なのと同じ理屈) */}
         <div
           aria-hidden
-          className="absolute inset-0"
+          className="absolute inset-0 rounded-full"
           style={{
             backgroundColor: vinylColor ?? "#3f3f46",
             transition: "background-color 0.5s ease",
@@ -1014,9 +1018,11 @@ function RecordDisc({ song, active, onRotationEnd }: RecordDiscProps) {
               "radial-gradient(circle closest-side at center, transparent 0%, transparent 51%, black 55%, black 96%, transparent 99%)",
           }}
         />
-        {/* 中央ラベル: ジャケット写真 (切り抜きは回転体と同じ理由で clip-path) */}
+        {/* 中央ラベル: ジャケット写真。コンテナの clip-path に加え、
+            自身と img にも rounded-full (上の盤面と同じ自衛。親クリップが
+            落ちても画像が四角く漏れない) */}
         <div
-          className="absolute bg-zinc-800"
+          className="absolute rounded-full bg-zinc-800"
           style={{
             inset: "24%",
             clipPath: "circle(50% at 50% 50%)",
@@ -1030,7 +1036,7 @@ function RecordDisc({ song, active, onRotationEnd }: RecordDiscProps) {
               fill
               sizes="10.5rem"
               loading="eager"
-              className="object-cover"
+              className="rounded-full object-cover"
               draggable={false}
             />
           ) : (
