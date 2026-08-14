@@ -975,10 +975,17 @@ function RecordDisc({ song, active, onRotationEnd }: RecordDiscProps) {
   const vinylColor = useVinylColor(src);
   return (
     <div className="relative h-full w-full">
-      {/* 回転体: 代表色の盤面 + 溝 + 中央ラベル (ジャケット) */}
+      {/* 回転体: 代表色の盤面 + 溝 + 中央ラベル (ジャケット)。
+          正円の切り抜きは rounded-full + overflow-hidden ではなく clip-path で
+          行う。隣の盤 (opacity 0.45 + transform で合成レイヤー化) では
+          iOS WebKit が border-radius の子クリップを落とし、盤面色やラベル
+          画像が四角いまま描画されることがある。clip-path は合成後も維持され、
+          回転にも不変。 */}
       <div
-        className="absolute inset-0 overflow-hidden rounded-full"
+        className="absolute inset-0"
         style={{
+          clipPath: "circle(50% at 50% 50%)",
+          WebkitClipPath: "circle(50% at 50% 50%)",
           animation: active
             ? `record-spin ${ROTATION_MS}ms linear infinite`
             : "none",
@@ -1007,10 +1014,14 @@ function RecordDisc({ song, active, onRotationEnd }: RecordDiscProps) {
               "radial-gradient(circle closest-side at center, transparent 0%, transparent 51%, black 55%, black 96%, transparent 99%)",
           }}
         />
-        {/* 中央ラベル: ジャケット写真 */}
+        {/* 中央ラベル: ジャケット写真 (切り抜きは回転体と同じ理由で clip-path) */}
         <div
-          className="absolute overflow-hidden rounded-full bg-zinc-800"
-          style={{ inset: "24%" }}
+          className="absolute bg-zinc-800"
+          style={{
+            inset: "24%",
+            clipPath: "circle(50% at 50% 50%)",
+            WebkitClipPath: "circle(50% at 50% 50%)",
+          }}
         >
           {src ? (
             <JacketImage
