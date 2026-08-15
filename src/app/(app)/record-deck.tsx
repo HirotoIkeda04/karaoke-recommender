@@ -53,39 +53,40 @@ const SILENT_WAV =
 
 /**
  * ディスク径。横幅いっぱい (左右 1.75rem マージン) を基本に、
- * 縦に収まらない小さい画面ではヘッダー + 組カルーセル + アーティスト名 +
- * 曲情報 + ボタン群 + ナビの予約分 (約 32.25rem) を引いた残りへ縮める。
- * 上限 20rem。loading.tsx の skeleton と式を揃えること。
+ * 縦に収まらない小さい画面ではヘッダー + 組カルーセル + 曲情報 +
+ * ボタン群 + ナビの予約分 (約 31.25rem) を引いた残りへ縮める。上限 20rem。
+ * loading.tsx の skeleton と式を揃えること。
  * ナビを浮かせたカプセルにした分 (safe-area 無しの端末で最大 1.25rem)
- * 予約を 31.5rem から増やし、アーティスト名の座布団の行 (1.5rem) と
- * ディスクまでの間隔 (0.75rem) を足し、座布団を組カルーセルへ寄せた分
- * (ARTIST_ROW_PULL_UP = 1.25rem) と曲名側で詰めた 1.5rem を引いてある。
+ * 予約を 31.5rem から増やし、アーティスト名を組カルーセルへ重ねて
+ * 独立した行を無くした分と、曲名側で詰めた 1.5rem を引いてある。
  */
 const DISC_SIZE =
-  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.25rem - env(safe-area-inset-bottom))))";
+  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 31.25rem - env(safe-area-inset-bottom))))";
 
 /**
- * 詳細表示 (上スワイプ) 中のディスク径。組カルーセル (3.5rem + 間隔
- * 0.25rem) とスキップ行 (3.5rem + gap 1.5rem) の 8.75rem が消え、代わりに
- * 楽曲情報 (mt-4 + 3 行 = 7.75rem) と歌詞ボタン (mt-2 + 2.25rem) の
- * 10.5rem が入るので、予約は 1.75rem 増える。
+ * 詳細表示 (上スワイプ) 中のディスク径。組カルーセルの行が 3.5rem から
+ * 座布団 1 行 (1.5rem) へ縮んで間隔も 0.75rem に詰まり、スキップ行
+ * (3.5rem + gap 1.5rem) が消える計 7.75rem の代わりに、楽曲情報
+ * (mt-4 + 3 行 = 7.75rem) と歌詞ボタン (mt-2 + 2.25rem) の 10.5rem が
+ * 入るので、予約は 2.75rem 増える。
  */
 const DISC_SIZE_DETAIL =
   "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 34rem - env(safe-area-inset-bottom))))";
 
 /**
- * 座布団の行を組カルーセルへ寄せる量。親の gap-6 (1.5rem) を打ち消して
- * 残り 0.25rem = ほぼ地続きに見せる。組カルーセルを畳む時の marginBottom
- * (残り 0.25rem を消す) と対になっている。
+ * 組カルーセルの行に重ねる size-10 ボタンの top。サムネイル (3.5rem) の
+ * 中央に来る位置 ((3.5rem - 2.5rem) / 2)。
  */
-const ARTIST_ROW_PULL_UP = "-1.25rem";
+const BAR_BUTTON_TOP = "0.5rem";
 
 /**
- * アーティスト名の座布団の行 (1.5rem) + ディスクまでの間隔 (0.75rem)。
- * シャッフル / 消音ボタンはこの分だけ下げ、従来どおりディスクの角に
- * 重ねる (背後がジャケットでなくなると GlassSurface が「黒い丸」になる)。
+ * 座布団の top (px)。サムネイル (56px) の下辺をまたいで貼り、
+ * 高さ 24px のうち 16px がジャケットに被る。
  */
-const ARTIST_ROW_OFFSET = "2.25rem";
+const PILLOW_OVERLAP_TOP = 40;
+
+/** 座布団の傾き (deg)。負 = 右上がり */
+const PILLOW_TILT_DEG = -2;
 
 /**
  * 座布団の紙めいた質感。fractalNoise を overlay で重ねる。SVG の data URI
@@ -719,26 +720,31 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         </div>
       ) : null}
 
-      {/* 組ごとのカルーセル: 各組のシード曲ジャケット。現在の組が中央に来る。
-          組の切替アニメーションと独立させるため、下の AnimatePresence の外に置く */}
+      {/* 組カルーセルの行。組サムネイル + 左右端のシャッフル / 消音 +
+          アクティブなジャケットに被せるアーティスト名の座布団を重ねる。
+          詳細表示ではサムネイルが消え、座布団 1 行分の高さまで畳む
+          (marginBottom で親の gap-6 も 0.75rem まで詰める)。 */}
+      <motion.div
+        className="relative w-full"
+        initial={false}
+        animate={{
+          height: detail ? "1.5rem" : "3.5rem",
+          marginBottom: detail ? "-0.75rem" : "0rem",
+        }}
+        transition={DETAIL_TRANSITION}
+      >
       <motion.div
         role="group"
         aria-roledescription="カルーセル"
         aria-label="デッキ内の組"
-        className="relative w-full"
+        className="absolute inset-x-0 top-0 h-14"
         inert={detail}
         initial={false}
-        // 詳細表示では高さごと畳む。座布団側が ARTIST_ROW_PULL_UP で親の
-        // gap-6 をほぼ打ち消しているので、ここで消し残す間隔は 0.25rem。
-        // 子は absolute なので縮む途中ははみ出すが、opacity を先に落として
-        // 見えなくしている。
-        animate={{
-          height: detail ? "0rem" : "3.5rem",
-          marginBottom: detail ? "-0.25rem" : "0rem",
-          opacity: detail ? 0 : 1,
-        }}
+        animate={{ opacity: detail ? 0 : 1 }}
         transition={DETAIL_TRANSITION}
-        // 子の rotateY に奥行きを与える (カバーフロー風の遠近)
+        // 子の rotateY に奥行きを与える (カバーフロー風の遠近)。
+        // perspective は直接の子にしか効かないので、サムネイルを直に持つ
+        // この層に置くこと (外側の高さアニメーション層に移すと平面になる)。
         style={{ perspective: "700px" }}
       >
         {groups.map((groupSongs, index) => {
@@ -782,25 +788,20 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         })}
       </motion.div>
 
-      {/* 組単位で左へ流れる。中は曲単位のカルーセル + 曲情報。
-          シャッフル / 消音トグルは組遷移で消えないよう AnimatePresence の外に重ねる。
-          marginTop で親の gap-6 を打ち消し、先頭の座布団を組カルーセルへ寄せる */}
-      <div className="relative w-full" style={{ marginTop: ARTIST_ROW_PULL_UP }}>
+        {/* シャッフル / 消音: 組カルーセルの行の左右端。組遷移で消えないよう
+            AnimatePresence の外に置く。背景色は敷かない (敷くとガラスが背後を
+            拾えず「黒い丸」になる。明るいジャケット対策は GlassSurface の
+            DIM 側で行う)。 */}
         <button
           type="button"
           onClick={handleShuffle}
           disabled={shuffling}
           aria-label="デッキをシャッフルする"
           inert={detail}
-          // 背景色は敷かない。敷くとガラスが背後を拾えず「黒い丸」になる。
-          // 明るいジャケットへの対策は GlassSurface の DIM (乗算) 側で行う。
           className="absolute left-1 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90 disabled:opacity-60"
-          // 詳細表示では消す。disabled:opacity-60 と競合しないよう
-          // クラスではなくインラインで上書きする。
-          style={{
-            top: ARTIST_ROW_OFFSET,
-            ...(detail ? { opacity: 0 } : null),
-          }}
+          // top はサムネイル (3.5rem) の中央。詳細表示では消すが、
+          // disabled:opacity-60 と競合しないようクラスでなくインラインで。
+          style={{ top: BAR_BUTTON_TOP, ...(detail ? { opacity: 0 } : null) }}
         >
           <GlassSurface variant="overlay" />
           <Dices
@@ -815,7 +816,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
             audioOn && !audioBlocked ? "試聴を停止する" : "試聴を再生する"
           }
           className="absolute right-1 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90"
-          style={{ top: ARTIST_ROW_OFFSET }}
+          style={{ top: BAR_BUTTON_TOP }}
         >
           <GlassSurface variant="overlay" />
           {audioOn && !audioBlocked ? (
@@ -824,6 +825,64 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
             <VolumeX className="relative size-5" aria-hidden />
           )}
         </button>
+
+        {/* アーティスト名の座布団: 再生中の組のジャケットに下から少し被せ、
+            右上がりに傾けて貼る。詳細表示ではサムネイルが消えるので、
+            傾きを戻しながら行の頭 (= 座布団だけの行) へ収める。
+            左右は size-10 のボタン (端から 2.75rem) を避けて inset-x-14。 */}
+        <motion.div
+          className="absolute inset-x-14 z-20 flex justify-center"
+          initial={false}
+          animate={{
+            top: detail ? 0 : PILLOW_OVERLAP_TOP,
+            rotate: detail ? 0 : PILLOW_TILT_DEG,
+          }}
+          transition={DETAIL_TRANSITION}
+        >
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={position.group}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.12 }}
+              className="flex max-w-full justify-center"
+            >
+              {current.artist_id ? (
+                <Link
+                  href={`/artists/${current.artist_id}`}
+                  className="line-clamp-1 max-w-full px-2.5 py-0.5 text-sm font-bold tracking-tight transition active:brightness-90"
+                  style={{
+                    backgroundColor: pillow,
+                    backgroundImage: PILLOW_NOISE,
+                    backgroundBlendMode: "overlay",
+                    color: PILLOW_TEXT,
+                    fontFamily: PILLOW_FONT,
+                  }}
+                >
+                  {current.artist}
+                </Link>
+              ) : (
+                <span
+                  className="line-clamp-1 max-w-full px-2.5 py-0.5 text-sm font-bold tracking-tight"
+                  style={{
+                    backgroundColor: pillow,
+                    backgroundImage: PILLOW_NOISE,
+                    backgroundBlendMode: "overlay",
+                    color: PILLOW_TEXT,
+                    fontFamily: PILLOW_FONT,
+                  }}
+                >
+                  {current.artist}
+                </span>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </motion.div>
+      </motion.div>
+
+      {/* 組単位で左へ流れる。中は曲単位のカルーセル + 曲情報 */}
+      <div className="relative w-full">
         <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={position.group}
@@ -833,42 +892,6 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           transition={{ duration: 0.2, ease: "easeOut" }}
           className="flex w-full flex-col items-center gap-6"
         >
-          {/* アーティスト名: 組カルーセルの真下に敷く座布団付きのラベル。
-              座布団の色は 1 枚目のレコードの代表色の反対色で、角は立てたまま
-              (rounded を付けない)、紙のようにノイズを乗算で混ぜる。
-              -mb-3 で親の gap-6 を 0.75rem まで詰め、レコードの見出しとして
-              寄せている (詰めた分は DISC_SIZE の予約に効いている)。 */}
-          <div className="-mb-3 flex h-6 w-full items-center justify-center px-14">
-            {current.artist_id ? (
-              <Link
-                href={`/artists/${current.artist_id}`}
-                className="line-clamp-1 max-w-full px-2.5 py-0.5 text-sm font-bold tracking-tight transition active:brightness-90"
-                style={{
-                  backgroundColor: pillow,
-                  backgroundImage: PILLOW_NOISE,
-                  backgroundBlendMode: "overlay",
-                  color: PILLOW_TEXT,
-                  fontFamily: PILLOW_FONT,
-                }}
-              >
-                {current.artist}
-              </Link>
-            ) : (
-              <span
-                className="line-clamp-1 max-w-full px-2.5 py-0.5 text-sm font-bold tracking-tight"
-                style={{
-                  backgroundColor: pillow,
-                  backgroundImage: PILLOW_NOISE,
-                  backgroundBlendMode: "overlay",
-                  color: PILLOW_TEXT,
-                  fontFamily: PILLOW_FONT,
-                }}
-              >
-                {current.artist}
-              </span>
-            )}
-          </div>
-
           {/* ジャケットのカルーセル (遷移ボタンなし。回転完了 or スキップで進む) */}
           <motion.div
             role="group"

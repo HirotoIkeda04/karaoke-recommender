@@ -13,22 +13,25 @@ export default function Loading() {
       role="status"
       aria-label="読み込み中"
     >
-      {/* 組ごとのカルーセル (サムネイル行) */}
-      <div className="flex h-14 w-full items-center justify-center gap-4">
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className={`animate-pulse bg-zinc-200 dark:bg-zinc-800 ${
-              i === 1 ? "size-14" : "size-11"
-            }`}
-          />
-        ))}
-      </div>
-
-      {/* アーティスト名の座布団 (組カルーセルの真下 / レコードの上)。
-          -mt-5 は record-deck.tsx の ARTIST_ROW_PULL_UP と対応 */}
-      <div className="-mt-5 -mb-3 flex h-6 w-full items-center justify-center">
-        <div className="h-6 w-32 animate-pulse bg-zinc-200 dark:bg-zinc-800" />
+      {/* 組ごとのカルーセル (サムネイル行) + 重ねたアーティスト名の座布団 */}
+      <div className="relative h-14 w-full">
+        <div className="flex h-14 w-full items-center justify-center gap-4">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className={`animate-pulse bg-zinc-200 dark:bg-zinc-800 ${
+                i === 1 ? "size-14" : "size-11"
+              }`}
+            />
+          ))}
+        </div>
+        {/* 位置と傾きは record-deck.tsx の PILLOW_OVERLAP_TOP / TILT と対応 */}
+        <div
+          className="absolute inset-x-14 flex justify-center"
+          style={{ top: 40, rotate: "-2deg" }}
+        >
+          <div className="h-6 w-32 animate-pulse bg-zinc-300 dark:bg-zinc-700" />
+        </div>
       </div>
 
       {/* レコード盤 */}
@@ -36,7 +39,7 @@ export default function Loading() {
         className="animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800"
         style={{
           width:
-            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.25rem - env(safe-area-inset-bottom))))",
+            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 31.25rem - env(safe-area-inset-bottom))))",
           aspectRatio: "1 / 1",
         }}
       />
