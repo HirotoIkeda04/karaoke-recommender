@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Liquid } from "liquid-gooey";
 import { Search, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import type { TabItem } from "@/components/app-bottom-nav";
 import {
@@ -64,11 +64,36 @@ export function AppSearchBar({ backTab, placeholder }: AppSearchBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const queryRef = useRef(query);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const scrollGuardRef = useRef<(() => void) | null>(null);
   const BackIcon = backTab.icon;
 
   useEffect(() => {
     queryRef.current = query;
   }, [query]);
+
+  // iOS はフォーカスした入力欄を可視領域へ入れようとしてページを
+  // スクロールする。この検索欄は fixed なので動かす必要がないのに、
+  // 背後の一覧だけが数行ぶん流れて、読んでいた位置を見失う。
+  // フォーカス直後の一定時間だけ、その勝手なスクロールを元の位置へ戻す。
+  const keepScrollPosition = useCallback(() => {
+    const top = window.scrollY;
+    const revert = () => {
+      if (window.scrollY !== top) window.scrollTo(0, top);
+    };
+    window.addEventListener("scroll", revert);
+    // キーボードがせり上がりきるまで。長く張ると、その後の
+    // ユーザー自身のスクロールまで巻き戻してしまう。
+    const timer = window.setTimeout(() => {
+      window.removeEventListener("scroll", revert);
+    }, 500);
+    scrollGuardRef.current = () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("scroll", revert);
+    };
+  }, []);
+
+  // 画面から外れるときに張りっぱなしのガードを外す。
+  useEffect(() => () => scrollGuardRef.current?.(), []);
 
   // 未入力の検索欄にフォーカスしたまま下へスクロールし始めたら、
   // ソフトウェアキーボードを閉じる。横スクロール (履歴のアーティスト
@@ -186,7 +211,10 @@ export function AppSearchBar({ backTab, placeholder }: AppSearchBarProps) {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 // フォーカスした時点で検索モードへ入る。降りるのは × のみ。
-                onFocus={() => setOpen(true)}
+                onFocus={() => {
+                  setOpen(true);
+                  keepScrollPosition();
+                }}
                 placeholder={placeholder}
                 aria-label={placeholder}
                 autoComplete="off"
