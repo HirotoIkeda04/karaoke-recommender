@@ -43,6 +43,21 @@ function parseArgs() {
   return { input, dryRun };
 }
 
+// fame_cache のアーティスト名はカラオケサイト由来で、末尾に別名の括弧が付く
+// ことがある ("SEKAI NO OWARI(世界の終わり)", "X JAPAN (X)")。songs.artist は
+// 括弧無しなので、完全一致だけだと丸ごと取りこぼす。
+function stripArtistAlias(name: string): string {
+  return name.replace(/[（(][^（()）]*[)）]\s*$/u, "").trim();
+}
+
+// migrations/033_strict_normalize_artist_name.sql と同等
+function normalizeArtistName(name: string): string {
+  return name
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/[\s\.\-_,'"!?·•・/\\()\[\]{}（）「」『』【】]+/g, "");
+}
+
 function loadCache(path: string): FameCacheEntry[] {
   const text = readFileSync(path, "utf-8");
   const entries: FameCacheEntry[] = [];
@@ -68,6 +83,7 @@ async function main() {
 
   let updated = 0;
   let songsMissing = 0;
+  let aliasMatched = 0;
   let errors = 0;
 
   for (const [i, entry] of cache.entries()) {
@@ -82,12 +98,39 @@ async function main() {
       errors++;
       continue;
     }
-    if (!rows || rows.length === 0) {
+
+    let ids = (rows ?? []).map((r) => r.id);
+
+    // 完全一致で拾えなかった場合のみ、同タイトル行を引いて正規化アーティスト名
+    // で突合し直す。タイトル一致に絞ってから比較するので別アーティストの
+    // 同名曲を巻き込むことはない。
+    if (ids.length === 0 && !entry.song_id) {
+      const wanted = new Set([
+        normalizeArtistName(entry.artist),
+        normalizeArtistName(stripArtistAlias(entry.artist)),
+      ]);
+      const { data: sameTitle, error: titleErr } = await supabase
+        .from("songs")
+        .select("id, artist")
+        .eq("title", entry.title);
+      if (titleErr) {
+        console.error(`[${i + 1}] title select failed for ${entry.title}:`, titleErr);
+        errors++;
+        continue;
+      }
+      const hit = (sameTitle ?? []).filter((r) =>
+        wanted.has(normalizeArtistName(r.artist)),
+      );
+      if (hit.length > 0) {
+        ids = hit.map((r) => r.id);
+        aliasMatched += hit.length;
+      }
+    }
+
+    if (ids.length === 0) {
       songsMissing++;
       continue;
     }
-
-    const ids = rows.map((r) => r.id);
     if (dryRun) {
       updated += ids.length;
       continue;
@@ -120,7 +163,7 @@ async function main() {
   console.log(
     `\n${dryRun ? "dry-run" : "done"}. cache_entries=${cache.length} ` +
       `${dryRun ? "would_update_rows" : "updated_rows"}=${updated} ` +
-      `songs_missing=${songsMissing} errors=${errors}`,
+      `alias_matched_rows=${aliasMatched} songs_missing=${songsMissing} errors=${errors}`,
   );
   if (errors > 0) process.exit(1);
 }
