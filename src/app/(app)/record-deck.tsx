@@ -32,6 +32,11 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { GlassSurface } from "@/components/ui/glass-surface";
 import { JacketImage } from "@/components/ui/jacket-image";
 import { useRatingActions } from "@/hooks/use-rating-actions";
+import {
+  getAudioContext,
+  isAudioContextRunning,
+  resumeAudioContext,
+} from "@/lib/audio-context";
 import { readGuestRatings } from "@/lib/guest-ratings";
 import { filterUnratedGroups, shuffleGroups } from "@/lib/guest-songs";
 import { triggerHaptic } from "@/lib/haptics";
@@ -45,6 +50,17 @@ import { SimilarSongsCarousel } from "./similar-songs-carousel";
 
 type Song = Database["public"]["Tables"]["songs"]["Row"];
 type Rating = Database["public"]["Enums"]["rating_type"];
+
+/**
+ * 試聴プレイヤー 1 台。音量は Web Audio の gain で動かす。iOS Safari は
+ * HTMLMediaElement.volume を変更できないため、要素の volume ではフェードが
+ * 表現できない (従来ここがハードカットに劣化していた)。gain が null なのは
+ * Web Audio 自体が使えない環境で、その時だけ要素の volume に落ちる。
+ */
+interface SnippetPlayer {
+  el: HTMLAudioElement;
+  gain: GainNode | null;
+}
 
 /**
  * 1 曲の表示時間 (ms) = 試聴スニペットの尺。曲送りのタイマーと、終端の
@@ -62,9 +78,18 @@ const SNIPPET_MS = 10000;
  */
 const ROTATION_MS = 10000;
 
-/** スニペット終端のフェードアウト長 (秒)。iOS Safari は volume 変更が
- *  効かないため、そこではハードカットに劣化する (仕様)。 */
-const AUDIO_FADE_SEC = 0.8;
+/**
+ * 自動送りのクロスフェード長 (ms)。尺の終わり CROSSFADE_AUTO_MS 前から
+ * 次の曲を重ね始める (前の曲が落ちながら次の曲が立ち上がる)。
+ */
+const CROSSFADE_AUTO_MS = 2000;
+
+/**
+ * 評価 / スキップ / 戻る で送った時のクロスフェード長 (ms)。タップへの
+ * 反応なので自動送りより短くする (長いと操作が重く感じる)。曲の頭出しや
+ * 消音解除のフェードインにもこの長さを使う。
+ */
+const CROSSFADE_TAP_MS = 800;
 
 /**
  * 再生アンロック用の極小無音 WAV。iOS Safari は「ユーザー操作中に play()
@@ -199,6 +224,19 @@ interface DeckPosition {
 }
 
 /**
+ * 次に再生される曲 (組の末尾からは次の組の先頭へ)。デッキの末尾では null。
+ * クロスフェードは「次の曲」を先に鳴らし始める必要があるので、advance と
+ * 同じ規則をここから引けるようにしてある。
+ */
+function nextSongOf(groups: Song[][], position: DeckPosition): Song | null {
+  const group = groups[position.group];
+  if (group && position.song + 1 < group.length) {
+    return group[position.song + 1];
+  }
+  return groups[position.group + 1]?.[0] ?? null;
+}
+
+/**
  * 1 つ前の位置 (組の先頭からは前の組の末尾へ)。デッキの先頭にいる時だけ
  * null。自動送りで流れていった曲へ戻るために使う。
  */
@@ -274,7 +312,6 @@ interface RecordDeckProps {
   persistToken: string | null;
 }
 
-
 export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const pathname = usePathname();
   // ゲスト (未ログイン) はデッキが固定 70 曲の中の 10 組なので、
@@ -312,25 +349,28 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   // を見せて実態と一致させる。play() の成否で needsGestureRetryRef と
   // 同時に更新される (ref はリスナー用の同期値、これは表示用)。
   const [audioBlocked, setAudioBlocked] = useState(true);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  // 再生中の曲 id。タップ起点の再生と曲送り effect の二重再生を防ぐ。
+  // 試聴プレイヤー 2 台と、今どちらが現役か。片方が鳴っている間にもう
+  // 片方が次の曲を読み込み、切り替えでは 2 台を重ねてクロスフェードする。
+  // 要素を作り直さず使い回すのは、iOS が「ユーザー操作中に play() した
+  // 要素」しか以後のプログラム再生を許さないため (アンロック済みの要素を
+  // 捨てると、次の曲から鳴らなくなる)。
+  const playersRef = useRef<SnippetPlayer[] | null>(null);
+  const activeRef = useRef(0);
+  // 2 台とも一度はユーザー操作の文脈で play() したか (iOS のアンロック)。
+  const unlockedRef = useRef(false);
+  // 現役プレイヤーに載っている曲 id。タップ起点の再生と曲送り effect の
+  // 二重再生を防ぐほか、クロスフェードで先に切り替わっている時の目印になる。
   const playingSongIdRef = useRef<string | null>(null);
-  // 今のスニペットが音源の何秒目から始まったか。詳細表示から戻った
-  // 時は途中の再生位置がそのまま起点になるので、フェードも曲送りもここを
-  // 基準に数える (音源を頭出しし直さないため、絶対値では測れない)。
-  const snippetOriginRef = useRef(0);
-  // 今 <audio> に載っているのが実際の試聴音源か (アンロック用の無音 WAV で
-  // ないか)。無音 WAV は即 ended が飛ぶので、そこで曲送りしないための印。
+  // 現役に載っているのが実際の試聴音源か (アンロック用の無音 WAV でないか)。
+  // 無音 WAV は即 ended が飛ぶので、そこで曲送りしないための印。
   const previewPlayingRef = useRef(false);
-  // 音源を最後まで流し切った時の処理。ensureAudio の中でリスナーを張るが、
-  // 中身は毎レンダー差し替えて最新の state を見せる。
-  const onAudioEndedRef = useRef<() => void>(() => {});
+  // 音源を最後まで流し切った時の処理。要素の生成時にリスナーを張るが、
+  // 中身は毎レンダー差し替えて最新の state を見せる。降りた側 (フェード
+  // アウト中) の ended と区別するため、発火元の要素を受け取る。
+  const onAudioEndedRef = useRef<(el: HTMLAudioElement) => void>(() => {});
   // 初期値 true: マウント直後の play() の reject が届く前の素早いタップでも
   // ジェスチャ再試行が動くようにする (鳴っていれば再試行側の guard が弾く)。
   const needsGestureRetryRef = useRef(true);
-  // 楽曲ページ (シート) と詳細表示の間のフル尺再生モード
-  // (スニペットのフェード/カット無効)
-  const fullModeRef = useRef(false);
 
   const group = groups[position.group];
   const current = group?.[position.song];
@@ -388,99 +428,181 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     return () => setDetail(false);
   }, [setDetail]);
 
-  /** <audio> 要素を遅延生成する。スニペット終端はフェードアウト */
-  const ensureAudio = (): HTMLAudioElement => {
-    if (audioRef.current) return audioRef.current;
-    const el = new Audio();
-    el.preload = "auto";
-    el.addEventListener("timeupdate", () => {
-      // フル尺モード (楽曲ページ表示中) はフェード/カットせず最後まで流す
-      if (fullModeRef.current) return;
-      // 窓の終わりは「起点 + SNIPPET_MS」だが、音源の終端の方が早ければそちら。
-      // 音源が先に尽きる時にフェードが間に合わないと、最大音量のまま
-      // 途切れてしまう (詳細表示を音源の終盤で閉じた時に起こる)。
-      const duration = Number.isFinite(el.duration) ? el.duration : Infinity;
-      const windowEnd = Math.min(
-        snippetOriginRef.current + SNIPPET_MS / 1000,
-        duration,
-      );
-      const remain = windowEnd - el.currentTime;
-      try {
-        el.volume = remain < AUDIO_FADE_SEC ? Math.max(0, remain / AUDIO_FADE_SEC) : 1;
-      } catch {
-        // iOS Safari は volume 変更不可 (ハードカットに劣化)
-      }
-    });
-    el.addEventListener("ended", () => onAudioEndedRef.current());
-    audioRef.current = el;
-    return el;
-  };
-
-  const playSnippet = (audio: HTMLAudioElement, song: Song) => {
-    const src = song.itunes_preview_url;
-    playingSongIdRef.current = song.id;
-    // 頭出しなので、この曲のスニペットは音源の 0 秒から始まる
-    snippetOriginRef.current = 0;
-    previewPlayingRef.current = Boolean(src);
-    if (!src) {
-      audio.pause();
-      return;
-    }
-    audio.src = src;
-    try {
-      audio.volume = 1;
-    } catch {
-      /* iOS */
-    }
-    void audio.play().then(
-      () => {
-        needsGestureRetryRef.current = false;
-        setAudioBlocked(false);
-      },
-      (err: unknown) => {
-        // pause() や src 差し替えによる自己中断 (AbortError) は正常系なので
-        // 無視する。自動再生ブロック (NotAllowedError) の時だけ、次の
-        // ユーザー操作 (ジェスチャ文脈) での再試行を予約する。
-        if ((err as DOMException)?.name === "NotAllowedError") {
-          needsGestureRetryRef.current = true;
-          setAudioBlocked(true);
+  /** 2 台のプレイヤーを遅延生成し、Web Audio の gain 経由でつなぐ */
+  const ensurePlayers = useCallback((): SnippetPlayer[] => {
+    if (playersRef.current) return playersRef.current;
+    const ctx = getAudioContext();
+    const create = (): SnippetPlayer => {
+      const el = new Audio();
+      el.preload = "auto";
+      // Web Audio へ流すには CORS 許可が要る (無いとグラフの出力が無音に
+      // なる)。iTunes のプレビューは ACAO: * を返すので通る。
+      el.crossOrigin = "anonymous";
+      let gain: GainNode | null = null;
+      if (ctx) {
+        try {
+          gain = ctx.createGain();
+          ctx
+            .createMediaElementSource(el)
+            .connect(gain)
+            .connect(ctx.destination);
+        } catch {
+          // Web Audio が使えない環境は要素の volume にフォールバックする
+          // (= iOS Safari 以外ではフェード無しの切り替えになる)
+          gain = null;
         }
-      },
-    );
-  };
+      }
+      el.addEventListener("ended", () => onAudioEndedRef.current(el));
+      return { el, gain };
+    };
+    playersRef.current = [create(), create()];
+    return playersRef.current;
+  }, []);
+
+  /**
+   * 音量を value へ動かす。ms > 0 なら線形に。
+   * gain が無い環境ではフェードを表現できないので、フェードアウトだけは
+   * 何もせず (鳴らしたまま最後に pause される)、それ以外は即時反映する。
+   */
+  const rampGain = useCallback(
+    (player: SnippetPlayer, value: number, ms: number) => {
+      const ctx = getAudioContext();
+      if (player.gain && ctx) {
+        const param = player.gain.gain;
+        const now = ctx.currentTime;
+        param.cancelScheduledValues(now);
+        param.setValueAtTime(param.value, now);
+        if (ms > 0) param.linearRampToValueAtTime(value, now + ms / 1000);
+        else param.setValueAtTime(value, now);
+        return;
+      }
+      if (ms > 0 && value === 0) return;
+      try {
+        player.el.volume = value;
+      } catch {
+        /* iOS Safari は volume 変更不可 */
+      }
+    },
+    [],
+  );
+
+  /** 今の再生が実際に聞こえる状態か (グラフ経由なら context 次第) */
+  const markPlaybackStarted = useCallback((player: SnippetPlayer) => {
+    const audible = !player.gain || isAudioContextRunning();
+    needsGestureRetryRef.current = !audible;
+    setAudioBlocked(!audible);
+  }, []);
+
+  /**
+   * iOS は「ユーザー操作中に play() した要素」しか以後のプログラム再生を
+   * 許さない。クロスフェードは 2 台目を裏で鳴らし始めるので、最初の操作で
+   * 両方アンロックしておく (鳴っていない側は無音 WAV を一瞬鳴らす)。
+   */
+  const unlockPlayers = useCallback(() => {
+    if (unlockedRef.current) return;
+    unlockedRef.current = true;
+    for (const player of ensurePlayers()) {
+      if (!player.el.paused) continue;
+      player.el.src = SILENT_WAV;
+      void player.el.play().then(
+        () => player.el.pause(),
+        () => {},
+      );
+    }
+  }, [ensurePlayers]);
+
+  /** 次の曲を待機側へ読み込ませておく (クロスフェードで即座に立ち上がる) */
+  const prefetchSong = useCallback(
+    (song: Song | null) => {
+      const src = song?.itunes_preview_url;
+      if (!src || !audioOnRef.current) return;
+      const standby = ensurePlayers()[1 - activeRef.current];
+      if (standby.el.src === src) return;
+      standby.el.src = src;
+    },
+    [ensurePlayers],
+  );
+
+  /**
+   * song へ切り替える。今鳴っている側を fadeMs かけて落としながら、待機側で
+   * song を頭から立ち上げる。song が null なら落とすだけ。待機側に先読み
+   * 済みなら src はそのまま使うので、切り替えは待たされない。
+   */
+  const crossfadeTo = useCallback(
+    (song: Song | null, fadeMs: number) => {
+      const players = ensurePlayers();
+      const outgoing = players[activeRef.current];
+      const incoming = players[1 - activeRef.current];
+
+      // 降りる側: 落とし切ってから止める (先に止めると音が途切れる)
+      rampGain(outgoing, 0, fadeMs);
+      const outgoingEl = outgoing.el;
+      window.setTimeout(() => {
+        // フェード中にこの要素が現役へ戻っていたら止めない
+        if (playersRef.current?.[activeRef.current].el === outgoingEl) return;
+        outgoingEl.pause();
+      }, fadeMs);
+
+      activeRef.current = 1 - activeRef.current;
+      playingSongIdRef.current = song?.id ?? null;
+      const src = song?.itunes_preview_url ?? null;
+      previewPlayingRef.current = Boolean(src);
+      if (!src) {
+        incoming.el.pause();
+        return;
+      }
+      // 先読み済みなら再代入しない (読み直しになる)
+      if (incoming.el.src !== src) incoming.el.src = src;
+      try {
+        incoming.el.currentTime = 0;
+      } catch {
+        /* メタデータ未読込。読み込み後に頭から始まる */
+      }
+      rampGain(incoming, 0, 0);
+      rampGain(incoming, 1, fadeMs);
+      void incoming.el.play().then(
+        () => markPlaybackStarted(incoming),
+        (err: unknown) => {
+          // pause() や src 差し替えによる自己中断 (AbortError) は正常系なので
+          // 無視する。自動再生ブロック (NotAllowedError) の時だけ、次の
+          // ユーザー操作 (ジェスチャ文脈) での再試行を予約する。
+          if ((err as DOMException)?.name === "NotAllowedError") {
+            needsGestureRetryRef.current = true;
+            setAudioBlocked(true);
+          }
+        },
+      );
+    },
+    [ensurePlayers, rampGain, markPlaybackStarted],
+  );
 
   // 自動再生がブロックされた場合の復帰: 最初の画面操作 (どこでも) の
   // ジェスチャ文脈内で play() し直す。iOS Safari は touchstart 相当
   // (pointerdown) の間はメディア再生を許可しないため、活性化が期待できる
   // pointerup と click の両方で試みる。フラグはここでは下ろさず、再生
-  // 成功時に playSnippet 側で下ろす (先に下ろすと、失敗の非同期 reject が
+  // 成功時に crossfadeTo 側で下ろす (先に下ろすと、失敗の非同期 reject が
   // click 通過後にフラグを立て直し、何度タップしても鳴らないループになる)。
   // pointerup と click が連続して二重に走った場合は、src の差し替えが
   // 先行の play() を AbortError (無視される正常系) で打ち切るだけで無害。
   useEffect(() => {
     const retryOnGesture = () => {
+      // AudioContext はユーザー操作の文脈でしか resume できない。鳴って
+      // いるかに関わらず、触られたら起こしておく (グラフ経由の音は
+      // context が suspended だと play() が成功しても無音になる)。
+      resumeAudioContext();
       if (!needsGestureRetryRef.current || !audioOnRef.current) return;
       const song = currentRef.current;
       if (!song) return;
-      const audio = ensureAudio();
+      unlockPlayers();
+      const active = ensurePlayers()[activeRef.current];
       // 既に現在の曲が鳴っているなら (stale フラグ) 頭出しし直さない
-      if (playingSongIdRef.current === song.id && !audio.paused) return;
-      if (song.itunes_preview_url) {
-        playSnippet(audio, song);
-      } else {
-        // 音源が無い曲でも無音 WAV で要素をアンロックし、以後の曲送りの
-        // プログラム再生 (音源のある曲) が通るようにしておく
-        playingSongIdRef.current = song.id;
-        previewPlayingRef.current = false;
-        audio.src = SILENT_WAV;
-        void audio.play().then(
-          () => {
-            needsGestureRetryRef.current = false;
-            setAudioBlocked(false);
-          },
-          () => {},
-        );
+      if (playingSongIdRef.current === song.id && !active.el.paused) {
+        markPlaybackStarted(active);
+        return;
       }
+      // 音源が無い曲でも unlockPlayers が要素を起こしてあるので、以後の
+      // 曲送り (音源のある曲) はプログラム再生で通る
+      crossfadeTo(song, 0);
     };
     document.addEventListener("pointerup", retryOnGesture, true);
     document.addEventListener("click", retryOnGesture, true);
@@ -488,46 +610,37 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
       document.removeEventListener("pointerup", retryOnGesture, true);
       document.removeEventListener("click", retryOnGesture, true);
     };
-
-  }, []);
+  }, [crossfadeTo, ensurePlayers, markPlaybackStarted, unlockPlayers]);
 
   // 楽曲シート (リンクで /songs/[id] がホームの上に開いた状態) と詳細表示の
-  // 開閉に合わせてフル尺モードを切り替える。ここでは再生に手を触れない。
-  // 頭出しし直すと開閉のたびに音が最初へ戻ってしまうので、鳴っている音は
-  // そのまま流し続け、スニペットの窓 (フェードと曲送り) の起点だけを
-  // 「今の再生位置」に張り直す。曲送りは下のタイマーが握っており、
-  // フル尺モードの間は張られないので、開いている間に曲が変わることもない。
-  // 下の曲送り effect より先に置くこと: 閉じると同時に曲が変わる場合
-  // (流し切り後) は、後続の playSnippet が起点を 0 に上書きするのが正しい。
+  // 開閉に合わせてフル尺モードへ入る。ここでは再生に手を触れない。頭出しし
+  // 直すと開閉のたびに音が最初へ戻ってしまうので、鳴っている音はそのまま
+  // 流し続ける。曲送りとクロスフェードは下のタイマーが握っており、フル尺
+  // モードの間は張られないので、開いている間に曲が変わることもない。
   const fullPlayback = sheetOpen || detail;
   useEffect(() => {
-    fullModeRef.current = fullPlayback;
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (!fullPlayback) snippetOriginRef.current = audio.currentTime;
-    try {
-      // 窓の終端でフェード途中だった場合に備えて音量を戻す
-      audio.volume = 1;
-    } catch {
-      /* iOS */
-    }
-  }, [fullPlayback]);
+    const players = playersRef.current;
+    if (!players) return;
+    // クロスフェードの途中で開かれた場合に備えて、現役側を最大へ戻す
+    rampGain(players[activeRef.current], 1, 0);
+  }, [fullPlayback, rampGain]);
 
-  // 曲が変わったら試聴音源を差し替える (タップ起点の再生分はスキップ)。
+  // 曲が変わったら試聴を切り替える。自動送りでは尺の終わりに始まった
+  // クロスフェードで既に切り替わっているので、その時はここは何もしない
+  // (playingSongIdRef が先に次の曲を指している)。評価やスキップで送られた
+  // 場合だけ、ここから短いクロスフェードで追いつく。
   // デフォルト ON なので初回マウントでもここから再生を試みる
   // (ブロックされたら上のジェスチャ再試行に委ねる)。
   useEffect(() => {
     if (!audioOn) return;
-    const audio = ensureAudio();
     if (!current) {
-      audio.pause();
+      for (const player of ensurePlayers()) player.el.pause();
       playingSongIdRef.current = null;
       return;
     }
     if (playingSongIdRef.current === current.id) return;
-    playSnippet(audio, current);
-
-  }, [audioOn, current]);
+    crossfadeTo(current, CROSSFADE_TAP_MS);
+  }, [audioOn, current, crossfadeTo, ensurePlayers]);
 
   // 詳細表示で試聴を流し切ったら、盤を止めて無音のままにする。鳴っている
   // 時は音源の ended が正確なので、ここでタイマーを張るのは「そもそも音が
@@ -539,7 +652,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     if (!detail || !currentId || willPlayPreview) return;
     const timer = window.setTimeout(() => {
       setDetailPlayedOut(currentId);
-      audioRef.current?.pause();
+      playersRef.current?.[activeRef.current].el.pause();
     }, DETAIL_PLAY_MS);
     return () => window.clearTimeout(timer);
   }, [detail, currentId, willPlayPreview]);
@@ -590,23 +703,22 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   // 現在の曲を頭から再生し直す (回転は次の周回で自然に再同期する)。
   useEffect(() => {
     const onVisibility = () => {
-      const audio = audioRef.current;
-      if (!audio) return;
+      const players = playersRef.current;
+      if (!players) return;
       if (document.hidden) {
-        audio.pause();
+        for (const player of players) player.el.pause();
       } else if (audioOn && current) {
-        playSnippet(audio, current);
+        crossfadeTo(current, CROSSFADE_TAP_MS);
       }
     };
     document.addEventListener("visibilitychange", onVisibility);
     return () => document.removeEventListener("visibilitychange", onVisibility);
-     
-  }, [audioOn, current]);
+  }, [audioOn, current, crossfadeTo]);
 
   // アンマウント時に音を止める
   useEffect(() => {
     return () => {
-      audioRef.current?.pause();
+      for (const player of playersRef.current ?? []) player.el.pause();
     };
   }, []);
 
@@ -625,28 +737,18 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     const song = currentRef.current;
     if (!song) return;
     triggerHaptic();
-    const audio = ensureAudio();
+    resumeAudioContext();
     if (audioOn && !audioBlocked) {
-      audio.pause();
+      for (const player of ensurePlayers()) player.el.pause();
       playingSongIdRef.current = null;
       setAudioOn(false);
       return;
     }
     setAudioOn(true);
-    if (song.itunes_preview_url) {
-      playSnippet(audio, song);
-    } else {
-      playingSongIdRef.current = song.id;
-      previewPlayingRef.current = false;
-      audio.src = SILENT_WAV;
-      void audio.play().then(
-        () => {
-          needsGestureRetryRef.current = false;
-          setAudioBlocked(false);
-        },
-        () => {},
-      );
-    }
+    // アンロックは crossfadeTo より先に済ませる (2 台目をこの操作の文脈で
+    // 起こしておかないと、次の曲のクロスフェードが iOS で鳴らない)
+    unlockPlayers();
+    crossfadeTo(song, CROSSFADE_TAP_MS);
   };
 
   /**
@@ -672,19 +774,45 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   // たびに音を頭出しする必要があった。タイマーに移したことで回転は見た目
   // だけの存在になり、角度が何度であっても音の連続性に影響しない。
   // フル尺モード (詳細表示 / 楽曲シート) の間は張らない = 自動送りも止まる。
+  // 同じタイマーで、尺の終わり CROSSFADE_AUTO_MS 前に次の曲を重ね始める
+  // (表示が切り替わる前に次の曲が鳴り始めるのがクロスフェード)。次の曲の
+  // 読み込みはその手前で済ませておく。開始を CROSSFADE_AUTO_MS + 0.5 秒に
+  // しているのは、現在の曲の取得 (実測 1 秒弱) と重ねないため。
   useEffect(() => {
     if (fullPlayback || !current) return;
-    const timer = window.setTimeout(() => advance(position), SNIPPET_MS);
-    return () => window.clearTimeout(timer);
-  }, [fullPlayback, current, position, advance]);
+    const next = nextSongOf(groups, position);
+    const prefetchTimer = window.setTimeout(
+      () => prefetchSong(next),
+      CROSSFADE_AUTO_MS + 500,
+    );
+    const crossfadeTimer = window.setTimeout(() => {
+      if (audioOnRef.current) crossfadeTo(next, CROSSFADE_AUTO_MS);
+    }, SNIPPET_MS - CROSSFADE_AUTO_MS);
+    const advanceTimer = window.setTimeout(() => advance(position), SNIPPET_MS);
+    return () => {
+      window.clearTimeout(prefetchTimer);
+      window.clearTimeout(crossfadeTimer);
+      window.clearTimeout(advanceTimer);
+    };
+  }, [
+    fullPlayback,
+    current,
+    position,
+    groups,
+    advance,
+    crossfadeTo,
+    prefetchSong,
+  ]);
 
   // 音源を最後まで流し切った時。詳細表示中なら盤を止めて無音のまま待ち、
   // 通常の周回中なら次の曲へ送る (詳細表示から音源の終盤で戻ってきた時、
   // スニペットのタイマーより先に音源が尽きるケース)。
   useEffect(() => {
-    onAudioEndedRef.current = () => {
+    onAudioEndedRef.current = (el) => {
       // アンロック用の無音 WAV の ended は無視する (即座に飛んでくる)
       if (!previewPlayingRef.current) return;
+      // クロスフェードで降りた側の ended は現役の周回に関係ない
+      if (playersRef.current?.[activeRef.current].el !== el) return;
       if (detailRef.current) {
         if (currentRef.current) setDetailPlayedOut(currentRef.current.id);
         return;
@@ -824,7 +952,11 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
    * 判定を満たした時点で起点を捨て、1 ジェスチャで 1 回だけ切り替える。
    */
   const handleSwipeStart = (event: React.PointerEvent) => {
-    swipeRef.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    swipeRef.current = {
+      id: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+    };
   };
 
   const handleSwipeMove = (event: React.PointerEvent) => {
@@ -994,60 +1126,60 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         }}
         transition={DETAIL_TRANSITION}
       >
-      <motion.div
-        role="group"
-        aria-roledescription="カルーセル"
-        aria-label="デッキ内の組"
-        className="absolute inset-x-0 top-0 h-14"
-        inert={detail}
-        initial={false}
-        animate={{ opacity: detail ? 0 : 1 }}
-        transition={DETAIL_TRANSITION}
-        // 子の rotateY に奥行きを与える (カバーフロー風の遠近)。
-        // perspective は直接の子にしか効かないので、サムネイルを直に持つ
-        // この層に置くこと (外側の高さアニメーション層に移すと平面になる)。
-        style={{ perspective: "700px" }}
-      >
-        {groups.map((groupSongs, index) => {
-          const seed = groupSongs[0];
-          if (!seed) return null;
-          const delta = index - position.group;
-          const isActive = delta === 0;
-          return (
-            <motion.div
-              key={seed.id}
-              aria-hidden={!isActive}
-              initial={false}
-              animate={{
-                x: `${groupThumbOffset(delta)}%`,
-                rotateY: groupThumbTilt(delta),
-                scale: isActive ? 1 : 0.8,
-              }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute left-1/2 top-0 -ml-7 size-14"
-              // 密に詰めた外側は中央寄りのサムネイルが上に重なるようにする。
-              // preserve-3d で子の側面 (厚み) を 3D 空間に保つ。
-              // 注意: このコンテナに opacity < 1 や filter を付けると CSS 仕様で
-              // preserve-3d が平面化され、背面がジャケットに被さって描画が壊れる。
-              // 減光は前面内のオーバーレイ、端の非表示は visibility で行う。
-              // 非表示は delta 固定数ではなく累積オフセットで判定する
-              // (間隔定数を詰めた時に画面内の項目まで隠れてポップインした反省)。
-              // 430% = 240px は max-w-md の clip 半幅 224px + 投影マージンで、
-              // 可視域内では絶対に切り替わらない。
-              style={{
-                zIndex: 10 - Math.abs(delta),
-                transformStyle: "preserve-3d",
-                visibility:
-                  Math.abs(groupThumbOffset(delta)) > 430
-                    ? "hidden"
-                    : "visible",
-              }}
-            >
-              <GroupThumb seed={seed} isActive={isActive} />
-            </motion.div>
-          );
-        })}
-      </motion.div>
+        <motion.div
+          role="group"
+          aria-roledescription="カルーセル"
+          aria-label="デッキ内の組"
+          className="absolute inset-x-0 top-0 h-14"
+          inert={detail}
+          initial={false}
+          animate={{ opacity: detail ? 0 : 1 }}
+          transition={DETAIL_TRANSITION}
+          // 子の rotateY に奥行きを与える (カバーフロー風の遠近)。
+          // perspective は直接の子にしか効かないので、サムネイルを直に持つ
+          // この層に置くこと (外側の高さアニメーション層に移すと平面になる)。
+          style={{ perspective: "700px" }}
+        >
+          {groups.map((groupSongs, index) => {
+            const seed = groupSongs[0];
+            if (!seed) return null;
+            const delta = index - position.group;
+            const isActive = delta === 0;
+            return (
+              <motion.div
+                key={seed.id}
+                aria-hidden={!isActive}
+                initial={false}
+                animate={{
+                  x: `${groupThumbOffset(delta)}%`,
+                  rotateY: groupThumbTilt(delta),
+                  scale: isActive ? 1 : 0.8,
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="absolute left-1/2 top-0 -ml-7 size-14"
+                // 密に詰めた外側は中央寄りのサムネイルが上に重なるようにする。
+                // preserve-3d で子の側面 (厚み) を 3D 空間に保つ。
+                // 注意: このコンテナに opacity < 1 や filter を付けると CSS 仕様で
+                // preserve-3d が平面化され、背面がジャケットに被さって描画が壊れる。
+                // 減光は前面内のオーバーレイ、端の非表示は visibility で行う。
+                // 非表示は delta 固定数ではなく累積オフセットで判定する
+                // (間隔定数を詰めた時に画面内の項目まで隠れてポップインした反省)。
+                // 430% = 240px は max-w-md の clip 半幅 224px + 投影マージンで、
+                // 可視域内では絶対に切り替わらない。
+                style={{
+                  zIndex: 10 - Math.abs(delta),
+                  transformStyle: "preserve-3d",
+                  visibility:
+                    Math.abs(groupThumbOffset(delta)) > 430
+                      ? "hidden"
+                      : "visible",
+                }}
+              >
+                <GroupThumb seed={seed} isActive={isActive} />
+              </motion.div>
+            );
+          })}
+        </motion.div>
 
         {/* アーティスト名の座布団: 再生中の組のジャケットに下から少し被せ、
             右上がりに傾けて貼る。詳細表示ではサムネイルが消えるので、
@@ -1109,204 +1241,204 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
       {/* 組単位で左へ流れる。中は曲単位のカルーセル + 曲情報 */}
       <div className="relative w-full">
         <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={position.group}
-          initial={{ x: 72, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: -72, opacity: 0 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          className="flex w-full flex-col items-center gap-6"
-        >
-          {/* 曲順 + 楽曲名 + リリース年。アーティスト名の座布団の真下に置く。
+          <motion.div
+            key={position.group}
+            initial={{ x: 72, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -72, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="flex w-full flex-col items-center gap-6"
+          >
+            {/* 曲順 + 楽曲名 + リリース年。アーティスト名の座布団の真下に置く。
               曲名は座布団と同じ face、曲順とリリース年は楽曲情報と同じ等幅
               face で軽めに添える。-my-2 で上下の gap-6 を 1rem まで詰め、
               座布団 (行から 0.5rem はみ出す) と近づけている。 */}
-          <AnimatePresence mode="popLayout" initial={false}>
-            <motion.div
-              key={current.id}
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -10, opacity: 0 }}
-              transition={{ duration: 0.18 }}
-              className="-my-2 w-full px-2"
-            >
-              {/* 曲順とリリース年は文字数が違うので、素直に並べると曲名が
+            <AnimatePresence mode="popLayout" initial={false}>
+              <motion.div
+                key={current.id}
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -10, opacity: 0 }}
+                transition={{ duration: 0.18 }}
+                className="-my-2 w-full px-2"
+              >
+                {/* 曲順とリリース年は文字数が違うので、素直に並べると曲名が
                   その差だけ横にずれる。左右を 1fr の等幅トラックにして
                   中央トラック (曲名) を必ず画面中央へ置く。年が無い曲でも
                   トラックは残すので、ずれない。min-w は両側の最小幅を
                   揃えるためで、これが無いと窮屈な時だけ非対称に潰れる。 */}
-              <h2 className="grid grid-cols-[1fr_auto_1fr] items-baseline gap-2 text-2xl font-bold">
-                {/* text-right: min-w で確保した余白は曲名との間ではなく
+                <h2 className="grid grid-cols-[1fr_auto_1fr] items-baseline gap-2 text-2xl font-bold">
+                  {/* text-right: min-w で確保した余白は曲名との間ではなく
                     表示順の左側に置く (既定の左寄せだと #1 と曲名の間だけが
                     リリース年側の 4 倍空いて、曲名が右にずれて見える) */}
-                <span className="min-w-11 justify-self-end text-right font-mono text-sm font-light text-zinc-500 dark:text-zinc-400">
-                  #{position.song + 1}
-                </span>
-                {/* min-w-0: line-clamp の親が grid なので、これが無いと
+                  <span className="min-w-11 justify-self-end text-right font-mono text-sm font-light text-zinc-500 dark:text-zinc-400">
+                    #{position.song + 1}
+                  </span>
+                  {/* min-w-0: line-clamp の親が grid なので、これが無いと
                     曲名の最小内容幅がデッキごと画面外へ押し広げる */}
-                <Link
-                  href={`/songs/${current.id}`}
-                  className="line-clamp-1 min-w-0 hover:underline"
-                  style={{ fontFamily: PILLOW_FONT }}
-                >
-                  {current.title}
-                </Link>
-                <span className="min-w-11 justify-self-start font-mono text-sm font-light text-zinc-500 dark:text-zinc-400">
-                  {current.release_year
-                    ? `('${String(current.release_year).slice(-2)})`
-                    : ""}
-                </span>
-              </h2>
+                  <Link
+                    href={`/songs/${current.id}`}
+                    className="line-clamp-1 min-w-0 hover:underline"
+                    style={{ fontFamily: PILLOW_FONT }}
+                  >
+                    {current.title}
+                  </Link>
+                  <span className="min-w-11 justify-self-start font-mono text-sm font-light text-zinc-500 dark:text-zinc-400">
+                    {current.release_year
+                      ? `('${String(current.release_year).slice(-2)})`
+                      : ""}
+                  </span>
+                </h2>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* ジャケットのカルーセル (遷移ボタンなし。回転完了 or スキップで進む) */}
+            <motion.div
+              role="group"
+              aria-roledescription="カルーセル"
+              aria-label="同じアーティストの楽曲"
+              className="relative mx-auto"
+              style={{
+                width: detail ? DISC_SIZE_DETAIL : DISC_SIZE,
+                height: detail ? DISC_SIZE_DETAIL : DISC_SIZE,
+                transition: "width 0.24s ease-out, height 0.24s ease-out",
+              }}
+            >
+              {group.map((song, index) => {
+                const delta = index - position.song;
+                const isActive = delta === 0;
+                return (
+                  <motion.div
+                    key={song.id}
+                    aria-hidden={!isActive}
+                    initial={false}
+                    animate={{
+                      x: `${delta * SLIDE_OFFSET_PERCENT}%`,
+                      scale: isActive ? 1 : 0.65,
+                      // 詳細表示は再生中の 1 枚だけの画面なので、前後の盤は
+                      // 端から覗かせない (display を切ると復帰時にポップイン
+                      // するので、フェードで消して位置は保っておく)
+                      opacity: isActive
+                        ? 1
+                        : detail || Math.abs(delta) > 1
+                          ? 0
+                          : 0.45,
+                    }}
+                    transition={{ type: "spring", stiffness: 260, damping: 30 }}
+                    className="absolute inset-0"
+                    // 現在の盤を最前面に。隣の盤は縮小したまま端から覗き、
+                    // スライド時は現在の盤の後ろへ滑り込む
+                    style={{
+                      zIndex: isActive ? 10 : Math.abs(delta) === 1 ? 5 : 0,
+                    }}
+                  >
+                    <RecordDisc
+                      song={song}
+                      // 楽曲ページ表示中は回転を止める。詳細表示では 30 秒を
+                      // 流し切った時点で止める。曲送りはもう回転とは無関係
+                      // なので、これは純粋に見た目の停止。
+                      active={isActive && !sheetOpen && !detailEnded}
+                    />
+                  </motion.div>
+                );
+              })}
             </motion.div>
-          </AnimatePresence>
 
-          {/* ジャケットのカルーセル (遷移ボタンなし。回転完了 or スキップで進む) */}
-          <motion.div
-            role="group"
-            aria-roledescription="カルーセル"
-            aria-label="同じアーティストの楽曲"
-            className="relative mx-auto"
-            style={{
-              width: detail ? DISC_SIZE_DETAIL : DISC_SIZE,
-              height: detail ? DISC_SIZE_DETAIL : DISC_SIZE,
-              transition: "width 0.24s ease-out, height 0.24s ease-out",
-            }}
-          >
-            {group.map((song, index) => {
-              const delta = index - position.song;
-              const isActive = delta === 0;
-              return (
-                <motion.div
-                  key={song.id}
-                  aria-hidden={!isActive}
-                  initial={false}
-                  animate={{
-                    x: `${delta * SLIDE_OFFSET_PERCENT}%`,
-                    scale: isActive ? 1 : 0.65,
-                    // 詳細表示は再生中の 1 枚だけの画面なので、前後の盤は
-                    // 端から覗かせない (display を切ると復帰時にポップイン
-                    // するので、フェードで消して位置は保っておく)
-                    opacity: isActive
-                      ? 1
-                      : detail || Math.abs(delta) > 1
-                        ? 0
-                        : 0.45,
-                  }}
-                  transition={{ type: "spring", stiffness: 260, damping: 30 }}
-                  className="absolute inset-0"
-                  // 現在の盤を最前面に。隣の盤は縮小したまま端から覗き、
-                  // スライド時は現在の盤の後ろへ滑り込む
-                  style={{
-                    zIndex: isActive ? 10 : Math.abs(delta) === 1 ? 5 : 0,
-                  }}
-                >
-                  <RecordDisc
-                    song={song}
-                    // 楽曲ページ表示中は回転を止める。詳細表示では 30 秒を
-                    // 流し切った時点で止める。曲送りはもう回転とは無関係
-                    // なので、これは純粋に見た目の停止。
-                    active={isActive && !sheetOpen && !detailEnded}
-                  />
-                </motion.div>
-              );
-            })}
-          </motion.div>
-
-          {/* 詳細表示でだけレコードの下に出る、シートと同じ楽曲情報。
+            {/* 詳細表示でだけレコードの下に出る、シートと同じ楽曲情報。
               外側の AnimatePresence は組が変わるたびに作り直されるので、
               initial={false} で「組送りでは開閉アニメを再生しない」。
               曲送りでは中身のテキストだけが差し替わる。 */}
-          <AnimatePresence initial={false}>
-            {detail ? (
-              <motion.div
-                key="detail"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={DETAIL_TRANSITION}
-                className="w-full overflow-hidden text-center"
-              >
-                    <dl className="mx-auto max-w-60 divide-y divide-zinc-200 rounded-xl bg-zinc-100 px-4 text-left text-sm dark:divide-zinc-700/60 dark:bg-zinc-800/60">
-                      <div className="flex items-baseline py-2">
-                        <dt className="w-14 shrink-0 text-zinc-600 dark:text-zinc-400">
-                          地声
-                        </dt>
-                        <dd className="font-mono">
-                          {current.range_low_midi == null &&
-                          current.range_high_midi == null ? (
-                            "—"
-                          ) : (
-                            <>
-                              <ColoredNote midi={current.range_low_midi} />
-                              {" — "}
-                              <ColoredNote midi={current.range_high_midi} />
-                            </>
-                          )}
-                        </dd>
-                      </div>
-                      <div className="flex items-baseline py-2">
-                        <dt className="w-14 shrink-0 text-zinc-600 dark:text-zinc-400">
-                          裏声
-                        </dt>
-                        <dd className="font-mono">
-                          <ColoredNote midi={current.falsetto_max_midi} />
-                        </dd>
-                      </div>
-                      <div className="flex items-baseline py-2">
-                        <dt className="w-14 shrink-0 text-zinc-600 dark:text-zinc-400">
-                          長さ
-                        </dt>
-                        <dd className="font-mono">
-                          {formatDuration(current.duration_ms) || "—"}
-                        </dd>
-                      </div>
-                    </dl>
-                    <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5">
-                      {/* sort=4 = 歌詞ネットの人気順。検索結果をいきなり
+            <AnimatePresence initial={false}>
+              {detail ? (
+                <motion.div
+                  key="detail"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={DETAIL_TRANSITION}
+                  className="w-full overflow-hidden text-center"
+                >
+                  <dl className="mx-auto max-w-60 divide-y divide-zinc-200 rounded-xl bg-zinc-100 px-4 text-left text-sm dark:divide-zinc-700/60 dark:bg-zinc-800/60">
+                    <div className="flex items-baseline py-2">
+                      <dt className="w-14 shrink-0 text-zinc-600 dark:text-zinc-400">
+                        地声
+                      </dt>
+                      <dd className="font-mono">
+                        {current.range_low_midi == null &&
+                        current.range_high_midi == null ? (
+                          "—"
+                        ) : (
+                          <>
+                            <ColoredNote midi={current.range_low_midi} />
+                            {" — "}
+                            <ColoredNote midi={current.range_high_midi} />
+                          </>
+                        )}
+                      </dd>
+                    </div>
+                    <div className="flex items-baseline py-2">
+                      <dt className="w-14 shrink-0 text-zinc-600 dark:text-zinc-400">
+                        裏声
+                      </dt>
+                      <dd className="font-mono">
+                        <ColoredNote midi={current.falsetto_max_midi} />
+                      </dd>
+                    </div>
+                    <div className="flex items-baseline py-2">
+                      <dt className="w-14 shrink-0 text-zinc-600 dark:text-zinc-400">
+                        長さ
+                      </dt>
+                      <dd className="font-mono">
+                        {formatDuration(current.duration_ms) || "—"}
+                      </dd>
+                    </div>
+                  </dl>
+                  <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5">
+                    {/* sort=4 = 歌詞ネットの人気順。検索結果をいきなり
                           人気順で開いて、目当ての曲を探す手間を省く */}
-                      <Link
-                        href={`https://www.uta-net.com/search/?target=song&type=in&Keyword=${encodeURIComponent(current.title)}&sort=4`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="歌詞ネットで歌詞を見る"
-                        className={DETAIL_ACTION_CLASS}
-                      >
-                        <ScrollText className="size-4" aria-hidden />
-                        <span>歌詞を見る</span>
-                      </Link>
-                      {/* songs に Apple 側の id は持っていないので、曲名 +
+                    <Link
+                      href={`https://www.uta-net.com/search/?target=song&type=in&Keyword=${encodeURIComponent(current.title)}&sort=4`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="歌詞ネットで歌詞を見る"
+                      className={DETAIL_ACTION_CLASS}
+                    >
+                      <ScrollText className="size-4" aria-hidden />
+                      <span>歌詞を見る</span>
+                    </Link>
+                    {/* songs に Apple 側の id は持っていないので、曲名 +
                           アーティストの検索で開く (Music アプリの universal
                           link なので、iOS なら Music が直接立ち上がる) */}
-                      <Link
-                        href={`https://music.apple.com/jp/search?term=${encodeURIComponent(serviceSearchTerm)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="iTunes で聴く"
-                        className={DETAIL_ACTION_CLASS}
-                      >
-                        <Music className="size-4" aria-hidden />
-                        <span>iTunesで聴く</span>
-                      </Link>
-                      {/* track id があれば曲へ直接、無ければ検索へ逃がす */}
-                      <Link
-                        href={
-                          current.spotify_track_id
-                            ? `https://open.spotify.com/track/${current.spotify_track_id}`
-                            : `https://open.spotify.com/search/${encodeURIComponent(serviceSearchTerm)}`
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="Spotify で聴く"
-                        className={DETAIL_ACTION_CLASS}
-                      >
-                        <Play className="size-3.5 fill-current" aria-hidden />
-                        <span>Spotifyで聴く</span>
-                      </Link>
-                    </div>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
-        </motion.div>
+                    <Link
+                      href={`https://music.apple.com/jp/search?term=${encodeURIComponent(serviceSearchTerm)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="iTunes で聴く"
+                      className={DETAIL_ACTION_CLASS}
+                    >
+                      <Music className="size-4" aria-hidden />
+                      <span>iTunesで聴く</span>
+                    </Link>
+                    {/* track id があれば曲へ直接、無ければ検索へ逃がす */}
+                    <Link
+                      href={
+                        current.spotify_track_id
+                          ? `https://open.spotify.com/track/${current.spotify_track_id}`
+                          : `https://open.spotify.com/search/${encodeURIComponent(serviceSearchTerm)}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Spotify で聴く"
+                      className={DETAIL_ACTION_CLASS}
+                    >
+                      <Play className="size-3.5 fill-current" aria-hidden />
+                      <span>Spotifyで聴く</span>
+                    </Link>
+                  </div>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          </motion.div>
         </AnimatePresence>
       </div>
 
@@ -1369,36 +1501,36 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         transition={DETAIL_TRANSITION}
         className="w-full overflow-hidden"
       >
-      <div className="grid w-full grid-cols-[1fr_1fr_3.5rem] items-center gap-3">
-        <button
-          type="button"
-          onClick={handleSkipSong}
-          className="relative flex h-14 items-center justify-center gap-1.5 rounded-full text-sm font-medium text-zinc-700 transition active:brightness-90 dark:text-zinc-100"
-        >
-          <GlassSurface variant="control" />
-          <SkipForward className="relative size-4" aria-hidden />
-          <span className="relative">1曲スキップ</span>
-        </button>
-        <button
-          type="button"
-          onClick={handleSkipGroup}
-          className="relative flex h-14 items-center justify-center gap-1.5 rounded-full text-sm font-medium text-zinc-700 transition active:brightness-90 dark:text-zinc-100"
-        >
-          <GlassSurface variant="control" />
-          <FastForward className="relative size-4" aria-hidden />
-          <span className="relative">次の組へ</span>
-        </button>
-        <button
-          type="button"
-          onClick={handleBack}
-          disabled={!lastAction && !previousPosition}
-          className="relative mx-auto flex size-14 items-center justify-center rounded-full text-zinc-700 transition active:brightness-90 disabled:opacity-30 dark:text-zinc-100"
-          aria-label="前の曲に戻る"
-        >
-          <GlassSurface variant="control" />
-          <Undo2 className="relative size-5" />
-        </button>
-      </div>
+        <div className="grid w-full grid-cols-[1fr_1fr_3.5rem] items-center gap-3">
+          <button
+            type="button"
+            onClick={handleSkipSong}
+            className="relative flex h-14 items-center justify-center gap-1.5 rounded-full text-sm font-medium text-zinc-700 transition active:brightness-90 dark:text-zinc-100"
+          >
+            <GlassSurface variant="control" />
+            <SkipForward className="relative size-4" aria-hidden />
+            <span className="relative">1曲スキップ</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleSkipGroup}
+            className="relative flex h-14 items-center justify-center gap-1.5 rounded-full text-sm font-medium text-zinc-700 transition active:brightness-90 dark:text-zinc-100"
+          >
+            <GlassSurface variant="control" />
+            <FastForward className="relative size-4" aria-hidden />
+            <span className="relative">次の組へ</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleBack}
+            disabled={!lastAction && !previousPosition}
+            className="relative mx-auto flex size-14 items-center justify-center rounded-full text-zinc-700 transition active:brightness-90 disabled:opacity-30 dark:text-zinc-100"
+            aria-label="前の曲に戻る"
+          >
+            <GlassSurface variant="control" />
+            <Undo2 className="relative size-5" />
+          </button>
+        </div>
       </motion.div>
     </div>
   );
@@ -1654,7 +1786,9 @@ function GroupThumb({ seed, isActive }: { seed: Song; isActive: boolean }) {
   const thumbSrc = seed.image_url_medium ?? seed.image_url_large;
   // 厚みが陰として読めるよう、代表色を大きく暗くして背表紙に塗る
   // 背表紙の色は現在の組だけ先に出す (残り 6 組ぶんは idle まで待たせる)。
-  const spineColor = spineColorOf(useVinylColor(thumbSrc, isActive) ?? "#3f3f46");
+  const spineColor = spineColorOf(
+    useVinylColor(thumbSrc, isActive) ?? "#3f3f46",
+  );
   const spineStyle = {
     backgroundColor: spineColor,
     borderRadius: GROUP_THUMB_RADIUS_PX,

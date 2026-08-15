@@ -1,11 +1,12 @@
+import { getAudioContext, resumeAudioContext } from "@/lib/audio-context";
 import type { Database } from "@/types/database";
 
 type Rating = Database["public"]["Enums"]["rating_type"];
 
 // Web Audio で「練習中」音 (Cmaj7 ハープ + 低域ドン + 高域シマー) を
 // ベースに、4 つの評価ボタンで和音 voicing と細部だけ変えて A/B 比較
-// できるようにする。AudioContext はタップ初回に遅延生成して使い回す。
-let audioCtx: AudioContext | null = null;
+// できるようにする。AudioContext は試聴のクロスフェードと共有する
+// (audio-context.ts)。
 
 function playLowThump(
   ctx: AudioContext,
@@ -51,15 +52,10 @@ function playPartial(
 
 export function triggerRatingSound(rating: Rating) {
   if (typeof window === "undefined") return;
-  const Ctor =
-    window.AudioContext ??
-    (window as unknown as { webkitAudioContext?: typeof AudioContext })
-      .webkitAudioContext;
-  if (!Ctor) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
   try {
-    if (!audioCtx) audioCtx = new Ctor();
-    if (audioCtx.state === "suspended") void audioCtx.resume();
-    const ctx = audioCtx;
+    resumeAudioContext();
     const now = ctx.currentTime;
 
     // 共通: 低域ドン + 上にハープアルペジオのみ (高域シマー / ガラス音は廃止)。
