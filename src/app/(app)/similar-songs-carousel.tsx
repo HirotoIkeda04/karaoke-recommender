@@ -6,8 +6,13 @@ import { JacketImage } from "@/components/ui/jacket-image";
 import { midiToKaraoke, noteChipColor } from "@/lib/note";
 import type { SimilarSong } from "@/lib/similar-songs";
 
-/** カードの横幅 (rem)。ジャケットは正方形なのでこれが高さの主要素にもなる */
-const CARD_WIDTH_REM = 3.75;
+/**
+ * カードの横幅 (rem)。ジャケットは正方形なのでこれが高さの主要素にもなる。
+ * 4.5rem = 72px は音域表示に合わせた幅: 等幅 10px の 1 文字が 6px なので
+ * "mid1G#–hiD" のような 10 文字で 60px、"mid1F–hihiA" の 11 文字でも 66px と
+ * 収まる。3.75rem (60px) では 10 文字がちょうど埋まって省略記号が出ていた。
+ */
+const CARD_WIDTH_REM = 4.5;
 
 /**
  * デッキの詳細表示に出す「似た音域の楽曲」。
@@ -67,7 +72,7 @@ export function SimilarSongsCarousel({
                         }
                         alt=""
                         fill
-                        sizes="3.75rem"
+                        sizes="4.5rem"
                         className="object-cover"
                         draggable={false}
                       />
@@ -80,23 +85,29 @@ export function SimilarSongsCarousel({
                   <p className="mt-0.5 line-clamp-1 text-[0.6875rem] leading-tight text-zinc-800 dark:text-zinc-100">
                     {song.title}
                   </p>
-                  {/* 音域は 1 行に潰す。この行の存在理由が「似た音域」なので、
-                      曲名より先にここが読めた方が選びやすい */}
-                  <p className="line-clamp-1 font-mono text-[0.625rem] leading-tight">
+                  {/* 音域は 1 行。この行の存在理由が「似た音域」なので、
+                      曲名より先にここが読めた方が選びやすい。
+                      幅が足りない時に削るのは地声の下限側だけにしてある
+                      (min-w-0 + truncate)。上限は shrink-0 で必ず出す:
+                      歌えるかの判断は最高音で決まるので、そこが "…" に
+                      なると行ごと無意味になる。 */}
+                  <p className="flex items-baseline justify-center font-mono text-[0.625rem] leading-tight">
                     {song.range_low_midi != null &&
                     song.range_high_midi != null ? (
                       <>
                         <span
+                          className="min-w-0 truncate"
                           style={{
                             color: noteChipColor(song.range_low_midi).background,
                           }}
                         >
                           {midiToKaraoke(song.range_low_midi)}
                         </span>
-                        <span className="text-zinc-500 dark:text-zinc-400">
+                        <span className="shrink-0 text-zinc-500 dark:text-zinc-400">
                           {"–"}
                         </span>
                         <span
+                          className="shrink-0"
                           style={{
                             color: noteChipColor(song.range_high_midi)
                               .background,

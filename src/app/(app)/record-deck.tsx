@@ -1023,7 +1023,10 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                   トラックは残すので、ずれない。min-w は両側の最小幅を
                   揃えるためで、これが無いと窮屈な時だけ非対称に潰れる。 */}
               <h2 className="grid grid-cols-[1fr_auto_1fr] items-baseline gap-2 text-2xl font-bold">
-                <span className="min-w-11 justify-self-end font-mono text-sm font-light text-zinc-500 dark:text-zinc-400">
+                {/* text-right: min-w で確保した余白は曲名との間ではなく
+                    表示順の左側に置く (既定の左寄せだと #1 と曲名の間だけが
+                    リリース年側の 4 倍空いて、曲名が右にずれて見える) */}
+                <span className="min-w-11 justify-self-end text-right font-mono text-sm font-light text-zinc-500 dark:text-zinc-400">
                   #{position.song + 1}
                 </span>
                 {/* min-w-0: line-clamp の親が grid なので、これが無いと
@@ -1233,7 +1236,10 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={DETAIL_TRANSITION}
-            className="w-full overflow-hidden"
+            // -mt-3: カードを音域が収まる幅 (4.5rem) に広げるとジャケットも
+            // 正方形のぶん高くなるので、その 12px を評価ボタンとの間隔から
+            // 返してもらい、詳細全体の高さは変えない。
+            className="-mt-3 w-full overflow-hidden"
           >
             <SimilarSongsCarousel
               songs={similarSongs}
