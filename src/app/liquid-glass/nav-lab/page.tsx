@@ -24,14 +24,15 @@ import {
   useLensWobble,
 } from "@samasante/liquid-glass";
 import { Liquid } from "liquid-gooey";
-import { Home, LibraryBig, Search, Users } from "lucide-react";
+import { Home, LibraryBig, Users } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { GlassSurface } from "@/components/ui/glass-surface";
 
+// 本番のカプセルと同じ 3 タブ。検索はカプセルの外の独立ボタンになったので
+// ここでは扱わない (インジケータが動くのはカプセル内だけ)。
 const ITEMS = [
   { label: "評価", icon: Home },
-  { label: "検索", icon: Search },
   { label: "ライブラリ", icon: LibraryBig },
   { label: "ルーム", icon: Users },
 ];
@@ -43,7 +44,8 @@ const LENS_R = 25;
 // 本番のナビと同じ寸法 (app-bottom-nav.tsx を参照)
 const LABEL_PX = 12;
 const PILL_H = 48;
-const PILL_R = 18;
+const PILL_R = 24;
+const PILL_INSET_X = 6;
 
 const EASE = cubicBezier(0.34, 1.36, 0.42, 1);
 const MOVE_ANIM = { ease: EASE, duration: 0.52 };
@@ -90,7 +92,7 @@ function Tabs({
   onPick: (i: number) => void;
 }) {
   return (
-    <ul className="grid h-full grid-cols-4 items-center">
+    <ul className="grid h-full grid-cols-3 items-center">
       {ITEMS.map((item, i) => {
         const Icon = item.icon;
         const isActive = i === active;
@@ -156,11 +158,11 @@ function GooIndicator({ active }: { active: number }) {
         style={{
           position: "absolute",
           top: (BAR_H - PILL_H) / 2,
-          left: 0,
-          width: "25%",
+          left: PILL_INSET_X,
+          width: `calc(${100 / ITEMS.length}% - ${PILL_INSET_X * 2}px)`,
           height: PILL_H,
           borderRadius: PILL_R,
-          transform: `translateX(${active * 100}%)`,
+          transform: `translateX(calc(${active} * (100% + ${PILL_INSET_X * 2}px)))`,
           transition: CSS_MOVE,
         }}
       />
