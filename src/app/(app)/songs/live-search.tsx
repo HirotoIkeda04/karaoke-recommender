@@ -54,7 +54,7 @@ interface LiveSearchProps {
   ratings: Record<string, string>;
   /** Spotify で聴いたことがある song_id 一覧 */
   knownSongIds?: string[];
-  /** ジャンルカード右下の丸い画像に使う、各ジャンル top 4 曲のジャケット URL */
+  /** ジャンルカードの丸い画像に使う、各ジャンル top 4 曲のジャケット URL */
   genreCovers?: Partial<Record<GenreCode, string[]>>;
   /** ランキングカード背景に使う、今週 top 4 曲のジャケット URL */
   rankingCovers?: string[];
@@ -92,12 +92,13 @@ const GENRE_CARD_COLORS: Record<GenreCode, string> = {
   other: "#525c68",
 };
 
-const GENRE_COVER_BUBBLES = [
-  { size: 48, right: -8, bottom: -6, zIndex: 5 },
-  { size: 48, right: 27, bottom: 4, zIndex: 4 },
-  { size: 48, right: 62, bottom: -2, zIndex: 3 },
-  { size: 48, right: 8, bottom: 38, zIndex: 2 },
-  { size: 48, right: 43, bottom: 42, zIndex: 1 },
+// ジャケット 3 枚を横一列の円で重ねる。中央を大きく前面に置き、
+// 幅の合計 (32 + 42 + 32 - 重なり 6) がちょうど 100% になるようにしている。
+const GENRE_COVER_TRIO = [
+  // covers[0] を中央に置きたいので、描画順は左 → 中央 → 右で並べ替える
+  { coverIndex: 1, className: "w-[32%]" },
+  { coverIndex: 0, className: "z-10 -mx-[3%] w-[42%]" },
+  { coverIndex: 2, className: "w-[32%]" },
 ] as const;
 
 const DEBOUNCE_MS = 200;
@@ -668,7 +669,8 @@ function GuestScopeNotice() {
 
 // ============================================================================
 // Browse: ジャンルカードグリッド
-//   - ジャンル固有の単色を背景にし、上位曲のジャケットを右下へ円形に重ねる。
+//   - ジャンル固有の単色を背景にし、上位曲のジャケット 3 枚を円形に重ねて
+//     中央へ置き、その下にジャンル名を出す。
 //   - covers が空でも単色カードとして成立させる。
 // ============================================================================
 function BrowseGrid({
@@ -899,31 +901,27 @@ function BrowseGrid({
             <li key={code}>
               <Link
                 href={`/songs/genre/${code}`}
-                className="relative flex aspect-video items-start overflow-hidden rounded-lg pl-4 pr-3 pt-4 pb-3 transition active:scale-[0.98]"
+                className="relative flex aspect-square flex-col overflow-hidden rounded-lg px-4 py-4 transition active:scale-[0.98]"
                 style={{ backgroundColor: GENRE_CARD_COLORS[code] }}
               >
                 {covers.length > 0 ? (
-                  <div className="absolute inset-0" aria-hidden>
-                    {covers.slice(0, 5).map((src, index) => {
-                      const bubble = GENRE_COVER_BUBBLES[index];
+                  <div
+                    className="flex flex-1 items-center justify-center"
+                    aria-hidden
+                  >
+                    {GENRE_COVER_TRIO.map(({ coverIndex, className }) => {
+                      const src = covers[coverIndex];
+                      if (!src) return null;
                       return (
                         <div
                           key={src}
-                          className="absolute overflow-hidden rounded-full border-[3px] border-solid bg-black/15"
-                          style={{
-                            width: bubble.size,
-                            height: bubble.size,
-                            right: bubble.right,
-                            bottom: bubble.bottom,
-                            zIndex: bubble.zIndex,
-                            borderColor: GENRE_CARD_COLORS[code],
-                          }}
+                          className={`relative aspect-square shrink-0 overflow-hidden rounded-full bg-black/15 ${className}`}
                         >
                           <JacketImage
                             src={src}
                             alt=""
                             fill
-                            sizes={`${bubble.size}px`}
+                            sizes="(max-width: 640px) 25vw, 12vw"
                             className="object-cover"
                           />
                         </div>
@@ -931,7 +929,7 @@ function BrowseGrid({
                     })}
                   </div>
                 ) : null}
-                <span className="relative z-10 max-w-[58%] text-sm font-extrabold leading-tight tracking-tight text-white">
+                <span className="mt-3 text-sm font-extrabold leading-tight tracking-tight text-white">
                   {GENRE_LABELS[code]}
                 </span>
               </Link>
