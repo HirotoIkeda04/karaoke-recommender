@@ -67,6 +67,13 @@
   --font-mono:
     ui-monospace, SFMono-Regular, "SF Mono", var(--font-geist-mono), Menlo,
     monospace;
+  /* 明朝 (プロフィールの表示名)。端末標準の明朝だけで賄う。
+     Noto Serif JP を next/font/google で読むとサブセットが 240 ファイルになり、
+     Vercel のビルドが fonts.gstatic.com から 404 を食らって落ちたため外した
+     (layout.tsx のコメント参照)。iOS/macOS は Hiragino Mincho ProN。 */
+  --font-serif-jp:
+    "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Yu Mincho", YuMincho,
+    "Noto Serif JP", "Songti SC", serif;
 
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Inter, Noto_Serif_JP } from "next/font/google";
+import { Geist_Mono, Inter } from "next/font/google";
 
 import { ServiceWorkerRegister } from "@/components/sw-register";
 
@@ -20,12 +20,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const notoSerifJp = Noto_Serif_JP({
-  variable: "--font-noto-serif-jp",
-  subsets: ["latin"],
-  weight: ["500", "700"],
-  display: "swap",
-});
+// 明朝 (プロフィールの表示名) は next/font/google から外し、globals.css の
+// --font-serif-jp (端末の明朝) に任せている。
+//
+// 理由: Noto Serif JP は日本語の unicode-range サブセットが 1 ウェイトあたり
+// 120 個あり、2 ウェイトで 1 ビルド 240 リクエストを fonts.gstatic.com に
+// 投げる。2026-08-15 の Vercel (iad1) ビルドで、このうち 124 件が 404 を返して
+// ビルドが落ちた (レート制限とみられる。ローカルでは再現しない)。
+// 表示名 1 箇所のためにビルドを外部サービスの機嫌に依存させる価値はない。
+// iOS/macOS には Hiragino Mincho ProN が標準で載っているので、
+// システムフォント優先という全体方針とも一致する。
 
 export const metadata: Metadata = {
   title: "KyokuMoku",
@@ -50,7 +54,7 @@ export default function RootLayout({
   return (
     <html
       lang="ja"
-      className={`dark ${inter.variable} ${geistMono.variable} ${notoSerifJp.variable} h-full antialiased`}
+      className={`dark ${inter.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ServiceWorkerRegister />
