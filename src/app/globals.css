@@ -203,6 +203,33 @@
   unicode-range: U+0020-024F, U+1E00-1EFF, U+2000-206F;
 }
 
+/* 日本語の見出し用に、CSS の font-weight では届かない太さを直接指名する face。
+
+   日本語は font-weight をいくら上げても Hiragino Sans W6 で頭打ちになる。
+   canvas に描いてインク量を測ると、system-ui の 600 / 700 / 800 / 900 が
+   すべて W6 と完全に同じ値 (1313) を返す。一方 PostScript 名で直に呼べば
+   W7 = 1489、W8 = 1678、W9 = 1893 と、端末には確かに太い face が載っている。
+   weight 経由で選べないだけなので、見出しはここから名指しで取る。
+
+   CondensedDisplay と同じくローカルフォント限定 (外部取得は増やさない)。
+   W7/W8 を持たない端末では face 自体が読み込まれず、次のフォールバック
+   (= 従来どおりの W6) に落ちるだけなので、無い環境でも壊れない。
+   font-weight は単一値で書くこと (範囲だと Lightning CSS がルールごと落とす)。 */
+@font-face {
+  font-family: "JapaneseDisplay";
+  /* W7 を第一候補にする。W6 から一段だけ太くなる見出し向きの太さで、
+     W8 以上は 24px の曲名には潰れ気味になる (W8 は W7 が無い端末向けの保険)。 */
+  src:
+    local("HiraginoSans-W7"), local("Hiragino Sans W7"),
+    local("HiraginoSans-W8"), local("Hiragino Sans W8"),
+    local("NotoSansJP-Black"), local("Noto Sans JP Black");
+  font-weight: 700;
+  /* かな + CJK 漢字 + 全角記号だけに効かせ、ラテン文字は前段の
+     CondensedDisplay に任せる */
+  unicode-range: U+3000-30FF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF,
+    U+FF00-FFEF;
+}
+
 /* ホームのレコード盤回転。1 周 = 1 曲の表示時間で、record-deck.tsx が
    animationiteration イベントを使って周回ごとに次の曲へ送る。 */
 @keyframes record-spin {

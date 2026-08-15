@@ -6,6 +6,8 @@ import {
   Dices,
   FastForward,
   Minus,
+  Music,
+  Play,
   ScrollText,
   SkipForward,
   Undo2,
@@ -59,14 +61,14 @@ const SILENT_WAV =
 /**
  * ディスク径。横幅いっぱい (左右 1.75rem マージン) を基本に、
  * 縦に収まらない小さい画面ではヘッダー + 組カルーセル + 曲名 +
- * ボタン群 + ナビの予約分 (約 30rem) を引いた残りへ縮める。上限 20rem。
+ * ボタン群 + ナビの予約分 (約 29.25rem) を引いた残りへ縮める。上限 20rem。
  * loading.tsx の skeleton と式を揃えること。
  * 内訳: pt-3 0.75 + 組カルーセル 3.5 + gap 1.5 + 曲名 1.75 + gap 1.5 +
- * (盤) + gap 1.5 + 評価 4.875 + gap 1.5 + スキップ行 3.5 + pb-2 0.5 の
- * 20.875rem に、ヘッダーと浮いたナビの実測 9.125rem を足した値。
+ * (盤) + gap 1.5 + 評価 4.875 + gap 1.5 + スキップ行 3.5 + pb-2 0.5 から
+ * 曲名行の -my-2 (1rem) を引いた 20.125rem に、ヘッダーと浮いたナビの実測 9.125rem を足した値。
  */
 const DISC_SIZE =
-  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 30rem - env(safe-area-inset-bottom))))";
+  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 29.25rem - env(safe-area-inset-bottom))))";
 
 /**
  * 詳細表示 (上スワイプ) 中のディスク径。組カルーセルの行が 3.5rem から
@@ -77,7 +79,7 @@ const DISC_SIZE =
  * (詳細ではナビを引っ込めるが、main の下 padding は残るので予約はそのまま)
  */
 const DISC_SIZE_DETAIL =
-  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 33.25rem - env(safe-area-inset-bottom))))";
+  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.5rem - env(safe-area-inset-bottom))))";
 
 /**
  * 座布団の top (px)。サムネイル (56px) の下辺をまたいで貼り、
@@ -97,8 +99,20 @@ const PILLOW_TILT_DEG = -2;
 const PILLOW_NOISE =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E\")";
 
-/** 座布団のフォント。ラテン文字だけ globals.css の縦長 face に載せる */
-const PILLOW_FONT = '"CondensedDisplay", var(--font-sans)';
+/**
+ * 座布団と曲名のフォント。ラテン文字は縦長 face、日本語は font-weight では
+ * 届かない太さの face (どちらも globals.css) に載せ、無ければ通常の sans。
+ */
+const PILLOW_FONT = '"CondensedDisplay", "JapaneseDisplay", var(--font-sans)';
+
+/**
+ * 詳細表示のアクションボタン (歌詞 / 各サービス) の共通スタイル。
+ * 3 つを 375px 幅で 1 行に収めるため、パディングとアイコン間隔を詰めてある
+ * (合計 329px + 間隔 12px < 内容幅 343px)。それより狭い端末では
+ * flex-wrap で 2 行に折れて、その分だけ盤が縮む。
+ */
+const DETAIL_ACTION_CLASS =
+  "inline-flex h-9 items-center justify-center gap-1 rounded-full bg-zinc-100/80 px-2 text-xs font-medium text-zinc-700 backdrop-blur-sm transition hover:bg-zinc-200/85 active:bg-zinc-200/85 dark:bg-zinc-800/75 dark:text-zinc-200 dark:hover:bg-zinc-700/80 dark:active:bg-zinc-700/80";
 
 /**
  * 詳細表示を切り替えるスワイプの最小縦移動量 (px)。評価ボタンのタップや
@@ -726,6 +740,10 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
 
   const nextGroup = groups[position.group + 1];
 
+  // 各サービスへ検索で飛ばす時の語。曲名だけだと同名異曲に当たるので
+  // アーティスト名も混ぜる。
+  const serviceSearchTerm = `${current.title} ${current.artist}`;
+
   // overflow-clip: transform で外側に置いた隣のディスクが overflow-hidden だと
   // スクロール可能領域を作ってしまい、フォーカス移動等の scrollIntoView で
   // レイアウト全体が横にずれる。clip はスクロール自体を不可能にする。
@@ -775,7 +793,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         disabled={shuffling}
         aria-label="デッキをシャッフルする"
         inert={detail}
-        className="absolute left-1 top-1 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90 disabled:opacity-60"
+        className="absolute left-4 top-2 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90 disabled:opacity-60"
         // 詳細表示では消すが、disabled:opacity-60 と競合しないよう
         // クラスではなくインラインで上書きする。
         style={detail ? { opacity: 0 } : undefined}
@@ -792,7 +810,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         aria-label={
           audioOn && !audioBlocked ? "試聴を停止する" : "試聴を再生する"
         }
-        className="absolute right-1 top-1 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90"
+        className="absolute right-4 top-2 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90"
       >
         <GlassSurface variant="overlay" />
         {audioOn && !audioBlocked ? (
@@ -939,8 +957,9 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           className="flex w-full flex-col items-center gap-6"
         >
           {/* 曲順 + 楽曲名 + リリース年。アーティスト名の座布団の真下に置く。
-              曲名は座布団と同じ縦長 face、曲順とリリース年は楽曲情報と同じ
-              等幅 face で軽めに添える。 */}
+              曲名は座布団と同じ face、曲順とリリース年は楽曲情報と同じ等幅
+              face で軽めに添える。-my-2 で上下の gap-6 を 1rem まで詰め、
+              座布団 (行から 0.5rem はみ出す) と近づけている。 */}
           <AnimatePresence mode="popLayout" initial={false}>
             <motion.div
               key={current.id}
@@ -948,10 +967,10 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -10, opacity: 0 }}
               transition={{ duration: 0.18 }}
-              className="w-full px-2"
+              className="-my-2 w-full px-2"
             >
-              <h2 className="flex items-baseline justify-center gap-2 text-xl font-semibold">
-                <span className="shrink-0 font-mono text-base font-light text-zinc-500 dark:text-zinc-400">
+              <h2 className="flex items-baseline justify-center gap-2 text-2xl font-bold">
+                <span className="shrink-0 font-mono text-sm font-light text-zinc-500 dark:text-zinc-400">
                   #{position.song + 1}
                 </span>
                 {/* min-w-0: line-clamp の親が flex なので、これが無いと
@@ -1079,18 +1098,48 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                         </dd>
                       </div>
                     </dl>
-                    {/* sort=4 = 歌詞ネットの人気順。検索結果をいきなり
-                        人気順で開いて、目当ての曲を探す手間を省く */}
-                    <Link
-                      href={`https://www.uta-net.com/search/?target=song&type=in&Keyword=${encodeURIComponent(current.title)}&sort=4`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="歌詞ネットで歌詞を見る"
-                      className="mt-2 inline-flex h-9 items-center justify-center gap-2 rounded-full bg-zinc-100/80 px-4 text-xs font-medium text-zinc-700 backdrop-blur-sm transition hover:bg-zinc-200/85 active:bg-zinc-200/85 dark:bg-zinc-800/75 dark:text-zinc-200 dark:hover:bg-zinc-700/80 dark:active:bg-zinc-700/80"
-                    >
-                      <ScrollText className="size-4" aria-hidden />
-                      <span>歌詞を見る</span>
-                    </Link>
+                    <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5">
+                      {/* sort=4 = 歌詞ネットの人気順。検索結果をいきなり
+                          人気順で開いて、目当ての曲を探す手間を省く */}
+                      <Link
+                        href={`https://www.uta-net.com/search/?target=song&type=in&Keyword=${encodeURIComponent(current.title)}&sort=4`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="歌詞ネットで歌詞を見る"
+                        className={DETAIL_ACTION_CLASS}
+                      >
+                        <ScrollText className="size-4" aria-hidden />
+                        <span>歌詞を見る</span>
+                      </Link>
+                      {/* songs に Apple 側の id は持っていないので、曲名 +
+                          アーティストの検索で開く (Music アプリの universal
+                          link なので、iOS なら Music が直接立ち上がる) */}
+                      <Link
+                        href={`https://music.apple.com/jp/search?term=${encodeURIComponent(serviceSearchTerm)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="iTunes で聴く"
+                        className={DETAIL_ACTION_CLASS}
+                      >
+                        <Music className="size-4" aria-hidden />
+                        <span>iTunesで聴く</span>
+                      </Link>
+                      {/* track id があれば曲へ直接、無ければ検索へ逃がす */}
+                      <Link
+                        href={
+                          current.spotify_track_id
+                            ? `https://open.spotify.com/track/${current.spotify_track_id}`
+                            : `https://open.spotify.com/search/${encodeURIComponent(serviceSearchTerm)}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Spotify で聴く"
+                        className={DETAIL_ACTION_CLASS}
+                      >
+                        <Play className="size-3.5 fill-current" aria-hidden />
+                        <span>Spotifyで聴く</span>
+                      </Link>
+                    </div>
               </motion.div>
             ) : null}
           </AnimatePresence>

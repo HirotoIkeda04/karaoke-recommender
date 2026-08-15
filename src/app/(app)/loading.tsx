@@ -34,15 +34,15 @@ export default function Loading() {
         </div>
       </div>
 
-      {/* 曲順 + 楽曲名 + リリース年 */}
-      <div className="h-7 w-48 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+      {/* 曲順 + 楽曲名 + リリース年 (-my-2 は record-deck.tsx の曲名行と対応) */}
+      <div className="-my-2 h-8 w-48 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
 
       {/* レコード盤 */}
       <div
         className="animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800"
         style={{
           width:
-            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 30rem - env(safe-area-inset-bottom))))",
+            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 29.25rem - env(safe-area-inset-bottom))))",
           aspectRatio: "1 / 1",
         }}
       />
