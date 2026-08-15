@@ -27,24 +27,24 @@ export interface EvaluationRow {
   song: Song | null;
 }
 
-export type SortKey = "updated" | "artist" | "release_year" | "range_high";
+export type SortKey = "updated" | "range_high" | "release_year" | "artist";
 export type SortDir = "asc" | "desc";
 
+/** 並び順は項目ごとに固定 (YouTube のソートチップと同様に切り替えのみ) */
 export const SORT_OPTIONS: ReadonlyArray<{
   key: SortKey;
   label: string;
-  defaultDir: SortDir;
+  dir: SortDir;
 }> = [
-  { key: "updated", label: "評価日", defaultDir: "desc" },
-  { key: "artist", label: "アーティスト名", defaultDir: "asc" },
-  { key: "release_year", label: "発売年", defaultDir: "desc" },
-  { key: "range_high", label: "最高音", defaultDir: "desc" },
+  { key: "updated", label: "評価日", dir: "desc" },
+  { key: "range_high", label: "最高音", dir: "desc" },
+  { key: "release_year", label: "発売年", dir: "desc" },
+  { key: "artist", label: "アーティスト名", dir: "asc" },
 ];
 
 interface SortableListProps {
   evaluations: EvaluationRow[];
   sortKey: SortKey;
-  sortDir: SortDir;
   /** Spotify で聴いたことがある song_id リスト (バッジ表示用) */
   knownSongIds?: string[];
   /** false にすると曲行を曲詳細ページへリンクしない (フレンド閲覧時) */
@@ -81,18 +81,18 @@ function compareEvaluation(
 export function SortableList({
   evaluations,
   sortKey,
-  sortDir,
   knownSongIds = [],
   linkable = true,
 }: SortableListProps) {
   const knownSet = useMemo(() => new Set(knownSongIds), [knownSongIds]);
 
   const sorted = useMemo(() => {
-    const factor = sortDir === "asc" ? 1 : -1;
+    const dir = SORT_OPTIONS.find((o) => o.key === sortKey)?.dir ?? "desc";
+    const factor = dir === "asc" ? 1 : -1;
     return [...evaluations].sort(
       (a, b) => compareEvaluation(a, b, sortKey) * factor,
     );
-  }, [evaluations, sortKey, sortDir]);
+  }, [evaluations, sortKey]);
 
   return (
     <ul>
