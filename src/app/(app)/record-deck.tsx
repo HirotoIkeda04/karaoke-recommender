@@ -17,7 +17,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { startTransition, useEffect, useRef, useState } from "react";
+import {
+  startTransition,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { DumbbellMini } from "@/components/icons/dumbbell-mini";
 import { useDeckDetail } from "@/components/deck-detail-context";
@@ -41,10 +47,11 @@ type Song = Database["public"]["Tables"]["songs"]["Row"];
 type Rating = Database["public"]["Enums"]["rating_type"];
 
 /**
- * レコード 1 周の時間 (ms) = 1 曲の表示時間。
- * 回転アニメーション (globals.css の record-spin) の周期であり、
- * animationiteration イベント経由で次の曲への自動送りも司る。
- * 試聴もこの周期に合わせた頭出しスニペット (曲送りで音源ごと切替)。
+ * 1 曲の表示時間 (ms) = 試聴スニペットの尺。曲送りのタイマーと、
+ * 盤の回転アニメーション (globals.css の record-spin) の周期を兼ねる。
+ * ただし両者は独立して動く。回転の角度と再生位置は一致していなくてよく、
+ * 揃っている必要があるのは「フェードが終わる瞬間」と「曲が変わる瞬間」
+ * だけなので、その 2 つは同じ起点 (snippetOriginRef) から数える。
  */
 const ROTATION_MS = 6000;
 
@@ -125,6 +132,8 @@ const DETAIL_SWIPE_PX = 48;
 /**
  * 詳細表示中の再生尺 (ms)。iTunes の試聴音源 1 本ぶん。この間は 6 秒の
  * フェード / 曲送りを止めてカット無しで流し、流し切ったら盤ごと停止する。
+ * 実際に鳴っている時の流し切り判定は音源の ended に任せるので、これは
+ * 音が鳴らない時 (音源なし / 消音 / 自動再生ブロック中) の代替タイマー。
  */
 const DETAIL_PLAY_MS = 30000;
 
@@ -281,6 +290,16 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   // 再生中の曲 id。タップ起点の再生と曲送り effect の二重再生を防ぐ。
   const playingSongIdRef = useRef<string | null>(null);
+  // 今の 6 秒スニペットが音源の何秒目から始まったか。詳細表示から戻った
+  // 時は途中の再生位置がそのまま起点になるので、フェードも曲送りもここを
+  // 基準に数える (音源を頭出しし直さないため、絶対値では測れない)。
+  const snippetOriginRef = useRef(0);
+  // 今 <audio> に載っているのが実際の試聴音源か (アンロック用の無音 WAV で
+  // ないか)。無音 WAV は即 ended が飛ぶので、そこで曲送りしないための印。
+  const previewPlayingRef = useRef(false);
+  // 音源を最後まで流し切った時の処理。ensureAudio の中でリスナーを張るが、
+  // 中身は毎レンダー差し替えて最新の state を見せる。
+  const onAudioEndedRef = useRef<() => void>(() => {});
   // 初期値 true: マウント直後の play() の reject が届く前の素早いタップでも
   // ジェスチャ再試行が動くようにする (鳴っていれば再試行側の guard が弾く)。
   const needsGestureRetryRef = useRef(true);
@@ -350,13 +369,22 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     el.addEventListener("timeupdate", () => {
       // フル尺モード (楽曲ページ表示中) はフェード/カットせず最後まで流す
       if (fullModeRef.current) return;
-      const remain = ROTATION_MS / 1000 - el.currentTime;
+      // 窓の終わりは「起点 + 6 秒」だが、音源の終端の方が早ければそちら。
+      // 音源が先に尽きる時にフェードが間に合わないと、最大音量のまま
+      // 途切れてしまう (詳細表示を音源の終盤で閉じた時に起こる)。
+      const duration = Number.isFinite(el.duration) ? el.duration : Infinity;
+      const windowEnd = Math.min(
+        snippetOriginRef.current + ROTATION_MS / 1000,
+        duration,
+      );
+      const remain = windowEnd - el.currentTime;
       try {
         el.volume = remain < AUDIO_FADE_SEC ? Math.max(0, remain / AUDIO_FADE_SEC) : 1;
       } catch {
         // iOS Safari は volume 変更不可 (ハードカットに劣化)
       }
     });
+    el.addEventListener("ended", () => onAudioEndedRef.current());
     audioRef.current = el;
     return el;
   };
@@ -364,6 +392,9 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const playSnippet = (audio: HTMLAudioElement, song: Song) => {
     const src = song.itunes_preview_url;
     playingSongIdRef.current = song.id;
+    // 頭出しなので、この曲のスニペットは音源の 0 秒から始まる
+    snippetOriginRef.current = 0;
+    previewPlayingRef.current = Boolean(src);
     if (!src) {
       audio.pause();
       return;
@@ -413,6 +444,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         // 音源が無い曲でも無音 WAV で要素をアンロックし、以後の曲送りの
         // プログラム再生 (音源のある曲) が通るようにしておく
         playingSongIdRef.current = song.id;
+        previewPlayingRef.current = false;
         audio.src = SILENT_WAV;
         void audio.play().then(
           () => {
@@ -432,6 +464,28 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
 
   }, []);
 
+  // 楽曲シート (リンクで /songs/[id] がホームの上に開いた状態) と詳細表示の
+  // 開閉に合わせてフル尺モードを切り替える。ここでは再生に手を触れない。
+  // 頭出しし直すと開閉のたびに音が最初へ戻ってしまうので、鳴っている音は
+  // そのまま流し続け、スニペットの窓 (フェードと曲送り) の起点だけを
+  // 「今の再生位置」に張り直す。曲送りは下のタイマーが握っており、
+  // フル尺モードの間は張られないので、開いている間に曲が変わることもない。
+  // 下の曲送り effect より先に置くこと: 閉じると同時に曲が変わる場合
+  // (流し切り後) は、後続の playSnippet が起点を 0 に上書きするのが正しい。
+  const fullPlayback = sheetOpen || detail;
+  useEffect(() => {
+    fullModeRef.current = fullPlayback;
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (!fullPlayback) snippetOriginRef.current = audio.currentTime;
+    try {
+      // 窓の終端でフェード途中だった場合に備えて音量を戻す
+      audio.volume = 1;
+    } catch {
+      /* iOS */
+    }
+  }, [fullPlayback]);
+
   // 曲が変わったら試聴音源を差し替える (タップ起点の再生分はスキップ)。
   // デフォルト ON なので初回マウントでもここから再生を試みる
   // (ブロックされたら上のジェスチャ再試行に委ねる)。
@@ -448,40 +502,20 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
 
   }, [audioOn, current]);
 
-  // 楽曲シート (リンクで /songs/[id] がホームの上に開いた状態) と詳細表示の
-  // 開閉に合わせてフル尺モードを切り替える。入ったら現在の曲を頭からフル尺で
-  // 再生し直し、抜けたら 6 秒スニペットのデッキ再生に戻る。
-  // シートでは回転が active={... && !sheetOpen} で止まり、詳細表示では
-  // onRotationEnd 側が送りを握り潰すので、どちらでも自動送りは起きない。
-  const fullPlayback = sheetOpen || detail;
-  useEffect(() => {
-    if (fullPlayback) {
-      fullModeRef.current = true;
-      const song = currentRef.current;
-      if (audioOnRef.current && song?.itunes_preview_url) {
-        playSnippet(ensureAudio(), song);
-      }
-    } else if (fullModeRef.current) {
-      fullModeRef.current = false;
-      const song = currentRef.current;
-      if (audioOnRef.current && song) {
-        playSnippet(ensureAudio(), song);
-      }
-    }
-
-  }, [fullPlayback]);
-
-  // 詳細表示に入ってから 30 秒 (= 試聴音源 1 本ぶん) 経ったら、盤を止めて
-  // 音も切る。曲を替えた (評価した) 時は数え直す。抜ければ元の周回に戻る。
+  // 詳細表示で試聴を流し切ったら、盤を止めて無音のままにする。鳴っている
+  // 時は音源の ended が正確なので、ここでタイマーを張るのは「そもそも音が
+  // 鳴らない」時だけ (音源なし / 消音中 / 自動再生ブロック中)。
   const currentId = current?.id;
+  const willPlayPreview =
+    audioOn && !audioBlocked && Boolean(current?.itunes_preview_url);
   useEffect(() => {
-    if (!detail || !currentId) return;
+    if (!detail || !currentId || willPlayPreview) return;
     const timer = window.setTimeout(() => {
       setDetailPlayedOut(currentId);
       audioRef.current?.pause();
     }, DETAIL_PLAY_MS);
     return () => window.clearTimeout(timer);
-  }, [detail, currentId]);
+  }, [detail, currentId, willPlayPreview]);
 
   // 似た音域の楽曲。詳細を開いている曲のぶんだけ取りに行き、曲 id で
   // キャッシュする (曲送りで開き直しても取り直さない)。
@@ -576,6 +610,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
       playSnippet(audio, song);
     } else {
       playingSongIdRef.current = song.id;
+      previewPlayingRef.current = false;
       audio.src = SILENT_WAV;
       void audio.play().then(
         () => {
@@ -589,20 +624,49 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
 
   /**
    * from の次の曲 (組の末尾なら次の組の先頭) へ進む。
-   * AnimatePresence (mode="wait") の退場ツリーは古い props が凍結されたまま
-   * 0.2 秒描画され続け、その間も旧ディスクの回転から stale な
-   * animationiteration が届き得る。現在位置が from と一致する時だけ進める
-   * ことで、組スキップ / undo 直後の上書きを防ぐ。
+   * 現在位置が from と一致する時だけ進めることで、組スキップ / undo と
+   * 6 秒タイマーや音源の ended が競合した時の上書きを防ぐ。
    */
-  const advance = (from: DeckPosition) => {
-    setPosition((p) => {
-      if (p.group !== from.group || p.song !== from.song) return p;
-      const g = groups[from.group];
-      return g && from.song + 1 < g.length
-        ? { group: from.group, song: from.song + 1 }
-        : { group: from.group + 1, song: 0 };
-    });
-  };
+  const advance = useCallback(
+    (from: DeckPosition) => {
+      setPosition((p) => {
+        if (p.group !== from.group || p.song !== from.song) return p;
+        const g = groups[from.group];
+        return g && from.song + 1 < g.length
+          ? { group: from.group, song: from.song + 1 }
+          : { group: from.group + 1, song: 0 };
+      });
+    },
+    [groups],
+  );
+
+  // 6 秒ごとの曲送り。以前は盤の回転 (animationiteration) が発火させていたが、
+  // それだと「回転の位相 = 音源の再生位置」を保つために、詳細表示を閉じる
+  // たびに音を頭出しする必要があった。タイマーに移したことで回転は見た目
+  // だけの存在になり、角度が何度であっても音の連続性に影響しない。
+  // フル尺モード (詳細表示 / 楽曲シート) の間は張らない = 自動送りも止まる。
+  useEffect(() => {
+    if (fullPlayback || !current) return;
+    const timer = window.setTimeout(() => advance(position), ROTATION_MS);
+    return () => window.clearTimeout(timer);
+  }, [fullPlayback, current, position, advance]);
+
+  // 音源を最後まで流し切った時。詳細表示中なら盤を止めて無音のまま待ち、
+  // 通常の周回中なら次の曲へ送る (詳細表示から音源の終盤で戻ってきた時、
+  // 6 秒のタイマーより先に音源が尽きるケース)。
+  useEffect(() => {
+    onAudioEndedRef.current = () => {
+      // アンロック用の無音 WAV の ended は無視する (即座に飛んでくる)
+      if (!previewPlayingRef.current) return;
+      if (detailRef.current) {
+        if (currentRef.current) setDetailPlayedOut(currentRef.current.id);
+        return;
+      }
+      // 楽曲シート表示中はページ側のフル尺再生なので、送らずに止まる
+      if (sheetOpen) return;
+      advance(position);
+    };
+  });
 
   const handleRate = (rating: Rating) => {
     if (!current) return;
@@ -705,7 +769,13 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     triggerHaptic();
     setDetail(next);
     // 同じ曲で入り直した時に「もう流し終わっている」扱いにしない
-    if (next) setDetailPlayedOut(null);
+    if (next) {
+      setDetailPlayedOut(null);
+      return;
+    }
+    // 流し切った曲は音源が終端にいるので、閉じても鳴らせない。無音で 6 秒
+    // 待たせる意味は無いので、その時だけ閉じると同時に次の曲へ送る。
+    if (current && detailPlayedOut === current.id) advance(position);
   };
 
   /**
@@ -1089,16 +1159,10 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                 >
                   <RecordDisc
                     song={song}
-                    // 楽曲ページ表示中は回転を止める (= 6 秒送りも停止し、
-                    // ページ側のフル尺再生を邪魔しない)。詳細表示では
-                    // 30 秒を流し切った時点で止める。
+                    // 楽曲ページ表示中は回転を止める。詳細表示では 30 秒を
+                    // 流し切った時点で止める。曲送りはもう回転とは無関係
+                    // なので、これは純粋に見た目の停止。
                     active={isActive && !sheetOpen && !detailEnded}
-                    onRotationEnd={() => {
-                      // 詳細表示中は 30 秒タイマーが再生を握っているので、
-                      // 6 秒ごとの周回では曲を送らない
-                      if (detailRef.current) return;
-                      advance(position);
-                    }}
                   />
                 </motion.div>
               );
@@ -1625,9 +1689,8 @@ function GroupThumb({ seed, isActive }: { seed: Song; isActive: boolean }) {
 
 interface RecordDiscProps {
   song: Song;
-  /** 現在再生位置のディスクのみ回転し、1 周ごとに onRotationEnd を呼ぶ */
+  /** 現在再生位置のディスクのみ回転する (曲送りとは無関係な装飾) */
   active: boolean;
-  onRotationEnd: () => void;
 }
 
 /**
@@ -1638,7 +1701,7 @@ interface RecordDiscProps {
  * シルエットが不変であり、overflow-hidden との組み合わせでも輪郭が
  * 乱れない。光沢は光源固定に見せるため回転体の外に置く。
  */
-function RecordDisc({ song, active, onRotationEnd }: RecordDiscProps) {
+function RecordDisc({ song, active }: RecordDiscProps) {
   const src = song.image_url_large ?? song.image_url_medium;
   const vinylColor = useVinylColor(src);
   return (
@@ -1655,11 +1718,11 @@ function RecordDisc({ song, active, onRotationEnd }: RecordDiscProps) {
         style={{
           clipPath: "circle(50% at 50% 50%)",
           WebkitClipPath: "circle(50% at 50% 50%)",
-          animation: active
-            ? `record-spin ${ROTATION_MS}ms linear infinite`
-            : "none",
+          animation: `record-spin ${ROTATION_MS}ms linear infinite`,
+          // 止める時はアニメーションを外さず一時停止する。外すと角度が
+          // 0 度へ飛ぶので、再開のたびに盤が跳ねて見える。
+          animationPlayState: active ? "running" : "paused",
         }}
-        onAnimationIteration={active ? onRotationEnd : undefined}
       >
         {/* 盤面: ジャケットの代表色 (抽出完了までは無彩色)。
             rounded-full は自衛: iOS 18 の WebKit は合成レイヤー化した隣の盤で
