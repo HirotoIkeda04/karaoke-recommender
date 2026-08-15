@@ -1,12 +1,13 @@
 "use client";
 
-import { Search, TrendingUp, X } from "lucide-react";
+import { TrendingUp, X } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ArtistRow, type ArtistRowData } from "@/components/artist-row";
 import { DecadeChips } from "@/components/decade-chips";
 import { PitchRangePicker } from "@/components/pitch-range-picker";
+import { useSearchBar } from "@/components/search-bar-context";
 import { SongCard } from "@/components/song-card";
 import { JacketImage } from "@/components/ui/jacket-image";
 import {
@@ -95,6 +96,19 @@ const RECENT_SONG_LIMIT = 3;
 
 type SearchMode = "browse" | "search-empty" | "search-results";
 
+/** 参照が変わらないよう module スコープに置く (memo の入力になる)。 */
+const EMPTY_RESULTS: SearchResponse = { artists: [], songs: [] };
+
+/** 直近に返ってきた検索結果と、それがどの要求に対するものか。 */
+interface SettledSearch {
+  /** 検索語 + 音域フィルタ。これが現在の要求と一致していれば最新。 */
+  key: string;
+  /** 検索語のみ。入力途中で前の結果を出し続けてよいかの判定に使う。 */
+  q: string;
+  data: SearchResponse;
+  error: string | null;
+}
+
 interface RecommendationFilters {
   lowMidi: number | null;
   highMidi: number | null;
@@ -148,23 +162,21 @@ export function LiveSearch({
   rankingCovers = [],
   rankingPreview = [],
 }: LiveSearchProps) {
-  const [query, setQuery] = useState("");
+  // 入力欄そのものは画面下部のバー (AppSearchBar) 側にある。
+  // ここが持つのは、その入力に対する検索結果と周辺の状態だけ。
+  const { query, open: isSearchOpen, reset: resetSearchBar } = useSearchBar();
+
   const [highNote, setHighNote] = useState("");
   const [lowNote, setLowNote] = useState("");
   const [selectedDecades, setSelectedDecades] = useState<number[]>([]);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [history, setHistory] = useState<RecentItem[]>(() => loadHistory());
-  const [results, setResults] = useState<SearchResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [errMsg, setErrMsg] = useState<string | null>(null);
+  // 検索結果は「どの要求に対する結果か」ごと持つ。入力や絞り込みが変われば
+  // 自動的に古くなるので、入力を消したときに結果を捨てる effect が要らない。
+  const [settled, setSettled] = useState<SettledSearch | null>(null);
   const [recommendations, setRecommendations] = useState<Song[]>([]);
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
   const [recommendationsError, setRecommendationsError] = useState(false);
 
-  const inputRef = useRef<HTMLInputElement>(null);
-  const isSearchOpenRef = useRef(false);
-  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
-  const queryRef = useRef(query);
   const recommendationsCacheRef = useRef(new Map<string, Song[]>());
   const recommendationsAbortRef = useRef<AbortController | null>(null);
   const [supabase] = useState(() => createClient());
@@ -188,24 +200,9 @@ export function LiveSearch({
     [recommendations, lowMidi, highMidi, selectedDecades],
   );
 
-  const filteredResults = useMemo<SearchResponse | null>(() => {
-    if (!results) return null;
-    return {
-      ...results,
-      songs: results.songs.filter((song) =>
-        matchesSongFilters(
-          song,
-          lowMidi,
-          highMidi,
-          selectedDecades,
-        ),
-      ),
-    };
-  }, [results, lowMidi, highMidi, selectedDecades]);
-
-  useEffect(() => {
-    queryRef.current = query;
-  }, [query]);
+  // 検索タブを離れたら検索状態を捨てる。バーの状態は layout 側の provider に
+  // 置いてあり、ページを離れても生き残ってしまうため、ここで畳む。
+  useEffect(() => resetSearchBar, [resetSearchBar]);
 
   const loadRecommendations = useCallback((filters: RecommendationFilters) => {
     const sortedDecades = [...filters.selectedDecades].sort((a, b) => a - b);
@@ -269,7 +266,7 @@ export function LiveSearch({
   // 絞り込み条件を DB 側へ渡し、条件適用後の候補を最大50曲取得する。
   // 連続タップは短くまとめ、切り替え前の結果は新しい結果が届くまで保持する。
   useEffect(() => {
-    if (!isSearchOpen || queryRef.current.length > 0) return;
+    if (!isSearchOpen || query.length > 0) return;
 
     const timer = window.setTimeout(() => {
       loadRecommendations({
@@ -285,6 +282,7 @@ export function LiveSearch({
     isSearchOpen,
     loadRecommendations,
     lowMidi,
+    query,
     selectedDecades,
   ]);
 
@@ -295,93 +293,15 @@ export function LiveSearch({
     [],
   );
 
-  // BottomNav の検索タブ再タップで、検索トップと検索モードを切り替える。
-  useEffect(() => {
-    const handler = () => {
-      if (isSearchOpenRef.current) {
-        isSearchOpenRef.current = false;
-        setIsSearchOpen(false);
-        setQuery("");
-        setResults(null);
-        setLoading(false);
-        setErrMsg(null);
-        inputRef.current?.blur();
-        return;
-      }
-
-      isSearchOpenRef.current = true;
-      setIsSearchOpen(true);
-      const el = inputRef.current;
-      if (!el) return;
-      el.focus();
-      // モバイルで仮想キーボード表示を促すため select() で再フォーカス感を出す
-      try {
-        el.select();
-      } catch {
-        // 一部ブラウザでは search input に select 不可 — 黙殺
-      }
-    };
-    window.addEventListener("app:toggle-search", handler);
-    return () => window.removeEventListener("app:toggle-search", handler);
-  }, []);
-
-  // 未入力の検索欄にフォーカスしたまま下へスクロールし始めたら、
-  // モバイルのソフトウェアキーボードを閉じる。横スクロールは対象外にする。
-  useEffect(() => {
-    const handleTouchStart = (event: TouchEvent) => {
-      const touch = event.touches[0];
-      touchStartRef.current = touch
-        ? { x: touch.clientX, y: touch.clientY }
-        : null;
-    };
-
-    const handleTouchMove = (event: TouchEvent) => {
-      const start = touchStartRef.current;
-      const touch = event.touches[0];
-      if (
-        !start ||
-        !touch ||
-        queryRef.current.length > 0 ||
-        document.activeElement !== inputRef.current
-      ) {
-        return;
-      }
-
-      const deltaX = touch.clientX - start.x;
-      const deltaY = start.y - touch.clientY;
-      if (deltaY > 10 && deltaY > Math.abs(deltaX)) {
-        inputRef.current?.blur();
-        touchStartRef.current = null;
-      }
-    };
-
-    const clearTouchStart = () => {
-      touchStartRef.current = null;
-    };
-
-    window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    window.addEventListener("touchmove", handleTouchMove, { passive: true });
-    window.addEventListener("touchend", clearTouchStart, { passive: true });
-    window.addEventListener("touchcancel", clearTouchStart, { passive: true });
-
-    return () => {
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("touchend", clearTouchStart);
-      window.removeEventListener("touchcancel", clearTouchStart);
-    };
-  }, []);
-
   const trimmedQ = query.trim();
   const hasQueryInput = query.length > 0;
+  const requestKey = `${trimmedQ} ${lowNote} ${highNote}`;
 
   // サーバー検索 (debounce + AbortController で多重発火を抑制)
   useEffect(() => {
     if (trimmedQ.length === 0) return;
     const ctrl = new AbortController();
     const timer = window.setTimeout(async () => {
-      setLoading(true);
-      setErrMsg(null);
       const lowMidiArg = (lowNote ? karaokeToMidi(lowNote) : undefined) ?? undefined;
       const highMidiArg = (highNote ? karaokeToMidi(highNote) : undefined) ?? undefined;
       const { data, error } = await supabase
@@ -392,20 +312,50 @@ export function LiveSearch({
         })
         .abortSignal(ctrl.signal);
       if (ctrl.signal.aborted) return;
-      if (error) {
-        setErrMsg(error.message);
-        setResults({ artists: [], songs: [] });
-      } else {
+      setSettled({
+        key: requestKey,
+        q: trimmedQ,
         // RPC は jsonb を返すので shape を信じてキャスト
-        setResults((data ?? { artists: [], songs: [] }) as unknown as SearchResponse);
-      }
-      setLoading(false);
+        data: error
+          ? EMPTY_RESULTS
+          : ((data ?? EMPTY_RESULTS) as unknown as SearchResponse),
+        error: error ? error.message : null,
+      });
     }, DEBOUNCE_MS);
     return () => {
       ctrl.abort();
       window.clearTimeout(timer);
     };
-  }, [trimmedQ, lowNote, highNote, supabase]);
+  }, [requestKey, trimmedQ, lowNote, highNote, supabase]);
+
+  // 結果が届くまでは前の結果を薄く出し続けたい。ただし、いったん入力を
+  // 消して別の語を打ち直したときにまで残ると、無関係な結果を見せることに
+  // なる。前後どちらかがもう一方の先頭一致なら「同じ検索の続き」とみなす。
+  const continued =
+    settled &&
+    (trimmedQ.startsWith(settled.q) || settled.q.startsWith(trimmedQ))
+      ? settled
+      : null;
+
+  const loading = trimmedQ.length > 0 && settled?.key !== requestKey;
+  const errMsg = settled?.key === requestKey ? settled.error : null;
+  const results: SearchResponse | null =
+    trimmedQ.length > 0
+      ? (continued?.data ?? null)
+      : // 空白だけの入力も「入力あり」の画面を維持したいので、該当なし扱い
+        (hasQueryInput ? EMPTY_RESULTS : null);
+
+  // 音域・年代の絞り込みは RPC 側にも渡しているが、結果が届くまでの間に
+  // 条件を変えても即座に効くよう、クライアント側でも同じ条件で絞る。
+  const filteredResults = useMemo<SearchResponse | null>(() => {
+    if (!results) return null;
+    return {
+      ...results,
+      songs: results.songs.filter((song) =>
+        matchesSongFilters(song, lowMidi, highMidi, selectedDecades),
+      ),
+    };
+  }, [results, lowMidi, highMidi, selectedDecades]);
 
   // 検索タブを「通常」「検索を開いた未入力」「検索を開いた入力あり」の
   // 3 状態に分ける。空白も入力として扱い、入力あり画面を維持する。
@@ -414,22 +364,6 @@ export function LiveSearch({
     : isSearchOpen
       ? "search-empty"
       : "browse";
-
-  const handleClear = useCallback(() => {
-    setQuery("");
-    setResults(null);
-    setLoading(false);
-    setErrMsg(null);
-    inputRef.current?.focus();
-  }, []);
-
-  const handleQueryChange = useCallback((nextQuery: string) => {
-    setQuery(nextQuery);
-    if (nextQuery.trim().length > 0) return;
-    setResults(nextQuery.length > 0 ? { artists: [], songs: [] } : null);
-    setLoading(false);
-    setErrMsg(null);
-  }, []);
 
   const handleSelectSong = useCallback((s: Song) => {
     const next = pushHistory({
@@ -466,52 +400,11 @@ export function LiveSearch({
     );
   }, []);
 
-  // 検索欄を一度開いたら、このページを離れるまで検索状態を維持する。
-  // フォーカス解除では閉じないため、モバイルのキーボード開閉にも影響されない。
-  const onFilterFocus = () => {
-    isSearchOpenRef.current = true;
-    setIsSearchOpen(true);
-  };
-
   return (
     <div className="space-y-4">
-      <div
-        className="space-y-4"
-        onFocus={onFilterFocus}
-      >
-        {/* 検索バー本体: 右側に検索アイコン or クリアボタン */}
-        <div className="relative">
-          <Search
-            className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-500 dark:text-zinc-400"
-            aria-hidden
-          />
-          <input
-            ref={inputRef}
-            type="search"
-            value={query}
-            onChange={(e) => handleQueryChange(e.target.value)}
-            placeholder="楽曲・アーティストを検索"
-            autoComplete="off"
-            autoCapitalize="off"
-            autoCorrect="off"
-            spellCheck={false}
-            // search 型ネイティブの clear ボタンは UI が分散するので非表示
-            className="w-full rounded-2xl bg-zinc-100 py-2 pl-9 pr-9 text-sm placeholder:text-zinc-500 focus:outline-none dark:bg-zinc-800 dark:placeholder:text-zinc-400 [&::-webkit-search-cancel-button]:hidden"
-          />
-          {query.length > 0 ? (
-            <button
-              type="button"
-              onClick={handleClear}
-              // mousedown で input から blur する前にクリックを処理
-              onMouseDown={(e) => e.preventDefault()}
-              aria-label="検索文字列をクリア"
-              className="absolute right-2 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full text-zinc-500 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-700"
-            >
-              <X className="size-3.5" aria-hidden />
-            </button>
-          ) : null}
-        </div>
-
+      {/* 入力欄はここには無い。画面下部のバー (AppSearchBar) が持っていて、
+          このツリーは入力に対する結果だけを描く。 */}
+      <div className="space-y-4">
         {mode === "search-empty" ? (
           <>
             <HistoryList
