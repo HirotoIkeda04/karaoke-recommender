@@ -174,8 +174,10 @@
       "Dragon Night",
       "Habit",
       "スターライトパレード",
-      "サザンカ"
-    ]
+      "サザンカ",
+      "眠り姫"
+    ],
+    "required_order": [["眠り姫", "Dragon Night"]]
   },
   {
     "artist": "KANA-BOON",
