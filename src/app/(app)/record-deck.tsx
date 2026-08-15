@@ -31,9 +31,11 @@ import { filterUnratedGroups, shuffleGroups } from "@/lib/guest-songs";
 import { triggerHaptic } from "@/lib/haptics";
 import { formatDuration, midiToKaraoke, noteChipColor } from "@/lib/note";
 import { triggerRatingSound } from "@/lib/rating-sound";
+import type { SimilarSong } from "@/lib/similar-songs";
 import type { Database } from "@/types/database";
 
-import { shuffleDeck } from "./actions";
+import { getSimilarSongs, shuffleDeck } from "./actions";
+import { SimilarSongsCarousel } from "./similar-songs-carousel";
 
 type Song = Database["public"]["Tables"]["songs"]["Row"];
 type Rating = Database["public"]["Enums"]["rating_type"];
@@ -71,15 +73,15 @@ const DISC_SIZE =
   "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 29.25rem - env(safe-area-inset-bottom))))";
 
 /**
- * 詳細表示 (上スワイプ) 中のディスク径。組カルーセルの行が 3.5rem から
- * 座布団 1 行 (1.5rem) へ縮んで間隔も 0.75rem に詰まり、スキップ行
- * (3.5rem + gap 1.5rem) も消える計 7.75rem の代わりに、楽曲情報 (3 行 =
- * 6.75rem) と歌詞ボタン (mt-2 + 2.25rem) にその上の gap 1.5rem を足した
- * 11rem が入るので、予約は 3.25rem 増える。
- * (詳細ではナビを引っ込めるが、main の下 padding は残るので予約はそのまま)
+ * 詳細表示 (上スワイプ) 中のディスク径。通常時に対して、組カルーセルの行が
+ * 座布団 1 行まで縮み、スキップ行が消える代わりに、楽曲情報 + 各サービスの
+ * ボタン + 似た音域のカルーセルが入る。ナビ用の下余白はデッキ側の
+ * marginBottom で打ち消しているので、その 5rem はここから引いてある。
+ * 下限を 6rem まで下げてあるのは、載せる情報が通常時より多いぶん、
+ * 縦の狭い端末では盤を通常時より小さく畳んで全部を収めるため。
  */
 const DISC_SIZE_DETAIL =
-  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.5rem - env(safe-area-inset-bottom))))";
+  "min(20rem, calc(100vw - 3.5rem), max(6rem, calc(100svh - 35.75rem - env(safe-area-inset-bottom))))";
 
 /**
  * 座布団の top (px)。サムネイル (56px) の下辺をまたいで貼り、
@@ -481,6 +483,42 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     return () => window.clearTimeout(timer);
   }, [detail, currentId]);
 
+  // 似た音域の楽曲。詳細を開いている曲のぶんだけ取りに行き、曲 id で
+  // キャッシュする (曲送りで開き直しても取り直さない)。
+  const [similarBySong, setSimilarBySong] = useState<
+    Record<string, SimilarSong[]>
+  >({});
+  // 取得を投げた曲 id。effect の依存に state を入れずに二重取得を防ぐ。
+  const similarRequestedRef = useRef(new Set<string>());
+  const similarSongs = currentId ? similarBySong[currentId] : undefined;
+
+  useEffect(() => {
+    if (!detail || !currentId) return;
+    if (similarRequestedRef.current.has(currentId)) return;
+    similarRequestedRef.current.add(currentId);
+    let cancelled = false;
+    void getSimilarSongs(currentId).then(
+      (result) => {
+        if (cancelled) return;
+        if (!result.ok) {
+          // 失敗した曲は投げ直せるようにしておく (次に開いた時に再挑戦)
+          similarRequestedRef.current.delete(currentId);
+          return;
+        }
+        setSimilarBySong((prev) => ({
+          ...prev,
+          [currentId]: result.songs ?? [],
+        }));
+      },
+      () => {
+        if (!cancelled) similarRequestedRef.current.delete(currentId);
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [detail, currentId]);
+
   // 流し切った判定は「詳細表示中で、かつ今の曲が流し終わっている」時だけ。
   // 曲送りでも詳細を抜けても勝手に外れるので、明示的なリセットは詳細に
   // 入り直す時 (toggleDetail) の 1 箇所だけで足りる。
@@ -752,7 +790,17 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
       className="relative mx-auto flex max-w-md select-none flex-col items-center gap-6 overflow-clip px-4 pb-2 pt-3"
       // 縦のパンをブラウザに渡さない (渡すと縦スワイプ中に pointercancel が
       // 飛んで判定が落ちる)。横パンとピンチズームはそのまま許可する。
-      style={{ touchAction: "pan-x pinch-zoom" }}
+      //
+      // marginBottom: 詳細表示ではボトムナビを引っ込めるので、(app) レイアウトが
+      // main に空けているナビ用の下余白 (5rem + safe-area) はその間だけ不要。
+      // 打ち消して似た音域のカルーセル 1 行分を捻出する。ナビを隠す条件と
+      // ここは同じ detail なので、ずれることはない。
+      style={{
+        touchAction: "pan-x pinch-zoom",
+        marginBottom: detail
+          ? "calc(-5rem - env(safe-area-inset-bottom))"
+          : undefined,
+      }}
       onPointerDown={handleSwipeStart}
       onPointerMove={handleSwipeMove}
       onPointerUp={handleSwipeEnd}
@@ -793,7 +841,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         disabled={shuffling}
         aria-label="デッキをシャッフルする"
         inert={detail}
-        className="absolute left-4 top-2 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90 disabled:opacity-60"
+        className="absolute left-4 top-4 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90 disabled:opacity-60"
         // 詳細表示では消すが、disabled:opacity-60 と競合しないよう
         // クラスではなくインラインで上書きする。
         style={detail ? { opacity: 0 } : undefined}
@@ -810,7 +858,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         aria-label={
           audioOn && !audioBlocked ? "試聴を停止する" : "試聴を再生する"
         }
-        className="absolute right-4 top-2 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90"
+        className="absolute right-4 top-4 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90"
       >
         <GlassSurface variant="overlay" />
         {audioOn && !audioBlocked ? (
@@ -969,11 +1017,16 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
               transition={{ duration: 0.18 }}
               className="-my-2 w-full px-2"
             >
-              <h2 className="flex items-baseline justify-center gap-2 text-2xl font-bold">
-                <span className="shrink-0 font-mono text-sm font-light text-zinc-500 dark:text-zinc-400">
+              {/* 曲順とリリース年は文字数が違うので、素直に並べると曲名が
+                  その差だけ横にずれる。左右を 1fr の等幅トラックにして
+                  中央トラック (曲名) を必ず画面中央へ置く。年が無い曲でも
+                  トラックは残すので、ずれない。min-w は両側の最小幅を
+                  揃えるためで、これが無いと窮屈な時だけ非対称に潰れる。 */}
+              <h2 className="grid grid-cols-[1fr_auto_1fr] items-baseline gap-2 text-2xl font-bold">
+                <span className="min-w-11 justify-self-end font-mono text-sm font-light text-zinc-500 dark:text-zinc-400">
                   #{position.song + 1}
                 </span>
-                {/* min-w-0: line-clamp の親が flex なので、これが無いと
+                {/* min-w-0: line-clamp の親が grid なので、これが無いと
                     曲名の最小内容幅がデッキごと画面外へ押し広げる */}
                 <Link
                   href={`/songs/${current.id}`}
@@ -982,11 +1035,11 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                 >
                   {current.title}
                 </Link>
-                {current.release_year ? (
-                  <span className="shrink-0 font-mono text-sm font-light text-zinc-500 dark:text-zinc-400">
-                    (&apos;{String(current.release_year).slice(-2)})
-                  </span>
-                ) : null}
+                <span className="min-w-11 justify-self-start font-mono text-sm font-light text-zinc-500 dark:text-zinc-400">
+                  {current.release_year
+                    ? `('${String(current.release_year).slice(-2)})`
+                    : ""}
+                </span>
               </h2>
             </motion.div>
           </AnimatePresence>
@@ -1168,6 +1221,27 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           </button>
         ))}
       </div>
+
+      {/* 似た音域の楽曲 (詳細表示のみ)。評価ボタンの下、スキップ行の代わりに
+          出る位置。ここは組ではなく曲に紐づくので、組の AnimatePresence の
+          外に置いて曲送りでも滑らかに差し替わるようにしている。 */}
+      <AnimatePresence initial={false}>
+        {detail ? (
+          <motion.div
+            key="similar"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={DETAIL_TRANSITION}
+            className="w-full overflow-hidden"
+          >
+            <SimilarSongsCarousel
+              songs={similarSongs}
+              loading={similarSongs === undefined}
+            />
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
       {/* スキップ 2 種 (同サイズ) + 戻る。詳細表示では高さごと畳む
           (marginTop で直前の gap-6 も相殺する) */}

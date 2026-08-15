@@ -4,6 +4,9 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 import { DECK_COOKIE, DECK_COOKIE_OPTIONS, buildDeck } from "@/lib/deck";
+import { findGuestSimilarSongs, toSong } from "@/lib/guest-songs";
+import { getGuestSong, getGuestSongs } from "@/lib/guest-songs.server";
+import { type SimilarSong, fetchSimilarSongs } from "@/lib/similar-songs";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
@@ -136,4 +139,63 @@ export async function shuffleDeck(): Promise<ShuffleDeckResult> {
     (await cookies()).set(DECK_COOKIE, deck.persistToken, DECK_COOKIE_OPTIONS);
   }
   return { ok: true, groups: deck.groups };
+}
+
+export interface SimilarSongsResult {
+  ok: boolean;
+  songs?: SimilarSong[];
+  error?: string;
+}
+
+/**
+ * デッキの詳細表示に出す「似た音域の楽曲」。
+ *
+ * 曲は 6 秒ごと / 評価ごとに変わるので、楽曲ページのように全評価を
+ * ページ送りで舐める処理 (fetchRatedSimilarSongs) は使わない。音域で
+ * 絞った 3 本のクエリだけで済む fetchSimilarSongs に寄せてある。
+ *
+ * ゲストは Supabase を叩けないので、公開 70 曲の中から音域が近い順に返す。
+ * getGuestSong が公開範囲外を null にするので、ここから範囲外の曲が
+ * 漏れることはない。
+ */
+export async function getSimilarSongs(
+  songId: string,
+  limit = 10,
+): Promise<SimilarSongsResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    const target = getGuestSong(songId);
+    if (!target) return { ok: true, songs: [] };
+    return {
+      ok: true,
+      songs: findGuestSimilarSongs(getGuestSongs(), target, limit).map(toSong),
+    };
+  }
+
+  const { data: song, error } = await supabase
+    .from("songs")
+    .select("id, artist_id, genres, range_low_midi, range_high_midi")
+    .eq("id", songId)
+    .maybeSingle();
+  if (error) return { ok: false, error: error.message };
+  if (!song || song.range_low_midi == null || song.range_high_midi == null) {
+    return { ok: true, songs: [] };
+  }
+
+  return {
+    ok: true,
+    songs: await fetchSimilarSongs(
+      supabase,
+      song.id,
+      song.artist_id,
+      song.genres,
+      song.range_low_midi,
+      song.range_high_midi,
+      limit,
+    ),
+  };
 }
