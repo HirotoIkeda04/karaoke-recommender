@@ -131,7 +131,7 @@ export function RatingTabs({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <div className="grid grid-cols-4 border-b border-zinc-200 dark:border-zinc-800">
         {TABS.map((tab) => {
           const active = tab.value === activeTab;
@@ -172,7 +172,7 @@ export function RatingTabs({
                 type="button"
                 onClick={() => setSortKey(option.key)}
                 aria-pressed={selected}
-                className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+                className={`shrink-0 rounded-md px-3 py-1.5 text-xs font-medium transition ${
                   selected
                     ? "bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900"
                     : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 active:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 dark:active:bg-zinc-700"
