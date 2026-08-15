@@ -6,12 +6,11 @@
  *
  * かつては lens (屈折レンズ) / goo (液体) / both の 3 案を並べて比較していたが、
  * goo 採用が決まったので lens と both は撤去した。残しているのは
- * 「ログインせずに本番と同じ見た目を実機で確認する」ため。/songs は
- * 認証必須なので、検索バーの形の変化はここでしか実機確認できない。
+ * 「ログインせずに本番と同じ見た目を実機で確認し、goo のノブを詰める」ため。
  *
- * 検索バーは本物の AppSearchBar をそのまま描いている。タブ側の行だけは
- * ルーティングに依存するので写しだが、寸法と色は bottom-bar-metrics に
- * 集約したので、片方だけずれることはない。
+ * ここは app-bottom-nav.tsx の写し (ルーティングに依存する部分だけ state に
+ * 置き換えてある)。寸法と色は bottom-bar-metrics に集約したので、
+ * 片方だけずれることはない。
  */
 
 import { Liquid } from "liquid-gooey";
@@ -19,7 +18,6 @@ import { Search } from "lucide-react";
 import { useState } from "react";
 
 import { TAB_ITEMS } from "@/components/app-bottom-nav";
-import { AppSearchBar } from "@/components/app-search-bar";
 import {
   BAR_HEIGHT_PX,
   BAR_INSET_CLASS,
@@ -33,7 +31,6 @@ import {
   PILL_R,
   SPLIT_GAP_PX,
 } from "@/components/bottom-bar-metrics";
-import { SearchBarProvider } from "@/components/search-bar-context";
 import { GlassSurface } from "@/components/ui/glass-surface";
 
 const SWATCHES = [
@@ -46,17 +43,13 @@ const SWATCHES = [
 ];
 
 export default function NavLabPage() {
-  // -1 = 検索が現在地。本番の pathname === "/songs" に相当し、
-  // このときバーは検索欄の姿になる。
+  // -1 = 検索が現在地 (本番の pathname === "/songs" に相当)。
   const [active, setActive] = useState(0);
-  // 検索欄に入る直前に開いていたタブ (本番の tabMemo に相当)。
-  const [backIndex, setBackIndex] = useState(0);
 
   const searchActive = active < 0;
-  const showSearchBar = searchActive;
 
   return (
-    <SearchBarProvider>
+    <>
       {/* Next の開発インジケータは画面左下に出て、バー左端の丸をちょうど
           覆ってしまう。ここはその丸を見るためのルートなので隠す。 */}
       <style>{`nextjs-portal { display: none; }`}</style>
@@ -88,13 +81,7 @@ export default function NavLabPage() {
               marginBottom: "max(0.75rem, env(safe-area-inset-bottom))",
             }}
           >
-            {showSearchBar ? (
-              <AppSearchBar
-                backTab={TAB_ITEMS[backIndex]}
-                placeholder="楽曲・アーティストを検索"
-              />
-            ) : (
-              <>
+            <>
                 {/* 行き先のタブ (くっつく側) */}
                 <div
                   className="relative h-full flex-1 rounded-full"
@@ -159,7 +146,6 @@ export default function NavLabPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (active >= 0) setBackIndex(active);
                     setActive(-1);
                   }}
                   aria-label="検索"
@@ -184,11 +170,10 @@ export default function NavLabPage() {
                   ) : null}
                   <Search className="relative size-6" aria-hidden />
                 </button>
-              </>
-            )}
+            </>
           </div>
         </div>
       </div>
-    </SearchBarProvider>
+    </>
   );
 }
