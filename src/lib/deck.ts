@@ -66,12 +66,48 @@ const popularityScore = (song: Song) =>
   Math.max(song.fame_score ?? 0, song.cert_score ?? 0);
 
 /**
- * 自分の評価済み (skip 含む) song_id を全件取得する。
+ * スキップの除外期間。get_unrated_songs_v2 の `interval '20 days'` と
+ * 必ず同じ値にすること (039 で導入し 055 で復元した仕様)。
+ */
+export const SKIP_TTL_MS = 20 * 24 * 60 * 60 * 1000;
+
+/**
+ * 評価行 1 件を推薦から除外すべきか。RPC の not exists 条件と 1:1 で対応する:
+ *
+ *   e.rating <> 'skip' or e.updated_at >= now() - interval '20 days'
+ *
+ * 純粋関数として切り出してあるのは、ここが RPC と食い違うと
+ * 「候補はあるのにデッキが空」という気づきにくい壊れ方をするため
+ * (実際に 2 回起きている)。deck.ts と RPC を同時に直すときは
+ * 必ずこのテストも一緒に見ること。
+ */
+export function isExcludedFromDeck(
+  row: { rating: string; updated_at: string },
+  now: number = Date.now(),
+): boolean {
+  if (row.rating !== "skip") return true;
+  return Date.parse(row.updated_at) >= now - SKIP_TTL_MS;
+}
+
+/**
+ * 推薦から除外すべき song_id を集める。
  * Supabase は 1 リクエスト最大 1000 行なのでページ送りで集める。
+ *
+ * 除外の条件は推薦 RPC (get_unrated_songs_v2) と完全に一致させる:
+ *   - skip 以外の評価 … 永久に除外
+ *   - skip           … updated_at から 20 日の間だけ除外 (経過したら候補へ戻す)
+ *
+ * ここを「評価行があれば一律除外」にすると、RPC が TTL 経過で候補に戻した曲を
+ * TS 側が再び捨ててしまい、デッキが空になる。実際 2026-08 にこれで
+ * 「代表曲をすべて評価しました」が出続ける不具合になった (RPC が返した 20 件が
+ * 全て 75〜103 日前の skip で、全部ここで落ちていた)。RPC の artist_boost は
+ * 高評価アーティストを最大 5 倍に重み付けするため、サンプリングは
+ * 「スキップし尽くしたアーティストのカタログ」に寄りやすく、全滅は普通に起きる。
  */
 async function fetchEvaluatedSongIds(
   supabase: SupabaseServerClient,
   userId: string,
+  now: number,
 ): Promise<Set<string>> {
   const ids = new Set<string>();
   const PAGE = 1000;
@@ -80,7 +116,7 @@ async function fetchEvaluatedSongIds(
     // PK 内で全順序になる song_id で安定化する。
     const { data, error } = await supabase
       .from("evaluations")
-      .select("song_id")
+      .select("song_id, rating, updated_at")
       .eq("user_id", userId)
       .order("song_id", { ascending: true })
       .range(from, from + PAGE - 1);
@@ -89,7 +125,9 @@ async function fetchEvaluatedSongIds(
       throw new Error(`評価済み一覧の取得に失敗しました: ${error.message}`);
     }
     if (!data || data.length === 0) break;
-    for (const row of data) ids.add(row.song_id);
+    for (const row of data) {
+      if (isExcludedFromDeck(row, now)) ids.add(row.song_id);
+    }
     if (data.length < PAGE) break;
   }
   return ids;
@@ -160,7 +198,7 @@ export async function buildDeck(
   const [savedSongs, evaluatedIds] = await Promise.all([
     savedSongsPromise,
     user
-      ? fetchEvaluatedSongIds(supabase, user.id)
+      ? fetchEvaluatedSongIds(supabase, user.id, now)
       : Promise.resolve(new Set<string>()),
   ]);
 
