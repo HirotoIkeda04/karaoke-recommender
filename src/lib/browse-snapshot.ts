@@ -92,10 +92,14 @@ const getCachedBrowseSnapshot = unstable_cache(
       rankingPreview: parsed.data.ranking_preview,
     };
   },
-  // v3: ジャンルカバーを4枚から5枚へ拡張したため、旧キャッシュを破棄する。
-  ["songs-browse-snapshot-v3"],
+  // v4: 週次ランキング更新後も前週のスナップショットが残る事故があったため、
+  //     旧キャッシュを破棄する。
+  ["songs-browse-snapshot-v4"],
   {
-    revalidate: 3600,
+    // 参照先は browse_snapshots の1行 SELECT だけなので TTL を長く取る旨味が
+    // 薄い。逆に 1 時間だと refresh:browse-snapshot 後も最大 1 時間だけ古い
+    // カルーセルが出続けるため、更新がその日のうちに見える 60 秒にする。
+    revalidate: 60,
     tags: ["songs-browse-snapshot"],
   },
 );

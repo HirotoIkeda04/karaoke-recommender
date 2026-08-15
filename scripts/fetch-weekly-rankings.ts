@@ -538,6 +538,17 @@ async function main() {
     process.exit(1);
   }
   console.log(`upserted ${rows.length} rows for week_start=${weekStart}`);
+
+  // 検索タブは weekly_rankings ではなく browse_snapshots を読むため、
+  // ここで再計算しないとカルーセルが前週のまま残る。夜間ルーチン経由なら
+  // Step 4 でも走るが、このスクリプト単体で叩かれる場合に取りこぼすので
+  // 更新元と同じトランザクション境界で呼んでおく。
+  const { error: snapErr } = await supabase.rpc("refresh_browse_snapshot");
+  if (snapErr) {
+    console.error(`refresh_browse_snapshot failed: ${snapErr.message}`);
+    process.exit(1);
+  }
+  console.log("browse snapshot refreshed");
 }
 
 main().catch((e) => {
