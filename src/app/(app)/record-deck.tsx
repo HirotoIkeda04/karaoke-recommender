@@ -920,7 +920,9 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         toggleDetail(event.deltaY < 0);
       }}
     >
-      {/* 次の組の先頭ジャケットを裏で先読み (現在の組は全ディスクが即ロードされる) */}
+      {/* 次の組の先頭ジャケットを裏で先読みする。「次の組へ」を押すまで
+          見えないものなので fetchPriority は low 固定。指定を外すと、
+          今まさに見えている盤 (high) より先にこの 2 枚が走ってしまう。 */}
       {(nextGroup ?? []).slice(0, 2).map((song) => {
         const preloadSrc = song.image_url_large ?? song.image_url_medium;
         return preloadSrc ? (
@@ -929,6 +931,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
             rel="preload"
             as="image"
             href={preloadSrc}
+            fetchPriority="low"
           />
         ) : null;
       })}
