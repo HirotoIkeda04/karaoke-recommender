@@ -495,8 +495,10 @@ export function LiveSearch({
             autoCapitalize="off"
             autoCorrect="off"
             spellCheck={false}
-            // search 型ネイティブの clear ボタンは UI が分散するので非表示
-            className="w-full rounded-2xl bg-zinc-100 py-2 pl-9 pr-9 text-sm placeholder:text-zinc-500 focus:outline-none dark:bg-zinc-800 dark:placeholder:text-zinc-400 [&::-webkit-search-cancel-button]:hidden"
+            // text-base (16px) を下回ると、iOS がフォーカス時に「読める大きさ」
+            // まで画面ごと拡大する。ここのサイズは見た目より先にこの制約で決まる。
+            // search 型ネイティブの clear ボタンは UI が分散するので非表示。
+            className="w-full rounded-2xl bg-zinc-100 py-2 pl-9 pr-9 text-base placeholder:text-zinc-500 focus:outline-none dark:bg-zinc-800 dark:placeholder:text-zinc-400 [&::-webkit-search-cancel-button]:hidden"
           />
           {query.length > 0 ? (
             <button

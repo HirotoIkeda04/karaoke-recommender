@@ -331,8 +331,10 @@ function LogForm({
   onSubmit,
   onCancel,
 }: LogFormProps) {
+  // text-base (16px) 未満にすると、iOS がフォーカス時に画面ごと拡大する。
+  // 入力欄の文字サイズはこの制約が最優先。
   const inputCls =
-    "w-full rounded-lg border-0 bg-zinc-200/60 px-3 py-2 text-sm transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 dark:bg-zinc-800/70 dark:focus:bg-zinc-900";
+    "w-full rounded-lg border-0 bg-zinc-200/60 px-3 py-2 text-base transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 dark:bg-zinc-800/70 dark:focus:bg-zinc-900";
   const labelCls = "space-y-1 text-xs text-zinc-600 dark:text-zinc-400";
 
   return (
