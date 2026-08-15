@@ -1,9 +1,11 @@
 import { GENRE_CODES, type GenreCode } from "@/lib/genres";
+import { getGuestSongs } from "@/lib/guest-songs.server";
 import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
 import { fetchAllPaginated } from "@/lib/supabase/paginate";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
+import { GuestLibrary } from "./guest-library";
 import { ProfileHeader } from "./profile-header";
 import { RatingTabs } from "./rating-tabs";
 import { type EvaluationRow } from "./sortable-list";
@@ -68,8 +70,17 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // ゲスト (未ログイン) は evaluations に行が無い。localStorage の評価と
+  // 公開 70 曲から同じ画面を組み立てる (計算は src/lib/guest-library.ts)。
   if (!user) {
-    return null; // middleware で防がれる想定
+    return (
+      <GuestLibrary
+        songs={getGuestSongs()}
+        initialTab={initialTab}
+        minEasyForEstimate={MIN_FOR_ESTIMATE}
+      />
+    );
   }
   const userId = user.id;
 

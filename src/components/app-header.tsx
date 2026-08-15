@@ -1,4 +1,4 @@
-import { InstallButton } from "./install-button";
+import { HeaderAction } from "./header-action";
 
 export function AppHeader() {
   return (
@@ -6,7 +6,7 @@ export function AppHeader() {
       <div className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
         KyokuMoku
       </div>
-      <InstallButton />
+      <HeaderAction />
     </header>
   );
 }

@@ -18,15 +18,19 @@ import { usePathname } from "next/navigation";
 import { startTransition, useEffect, useRef, useState } from "react";
 
 import { DumbbellMini } from "@/components/icons/dumbbell-mini";
-import { Button } from "@/components/ui/button";
+import { useIsGuest } from "@/components/session-provider";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { GlassSurface } from "@/components/ui/glass-surface";
 import { JacketImage } from "@/components/ui/jacket-image";
+import { useRatingActions } from "@/hooks/use-rating-actions";
+import { readGuestRatings } from "@/lib/guest-ratings";
+import { filterUnratedGroups, shuffleGroups } from "@/lib/guest-songs";
 import { triggerHaptic } from "@/lib/haptics";
 import { formatDuration, midiToKaraoke, noteChipColor } from "@/lib/note";
 import { triggerRatingSound } from "@/lib/rating-sound";
 import type { Database } from "@/types/database";
 
-import { markSkipped, rateSong, shuffleDeck, unrateSong } from "./actions";
+import { shuffleDeck } from "./actions";
 
 type Song = Database["public"]["Tables"]["songs"]["Row"];
 type Rating = Database["public"]["Enums"]["rating_type"];
@@ -227,6 +231,10 @@ interface RecordDeckProps {
 
 export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const pathname = usePathname();
+  // ゲスト (未ログイン) はデッキが固定 70 曲の中の 10 組なので、
+  // 引き直し先が無い。評価の保存先も localStorage に変わる。
+  const isGuest = useIsGuest();
+  const { rateSong, unrateSong, markSkipped } = useRatingActions();
   // RecordDeck はホーム (/) でのみマウントされるので、マウントされたまま
   // pathname が /songs/[id] になっていれば、楽曲ページ/シートが上に
   // 開いている (intercepting route) と判定できる。
@@ -594,6 +602,19 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     if (shuffling) return;
     triggerHaptic();
     setError(null);
+
+    // ゲストのデッキは固定 10 組なので引き直す先が無い。未評価で残っている
+    // 組を並べ替え、先頭から見せ直す (評価済みはここで落とす)。
+    if (isGuest) {
+      const rated = new Set(Object.keys(readGuestRatings()));
+      setGroups((current) =>
+        shuffleGroups(filterUnratedGroups(current, rated)),
+      );
+      setPosition({ group: 0, song: 0 });
+      setLastAction(null);
+      return;
+    }
+
     setShuffling(true);
     startTransition(async () => {
       const result = await shuffleDeck();
@@ -658,20 +679,41 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   };
 
   if (!current) {
+    // ゲストは残りの組が無くなったら引き直す先が無い (お試しの 10 組で
+    // 打ち止め)。ここが一番ログインの動機が立つ場面なので導線を出す。
+    const guestExhausted = isGuest && groups.length === 0;
     return (
       <div className="mx-auto flex min-h-[70dvh] max-w-md flex-col items-center justify-center gap-4 p-8 text-center">
-        <h1 className="text-xl font-semibold">このデッキは終了しました 🎉</h1>
+        <h1 className="text-xl font-semibold">
+          {guestExhausted
+            ? "お試しの曲をすべて評価しました 🎉"
+            : "このデッキは終了しました 🎉"}
+        </h1>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          「次のデッキへ」で新しい組を引き直せます。
+          {guestExhausted
+            ? "ログインすると全曲から評価でき、評価した履歴も残ります。"
+            : "「次のデッキへ」で新しい組を引き直せます。"}
         </p>
-        <Button
-          onClick={handleShuffle}
-          disabled={shuffling}
-          size="lg"
-          className="h-14 px-8 text-lg font-bold"
-        >
-          次のデッキへ
-        </Button>
+        {guestExhausted ? (
+          <Link
+            href="/login?next=/"
+            className={buttonVariants({
+              size: "lg",
+              className: "h-14 px-8 text-lg font-bold",
+            })}
+          >
+            ログインする
+          </Link>
+        ) : (
+          <Button
+            onClick={handleShuffle}
+            disabled={shuffling}
+            size="lg"
+            className="h-14 px-8 text-lg font-bold"
+          >
+            次のデッキへ
+          </Button>
+        )}
         {error ? (
           <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         ) : null}

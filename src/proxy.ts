@@ -17,6 +17,24 @@ const PUBLIC_PATHS = [
   "/liquid-glass",
 ] as const;
 
+// ゲスト (未ログイン) に開放するアプリ本体のパス。
+//
+// ここに並ぶページは「ゲスト公開 70 曲 (src/data/guest-songs.json) の範囲で
+// 動く」ように作ってある。ゲストは Supabase を一切叩かず、評価は
+// localStorage に入る。だから anon 向けに RLS / GRANT を開ける必要が無い。
+//
+// ここに新しいパスを足す時は、そのページがゲスト (user = null) で
+// 破綻しないことを必ず確認すること。ルーム / フレンド / ランキング /
+// アーティスト / プロフィール / 設定は他人のデータや全曲カタログを
+// 前提にしているので、ログイン必須のままにしてある。
+const GUEST_PATHS = [
+  "/", // ホーム (レコードデッキ)
+  "/songs", // 検索と曲詳細
+  "/library", // ライブラリ (localStorage 由来)
+] as const;
+
+const UNAUTHENTICATED_PATHS = [...PUBLIC_PATHS, ...GUEST_PATHS];
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -30,7 +48,7 @@ export async function proxy(request: NextRequest) {
     return new NextResponse(null, { status: 404 });
   }
 
-  return updateSession(request, PUBLIC_PATHS);
+  return updateSession(request, UNAUTHENTICATED_PATHS);
 }
 
 export const config = {

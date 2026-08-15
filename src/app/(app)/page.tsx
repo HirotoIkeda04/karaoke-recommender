@@ -3,14 +3,25 @@ import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
 import { DECK_COOKIE, buildDeck } from "@/lib/deck";
+import { getGuestDeckGroups } from "@/lib/guest-songs.server";
 import { createClient } from "@/lib/supabase/server";
 
+import { GuestRecordDeck } from "./guest-record-deck";
 import { RecordDeck } from "./record-deck";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const [supabase, cookieStore] = await Promise.all([createClient(), cookies()]);
+
+  // ゲスト (未ログイン) は推薦 RPC を呼べないので、固定の 10 組を出す。
+  // 評価済みの除外は localStorage を読めるクライアント側で行う。
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session?.user) {
+    return <GuestRecordDeck groups={getGuestDeckGroups()} />;
+  }
 
   // cookie に前回のシードが残っていればそれを再利用する (タブ切替や
   // アーティストページ往復で推薦が入れ替わらないように)。入れ替わるのは

@@ -27,8 +27,11 @@ interface Props {
   genreBuckets: Partial<Record<GenreCode, number>>;
   // 推定音域を表示するかの閾値判定用 (easy_count >= MIN_FOR_ESTIMATE のときのみ)
   minEasyForEstimate: number;
-  // 'self' = 自分の library。'friend' = フレンド閲覧時 (編集/シェアボタン非表示)
-  viewMode?: "self" | "friend";
+  // 'self'   = 自分の library
+  // 'friend' = フレンド閲覧時 (編集/シェアボタン非表示)
+  // 'guest'  = 未ログイン (フレンド数・編集・シェア・設定をすべて出さない。
+  //            ログイン導線はこの上のバナー側が持つ)
+  viewMode?: "self" | "friend" | "guest";
   // viewMode='friend' のとき必須: 表示中のフレンドの user id
   friendUserId?: string;
 }
@@ -74,6 +77,7 @@ export function ProfileHeader({
       : null;
 
   const isSelf = viewMode === "self";
+  const isGuest = viewMode === "guest";
 
   return (
     <section className="space-y-4">
@@ -86,13 +90,18 @@ export function ProfileHeader({
           </p>
           <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
             <span className="tabular-nums">{ratedSongCount}</span> 曲評価
-            <span className="mx-1.5">·</span>
-            <Link
-              href="/friends"
-              className="transition hover:text-zinc-700 active:text-zinc-700 dark:hover:text-zinc-200 dark:active:text-zinc-200"
-            >
-              <span className="tabular-nums">{friendCount}</span> フレンド
-            </Link>
+            {/* フレンドはログインしないと使えない機能なので、ゲストには出さない */}
+            {isGuest ? null : (
+              <>
+                <span className="mx-1.5">·</span>
+                <Link
+                  href="/friends"
+                  className="transition hover:text-zinc-700 active:text-zinc-700 dark:hover:text-zinc-200 dark:active:text-zinc-200"
+                >
+                  <span className="tabular-nums">{friendCount}</span> フレンド
+                </Link>
+              </>
+            )}
           </p>
         </div>
         <div
@@ -115,7 +124,7 @@ export function ProfileHeader({
             {falsettoLabel ? ` ・ ${falsettoLabel}` : ""}
           </p>
         </div>
-      ) : isSelf ? (
+      ) : isSelf || isGuest ? (
         <p className="text-[11px] text-zinc-500 dark:text-zinc-500">
           「得意」評価が {minEasyForEstimate} 件以上で推定音域を表示します
         </p>
