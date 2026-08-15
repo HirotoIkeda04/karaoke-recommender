@@ -1,7 +1,8 @@
 /**
  * ホーム (/) 遷移時の skeleton。
- * RecordDeck の構造を模した: レコード盤 (円) + 曲情報 + 4 評価ボタン +
- * スキップ 2 種/戻る行。円のサイズ式は record-deck.tsx の DISC_SIZE と揃える。
+ * RecordDeck の構造を模した: アーティスト名の枕 + レコード盤 (円) + 曲名 +
+ * 4 評価ボタン + スキップ 2 種/戻る行。
+ * 円のサイズ式は record-deck.tsx の DISC_SIZE と揃える。
  *
  * 子ルートで loading.tsx が定義されている場合はそちらが優先される。
  */
@@ -24,21 +25,23 @@ export default function Loading() {
         ))}
       </div>
 
+      {/* アーティスト名の枕 (レコードの上) */}
+      <div className="-mb-3 flex h-6 w-full items-center justify-center">
+        <div className="h-6 w-32 animate-pulse rounded-sm bg-zinc-200 dark:bg-zinc-800" />
+      </div>
+
       {/* レコード盤 */}
       <div
         className="animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800"
         style={{
           width:
-            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.75rem - env(safe-area-inset-bottom))))",
+            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 33.5rem - env(safe-area-inset-bottom))))",
           aspectRatio: "1 / 1",
         }}
       />
 
-      {/* 曲順 + 楽曲名 / アーティスト名 */}
-      <div className="flex w-full flex-col items-center gap-2">
-        <div className="h-6 w-48 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-        <div className="h-4 w-28 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-      </div>
+      {/* 曲順 + 楽曲名 */}
+      <div className="h-7 w-48 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
 
       {/* 4 評価ボタン (丸 size-14 + ラベル) */}
       <div className="grid w-full grid-cols-[repeat(4,3.5rem)] justify-around">

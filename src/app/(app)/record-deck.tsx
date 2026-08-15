@@ -53,29 +53,43 @@ const SILENT_WAV =
 
 /**
  * ディスク径。横幅いっぱい (左右 1.75rem マージン) を基本に、
- * 縦に収まらない小さい画面ではヘッダー + 組カルーセル + 曲情報 +
- * ボタン群 + ナビの予約分 (約 32.75rem) を引いた残りへ縮める。上限 20rem。
- * loading.tsx の skeleton と式を揃えること。
+ * 縦に収まらない小さい画面ではヘッダー + 組カルーセル + アーティスト名 +
+ * 曲情報 + ボタン群 + ナビの予約分 (約 33.5rem) を引いた残りへ縮める。
+ * 上限 20rem。loading.tsx の skeleton と式を揃えること。
  * ナビを浮かせたカプセルにした分 (safe-area 無しの端末で最大 1.25rem)
- * 予約を 31.5rem から増やしてある。
+ * 予約を 31.5rem から増やし、アーティスト名の枕の行 (1.5rem + 間隔
+ * 0.75rem を曲名側から 1.5rem 取り返して差し引き 0.75rem) を足してある。
  */
 const DISC_SIZE =
-  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.75rem - env(safe-area-inset-bottom))))";
+  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 33.5rem - env(safe-area-inset-bottom))))";
 
 /**
- * 詳細表示 (下スワイプ) 中のディスク径。組カルーセル (3.5rem) と
+ * 詳細表示 (上スワイプ) 中のディスク径。組カルーセル (3.5rem) と
  * スキップ行 (3.5rem) + それぞれの gap (1.5rem ずつ) の 10rem が消え、
  * 代わりに楽曲情報 (mt-4 + 3 行 = 7.75rem) と歌詞ボタン (mt-2 + 2.25rem)
  * の 10.5rem が入るので、予約は 0.5rem だけ増える。
  */
 const DISC_SIZE_DETAIL =
-  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 33.25rem - env(safe-area-inset-bottom))))";
+  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 34rem - env(safe-area-inset-bottom))))";
+
+/**
+ * アーティスト名の枕の行 (1.5rem) + ディスクまでの間隔 (0.75rem)。
+ * シャッフル / 消音ボタンはこの分だけ下げ、従来どおりディスクの角に
+ * 重ねる (背後がジャケットでなくなると GlassSurface が「黒い丸」になる)。
+ */
+const ARTIST_ROW_OFFSET = "2.25rem";
 
 /**
  * 詳細表示を切り替えるスワイプの最小縦移動量 (px)。評価ボタンのタップや
  * 指ブレで誤爆しないだけの距離を取る。横移動が縦移動を上回る間は無視する。
  */
 const DETAIL_SWIPE_PX = 48;
+
+/**
+ * 詳細表示中の再生尺 (ms)。iTunes の試聴音源 1 本ぶん。この間は 6 秒の
+ * フェード / 曲送りを止めてカット無しで流し、流し切ったら盤ごと停止する。
+ */
+const DETAIL_PLAY_MS = 30000;
 
 /** 表示切替のトランジション。opacity を先に畳んでから高さを詰める */
 const DETAIL_TRANSITION = {
@@ -204,11 +218,13 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const [lastAction, setLastAction] = useState<LastAction | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [shuffling, setShuffling] = useState(false);
-  // 下スワイプで入る擬似的な楽曲詳細表示。組カルーセル / スキップ行 /
-  // シャッフルを畳み、代わりに楽曲情報と歌詞ボタンを出す (上スワイプで戻る)。
-  // レコードの回転 (= 6 秒ごとの曲送り) はそのまま続くので、表示は常に
-  // 「再生中の曲」を追う。
+  // 上スワイプで入る擬似的な楽曲詳細表示。組カルーセル / スキップ行 /
+  // シャッフルを畳み、代わりに楽曲情報と歌詞ボタンを出す (下スワイプで戻る)。
+  // この間は 6 秒の自動送りを止め、試聴を 30 秒フルで流す。
   const [detail, setDetail] = useState(false);
+  // 詳細表示で 30 秒を流し切った曲の id。曲を替えれば自動的に外れるので、
+  // 「今の曲が流し終わったか」は下で id を突き合わせて導出する。
+  const [detailPlayedOut, setDetailPlayedOut] = useState<string | null>(null);
   // 進行中のスワイプの起点。pointerId で 1 本目の指だけを追う。
   const swipeRef = useRef<{ id: number; x: number; y: number } | null>(null);
   // 試聴 ON/OFF (ユーザーの意思)。デフォルト ON。ON でも音源が無い曲は
@@ -226,21 +242,32 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   // 初期値 true: マウント直後の play() の reject が届く前の素早いタップでも
   // ジェスチャ再試行が動くようにする (鳴っていれば再試行側の guard が弾く)。
   const needsGestureRetryRef = useRef(true);
-  // 楽曲ページ (シート) が開いている間のフル尺再生モード
+  // 楽曲ページ (シート) と詳細表示の間のフル尺再生モード
   // (6 秒フェード/カット無効)
   const fullModeRef = useRef(false);
 
   const group = groups[position.group];
   const current = group?.[position.song];
 
+  // アーティスト名の枕は「1 枚目のレコード」の代表色の反対色。組が
+  // 変わると 1 枚目も変わるので、組の先頭曲のジャケットから引く。
+  const groupSeed = group?.[0];
+  const pillow = pillowColorOf(
+    useVinylColor(
+      groupSeed?.image_url_large ?? groupSeed?.image_url_medium ?? null,
+    ),
+  );
+
   // AnimatePresence の退場ツリー (組遷移中 0.2 秒残る) のボタンは古い
   // props を凍結したままタップできてしまう。ハンドラが常に実状態で動ける
-  // よう、最新の current / audioOn をコミット後に ref へ同期しておく。
+  // よう、最新の current / audioOn / detail をコミット後に ref へ同期しておく。
   const currentRef = useRef(current);
   const audioOnRef = useRef(audioOn);
+  const detailRef = useRef(detail);
   useEffect(() => {
     currentRef.current = current;
     audioOnRef.current = audioOn;
+    detailRef.current = detail;
   });
 
   // 新しく組まれたデッキを cookie に保存する (レンダー中は cookie を
@@ -373,12 +400,14 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
 
   }, [audioOn, current]);
 
-  // 楽曲シート (リンクで /songs/[id] がホームの上に開いた状態) の開閉に
-  // 合わせてフル尺モードを切り替える。開いたら現在の曲を頭からフル尺で
-  // 再生し直し、閉じたら 6 秒スニペットのデッキ再生に戻る。
-  // 回転は active={... && !sheetOpen} で止まるため自動送りも起きない。
+  // 楽曲シート (リンクで /songs/[id] がホームの上に開いた状態) と詳細表示の
+  // 開閉に合わせてフル尺モードを切り替える。入ったら現在の曲を頭からフル尺で
+  // 再生し直し、抜けたら 6 秒スニペットのデッキ再生に戻る。
+  // シートでは回転が active={... && !sheetOpen} で止まり、詳細表示では
+  // onRotationEnd 側が送りを握り潰すので、どちらでも自動送りは起きない。
+  const fullPlayback = sheetOpen || detail;
   useEffect(() => {
-    if (sheetOpen) {
+    if (fullPlayback) {
       fullModeRef.current = true;
       const song = currentRef.current;
       if (audioOnRef.current && song?.itunes_preview_url) {
@@ -392,7 +421,24 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
       }
     }
 
-  }, [sheetOpen]);
+  }, [fullPlayback]);
+
+  // 詳細表示に入ってから 30 秒 (= 試聴音源 1 本ぶん) 経ったら、盤を止めて
+  // 音も切る。曲を替えた (評価した) 時は数え直す。抜ければ元の周回に戻る。
+  const currentId = current?.id;
+  useEffect(() => {
+    if (!detail || !currentId) return;
+    const timer = window.setTimeout(() => {
+      setDetailPlayedOut(currentId);
+      audioRef.current?.pause();
+    }, DETAIL_PLAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [detail, currentId]);
+
+  // 流し切った判定は「詳細表示中で、かつ今の曲が流し終わっている」時だけ。
+  // 曲送りでも詳細を抜けても勝手に外れるので、明示的なリセットは詳細に
+  // 入り直す時 (toggleDetail) の 1 箇所だけで足りる。
+  const detailEnded = detail && detailPlayedOut === currentId;
 
   // バックグラウンドでは試聴を止める。Android は放置すると裏で音が流れ
   // 続け、iOS は OS に止められた後で無音のままになるため、復帰時は
@@ -561,6 +607,8 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     if (next === detail) return;
     triggerHaptic();
     setDetail(next);
+    // 同じ曲で入り直した時に「もう流し終わっている」扱いにしない
+    if (next) setDetailPlayedOut(null);
   };
 
   /**
@@ -580,7 +628,8 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     // 横に流れているスワイプ (カルーセル的な操作) では切り替えない
     if (Math.abs(dy) < DETAIL_SWIPE_PX || Math.abs(dy) <= Math.abs(dx)) return;
     swipeRef.current = null;
-    toggleDetail(dy > 0);
+    // 上スワイプ (dy < 0) で詳細を引き上げ、下スワイプで元に戻す
+    toggleDetail(dy < 0);
   };
 
   const handleSwipeEnd = () => {
@@ -626,7 +675,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
       onPointerCancel={handleSwipeEnd}
       onWheel={(event) => {
         if (Math.abs(event.deltaY) < 8) return;
-        toggleDetail(event.deltaY > 0);
+        toggleDetail(event.deltaY < 0);
       }}
     >
       {/* 次の組の先頭ジャケットを裏で先読み (現在の組は全ディスクが即ロードされる) */}
@@ -723,10 +772,13 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           inert={detail}
           // 背景色は敷かない。敷くとガラスが背後を拾えず「黒い丸」になる。
           // 明るいジャケットへの対策は GlassSurface の DIM (乗算) 側で行う。
-          className="absolute left-1 top-0 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90 disabled:opacity-60"
+          className="absolute left-1 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90 disabled:opacity-60"
           // 詳細表示では消す。disabled:opacity-60 と競合しないよう
           // クラスではなくインラインで上書きする。
-          style={detail ? { opacity: 0 } : undefined}
+          style={{
+            top: ARTIST_ROW_OFFSET,
+            ...(detail ? { opacity: 0 } : null),
+          }}
         >
           <GlassSurface variant="overlay" />
           <Dices
@@ -740,7 +792,8 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           aria-label={
             audioOn && !audioBlocked ? "試聴を停止する" : "試聴を再生する"
           }
-          className="absolute right-1 top-0 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90"
+          className="absolute right-1 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90"
+          style={{ top: ARTIST_ROW_OFFSET }}
         >
           <GlassSurface variant="overlay" />
           {audioOn && !audioBlocked ? (
@@ -758,6 +811,35 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           transition={{ duration: 0.2, ease: "easeOut" }}
           className="flex w-full flex-col items-center gap-6"
         >
+          {/* アーティスト名: 組カルーセルとレコードの間に敷く枕付きのラベル。
+              枕の色は 1 枚目のレコードの代表色の反対色。-mb-3 で親の gap-6 を
+              0.75rem まで詰め、レコードの見出しとして寄せている
+              (詰めた分は ARTIST_ROW_OFFSET と DISC_SIZE の予約に効いている)。 */}
+          <div className="-mb-3 flex h-6 w-full items-center justify-center px-14">
+            {current.artist_id ? (
+              <Link
+                href={`/artists/${current.artist_id}`}
+                className="line-clamp-1 max-w-full rounded-sm px-2.5 py-0.5 text-sm font-bold transition active:brightness-90"
+                style={{
+                  backgroundColor: pillow.background,
+                  color: pillow.foreground,
+                }}
+              >
+                {current.artist}
+              </Link>
+            ) : (
+              <span
+                className="line-clamp-1 max-w-full rounded-sm px-2.5 py-0.5 text-sm font-bold"
+                style={{
+                  backgroundColor: pillow.background,
+                  color: pillow.foreground,
+                }}
+              >
+                {current.artist}
+              </span>
+            )}
+          </div>
+
           {/* ジャケットのカルーセル (遷移ボタンなし。回転完了 or スキップで進む) */}
           <motion.div
             role="group"
@@ -794,16 +876,22 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                   <RecordDisc
                     song={song}
                     // 楽曲ページ表示中は回転を止める (= 6 秒送りも停止し、
-                    // ページ側のフル尺再生を邪魔しない)
-                    active={isActive && !sheetOpen}
-                    onRotationEnd={() => advance(position)}
+                    // ページ側のフル尺再生を邪魔しない)。詳細表示では
+                    // 30 秒を流し切った時点で止める。
+                    active={isActive && !sheetOpen && !detailEnded}
+                    onRotationEnd={() => {
+                      // 詳細表示中は 30 秒タイマーが再生を握っているので、
+                      // 6 秒ごとの周回では曲を送らない
+                      if (detailRef.current) return;
+                      advance(position);
+                    }}
                   />
                 </motion.div>
               );
             })}
           </motion.div>
 
-          {/* 曲順 + 楽曲名 / アーティスト名 */}
+          {/* 曲順 + 楽曲名 (アーティスト名はレコードの上の枕へ移した) */}
           <AnimatePresence mode="popLayout" initial={false}>
             <motion.div
               key={current.id}
@@ -826,20 +914,8 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                   {current.title}
                 </Link>
               </h2>
-              <p className="mt-1 line-clamp-1 text-sm text-zinc-600 dark:text-zinc-400">
-                {current.artist_id ? (
-                  <Link
-                    href={`/artists/${current.artist_id}`}
-                    className="hover:underline"
-                  >
-                    {current.artist}
-                  </Link>
-                ) : (
-                  current.artist
-                )}
-              </p>
 
-              {/* 詳細表示でだけアーティスト名の下に出る、シートと同じ楽曲情報。
+              {/* 詳細表示でだけ曲名の下に出る、シートと同じ楽曲情報。
                   外側の AnimatePresence は曲が変わるたびに作り直されるので、
                   initial={false} で「曲送りでは開閉アニメを再生しない」。 */}
               <AnimatePresence initial={false}>
@@ -852,9 +928,9 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                     transition={DETAIL_TRANSITION}
                     className="overflow-hidden"
                   >
-                    <dl className="mt-4 divide-y divide-zinc-200 rounded-xl bg-zinc-100 px-5 text-left text-sm dark:divide-zinc-700/60 dark:bg-zinc-800/60">
+                    <dl className="mx-auto mt-4 max-w-60 divide-y divide-zinc-200 rounded-xl bg-zinc-100 px-4 text-left text-sm dark:divide-zinc-700/60 dark:bg-zinc-800/60">
                       <div className="flex items-baseline py-2">
-                        <dt className="w-16 shrink-0 text-zinc-600 dark:text-zinc-400">
+                        <dt className="w-14 shrink-0 text-zinc-600 dark:text-zinc-400">
                           地声
                         </dt>
                         <dd className="font-mono">
@@ -871,7 +947,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                         </dd>
                       </div>
                       <div className="flex items-baseline py-2">
-                        <dt className="w-16 shrink-0 text-zinc-600 dark:text-zinc-400">
+                        <dt className="w-14 shrink-0 text-zinc-600 dark:text-zinc-400">
                           裏声
                         </dt>
                         <dd className="font-mono">
@@ -879,7 +955,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                         </dd>
                       </div>
                       <div className="flex items-baseline py-2">
-                        <dt className="w-16 shrink-0 text-zinc-600 dark:text-zinc-400">
+                        <dt className="w-14 shrink-0 text-zinc-600 dark:text-zinc-400">
                           長さ
                         </dt>
                         <dd className="font-mono">
@@ -1128,6 +1204,51 @@ function spineColorOf(edgeColor: string): string {
   const m = /^hsl\((\d+), (\d+)%, (\d+)%\)$/.exec(edgeColor);
   if (!m) return "#1c1c21";
   return `hsl(${m[1]}, ${m[2]}%, ${Math.round(Number(m[3]) * 0.38)}%)`;
+}
+
+/** 明るい枕に載せる文字色。note.ts の chip() の前景と同じ暗い zinc */
+const PILLOW_TEXT_DARK = "oklch(0.25 0.02 260)";
+/** 暗い枕に載せる文字色 */
+const PILLOW_TEXT_LIGHT = "oklch(0.97 0 0)";
+
+/**
+ * アーティスト名の枕 (テロップ背景) の色。1 枚目のレコードの代表色の
+ * 反対色 = 色相を 180° 回した色を敷く。彩度も明度も useVinylColor が
+ * 明るめ (L 50〜72%) にクランプ済みなので、有彩色ならそのまま読める。
+ * 色相を持たない盤 (モノクロのジャケット) は回しても同じ色にしかならない
+ * ので明度で反転させる。ただし素直に 100 - L とすると、盤の明度帯
+ * (45〜70%) の反対は 30〜55% = 元とほとんど差が無く、しかも暗い背景に
+ * 沈んで「枕」として機能しない。そこで明暗の向きだけ反転させたまま、
+ * 枕として読める明るい帯 (82〜92%) へ写す。文字色は最終の明度で決める。
+ * 代表色がまだ無い / CORS で読めない間は無彩色の明るいグレーで待つ。
+ */
+function pillowColorOf(vinylColor: string | null): {
+  background: string;
+  foreground: string;
+} {
+  const m = vinylColor
+    ? /^hsl\((\d+), (\d+)%, (\d+)%\)$/.exec(vinylColor)
+    : null;
+  if (!m) return { background: "hsl(0, 0%, 78%)", foreground: PILLOW_TEXT_DARK };
+
+  const [, h, s, l] = m;
+  const hue = Number(h);
+  const sat = Number(s);
+  const lit = Number(l);
+
+  let bgLit = lit;
+  let background: string;
+  if (sat === 0) {
+    bgLit = Math.round(92 - (clamp(lit, 45, 70) - 45) * 0.4);
+    background = `hsl(0, 0%, ${bgLit}%)`;
+  } else {
+    background = `hsl(${(hue + 180) % 360}, ${sat}%, ${lit}%)`;
+  }
+
+  return {
+    background,
+    foreground: bgLit >= 55 ? PILLOW_TEXT_DARK : PILLOW_TEXT_LIGHT,
+  };
 }
 
 function GroupThumb({ seed, isActive }: { seed: Song; isActive: boolean }) {
