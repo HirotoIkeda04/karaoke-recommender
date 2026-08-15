@@ -40,7 +40,11 @@ const BAR_H = 64;
 const LENS_W = 66;
 const LENS_H = 50;
 const LENS_R = 25;
-const PILL_H = 48;
+// 本番のナビと同じ寸法 (app-bottom-nav.tsx を参照)
+const CHIP_PX = 34;
+const LABEL_PX = 12;
+const PILL_H = 54;
+const PILL_R = 20;
 
 const EASE = cubicBezier(0.34, 1.36, 0.42, 1);
 const MOVE_ANIM = { ease: EASE, duration: 0.52 };
@@ -75,7 +79,7 @@ const LENS: Partial<GlassOptics> = {
 };
 
 /** goo の fill は必ず不透明色。alpha' = 20a - 7.83 なので半透明だと消える。 */
-const GOO_FILL = "#3a3a3a";
+const GOO_FILL = "#3f3f42";
 
 type Variant = "lens" | "goo" | "both";
 
@@ -90,18 +94,31 @@ function Tabs({
     <ul className="grid h-full grid-cols-4 items-center">
       {ITEMS.map((item, i) => {
         const Icon = item.icon;
+        const isActive = i === active;
         return (
           <li key={item.label} className="min-w-0">
             <button
               type="button"
               onClick={() => onPick(i)}
-              aria-label={item.label}
-              aria-current={i === active ? "page" : undefined}
-              className={`flex w-full items-center justify-center py-3 ${
-                i === active ? "text-white" : "text-zinc-400"
+              aria-current={isActive ? "page" : undefined}
+              className={`flex w-full flex-col items-center justify-center gap-[3px] px-1 ${
+                isActive ? "text-white" : "text-zinc-400"
               }`}
             >
-              <Icon className="size-6" aria-hidden />
+              <span
+                className={`flex items-center justify-center rounded-full transition-colors ${
+                  isActive ? "bg-white/22" : "bg-white/[0.08]"
+                }`}
+                style={{ width: CHIP_PX, height: CHIP_PX }}
+              >
+                <Icon className="size-5" aria-hidden />
+              </span>
+              <span
+                className="max-w-full truncate text-[10px] font-medium"
+                style={{ lineHeight: `${LABEL_PX}px` }}
+              >
+                {item.label}
+              </span>
             </button>
           </li>
         );
@@ -150,7 +167,7 @@ function GooIndicator({ active }: { active: number }) {
           left: 0,
           width: "25%",
           height: PILL_H,
-          borderRadius: PILL_H / 2,
+          borderRadius: PILL_R,
           transform: `translateX(${active * 100}%)`,
           transition: CSS_MOVE,
         }}

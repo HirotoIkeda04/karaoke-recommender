@@ -25,8 +25,18 @@ const ITEMS = [
 const BAR_HEIGHT_REM = 4;
 const BAR_HEIGHT_PX = BAR_HEIGHT_REM * 16;
 
-/** 選択インジケータ (液体の塊) の高さ。 */
-const PILL_H = 48;
+/**
+ * タブ 1 つ分の中身の寸法。Luma のタブバーに合わせて
+ * 「円形チップ + その下にラベル」の 2 段構成にしている。
+ * 34 + 3 + 12 = 49px なのでバー高さ 4rem (64px) に収まり、
+ * record-deck / loading の縦予算 (DISC_SIZE) を触らずに済む。
+ */
+const CHIP_PX = 34;
+const LABEL_PX = 12;
+
+/** 選択インジケータ (液体の塊) の寸法。チップとラベルをまとめて包む。 */
+const PILL_H = 54;
+const PILL_R = 20;
 
 /** インジケータの移動時間。goo のバネはこれを追いかけて尾を引く。 */
 const MOVE_TRANSITION = "transform .52s cubic-bezier(.34,1.36,.42,1)";
@@ -35,10 +45,11 @@ const MOVE_TRANSITION = "transform .52s cubic-bezier(.34,1.36,.42,1)";
  * goo の塗り。必ず不透明色にすること。
  * goo フィルタは alpha' = contrast*a - offset (既定 20a - 7.83) でアルファを
  * 切り直すため、半透明色を渡すと alpha' が負に振り切れてシルエットが丸ごと
- * 消える。透け感は色そのもので作る。#3a3a3a はすりガラスのバーの上で
- * 「白 14% を乗せた」くらいに見える値。
+ * 消える。透け感は色そのもので作る。
+ * #3f3f42 は iOS の systemGray4 (#3a3a3c) を一段明るくした値で、
+ * Luma のアクティブ矩形と同じくらいバーから浮いて見える。
  */
-const GOO_FILL = "#3a3a3a";
+const GOO_FILL = "#3f3f42";
 
 export function AppBottomNav() {
   const pathname = usePathname();
@@ -102,7 +113,7 @@ export function AppBottomNav() {
                   left: 0,
                   width: `${100 / ITEMS.length}%`,
                   height: PILL_H,
-                  borderRadius: PILL_H / 2,
+                  borderRadius: PILL_R,
                   transform: `translateX(${activeIndex * 100}%)`,
                   transition: MOVE_TRANSITION,
                 }}
@@ -126,20 +137,37 @@ export function AppBottomNav() {
                   window.dispatchEvent(new CustomEvent("app:toggle-search"));
                 }
               };
+              const active = i === activeIndex;
               return (
                 <li key={item.href} className="min-w-0">
+                  {/* ラベルが見えているので aria-label は付けない
+                      (付けるとスクリーンリーダーがラベルを二重に読む)。 */}
                   <Link
                     href={item.href}
                     onClick={onClick}
-                    aria-label={item.label}
-                    aria-current={i === activeIndex ? "page" : undefined}
+                    aria-current={active ? "page" : undefined}
                     className={cn(
-                      "flex w-full items-center justify-center px-1 py-3",
-                      i === activeIndex ? "text-white" : "text-zinc-400",
+                      "flex w-full flex-col items-center justify-center gap-[3px] px-1",
+                      active ? "text-white" : "text-zinc-400",
                     )}
                   >
-                    <Icon className="size-6" aria-hidden />
-                    <span className="sr-only">{item.label}</span>
+                    {/* アイコンを載せる円形チップ。非アクティブは
+                        systemGray5 相当、アクティブはさらに白を足して起こす。 */}
+                    <span
+                      className={cn(
+                        "flex items-center justify-center rounded-full transition-colors",
+                        active ? "bg-white/22" : "bg-white/[0.08]",
+                      )}
+                      style={{ width: CHIP_PX, height: CHIP_PX }}
+                    >
+                      <Icon className="size-5" aria-hidden />
+                    </span>
+                    <span
+                      className="max-w-full truncate text-[10px] font-medium"
+                      style={{ lineHeight: `${LABEL_PX}px` }}
+                    >
+                      {item.label}
+                    </span>
                   </Link>
                 </li>
               );
