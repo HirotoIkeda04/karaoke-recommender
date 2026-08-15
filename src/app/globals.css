@@ -176,6 +176,33 @@
   unicode-range: U+0020-024F, U+1E00-1EFF, U+2000-206F;
   size-adjust: 120%;
 }
+
+/* 座布団 (ホームのアーティスト名) 用の縦長ディスプレイ face。
+   LatinUpscale と同じく端末に載っているフォントだけで組む: next/font/google
+   は Noto Serif JP で Vercel ビルドを落とした経緯があり (layout.tsx の
+   コメント参照)、ラベル 1 箇所のために外部取得を増やさない方針に揃える。
+   日本語には縦長の標準フォントが無いので unicode-range でラテン文字だけに
+   効かせ、日本語は次のフォールバック (ゴシックの太字) に回す。
+   font-weight: 700 は、既に太いローカル face にブラウザが合成ボールドを
+   重ねて潰れるのを防ぐため (ラベル側も font-bold で 700 を要求している)。
+   注意: ここを `font-weight: 100 900` のような範囲で書くと、Tailwind v4 の
+   Lightning CSS が @font-face ごと出力から落とす。単一値で書くこと。 */
+@font-face {
+  font-family: "CondensedDisplay";
+  src:
+    local("HelveticaNeue-CondensedBlack"),
+    local("Helvetica Neue Condensed Black"),
+    local("HelveticaNeue-CondensedBold"),
+    local("Helvetica Neue Condensed Bold"),
+    local("AvenirNextCondensed-Bold"),
+    local("Avenir Next Condensed Bold"),
+    local("RobotoCondensed-Bold"),
+    local("Roboto Condensed Bold"),
+    local("Arial Narrow Bold"), local("Arial Narrow"), local("Impact");
+  font-weight: 700;
+  unicode-range: U+0020-024F, U+1E00-1EFF, U+2000-206F;
+}
+
 /* ホームのレコード盤回転。1 周 = 1 曲の表示時間で、record-deck.tsx が
    animationiteration イベントを使って周回ごとに次の曲へ送る。 */
 @keyframes record-spin {

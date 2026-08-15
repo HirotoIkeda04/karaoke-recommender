@@ -25,9 +25,10 @@ export default function Loading() {
         ))}
       </div>
 
-      {/* アーティスト名の枕 (レコードの上) */}
-      <div className="-mb-3 flex h-6 w-full items-center justify-center">
-        <div className="h-6 w-32 animate-pulse rounded-sm bg-zinc-200 dark:bg-zinc-800" />
+      {/* アーティスト名の座布団 (組カルーセルの真下 / レコードの上)。
+          -mt-5 は record-deck.tsx の ARTIST_ROW_PULL_UP と対応 */}
+      <div className="-mt-5 -mb-3 flex h-6 w-full items-center justify-center">
+        <div className="h-6 w-32 animate-pulse bg-zinc-200 dark:bg-zinc-800" />
       </div>
 
       {/* レコード盤 */}
@@ -35,7 +36,7 @@ export default function Loading() {
         className="animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800"
         style={{
           width:
-            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 33.5rem - env(safe-area-inset-bottom))))",
+            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.25rem - env(safe-area-inset-bottom))))",
           aspectRatio: "1 / 1",
         }}
       />

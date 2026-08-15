@@ -54,30 +54,50 @@ const SILENT_WAV =
 /**
  * ディスク径。横幅いっぱい (左右 1.75rem マージン) を基本に、
  * 縦に収まらない小さい画面ではヘッダー + 組カルーセル + アーティスト名 +
- * 曲情報 + ボタン群 + ナビの予約分 (約 33.5rem) を引いた残りへ縮める。
+ * 曲情報 + ボタン群 + ナビの予約分 (約 32.25rem) を引いた残りへ縮める。
  * 上限 20rem。loading.tsx の skeleton と式を揃えること。
  * ナビを浮かせたカプセルにした分 (safe-area 無しの端末で最大 1.25rem)
- * 予約を 31.5rem から増やし、アーティスト名の枕の行 (1.5rem + 間隔
- * 0.75rem を曲名側から 1.5rem 取り返して差し引き 0.75rem) を足してある。
+ * 予約を 31.5rem から増やし、アーティスト名の座布団の行 (1.5rem) と
+ * ディスクまでの間隔 (0.75rem) を足し、座布団を組カルーセルへ寄せた分
+ * (ARTIST_ROW_PULL_UP = 1.25rem) と曲名側で詰めた 1.5rem を引いてある。
  */
 const DISC_SIZE =
-  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 33.5rem - env(safe-area-inset-bottom))))";
+  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.25rem - env(safe-area-inset-bottom))))";
 
 /**
- * 詳細表示 (上スワイプ) 中のディスク径。組カルーセル (3.5rem) と
- * スキップ行 (3.5rem) + それぞれの gap (1.5rem ずつ) の 10rem が消え、
- * 代わりに楽曲情報 (mt-4 + 3 行 = 7.75rem) と歌詞ボタン (mt-2 + 2.25rem)
- * の 10.5rem が入るので、予約は 0.5rem だけ増える。
+ * 詳細表示 (上スワイプ) 中のディスク径。組カルーセル (3.5rem + 間隔
+ * 0.25rem) とスキップ行 (3.5rem + gap 1.5rem) の 8.75rem が消え、代わりに
+ * 楽曲情報 (mt-4 + 3 行 = 7.75rem) と歌詞ボタン (mt-2 + 2.25rem) の
+ * 10.5rem が入るので、予約は 1.75rem 増える。
  */
 const DISC_SIZE_DETAIL =
   "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 34rem - env(safe-area-inset-bottom))))";
 
 /**
- * アーティスト名の枕の行 (1.5rem) + ディスクまでの間隔 (0.75rem)。
+ * 座布団の行を組カルーセルへ寄せる量。親の gap-6 (1.5rem) を打ち消して
+ * 残り 0.25rem = ほぼ地続きに見せる。組カルーセルを畳む時の marginBottom
+ * (残り 0.25rem を消す) と対になっている。
+ */
+const ARTIST_ROW_PULL_UP = "-1.25rem";
+
+/**
+ * アーティスト名の座布団の行 (1.5rem) + ディスクまでの間隔 (0.75rem)。
  * シャッフル / 消音ボタンはこの分だけ下げ、従来どおりディスクの角に
  * 重ねる (背後がジャケットでなくなると GlassSurface が「黒い丸」になる)。
  */
 const ARTIST_ROW_OFFSET = "2.25rem";
+
+/**
+ * 座布団の紙めいた質感。fractalNoise を overlay で重ねる。SVG の data URI
+ * にしているのは、座布団の色が盤ごとに変わるので画像を固定色で焼けないため。
+ * overlay なら中間グレーが恒等になるので、明るい座布団でも暗い座布団でも
+ * 粒が明暗の両側に散り、乗算のように色が濁って沈まない。
+ */
+const PILLOW_NOISE =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E\")";
+
+/** 座布団のフォント。ラテン文字だけ globals.css の縦長 face に載せる */
+const PILLOW_FONT = '"CondensedDisplay", var(--font-sans)';
 
 /**
  * 詳細表示を切り替えるスワイプの最小縦移動量 (px)。評価ボタンのタップや
@@ -708,12 +728,13 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         className="relative w-full"
         inert={detail}
         initial={false}
-        // 詳細表示では高さごと畳む。marginBottom で親の gap-6 も相殺して、
-        // 消えた分だけディスクが上がるようにする。子は absolute なので
-        // 縮む途中ははみ出すが、opacity を先に落として見えなくしている。
+        // 詳細表示では高さごと畳む。座布団側が ARTIST_ROW_PULL_UP で親の
+        // gap-6 をほぼ打ち消しているので、ここで消し残す間隔は 0.25rem。
+        // 子は absolute なので縮む途中ははみ出すが、opacity を先に落として
+        // 見えなくしている。
         animate={{
           height: detail ? "0rem" : "3.5rem",
-          marginBottom: detail ? "-1.5rem" : "0rem",
+          marginBottom: detail ? "-0.25rem" : "0rem",
           opacity: detail ? 0 : 1,
         }}
         transition={DETAIL_TRANSITION}
@@ -762,8 +783,9 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
       </motion.div>
 
       {/* 組単位で左へ流れる。中は曲単位のカルーセル + 曲情報。
-          シャッフル / 消音トグルは組遷移で消えないよう AnimatePresence の外に重ねる */}
-      <div className="relative w-full">
+          シャッフル / 消音トグルは組遷移で消えないよう AnimatePresence の外に重ねる。
+          marginTop で親の gap-6 を打ち消し、先頭の座布団を組カルーセルへ寄せる */}
+      <div className="relative w-full" style={{ marginTop: ARTIST_ROW_PULL_UP }}>
         <button
           type="button"
           onClick={handleShuffle}
@@ -811,28 +833,35 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           transition={{ duration: 0.2, ease: "easeOut" }}
           className="flex w-full flex-col items-center gap-6"
         >
-          {/* アーティスト名: 組カルーセルとレコードの間に敷く枕付きのラベル。
-              枕の色は 1 枚目のレコードの代表色の反対色。-mb-3 で親の gap-6 を
-              0.75rem まで詰め、レコードの見出しとして寄せている
-              (詰めた分は ARTIST_ROW_OFFSET と DISC_SIZE の予約に効いている)。 */}
+          {/* アーティスト名: 組カルーセルの真下に敷く座布団付きのラベル。
+              座布団の色は 1 枚目のレコードの代表色の反対色で、角は立てたまま
+              (rounded を付けない)、紙のようにノイズを乗算で混ぜる。
+              -mb-3 で親の gap-6 を 0.75rem まで詰め、レコードの見出しとして
+              寄せている (詰めた分は DISC_SIZE の予約に効いている)。 */}
           <div className="-mb-3 flex h-6 w-full items-center justify-center px-14">
             {current.artist_id ? (
               <Link
                 href={`/artists/${current.artist_id}`}
-                className="line-clamp-1 max-w-full rounded-sm px-2.5 py-0.5 text-sm font-bold transition active:brightness-90"
+                className="line-clamp-1 max-w-full px-2.5 py-0.5 text-sm font-bold tracking-tight transition active:brightness-90"
                 style={{
-                  backgroundColor: pillow.background,
-                  color: pillow.foreground,
+                  backgroundColor: pillow,
+                  backgroundImage: PILLOW_NOISE,
+                  backgroundBlendMode: "overlay",
+                  color: PILLOW_TEXT,
+                  fontFamily: PILLOW_FONT,
                 }}
               >
                 {current.artist}
               </Link>
             ) : (
               <span
-                className="line-clamp-1 max-w-full rounded-sm px-2.5 py-0.5 text-sm font-bold"
+                className="line-clamp-1 max-w-full px-2.5 py-0.5 text-sm font-bold tracking-tight"
                 style={{
-                  backgroundColor: pillow.background,
-                  color: pillow.foreground,
+                  backgroundColor: pillow,
+                  backgroundImage: PILLOW_NOISE,
+                  backgroundBlendMode: "overlay",
+                  color: PILLOW_TEXT,
+                  fontFamily: PILLOW_FONT,
                 }}
               >
                 {current.artist}
@@ -1206,49 +1235,79 @@ function spineColorOf(edgeColor: string): string {
   return `hsl(${m[1]}, ${m[2]}%, ${Math.round(Number(m[3]) * 0.38)}%)`;
 }
 
-/** 明るい枕に載せる文字色。note.ts の chip() の前景と同じ暗い zinc */
-const PILLOW_TEXT_DARK = "oklch(0.25 0.02 260)";
-/** 暗い枕に載せる文字色 */
-const PILLOW_TEXT_LIGHT = "oklch(0.97 0 0)";
+/** 座布団の文字色。note.ts の chip() の前景と同じ暗い zinc */
+const PILLOW_TEXT = "oklch(0.25 0.02 260)";
 
 /**
- * アーティスト名の枕 (テロップ背景) の色。1 枚目のレコードの代表色の
- * 反対色 = 色相を 180° 回した色を敷く。彩度も明度も useVinylColor が
- * 明るめ (L 50〜72%) にクランプ済みなので、有彩色ならそのまま読める。
+ * 座布団に要求する最低輝度。PILLOW_TEXT (輝度 ≈ 0.043) との
+ * コントラスト比が約 5:1 になる線。
+ */
+const PILLOW_MIN_LUMINANCE = 0.42;
+
+/** 明度を持ち上げる上限 (%)。ここまで上げても届かない色は諦める */
+const PILLOW_MAX_LIT = 92;
+
+/**
+ * hsl() 成分から sRGB の相対輝度 (WCAG) を出す。座布団の読みやすさを
+ * HSL の L だけで測ると、同じ L 50% でも黄色は明るく青は暗いのに同じ扱いに
+ * なってしまう (実際、青い盤の補色の琥珀は読めるのに、橙の盤の補色の青は
+ * 暗文字でも白文字でもコントラストが 4:1 に届かなかった)。
+ */
+function hslLuminance(h: number, s: number, l: number): number {
+  const sN = s / 100;
+  const lN = l / 100;
+  const c = (1 - Math.abs(2 * lN - 1)) * sN;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = lN - c / 2;
+  const rgb = [
+    [c, x, 0],
+    [x, c, 0],
+    [0, c, x],
+    [0, x, c],
+    [x, 0, c],
+    [c, 0, x],
+  ][Math.floor(h / 60) % 6].map((v) => v + m);
+  const lin = (v: number) =>
+    v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  return 0.2126 * lin(rgb[0]) + 0.7152 * lin(rgb[1]) + 0.0722 * lin(rgb[2]);
+}
+
+/**
+ * アーティスト名の座布団の色。1 枚目のレコードの代表色の反対色 =
+ * 色相を 180° 回した色を敷く。
+ * 明度は色相を回しただけでは足りない: HSL の L が同じでも黄は明るく青は
+ * 暗いので、橙の盤の補色 (青) は暗文字でも白文字でもコントラストが 4:1 に
+ * 届かなかった。そこで色相は反対のまま、暗い文字が確実に読める輝度まで
+ * 明度だけを持ち上げる。もともと明るい補色 (琥珀など) は手つかずで済む。
  * 色相を持たない盤 (モノクロのジャケット) は回しても同じ色にしかならない
  * ので明度で反転させる。ただし素直に 100 - L とすると、盤の明度帯
  * (45〜70%) の反対は 30〜55% = 元とほとんど差が無く、しかも暗い背景に
- * 沈んで「枕」として機能しない。そこで明暗の向きだけ反転させたまま、
- * 枕として読める明るい帯 (82〜92%) へ写す。文字色は最終の明度で決める。
+ * 沈んで「座布団」として機能しない。そこで明暗の向きだけ反転させたまま、
+ * 紙らしい明るい帯 (82〜92%) へ写す。
  * 代表色がまだ無い / CORS で読めない間は無彩色の明るいグレーで待つ。
  */
-function pillowColorOf(vinylColor: string | null): {
-  background: string;
-  foreground: string;
-} {
+function pillowColorOf(vinylColor: string | null): string {
   const m = vinylColor
     ? /^hsl\((\d+), (\d+)%, (\d+)%\)$/.exec(vinylColor)
     : null;
-  if (!m) return { background: "hsl(0, 0%, 78%)", foreground: PILLOW_TEXT_DARK };
+  if (!m) return "hsl(0, 0%, 78%)";
 
   const [, h, s, l] = m;
-  const hue = Number(h);
   const sat = Number(s);
-  const lit = Number(l);
+  const hue = sat === 0 ? 0 : (Number(h) + 180) % 360;
 
-  let bgLit = lit;
-  let background: string;
-  if (sat === 0) {
-    bgLit = Math.round(92 - (clamp(lit, 45, 70) - 45) * 0.4);
-    background = `hsl(0, 0%, ${bgLit}%)`;
-  } else {
-    background = `hsl(${(hue + 180) % 360}, ${sat}%, ${lit}%)`;
+  let lit =
+    sat === 0
+      ? Math.round(92 - (clamp(Number(l), 45, 70) - 45) * 0.4)
+      : Number(l);
+  while (
+    lit < PILLOW_MAX_LIT &&
+    hslLuminance(hue, sat, lit) < PILLOW_MIN_LUMINANCE
+  ) {
+    lit += 2;
   }
 
-  return {
-    background,
-    foreground: bgLit >= 55 ? PILLOW_TEXT_DARK : PILLOW_TEXT_LIGHT,
-  };
+  return `hsl(${hue}, ${sat}%, ${lit}%)`;
 }
 
 function GroupThumb({ seed, isActive }: { seed: Song; isActive: boolean }) {
