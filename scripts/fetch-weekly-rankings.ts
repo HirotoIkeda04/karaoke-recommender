@@ -61,6 +61,17 @@ const MIN_ARTIST_SIM = 0.4;
 
 // --- text utilities --------------------------------------------------------
 
+/**
+ * 共演者の羅列から主たるアーティストだけを取り出す。
+ * Apple RSS は "EBiDAN, 超特急, M!LK & 原因は自分にある。" のように共演者を
+ * 全部並べるため、DB 側の主アーティスト表記と normKey が一致しない。
+ */
+function primaryArtistName(s: string): string {
+  // 括弧内に読点を含む表記 ("A (feat. B, C)") で切り損ねないよう先に括弧を落とす
+  const flat = s.replace(/[（(][^）)]*[）)]/g, " ");
+  return (flat.split(/\s*(?:,|、|&|＆|feat\.|ft\.|with)\s*/i)[0] ?? flat).trim();
+}
+
 function normalizeTitle(s: string): string {
   return s
     .normalize("NFKC")
@@ -343,12 +354,14 @@ async function buildSongIndex(
   bySpotifyId: Map<string, string>;
   byIsrc: Map<string, string>;
   byNormKey: Map<string, string>;
+  byPrimaryKey: Map<string, string>;
   needsItunesFill: Set<string>;
 }> {
   const byItunesId = new Map<string, string>();
   const bySpotifyId = new Map<string, string>();
   const byIsrc = new Map<string, string>();
   const byNormKey = new Map<string, string>();
+  const byPrimaryKey = new Map<string, string>();
   const needsItunesFill = new Set<string>();
   const PAGE = 1000;
   for (let from = 0; ; from += PAGE) {
@@ -366,13 +379,23 @@ async function buildSongIndex(
       if (r.spotify_track_id) bySpotifyId.set(r.spotify_track_id, r.id);
       if (r.spotify_isrc) byIsrc.set(r.spotify_isrc, r.id);
       if (!r.itunes_preview_url) needsItunesFill.add(r.id);
-      const k =
-        normalizeArtistName(r.artist ?? "") + "|" + normalizeTitle(r.title);
+      const title = normalizeTitle(r.title);
+      const k = normalizeArtistName(r.artist ?? "") + "|" + title;
       if (!byNormKey.has(k)) byNormKey.set(k, r.id);
+      const pk =
+        normalizeArtistName(primaryArtistName(r.artist ?? "")) + "|" + title;
+      if (!byPrimaryKey.has(pk)) byPrimaryKey.set(pk, r.id);
     }
     if (data.length < PAGE) break;
   }
-  return { byItunesId, bySpotifyId, byIsrc, byNormKey, needsItunesFill };
+  return {
+    byItunesId,
+    bySpotifyId,
+    byIsrc,
+    byNormKey,
+    byPrimaryKey,
+    needsItunesFill,
+  };
 }
 
 /** artists に該当が無ければ最低限の行を作って artist_id を返す。 */
@@ -633,12 +656,28 @@ async function main() {
     // (RSS 表記と iTunes 正規表記の両方で引く)
     const normKey =
       normalizeArtistName(entry.artistName) + "|" + normalizeTitle(entry.name);
+    const primaryKey =
+      normalizeArtistName(primaryArtistName(entry.artistName)) +
+      "|" +
+      normalizeTitle(entry.name);
     let songId =
       songIdx.byItunesId.get(entry.id) ?? songIdx.byNormKey.get(normKey);
     if (!songId && it) {
       const itKey =
         normalizeArtistName(it.artistName) + "|" + normalizeTitle(it.trackName);
       songId = songIdx.byNormKey.get(itKey);
+    }
+    if (!songId) {
+      // 共演者を並べた表記 ("A, B & C") は主アーティストだけで引き直す。
+      // これを飛ばすと既存曲と別行で重複 INSERT してしまう。
+      songId = songIdx.byPrimaryKey.get(primaryKey);
+      if (!songId && it) {
+        songId = songIdx.byPrimaryKey.get(
+          normalizeArtistName(primaryArtistName(it.artistName)) +
+            "|" +
+            normalizeTitle(it.trackName),
+        );
+      }
     }
 
     if (!songId) {
@@ -690,6 +729,7 @@ async function main() {
               if (tr.external_ids?.isrc)
                 songIdx.byIsrc.set(tr.external_ids.isrc, newId);
               songIdx.byNormKey.set(normKey, newId);
+              songIdx.byPrimaryKey.set(primaryKey, newId);
               if (it) songIdx.byItunesId.set(entry.id, newId);
             }
           }
@@ -705,6 +745,7 @@ async function main() {
             songId = newId;
             songIdx.byItunesId.set(entry.id, newId);
             songIdx.byNormKey.set(normKey, newId);
+            songIdx.byPrimaryKey.set(primaryKey, newId);
           }
         }
       } else {
@@ -721,7 +762,11 @@ async function main() {
     }
 
     if (songId) {
-      ensureBucket(songId).sources.apple = rank;
+      // 同じ曲が複数バージョンでチャートインすることがある
+      // (例: "Yes! 東京" が rank 9 と rank 100 の 2 バージョン)。
+      // 後勝ちにすると下位の順位で上書きされてしまうので上位を採る。
+      const bucket = ensureBucket(songId);
+      bucket.sources.apple = Math.min(bucket.sources.apple ?? rank, rank);
     }
   }
 
