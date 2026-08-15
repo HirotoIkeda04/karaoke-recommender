@@ -45,55 +45,72 @@ type GlassVariant = "bar" | "control" | "overlay";
  *   #121212 → やや明るい (= 背景から浮く)  /  白 → 中間グレー (= アイコンが読める)
  * の両立になる。これは iOS のダーク系マテリアルの振る舞いに近い。
  */
+/**
+ * 質感の目標は Luma (lu.ma) の iOS アプリ。実機スクリーンショットから読み取った
+ * 特徴は 4 つで、これがそのままチューニングの制約になっている:
+ *
+ *   1. 縁の鏡面ハイライトがほぼ無い。ガラスの稜線を主張せず、マットに近い。
+ *   2. 色がニュートラル。背後のカラフルな画像の色をほとんど拾わない。
+ *   3. 色収差 (縁の色ズレ) が無い。
+ *   4. 素材色は iOS のシステムグレー。
+ *        バー          #1c1c1e (systemGray6)
+ *        アクティブ    #3a3a3c (systemGray4)  ← goo の fill と一致させてある
+ *
+ * したがって specular / sheen / glow / dispersion はいずれも「効かせない」方向へ
+ * 振る。これらを上げると途端に「安いガラス風エフェクト」に見えるのが、
+ * Luma と並べた時に一番効く差だった。透け感はブラーと減光層だけで作る。
+ */
 const OPTICS: Record<GlassVariant, Partial<GlassOptics>> = {
   // ボトムナビのような横長で面積の大きいバー。
-  // 屈折を強くすると縁で背景が伸びて安っぽくなるので、ブラーと彩度を主役にする。
   bar: {
-    frost: 20,
-    saturate: 1.9,
-    brightness: 0.1,
-    specular: 1.1,
-    sheen: 0.4,
-    sheenWidth: 14,
-    glow: 0.1,
-    depth: 0.4,
-    curvature: 0.2,
-    bend: 0.3,
-    dispersion: 0.28,
-    strength: 0.045,
+    frost: 24,
+    // 1.0 に近づけて背後の色を拾わせない (Luma はニュートラルなグレー)
+    saturate: 1.15,
+    // 黒地の上で #1f1f1f 前後 = systemGray6 近辺に着地する量
+    brightness: 0.12,
+    specular: 0.28,
+    sheen: 0.1,
+    // 幅を広げるほど稜線がぼやけて「線」に見えなくなる
+    sheenWidth: 22,
+    glow: 0.03,
+    depth: 0.3,
+    curvature: 0.12,
+    bend: 0.18,
+    dispersion: 0.08,
+    strength: 0.03,
   },
-  // 円形 / ピル型のフローティングボタン。小さいぶん厚み感を強めに出す。
+  // 円形 / ピル型のフローティングボタン。
   // 背後が常にアプリ背景 (暗い) である前提で、白ヴェールで浮かせる。
   control: {
-    frost: 12,
-    saturate: 1.7,
-    brightness: 0.08,
-    specular: 1.05,
-    sheen: 0.36,
-    sheenWidth: 8,
-    glow: 0.14,
-    depth: 0.7,
-    curvature: 0.5,
-    bend: 0.5,
-    dispersion: 0.4,
-    strength: 0.08,
+    frost: 16,
+    saturate: 1.15,
+    brightness: 0.1,
+    specular: 0.3,
+    sheen: 0.12,
+    sheenWidth: 14,
+    glow: 0.04,
+    depth: 0.35,
+    curvature: 0.2,
+    bend: 0.22,
+    dispersion: 0.08,
+    strength: 0.035,
   },
   // ジャケット画像の上に重なるフローティングボタン用。
-  // control と同じ形状だが、明るい画像の上で白アイコンが飛ばないよう
+  // control と同じ質感だが、明るい画像の上で白アイコンが飛ばないよう
   // ヴェールを黒側へ反転させている。
   overlay: {
-    frost: 12,
-    saturate: 1.7,
-    brightness: -0.2,
-    specular: 1.05,
-    sheen: 0.36,
-    sheenWidth: 8,
-    glow: 0.14,
-    depth: 0.7,
-    curvature: 0.5,
-    bend: 0.5,
-    dispersion: 0.4,
-    strength: 0.08,
+    frost: 16,
+    saturate: 1.15,
+    brightness: -0.18,
+    specular: 0.3,
+    sheen: 0.12,
+    sheenWidth: 14,
+    glow: 0.04,
+    depth: 0.35,
+    curvature: 0.2,
+    bend: 0.22,
+    dispersion: 0.08,
+    strength: 0.035,
   },
 };
 
@@ -102,7 +119,9 @@ const OPTICS: Record<GlassVariant, Partial<GlassOptics>> = {
  * 値は backdrop-filter: brightness() に渡る係数。
  */
 const DIM: Record<GlassVariant, number | null> = {
-  bar: 0.3,
+  // Luma のバーは「背後の文字が滲んで見える」程度でかなり不透明寄り。
+  // 透け過ぎるとガラスというより素通しに見えるので、0.3 から一段沈めた。
+  bar: 0.2,
   control: null,
   overlay: null,
 };
