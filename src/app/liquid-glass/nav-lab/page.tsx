@@ -22,6 +22,7 @@ import { TAB_ITEMS } from "@/components/app-bottom-nav";
 import { AppSearchBar } from "@/components/app-search-bar";
 import {
   BAR_HEIGHT_PX,
+  BAR_INSET_CLASS,
   BAR_SHADOW,
   GOO_FILL,
   LABEL_PX,
@@ -79,7 +80,7 @@ export default function NavLabPage() {
           ))}
         </div>
 
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-10 px-4">
+        <div className={`pointer-events-none fixed inset-x-0 bottom-0 z-10 ${BAR_INSET_CLASS}`}>
           <div
             className="pointer-events-auto mx-auto flex max-w-md items-center"
             style={{
@@ -139,7 +140,7 @@ export default function NavLabPage() {
                                 isActive ? "text-white" : "text-zinc-400"
                               }`}
                             >
-                              <Icon className="size-6" aria-hidden />
+                              <Icon className="size-5" aria-hidden />
                               <span
                                 className="max-w-full truncate text-[10px] font-medium"
                                 style={{ lineHeight: `${LABEL_PX}px` }}

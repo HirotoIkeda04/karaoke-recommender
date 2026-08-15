@@ -11,6 +11,7 @@ import { AppSearchBar } from "@/components/app-search-bar";
 import {
   BAR_HEIGHT_PX,
   BAR_HEIGHT_REM,
+  BAR_INSET_CLASS,
   BAR_SHADOW,
   GOO_FILL,
   LABEL_PX,
@@ -115,7 +116,7 @@ export function AppBottomNav() {
       // 画面幅いっぱいの帯ではなく、左右と下端から浮かせたカプセルにする
       // (iOS 26 のタブバー)。背後のコンテンツがバーの周りに見えることで
       // 初めてガラスがガラスとして読めるので、この余白は装飾ではなく必須。
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-10 px-4"
+      className={cn("pointer-events-none fixed inset-x-0 bottom-0 z-10", BAR_INSET_CLASS)}
       initial={false}
       animate={{ y: songSheetOpen ? "150%" : -lift }}
       transition={{ duration: 0.32, ease: [0.32, 0.72, 0, 1] }}
@@ -205,7 +206,12 @@ export function AppBottomNav() {
                             active ? "text-white" : "text-zinc-400",
                           )}
                         >
-                          <Icon className="size-6" aria-hidden />
+                          {/* 純正の SF Symbol はグリフ 18pt 前後 (実測)。
+                              lucide は viewBox いっぱいに描くので、同じ
+                              24px にするとタブだけ一回り大きく見える。
+                              ラベルを持たない円ボタン側は純正も 22-23pt
+                              あるので、そちらは 24px のままにする。 */}
+                          <Icon className="size-5" aria-hidden />
                           <span
                             className="max-w-full truncate text-[10px] font-medium"
                             style={{ lineHeight: `${LABEL_PX}px` }}
