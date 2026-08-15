@@ -116,9 +116,9 @@ const GENRE_LABEL_COLORS: Record<GenreCode, string> = {
 // サイズは高さ基準 (h-*) なので、横長カードでも縦が溢れない。
 const GENRE_COVER_TRIO = [
   // covers[0] を中央に置きたいので、描画順は左 → 中央 → 右で並べ替える
-  { coverIndex: 1, className: "h-[90%] translate-y-[14%]", ring: false },
-  { coverIndex: 0, className: "z-10 -mx-[4%] h-full", ring: true },
-  { coverIndex: 2, className: "h-[90%] translate-y-[14%]", ring: false },
+  { coverIndex: 1, className: "h-[92%] translate-y-[12%]", ring: false },
+  { coverIndex: 0, className: "z-10 -mx-[3%] h-full", ring: true },
+  { coverIndex: 2, className: "h-[92%] translate-y-[12%]", ring: false },
 ] as const;
 
 const DEBOUNCE_MS = 200;
@@ -774,10 +774,10 @@ function BrowseGrid({
 
   return (
     <section>
-      <ul className="grid grid-cols-2 gap-2">
-        {/* 「今週のランキング」エントリ。col-span-2 で全幅、aspect は
+      <ul className="grid grid-cols-3 gap-2">
+        {/* 「今週のランキング」エントリ。col-span-3 で全幅、aspect は
             ジャンルカード半分弱の高さに揃えて視覚的バランスを取る。 */}
-        <li className="col-span-2">
+        <li className="col-span-3">
           <Link
             href="/rankings"
             className="relative flex aspect-[16/5] items-center overflow-hidden rounded-lg bg-zinc-900 px-4 py-3 transition active:scale-[0.98]"
@@ -854,7 +854,7 @@ function BrowseGrid({
           </Link>
         </li>
         {rankingPreview.length > 0 ? (
-          <li className="col-span-2 py-3">
+          <li className="col-span-3 py-3">
             <div className="mb-1 flex items-center justify-between px-2">
               <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
                 今週のランキング
@@ -921,7 +921,7 @@ function BrowseGrid({
             <li key={code}>
               <Link
                 href={`/songs/genre/${code}`}
-                className="relative flex aspect-[16/9] flex-col overflow-hidden rounded-lg px-3 pb-1.5 pt-1 transition active:scale-[0.98]"
+                className="relative flex aspect-[16/9] flex-col overflow-hidden rounded-lg px-2 pb-1 pt-0.5 transition active:scale-[0.98]"
                 style={{ backgroundColor: GENRE_CARD_COLORS[code] }}
               >
                 {covers.length > 0 ? (
@@ -943,7 +943,7 @@ function BrowseGrid({
                           style={
                             ring
                               ? {
-                                  boxShadow: `0 0 0 3px ${GENRE_CARD_COLORS[code]}`,
+                                  boxShadow: `0 0 0 2px ${GENRE_CARD_COLORS[code]}`,
                                 }
                               : undefined
                           }
@@ -961,7 +961,7 @@ function BrowseGrid({
                   </div>
                 ) : null}
                 <span
-                  className="text-sm font-extrabold leading-tight tracking-tight"
+                  className="truncate text-[11px] font-extrabold leading-tight tracking-tight"
                   style={{ color: GENRE_LABEL_COLORS[code] }}
                 >
                   {GENRE_LABELS[code]}

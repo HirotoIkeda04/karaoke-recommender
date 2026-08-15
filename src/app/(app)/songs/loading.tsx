@@ -16,8 +16,8 @@ export default function Loading() {
       <div className="h-4 w-24 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
 
       {/* ジャンルカードグリッド */}
-      <ul className="grid grid-cols-2 gap-2">
-        {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+      <ul className="grid grid-cols-3 gap-2">
+        {[0, 1, 2, 3, 4, 5].map((i) => (
           <li
             key={i}
             className="aspect-[16/9] animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800"
