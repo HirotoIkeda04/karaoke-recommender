@@ -20,6 +20,7 @@ import {
   PILL_R,
   SPLIT_GAP_PX,
 } from "@/components/bottom-bar-metrics";
+import { useDeckDetail } from "@/components/deck-detail-context";
 import { GlassSurface } from "@/components/ui/glass-surface";
 import { triggerHaptic } from "@/lib/haptics";
 import { isSongSheetOpen } from "@/lib/song-sheet-route";
@@ -58,6 +59,9 @@ export function AppBottomNav() {
   const pathname = usePathname();
   const songSheetSegment = useSelectedLayoutSegment("songSheet");
   const songSheetOpen = isSongSheetOpen(pathname, songSheetSegment);
+  // ホームのデッキが擬似詳細を開いている間も、シートと同じように引っ込める
+  const { detailOpen } = useDeckDetail();
+  const hidden = songSheetOpen || detailOpen;
 
   // カプセル内タブの現在地。タブ外のページ (/friends, /artists/... 等) では
   // -1 になり、その間はインジケータごと外す。
@@ -76,9 +80,10 @@ export function AppBottomNav() {
         BAR_INSET_CLASS,
       )}
       initial={false}
-      animate={{ y: songSheetOpen ? "150%" : 0 }}
+      animate={{ y: hidden ? "150%" : 0 }}
       transition={{ duration: 0.32, ease: [0.32, 0.72, 0, 1] }}
-      aria-hidden={songSheetOpen}
+      aria-hidden={hidden}
+      inert={hidden}
       // ホームインジケータの上に載せる。safe-area が無い端末でも最低 0.75rem
       // は浮かせて、画面下端に貼り付いて見えないようにする。
       style={{

@@ -18,6 +18,7 @@ import { usePathname } from "next/navigation";
 import { startTransition, useEffect, useRef, useState } from "react";
 
 import { DumbbellMini } from "@/components/icons/dumbbell-mini";
+import { useDeckDetail } from "@/components/deck-detail-context";
 import { useIsGuest } from "@/components/session-provider";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { GlassSurface } from "@/components/ui/glass-surface";
@@ -57,31 +58,26 @@ const SILENT_WAV =
 
 /**
  * ディスク径。横幅いっぱい (左右 1.75rem マージン) を基本に、
- * 縦に収まらない小さい画面ではヘッダー + 組カルーセル + 曲情報 +
- * ボタン群 + ナビの予約分 (約 31.25rem) を引いた残りへ縮める。上限 20rem。
+ * 縦に収まらない小さい画面ではヘッダー + 組カルーセル + 曲名 +
+ * ボタン群 + ナビの予約分 (約 30rem) を引いた残りへ縮める。上限 20rem。
  * loading.tsx の skeleton と式を揃えること。
- * ナビを浮かせたカプセルにした分 (safe-area 無しの端末で最大 1.25rem)
- * 予約を 31.5rem から増やし、アーティスト名を組カルーセルへ重ねて
- * 独立した行を無くした分と、曲名側で詰めた 1.5rem を引いてある。
+ * 内訳: pt-3 0.75 + 組カルーセル 3.5 + gap 1.5 + 曲名 1.75 + gap 1.5 +
+ * (盤) + gap 1.5 + 評価 4.875 + gap 1.5 + スキップ行 3.5 + pb-2 0.5 の
+ * 20.875rem に、ヘッダーと浮いたナビの実測 9.125rem を足した値。
  */
 const DISC_SIZE =
-  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 31.25rem - env(safe-area-inset-bottom))))";
+  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 30rem - env(safe-area-inset-bottom))))";
 
 /**
  * 詳細表示 (上スワイプ) 中のディスク径。組カルーセルの行が 3.5rem から
  * 座布団 1 行 (1.5rem) へ縮んで間隔も 0.75rem に詰まり、スキップ行
- * (3.5rem + gap 1.5rem) が消える計 7.75rem の代わりに、楽曲情報
- * (mt-4 + 3 行 = 7.75rem) と歌詞ボタン (mt-2 + 2.25rem) の 10.5rem が
- * 入るので、予約は 2.75rem 増える。
+ * (3.5rem + gap 1.5rem) も消える計 7.75rem の代わりに、楽曲情報 (3 行 =
+ * 6.75rem) と歌詞ボタン (mt-2 + 2.25rem) にその上の gap 1.5rem を足した
+ * 11rem が入るので、予約は 3.25rem 増える。
+ * (詳細ではナビを引っ込めるが、main の下 padding は残るので予約はそのまま)
  */
 const DISC_SIZE_DETAIL =
-  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 34rem - env(safe-area-inset-bottom))))";
-
-/**
- * 組カルーセルの行に重ねる size-10 ボタンの top。サムネイル (3.5rem) の
- * 中央に来る位置 ((3.5rem - 2.5rem) / 2)。
- */
-const BAR_BUTTON_TOP = "0.5rem";
+  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 33.25rem - env(safe-area-inset-bottom))))";
 
 /**
  * 座布団の top (px)。サムネイル (56px) の下辺をまたいで貼り、
@@ -250,7 +246,8 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   // 上スワイプで入る擬似的な楽曲詳細表示。組カルーセル / スキップ行 /
   // シャッフルを畳み、代わりに楽曲情報と歌詞ボタンを出す (下スワイプで戻る)。
   // この間は 6 秒の自動送りを止め、試聴を 30 秒フルで流す。
-  const [detail, setDetail] = useState(false);
+  // state をレイアウト側に置いてあるのは、兄弟のボトムナビも引っ込めるため。
+  const { detailOpen: detail, setDetailOpen: setDetail } = useDeckDetail();
   // 詳細表示で 30 秒を流し切った曲の id。曲を替えれば自動的に外れるので、
   // 「今の曲が流し終わったか」は下で id を突き合わせて導出する。
   const [detailPlayedOut, setDetailPlayedOut] = useState<string | null>(null);
@@ -322,6 +319,12 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
       document.body.style.overflow = prev;
     };
   }, []);
+
+  // 詳細表示の state はレイアウト側に置いてあるので、ホームを離れる時に
+  // 自分で畳んでおく (放置するとナビが引っ込んだままの画面へ移動する)。
+  useEffect(() => {
+    return () => setDetail(false);
+  }, [setDetail]);
 
   /** <audio> 要素を遅延生成する。スニペット終端はフェードアウト */
   const ensureAudio = (): HTMLAudioElement => {
@@ -728,7 +731,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   // レイアウト全体が横にずれる。clip はスクロール自体を不可能にする。
   return (
     <div
-      className="relative mx-auto flex max-w-md select-none flex-col items-center gap-6 overflow-clip px-4 pb-2 pt-8"
+      className="relative mx-auto flex max-w-md select-none flex-col items-center gap-6 overflow-clip px-4 pb-2 pt-3"
       // 縦のパンをブラウザに渡さない (渡すと縦スワイプ中に pointercancel が
       // 飛んで判定が落ちる)。横パンとピンチズームはそのまま許可する。
       style={{ touchAction: "pan-x pinch-zoom" }}
@@ -762,9 +765,46 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         </div>
       ) : null}
 
-      {/* 組カルーセルの行。組サムネイル + 左右端のシャッフル / 消音 +
-          アクティブなジャケットに被せるアーティスト名の座布団を重ねる。
-          詳細表示ではサムネイルが消え、座布団 1 行分の高さまで畳む
+      {/* シャッフル / 消音: 画面上部の左右端に固定する。組カルーセルが
+          詳細表示で畳まれても動かないよう、行ではなくデッキ全体を基準に
+          置いている。背景色は敷かない (敷くとガラスが背後を拾えず「黒い丸」
+          になる。明るいジャケット対策は GlassSurface の DIM 側で行う)。 */}
+      <button
+        type="button"
+        onClick={handleShuffle}
+        disabled={shuffling}
+        aria-label="デッキをシャッフルする"
+        inert={detail}
+        className="absolute left-1 top-1 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90 disabled:opacity-60"
+        // 詳細表示では消すが、disabled:opacity-60 と競合しないよう
+        // クラスではなくインラインで上書きする。
+        style={detail ? { opacity: 0 } : undefined}
+      >
+        <GlassSurface variant="overlay" />
+        <Dices
+          className={`relative size-5 ${shuffling ? "animate-spin" : ""}`}
+          aria-hidden
+        />
+      </button>
+      <button
+        type="button"
+        onClick={handleToggleAudio}
+        aria-label={
+          audioOn && !audioBlocked ? "試聴を停止する" : "試聴を再生する"
+        }
+        className="absolute right-1 top-1 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90"
+      >
+        <GlassSurface variant="overlay" />
+        {audioOn && !audioBlocked ? (
+          <Volume2 className="relative size-5" aria-hidden />
+        ) : (
+          <VolumeX className="relative size-5" aria-hidden />
+        )}
+      </button>
+
+      {/* 組カルーセルの行。組サムネイルと、アクティブなジャケットに被せる
+          アーティスト名の座布団を重ねる。詳細表示ではサムネイルが消え、
+          座布団 1 行分の高さまで畳む
           (marginBottom で親の gap-6 も 0.75rem まで詰める)。 */}
       <motion.div
         className="relative w-full"
@@ -829,44 +869,6 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           );
         })}
       </motion.div>
-
-        {/* シャッフル / 消音: 組カルーセルの行の左右端。組遷移で消えないよう
-            AnimatePresence の外に置く。背景色は敷かない (敷くとガラスが背後を
-            拾えず「黒い丸」になる。明るいジャケット対策は GlassSurface の
-            DIM 側で行う)。 */}
-        <button
-          type="button"
-          onClick={handleShuffle}
-          disabled={shuffling}
-          aria-label="デッキをシャッフルする"
-          inert={detail}
-          className="absolute left-1 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90 disabled:opacity-60"
-          // top はサムネイル (3.5rem) の中央。詳細表示では消すが、
-          // disabled:opacity-60 と競合しないようクラスでなくインラインで。
-          style={{ top: BAR_BUTTON_TOP, ...(detail ? { opacity: 0 } : null) }}
-        >
-          <GlassSurface variant="overlay" />
-          <Dices
-            className={`relative size-5 ${shuffling ? "animate-spin" : ""}`}
-            aria-hidden
-          />
-        </button>
-        <button
-          type="button"
-          onClick={handleToggleAudio}
-          aria-label={
-            audioOn && !audioBlocked ? "試聴を停止する" : "試聴を再生する"
-          }
-          className="absolute right-1 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90"
-          style={{ top: BAR_BUTTON_TOP }}
-        >
-          <GlassSurface variant="overlay" />
-          {audioOn && !audioBlocked ? (
-            <Volume2 className="relative size-5" aria-hidden />
-          ) : (
-            <VolumeX className="relative size-5" aria-hidden />
-          )}
-        </button>
 
         {/* アーティスト名の座布団: 再生中の組のジャケットに下から少し被せ、
             右上がりに傾けて貼る。詳細表示ではサムネイルが消えるので、
@@ -936,6 +938,40 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           transition={{ duration: 0.2, ease: "easeOut" }}
           className="flex w-full flex-col items-center gap-6"
         >
+          {/* 曲順 + 楽曲名 + リリース年。アーティスト名の座布団の真下に置く。
+              曲名は座布団と同じ縦長 face、曲順とリリース年は楽曲情報と同じ
+              等幅 face で軽めに添える。 */}
+          <AnimatePresence mode="popLayout" initial={false}>
+            <motion.div
+              key={current.id}
+              initial={{ y: 10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -10, opacity: 0 }}
+              transition={{ duration: 0.18 }}
+              className="w-full px-2"
+            >
+              <h2 className="flex items-baseline justify-center gap-2 text-xl font-semibold">
+                <span className="shrink-0 font-mono text-base font-light text-zinc-500 dark:text-zinc-400">
+                  #{position.song + 1}
+                </span>
+                {/* min-w-0: line-clamp の親が flex なので、これが無いと
+                    曲名の最小内容幅がデッキごと画面外へ押し広げる */}
+                <Link
+                  href={`/songs/${current.id}`}
+                  className="line-clamp-1 min-w-0 hover:underline"
+                  style={{ fontFamily: PILLOW_FONT }}
+                >
+                  {current.title}
+                </Link>
+                {current.release_year ? (
+                  <span className="shrink-0 font-mono text-sm font-light text-zinc-500 dark:text-zinc-400">
+                    (&apos;{String(current.release_year).slice(-2)})
+                  </span>
+                ) : null}
+              </h2>
+            </motion.div>
+          </AnimatePresence>
+
           {/* ジャケットのカルーセル (遷移ボタンなし。回転完了 or スキップで進む) */}
           <motion.div
             role="group"
@@ -959,7 +995,14 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                   animate={{
                     x: `${delta * SLIDE_OFFSET_PERCENT}%`,
                     scale: isActive ? 1 : 0.65,
-                    opacity: Math.abs(delta) > 1 ? 0 : isActive ? 1 : 0.45,
+                    // 詳細表示は再生中の 1 枚だけの画面なので、前後の盤は
+                    // 端から覗かせない (display を切ると復帰時にポップイン
+                    // するので、フェードで消して位置は保っておく)
+                    opacity: isActive
+                      ? 1
+                      : detail || Math.abs(delta) > 1
+                        ? 0
+                        : 0.45,
                   }}
                   transition={{ type: "spring", stiffness: 260, damping: 30 }}
                   className="absolute inset-0"
@@ -987,44 +1030,21 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
             })}
           </motion.div>
 
-          {/* 曲順 + 楽曲名 (アーティスト名はレコードの上の枕へ移した) */}
-          <AnimatePresence mode="popLayout" initial={false}>
-            <motion.div
-              key={current.id}
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -10, opacity: 0 }}
-              transition={{ duration: 0.18 }}
-              className="w-full px-2 text-center"
-            >
-              <h2
-                className="line-clamp-1 text-xl font-semibold"
-                style={{
-                  fontFamily: '"LatinUpscale", var(--font-sans)',
-                }}
+          {/* 詳細表示でだけレコードの下に出る、シートと同じ楽曲情報。
+              外側の AnimatePresence は組が変わるたびに作り直されるので、
+              initial={false} で「組送りでは開閉アニメを再生しない」。
+              曲送りでは中身のテキストだけが差し替わる。 */}
+          <AnimatePresence initial={false}>
+            {detail ? (
+              <motion.div
+                key="detail"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={DETAIL_TRANSITION}
+                className="w-full overflow-hidden text-center"
               >
-                <span className="mr-2 font-mono text-base text-zinc-500 dark:text-zinc-400">
-                  #{position.song + 1}
-                </span>
-                <Link href={`/songs/${current.id}`} className="hover:underline">
-                  {current.title}
-                </Link>
-              </h2>
-
-              {/* 詳細表示でだけ曲名の下に出る、シートと同じ楽曲情報。
-                  外側の AnimatePresence は曲が変わるたびに作り直されるので、
-                  initial={false} で「曲送りでは開閉アニメを再生しない」。 */}
-              <AnimatePresence initial={false}>
-                {detail ? (
-                  <motion.div
-                    key="detail"
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={DETAIL_TRANSITION}
-                    className="overflow-hidden"
-                  >
-                    <dl className="mx-auto mt-4 max-w-60 divide-y divide-zinc-200 rounded-xl bg-zinc-100 px-4 text-left text-sm dark:divide-zinc-700/60 dark:bg-zinc-800/60">
+                    <dl className="mx-auto max-w-60 divide-y divide-zinc-200 rounded-xl bg-zinc-100 px-4 text-left text-sm dark:divide-zinc-700/60 dark:bg-zinc-800/60">
                       <div className="flex items-baseline py-2">
                         <dt className="w-14 shrink-0 text-zinc-600 dark:text-zinc-400">
                           地声
@@ -1059,8 +1079,10 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                         </dd>
                       </div>
                     </dl>
+                    {/* sort=4 = 歌詞ネットの人気順。検索結果をいきなり
+                        人気順で開いて、目当ての曲を探す手間を省く */}
                     <Link
-                      href={`https://www.uta-net.com/search/?target=song&type=in&Keyword=${encodeURIComponent(current.title)}`}
+                      href={`https://www.uta-net.com/search/?target=song&type=in&Keyword=${encodeURIComponent(current.title)}&sort=4`}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label="歌詞ネットで歌詞を見る"
@@ -1069,10 +1091,8 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                       <ScrollText className="size-4" aria-hidden />
                       <span>歌詞を見る</span>
                     </Link>
-                  </motion.div>
-                ) : null}
-              </AnimatePresence>
-            </motion.div>
+              </motion.div>
+            ) : null}
           </AnimatePresence>
         </motion.div>
         </AnimatePresence>

@@ -1,7 +1,7 @@
 /**
  * ホーム (/) 遷移時の skeleton。
- * RecordDeck の構造を模した: アーティスト名の枕 + レコード盤 (円) + 曲名 +
- * 4 評価ボタン + スキップ 2 種/戻る行。
+ * RecordDeck の構造を模した: アーティスト名の座布団 + 曲名 +
+ * レコード盤 (円) + 4 評価ボタン + スキップ 2 種/戻る行。
  * 円のサイズ式は record-deck.tsx の DISC_SIZE と揃える。
  *
  * 子ルートで loading.tsx が定義されている場合はそちらが優先される。
@@ -9,7 +9,7 @@
 export default function Loading() {
   return (
     <div
-      className="mx-auto flex max-w-md flex-col items-center gap-6 overflow-hidden px-4 pb-2 pt-8"
+      className="mx-auto flex max-w-md flex-col items-center gap-6 overflow-hidden px-4 pb-2 pt-3"
       role="status"
       aria-label="読み込み中"
     >
@@ -34,18 +34,18 @@ export default function Loading() {
         </div>
       </div>
 
+      {/* 曲順 + 楽曲名 + リリース年 */}
+      <div className="h-7 w-48 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+
       {/* レコード盤 */}
       <div
         className="animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800"
         style={{
           width:
-            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 31.25rem - env(safe-area-inset-bottom))))",
+            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 30rem - env(safe-area-inset-bottom))))",
           aspectRatio: "1 / 1",
         }}
       />
-
-      {/* 曲順 + 楽曲名 */}
-      <div className="h-7 w-48 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
 
       {/* 4 評価ボタン (丸 size-14 + ラベル) */}
       <div className="grid w-full grid-cols-[repeat(4,3.5rem)] justify-around">

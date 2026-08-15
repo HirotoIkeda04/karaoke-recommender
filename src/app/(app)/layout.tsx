@@ -1,5 +1,6 @@
 import { AppHeader } from "@/components/app-header";
 import { AppBottomNav } from "@/components/app-bottom-nav";
+import { DeckDetailProvider } from "@/components/deck-detail-context";
 import { GuestRatingsImporter } from "@/components/guest-ratings-importer";
 import { InAppBrowserGate } from "@/components/in-app-browser-gate";
 import { SessionProvider } from "@/components/session-provider";
@@ -31,17 +32,21 @@ export default async function AppLayout({
       <InAppBrowserGate />
       {/* min-h-dvh: 動的ビューポート高 (iOS Safari の URL バー伸縮に追従、
           100vh のような固定値ではなく現在の表示領域を毎フレーム反映する) */}
-      <div className="flex min-h-dvh flex-col">
-        <AppHeader />
-        {/* main の bottom padding: 浮いた BottomNav (バー 3.5rem + 下の余白
-            max(0.75rem, safe-area)) を必ず上回る値。5rem + safe-area なら
-            safe-area の有無どちらでも 0.75rem 以上のクリアランスが残る。 */}
-        <main className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))]">
-          {children}
-        </main>
-        <AppBottomNav />
-        {songSheet}
-      </div>
+      {/* ホームのデッキが詳細表示に入ったらナビを引っ込める。デッキと
+          ナビは兄弟なので、その状態だけ Provider 経由で共有する */}
+      <DeckDetailProvider>
+        <div className="flex min-h-dvh flex-col">
+          <AppHeader />
+          {/* main の bottom padding: 浮いた BottomNav (バー 3.5rem + 下の余白
+              max(0.75rem, safe-area)) を必ず上回る値。5rem + safe-area なら
+              safe-area の有無どちらでも 0.75rem 以上のクリアランスが残る。 */}
+          <main className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))]">
+            {children}
+          </main>
+          <AppBottomNav />
+          {songSheet}
+        </div>
+      </DeckDetailProvider>
     </SessionProvider>
   );
 }
