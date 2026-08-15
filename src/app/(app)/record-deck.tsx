@@ -635,9 +635,9 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           onClick={handleShuffle}
           disabled={shuffling}
           aria-label="デッキをシャッフルする"
-          // bg-black/30 はガラスの下に敷く色。ジャケット画像が明るいと白アイコンが
-          // 飛ぶので、屈折させる背景そのものを一段暗くしてコントラストを確保する。
-          className="absolute left-1 top-0 z-20 flex size-10 items-center justify-center rounded-full bg-black/45 text-white transition active:brightness-90 disabled:opacity-60"
+          // 背景色は敷かない。敷くとガラスが背後を拾えず「黒い丸」になる。
+          // 明るいジャケットへの対策は GlassSurface の DIM (乗算) 側で行う。
+          className="absolute left-1 top-0 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90 disabled:opacity-60"
         >
           <GlassSurface variant="overlay" />
           <Dices
@@ -651,7 +651,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           aria-label={
             audioOn && !audioBlocked ? "試聴を停止する" : "試聴を再生する"
           }
-          className="absolute right-1 top-0 z-20 flex size-10 items-center justify-center rounded-full bg-black/45 text-white transition active:brightness-90"
+          className="absolute right-1 top-0 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90"
         >
           <GlassSurface variant="overlay" />
           {audioOn && !audioBlocked ? (

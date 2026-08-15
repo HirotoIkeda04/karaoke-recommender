@@ -96,12 +96,13 @@ const OPTICS: Record<GlassVariant, Partial<GlassOptics>> = {
     strength: 0.035,
   },
   // ジャケット画像の上に重なるフローティングボタン用。
-  // control と同じ質感だが、明るい画像の上で白アイコンが飛ばないよう
-  // ヴェールを黒側へ反転させている。
+  // control と同じ質感。かつては黒ヴェール (brightness 負) にしていたが、
+  // それだと暗い背景の上で「背景より暗い丸」になってガラスに見えなかった。
+  // 明るい画像への対策は下の DIM (乗算) 側に寄せ、ヴェールは白で統一する。
   overlay: {
     frost: 16,
     saturate: 1.15,
-    brightness: -0.18,
+    brightness: 0.1,
     specular: 0.3,
     sheen: 0.12,
     sheenWidth: 14,
@@ -123,7 +124,10 @@ const DIM: Record<GlassVariant, number | null> = {
   // 透け過ぎるとガラスというより素通しに見えるので、0.3 から一段沈めた。
   bar: 0.2,
   control: null,
-  overlay: null,
+  // ジャケット画像の上に載るので bar と同じ考え方で沈める。
+  //   暗い背景 (#121212) → 18×0.3 = 5.4、白ヴェール後 30 (#1e1e1e) = 背景より明るい
+  //   明るいジャケット     → 255×0.3 = 76、白ヴェール後 94 (#5e5e5e) = 白アイコンが読める
+  overlay: 0.3,
 };
 
 interface GlassSurfaceProps {

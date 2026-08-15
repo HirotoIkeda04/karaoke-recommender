@@ -26,17 +26,19 @@ const BAR_HEIGHT_REM = 4;
 const BAR_HEIGHT_PX = BAR_HEIGHT_REM * 16;
 
 /**
- * タブ 1 つ分の中身の寸法。Luma のタブバーに合わせて
- * 「円形チップ + その下にラベル」の 2 段構成にしている。
- * 34 + 3 + 12 = 49px なのでバー高さ 4rem (64px) に収まり、
+ * タブ 1 つ分の中身の寸法。「アイコン + その下にラベル」の 2 段。
+ * 24 + 3 + 12 = 39px なのでバー高さ 4rem (64px) に収まり、
  * record-deck / loading の縦予算 (DISC_SIZE) を触らずに済む。
+ *
+ * アイコンを円チップに載せる案は一度試して取りやめた。Luma のチップは
+ * サイズ・明度・アイコンとの余白が精妙で、雑に寄せると再現度が低いまま
+ * 要素だけ増えて悪化する。素のアイコンのほうがまだ良い。
  */
-const CHIP_PX = 34;
 const LABEL_PX = 12;
 
-/** 選択インジケータ (液体の塊) の寸法。チップとラベルをまとめて包む。 */
-const PILL_H = 54;
-const PILL_R = 20;
+/** 選択インジケータ (液体の塊) の寸法。アイコンとラベルをまとめて包む。 */
+const PILL_H = 48;
+const PILL_R = 18;
 
 /** インジケータの移動時間。goo のバネはこれを追いかけて尾を引く。 */
 const MOVE_TRANSITION = "transform .52s cubic-bezier(.34,1.36,.42,1)";
@@ -151,17 +153,7 @@ export function AppBottomNav() {
                       active ? "text-white" : "text-zinc-400",
                     )}
                   >
-                    {/* アイコンを載せる円形チップ。非アクティブは
-                        systemGray5 相当、アクティブはさらに白を足して起こす。 */}
-                    <span
-                      className={cn(
-                        "flex items-center justify-center rounded-full transition-colors",
-                        active ? "bg-white/22" : "bg-white/[0.08]",
-                      )}
-                      style={{ width: CHIP_PX, height: CHIP_PX }}
-                    >
-                      <Icon className="size-5" aria-hidden />
-                    </span>
+                    <Icon className="size-6" aria-hidden />
                     <span
                       className="max-w-full truncate text-[10px] font-medium"
                       style={{ lineHeight: `${LABEL_PX}px` }}

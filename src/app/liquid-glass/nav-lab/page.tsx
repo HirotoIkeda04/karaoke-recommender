@@ -41,10 +41,9 @@ const LENS_W = 66;
 const LENS_H = 50;
 const LENS_R = 25;
 // 本番のナビと同じ寸法 (app-bottom-nav.tsx を参照)
-const CHIP_PX = 34;
 const LABEL_PX = 12;
-const PILL_H = 54;
-const PILL_R = 20;
+const PILL_H = 48;
+const PILL_R = 18;
 
 const EASE = cubicBezier(0.34, 1.36, 0.42, 1);
 const MOVE_ANIM = { ease: EASE, duration: 0.52 };
@@ -105,14 +104,7 @@ function Tabs({
                 isActive ? "text-white" : "text-zinc-400"
               }`}
             >
-              <span
-                className={`flex items-center justify-center rounded-full transition-colors ${
-                  isActive ? "bg-white/22" : "bg-white/[0.08]"
-                }`}
-                style={{ width: CHIP_PX, height: CHIP_PX }}
-              >
-                <Icon className="size-5" aria-hidden />
-              </span>
+              <Icon className="size-6" aria-hidden />
               <span
                 className="max-w-full truncate text-[10px] font-medium"
                 style={{ lineHeight: `${LABEL_PX}px` }}
