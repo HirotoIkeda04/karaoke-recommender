@@ -113,12 +113,13 @@ const GENRE_LABEL_COLORS: Record<GenreCode, string> = {
 // ジャケット 3 枚を横一列の円で並べる。中央だけ大きく上に出し、左右は一回り
 // 小さくして下へずらす。中央を負のマージンで左右に食い込ませ、その上でカード
 // 色のリム (ring) を回すことで「重なっているが間に余白がある」形にする。
-// サイズは高さ基準 (h-*) なので、横長カードでも縦が溢れない。
+// サイズはカード幅基準 (w-*)。3 枚の合計がカード幅を少し超えるので、左右が
+// 端でわずかに見切れる。
 const GENRE_COVER_TRIO = [
   // covers[0] を中央に置きたいので、描画順は左 → 中央 → 右で並べ替える
-  { coverIndex: 1, className: "h-[92%] translate-y-[12%]", ring: false },
-  { coverIndex: 0, className: "z-10 -mx-[3%] h-full", ring: true },
-  { coverIndex: 2, className: "h-[92%] translate-y-[12%]", ring: false },
+  { coverIndex: 1, className: "w-[39%] translate-y-[22%]", ring: false },
+  { coverIndex: 0, className: "z-10 -mx-[3%] w-[50%]", ring: true },
+  { coverIndex: 2, className: "w-[39%] translate-y-[22%]", ring: false },
 ] as const;
 
 const DEBOUNCE_MS = 200;
@@ -921,7 +922,7 @@ function BrowseGrid({
             <li key={code}>
               <Link
                 href={`/songs/genre/${code}`}
-                className="relative flex aspect-[16/9] flex-col overflow-hidden rounded-lg px-2 pb-1 pt-0.5 transition active:scale-[0.98]"
+                className="relative flex aspect-[3/2] flex-col overflow-hidden rounded-lg px-2 pb-1.5 pt-0.5 transition active:scale-[0.98]"
                 style={{ backgroundColor: GENRE_CARD_COLORS[code] }}
               >
                 {covers.length > 0 ? (
