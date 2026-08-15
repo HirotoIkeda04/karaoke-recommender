@@ -92,13 +92,32 @@ const GENRE_CARD_COLORS: Record<GenreCode, string> = {
   other: "#525c68",
 };
 
-// ジャケット 3 枚を横一列の円で重ねる。中央を大きく前面に置き、
-// 幅の合計 (32 + 42 + 32 - 重なり 6) がちょうど 100% になるようにしている。
+// ジャンル名は背景と同じ色相のまま明度 15% / 彩度 0.75 倍まで落として、
+// 黒に近づけた文字色を使う (Spotify のステーションカードと同じ見え方)。
+const GENRE_LABEL_COLORS: Record<GenreCode, string> = {
+  j_pop: "#311b24",
+  j_rock: "#331e1a",
+  anison: "#1b2331",
+  vocaloid_utaite: "#183234",
+  idol_female: "#311c24",
+  idol_male: "#1d2230",
+  rnb_soul: "#30251d",
+  hiphop: "#2b2922",
+  enka_kayo: "#2e1f22",
+  western: "#1f2d27",
+  kpop: "#261f2d",
+  game_bgm: "#262d20",
+  other: "#23262a",
+};
+
+// ジャケット 3 枚を横一列の円で並べる。中央だけ大きく上に出し、左右は一回り
+// 小さくして下へずらす。サイズは高さ基準 (h-*) なので、横長カードでも縦が
+// 溢れない。
 const GENRE_COVER_TRIO = [
   // covers[0] を中央に置きたいので、描画順は左 → 中央 → 右で並べ替える
-  { coverIndex: 1, className: "w-[32%]" },
-  { coverIndex: 0, className: "z-10 -mx-[3%] w-[42%]" },
-  { coverIndex: 2, className: "w-[32%]" },
+  { coverIndex: 1, className: "h-[82%] translate-y-[14%]" },
+  { coverIndex: 0, className: "h-full" },
+  { coverIndex: 2, className: "h-[82%] translate-y-[14%]" },
 ] as const;
 
 const DEBOUNCE_MS = 200;
@@ -901,12 +920,14 @@ function BrowseGrid({
             <li key={code}>
               <Link
                 href={`/songs/genre/${code}`}
-                className="relative flex aspect-square flex-col overflow-hidden rounded-lg px-4 py-4 transition active:scale-[0.98]"
+                className="relative flex aspect-[16/9] flex-col overflow-hidden rounded-lg px-3 pb-2.5 pt-1.5 transition active:scale-[0.98]"
                 style={{ backgroundColor: GENRE_CARD_COLORS[code] }}
               >
                 {covers.length > 0 ? (
+                  // 円は高さ基準で作る (h-full + aspect-square)。3 枚 + 余白の
+                  // 合計はカード幅を超えるので、左右が端で見切れる。
                   <div
-                    className="flex flex-1 items-center justify-center"
+                    className="flex min-h-0 flex-1 items-start justify-center gap-[12%]"
                     aria-hidden
                   >
                     {GENRE_COVER_TRIO.map(({ coverIndex, className }) => {
@@ -929,7 +950,10 @@ function BrowseGrid({
                     })}
                   </div>
                 ) : null}
-                <span className="mt-3 text-sm font-extrabold leading-tight tracking-tight text-white">
+                <span
+                  className="mt-1 text-sm font-extrabold leading-tight tracking-tight"
+                  style={{ color: GENRE_LABEL_COLORS[code] }}
+                >
                   {GENRE_LABELS[code]}
                 </span>
               </Link>
