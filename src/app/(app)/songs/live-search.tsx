@@ -18,7 +18,9 @@ import { karaokeToMidi } from "@/lib/note";
 import {
   loadHistory,
   pushHistory,
+  type RecentArtist,
   type RecentItem,
+  type RecentSong,
   removeHistoryItem,
 } from "@/lib/search-history";
 import { createClient } from "@/lib/supabase/client";
@@ -87,6 +89,9 @@ const GENRE_COVER_BUBBLES = [
 
 const DEBOUNCE_MS = 200;
 const RECOMMENDATION_LIMIT = 50;
+// 「最近の検索」はアーティスト (横スクロール) と楽曲 (縦リスト) で上限を分ける
+const RECENT_ARTIST_LIMIT = 10;
+const RECENT_SONG_LIMIT = 3;
 
 type SearchMode = "browse" | "search-empty" | "search-results";
 
@@ -513,7 +518,7 @@ export function LiveSearch({
         {mode === "search-empty" ? (
           <>
             <HistoryList
-              history={history.slice(0, 3)}
+              history={history}
               onRemove={handleRemoveHistory}
               onSelectSong={handleSelectSong}
               onSelectArtist={handleSelectArtist}
@@ -871,7 +876,9 @@ function BrowseGrid({
 }
 
 // ============================================================================
-// History: タップした曲/アーティストの最近リスト (Spotify 風)
+// History: タップした曲/アーティストの「最近の検索」
+//   - アーティストは X (Twitter) の検索履歴風に丸アイコンの横スクロール
+//   - 楽曲は従来通りの縦リストで、カルーセルの下に置く
 // ============================================================================
 function HistoryList({
   history,
@@ -892,53 +899,95 @@ function HistoryList({
   ratings: Record<string, string>;
   knownSet: Set<string>;
 }) {
+  const artists = history
+    .filter((item): item is RecentArtist => item.type === "artist")
+    .slice(0, RECENT_ARTIST_LIMIT);
+  const songs = history
+    .filter((item): item is RecentSong => item.type === "song")
+    .slice(0, RECENT_SONG_LIMIT);
+
   return (
     <section>
       <h2 className="mb-2 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-        最近検索したもの
+        最近の検索
       </h2>
-      {history.length > 0 ? (
+      {artists.length > 0 ? (
+        // px-6 = ページの px-4 + SongCard の p-2。下の曲リストと左端を揃える
+        <ul className="-mx-4 mb-2 flex gap-3 overflow-x-auto px-6 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {artists.map((item) => (
+            <li key={item.id} className="relative w-16 shrink-0">
+              <Link
+                href={`/artists/${item.id}`}
+                onClick={() =>
+                  onSelectArtist({
+                    id: item.id,
+                    name: item.name,
+                    song_count: null,
+                    image_url: item.image,
+                  })
+                }
+                className="block focus:outline-none"
+              >
+                <div className="relative size-16 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+                  {item.image ? (
+                    <JacketImage
+                      src={item.image}
+                      alt=""
+                      fill
+                      sizes="4rem"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-xl text-zinc-500">
+                      {item.name.slice(0, 1)}
+                    </div>
+                  )}
+                </div>
+                <p className="mt-1.5 truncate text-center text-xs font-medium text-zinc-900 dark:text-zinc-50">
+                  {item.name}
+                </p>
+              </Link>
+              {/* 丸アイコンの右上角 (画像の外側) に重ねるので縦にはみ出さない */}
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={(e) => onRemove(e, "artist", item.id)}
+                aria-label={`${item.name} を履歴から削除`}
+                className="absolute right-0 top-0 grid size-5 place-items-center rounded-full bg-zinc-900/70 text-zinc-100 backdrop-blur-sm dark:bg-zinc-700/85"
+              >
+                <X className="size-3" aria-hidden />
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {songs.length > 0 ? (
         <ul>
-          {history.map((item) => (
-            <li
-              key={`${item.type}:${item.id}`}
-              className="flex items-center gap-1"
-            >
+          {songs.map((item) => (
+            <li key={item.id} className="flex items-center gap-1">
               <div className="min-w-0 flex-1">
-                {item.type === "song" ? (
-                  <SongCard
-                    song={{
-                      id: item.id,
-                      title: item.title,
-                      artist: item.artist,
-                      release_year: null,
-                      range_low_midi: null,
-                      range_high_midi: null,
-                      falsetto_max_midi: null,
-                      image_url_small: item.image,
-                      image_url_medium: null,
-                      duration_ms: null,
-                    }}
-                    rating={ratings[item.id] ?? null}
-                    isKnown={knownSet.has(item.id)}
-                    onSelect={onSelectSong}
-                  />
-                ) : (
-                  <ArtistRow
-                    artist={{
-                      id: item.id,
-                      name: item.name,
-                      song_count: null,
-                      image_url: item.image,
-                    }}
-                    onSelect={onSelectArtist}
-                  />
-                )}
+                <SongCard
+                  song={{
+                    id: item.id,
+                    title: item.title,
+                    artist: item.artist,
+                    release_year: null,
+                    range_low_midi: null,
+                    range_high_midi: null,
+                    falsetto_max_midi: null,
+                    image_url_small: item.image,
+                    image_url_medium: null,
+                    duration_ms: null,
+                  }}
+                  rating={ratings[item.id] ?? null}
+                  isKnown={knownSet.has(item.id)}
+                  onSelect={onSelectSong}
+                />
               </div>
               <button
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={(e) => onRemove(e, item.type, item.id)}
+                onClick={(e) => onRemove(e, "song", item.id)}
                 aria-label="履歴から削除"
                 className="grid size-8 shrink-0 place-items-center rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
               >
@@ -947,11 +996,12 @@ function HistoryList({
             </li>
           ))}
         </ul>
-      ) : (
+      ) : null}
+      {artists.length === 0 && songs.length === 0 ? (
         <p className="px-2 py-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
           最近の検索はまだありません
         </p>
-      )}
+      ) : null}
     </section>
   );
 }
