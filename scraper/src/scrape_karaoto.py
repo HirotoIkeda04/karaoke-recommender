@@ -168,7 +168,7 @@ def parse_page(html: str, max_key_n: int, source_url: str) -> list[RawSong]:
 
 def _build_user_agent(contact_email: str) -> str:
     return (
-        f"KaraokeRecommenderBot/0.1 (contact: {contact_email}; research/personal)"
+        f"personal-karaoke-hobby/0.1 (non-commercial hobby project; contact: {contact_email})"
     )
 
 

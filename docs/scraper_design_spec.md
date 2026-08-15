@@ -133,10 +133,12 @@ GET https://api.spotify.com/v1/search?q={query}&type=track&market=JP&limit=5
 ### 3.3 連絡用 User-Agent
 
 ```
-User-Agent: KaraokeRecommenderBot/0.1 (contact: {Hirotoさんの連絡先}; research/personal)
+User-Agent: personal-karaoke-hobby/0.1 (non-commercial hobby project; contact: hiroto.ikeda.oka@gmail.com)
 ```
 
-サイト運営者が問い合わせできる形にする。
+サイト運営者が問い合わせできる形にする。ブラウザを装ったり素性を伏せたりはしない。
+「非商用の個人の趣味である」ことが一読して伝わる文言にし、製品名やサービス名は
+名乗らない (商用サービスの収集活動と誤解されないため)。
 
 ---
 

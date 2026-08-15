@@ -29,7 +29,7 @@ type SongInsert = Database["public"]["Tables"]["songs"]["Insert"];
 type ArtistInsert = Database["public"]["Tables"]["artists"]["Insert"];
 
 const UA =
-  "karaoke-recommender-research/0.1 (hiroto.lalapalooza.ikeda@gmail.com)";
+  "personal-karaoke-hobby/0.1 (non-commercial hobby project; contact: hiroto.ikeda.oka@gmail.com)";
 const FETCH_INTERVAL_MS = 2000;
 
 type Format = "table" | "thirty";

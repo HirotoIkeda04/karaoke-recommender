@@ -45,7 +45,7 @@ DEFAULT_FEATURES_PATH = SCRAPER_ROOT / "output" / "karaoke_features.jsonl"
 DEFAULT_SCORES_PATH = SCRAPER_ROOT / "output" / "karaoke_scores.jsonl"
 DEFAULT_MODEL_PATH = SCRAPER_ROOT / "output" / "karaoke_model.txt"
 
-USER_AGENT = "karaoke-recommender-research/0.1 (hiroto.lalapalooza.ikeda@gmail.com)"
+USER_AGENT = "personal-karaoke-hobby/0.1 (non-commercial hobby project; contact: hiroto.ikeda.oka@gmail.com)"
 FETCH_INTERVAL_SECONDS = 2.0
 REQUEST_TIMEOUT_SECONDS = 30
 MAX_GENRES_PER_SCOPE = 64

@@ -75,7 +75,7 @@ class _SearchHit:
 
 
 def _build_user_agent(contact_email: str) -> str:
-    return f"KaraokeRecommenderBot/0.1 (contact: {contact_email}; research/personal)"
+    return f"personal-karaoke-hobby/0.1 (non-commercial hobby project; contact: {contact_email})"
 
 
 class VocalRangeClient:

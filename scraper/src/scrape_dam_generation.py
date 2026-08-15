@@ -47,7 +47,7 @@ DEFAULT_YEAR_RANGE: list[int] = list(range(1949, 2026))
 
 
 def _build_user_agent(contact_email: str) -> str:
-    return f"KaraokeRecommenderBot/0.1 (contact: {contact_email}; research/personal)"
+    return f"personal-karaoke-hobby/0.1 (non-commercial hobby project; contact: {contact_email})"
 
 
 def _cache_path(cache_dir: Path, year: int, genre_code: str) -> Path:

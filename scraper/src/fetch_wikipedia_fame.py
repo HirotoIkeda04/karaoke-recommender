@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 # --- API 定数 ---------------------------------------------------------------
 
-USER_AGENT = "karaoke-recommender-research/0.1 (hiroto.lalapalooza.ikeda@gmail.com)"
+USER_AGENT = "personal-karaoke-hobby/0.1 (non-commercial hobby project; contact: hiroto.ikeda.oka@gmail.com)"
 
 PAGEVIEWS_ENDPOINT = (
     "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"

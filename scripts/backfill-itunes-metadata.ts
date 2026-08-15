@@ -37,7 +37,7 @@ import type { Database } from "../src/types/database";
 type SongUpdate = Database["public"]["Tables"]["songs"]["Update"];
 
 const USER_AGENT =
-  "karaoke-recommender-research/0.1 (hiroto.lalapalooza.ikeda@gmail.com)";
+  "personal-karaoke-hobby/0.1 (non-commercial hobby project; contact: hiroto.ikeda.oka@gmail.com)";
 const ENDPOINT = "https://itunes.apple.com/search";
 const CACHE_PATH = resolve(
   process.cwd(),

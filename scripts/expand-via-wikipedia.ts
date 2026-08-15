@@ -29,7 +29,7 @@ type SongInsert = Database["public"]["Tables"]["songs"]["Insert"];
 // --- Configuration ----------------------------------------------------------
 
 const USER_AGENT =
-  "karaoke-recommender-research/0.1 (hiroto.lalapalooza.ikeda@gmail.com)";
+  "personal-karaoke-hobby/0.1 (non-commercial hobby project; contact: hiroto.ikeda.oka@gmail.com)";
 
 const WIKIPEDIA_API = "https://ja.wikipedia.org/w/api.php";
 const SPARQL_ENDPOINT = "https://query.wikidata.org/sparql";

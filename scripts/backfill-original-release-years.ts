@@ -57,7 +57,7 @@ interface MusicBrainzResponse {
 const MUSICBRAINZ_ENDPOINT = "https://musicbrainz.org/ws/2/recording/";
 const WIKIDATA_ENDPOINT = "https://query.wikidata.org/sparql";
 const USER_AGENT =
-  "karaoke-recommender/0.1 (https://github.com/HirotoIkeda04/karaoke-recommender)";
+  "personal-karaoke-hobby/0.1 (non-commercial hobby project; contact: hiroto.ikeda.oka@gmail.com)";
 const REQUEST_INTERVAL_MS = 1200;
 const DEFAULT_LIMIT = 100;
 const DEFAULT_PER_GENRE_LIMIT = 100;

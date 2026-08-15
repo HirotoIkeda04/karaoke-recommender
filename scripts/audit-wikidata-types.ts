@@ -12,7 +12,7 @@ import { createAdminClient } from "../src/lib/supabase/admin";
 
 const SPARQL = "https://query.wikidata.org/sparql";
 const UA =
-  "karaoke-recommender-research/0.1 (hiroto.lalapalooza.ikeda@gmail.com)";
+  "personal-karaoke-hobby/0.1 (non-commercial hobby project; contact: hiroto.ikeda.oka@gmail.com)";
 
 const BATCH = 50;
 const SLEEP_MS = 800;

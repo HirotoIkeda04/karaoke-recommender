@@ -42,8 +42,9 @@ import requests
 logger = logging.getLogger(__name__)
 
 USER_AGENT = (
-    "karaoke-recommender-research/0.1 "
-    "(RIAJ certification extraction; mailto:hiroto.lalapalooza.ikeda@gmail.com)"
+    "personal-karaoke-hobby/0.1 "
+    "(non-commercial hobby project; RIAJ certification extraction; "
+    "contact: hiroto.ikeda.oka@gmail.com)"
 )
 WIKI_API = "https://ja.wikipedia.org/w/api.php"
 RIAJ_STREAMING_API = "https://www.riaj.or.jp/f/data/api/StProducts/index.json"
