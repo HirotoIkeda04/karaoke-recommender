@@ -47,11 +47,16 @@ type Song = Database["public"]["Tables"]["songs"]["Row"];
 type Rating = Database["public"]["Enums"]["rating_type"];
 
 /**
- * 1 曲の表示時間 (ms) = 試聴スニペットの尺。曲送りのタイマーと、
- * 盤の回転アニメーション (globals.css の record-spin) の周期を兼ねる。
- * ただし両者は独立して動く。回転の角度と再生位置は一致していなくてよく、
- * 揃っている必要があるのは「フェードが終わる瞬間」と「曲が変わる瞬間」
- * だけなので、その 2 つは同じ起点 (snippetOriginRef) から数える。
+ * 1 曲の表示時間 (ms) = 試聴スニペットの尺。曲送りのタイマーと、終端の
+ * フェードアウトの両方がこれを見る。揃っている必要があるのは「フェードが
+ * 終わる瞬間」と「曲が変わる瞬間」だけなので、その 2 つは同じ起点
+ * (snippetOriginRef) から数える。
+ */
+const SNIPPET_MS = 10000;
+
+/**
+ * 盤 1 周の時間 (ms)。見た目だけの値で、曲送りにも試聴にも関与しない
+ * (回転の角度と再生位置は一致していなくてよい)。
  */
 const ROTATION_MS = 6000;
 
@@ -130,7 +135,7 @@ const DETAIL_ACTION_CLASS =
 const DETAIL_SWIPE_PX = 48;
 
 /**
- * 詳細表示中の再生尺 (ms)。iTunes の試聴音源 1 本ぶん。この間は 6 秒の
+ * 詳細表示中の再生尺 (ms)。iTunes の試聴音源 1 本ぶん。この間はスニペットの
  * フェード / 曲送りを止めてカット無しで流し、流し切ったら盤ごと停止する。
  * 実際に鳴っている時の流し切り判定は音源の ended に任せるので、これは
  * 音が鳴らない時 (音源なし / 消音 / 自動再生ブロック中) の代替タイマー。
@@ -288,7 +293,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const [shuffling, setShuffling] = useState(false);
   // 上スワイプで入る擬似的な楽曲詳細表示。組カルーセル / スキップ行 /
   // シャッフルを畳み、代わりに楽曲情報と歌詞ボタンを出す (下スワイプで戻る)。
-  // この間は 6 秒の自動送りを止め、試聴を 30 秒フルで流す。
+  // この間は自動送りを止め、試聴を 30 秒フルで流す。
   // state をレイアウト側に置いてあるのは、兄弟のボトムナビも引っ込めるため。
   const { detailOpen: detail, setDetailOpen: setDetail } = useDeckDetail();
   // 詳細表示で 30 秒を流し切った曲の id。曲を替えれば自動的に外れるので、
@@ -308,7 +313,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   // 再生中の曲 id。タップ起点の再生と曲送り effect の二重再生を防ぐ。
   const playingSongIdRef = useRef<string | null>(null);
-  // 今の 6 秒スニペットが音源の何秒目から始まったか。詳細表示から戻った
+  // 今のスニペットが音源の何秒目から始まったか。詳細表示から戻った
   // 時は途中の再生位置がそのまま起点になるので、フェードも曲送りもここを
   // 基準に数える (音源を頭出しし直さないため、絶対値では測れない)。
   const snippetOriginRef = useRef(0);
@@ -322,7 +327,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   // ジェスチャ再試行が動くようにする (鳴っていれば再試行側の guard が弾く)。
   const needsGestureRetryRef = useRef(true);
   // 楽曲ページ (シート) と詳細表示の間のフル尺再生モード
-  // (6 秒フェード/カット無効)
+  // (スニペットのフェード/カット無効)
   const fullModeRef = useRef(false);
 
   const group = groups[position.group];
@@ -389,12 +394,12 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     el.addEventListener("timeupdate", () => {
       // フル尺モード (楽曲ページ表示中) はフェード/カットせず最後まで流す
       if (fullModeRef.current) return;
-      // 窓の終わりは「起点 + 6 秒」だが、音源の終端の方が早ければそちら。
+      // 窓の終わりは「起点 + SNIPPET_MS」だが、音源の終端の方が早ければそちら。
       // 音源が先に尽きる時にフェードが間に合わないと、最大音量のまま
       // 途切れてしまう (詳細表示を音源の終盤で閉じた時に起こる)。
       const duration = Number.isFinite(el.duration) ? el.duration : Infinity;
       const windowEnd = Math.min(
-        snippetOriginRef.current + ROTATION_MS / 1000,
+        snippetOriginRef.current + SNIPPET_MS / 1000,
         duration,
       );
       const remain = windowEnd - el.currentTime;
@@ -645,7 +650,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   /**
    * from の次の曲 (組の末尾なら次の組の先頭) へ進む。
    * 現在位置が from と一致する時だけ進めることで、組スキップ / undo と
-   * 6 秒タイマーや音源の ended が競合した時の上書きを防ぐ。
+   * スニペットのタイマーや音源の ended が競合した時の上書きを防ぐ。
    */
   const advance = useCallback(
     (from: DeckPosition) => {
@@ -660,20 +665,20 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     [groups],
   );
 
-  // 6 秒ごとの曲送り。以前は盤の回転 (animationiteration) が発火させていたが、
+  // スニペットの尺ごとの曲送り。以前は盤の回転 (animationiteration) が発火させていたが、
   // それだと「回転の位相 = 音源の再生位置」を保つために、詳細表示を閉じる
   // たびに音を頭出しする必要があった。タイマーに移したことで回転は見た目
   // だけの存在になり、角度が何度であっても音の連続性に影響しない。
   // フル尺モード (詳細表示 / 楽曲シート) の間は張らない = 自動送りも止まる。
   useEffect(() => {
     if (fullPlayback || !current) return;
-    const timer = window.setTimeout(() => advance(position), ROTATION_MS);
+    const timer = window.setTimeout(() => advance(position), SNIPPET_MS);
     return () => window.clearTimeout(timer);
   }, [fullPlayback, current, position, advance]);
 
   // 音源を最後まで流し切った時。詳細表示中なら盤を止めて無音のまま待ち、
   // 通常の周回中なら次の曲へ送る (詳細表示から音源の終盤で戻ってきた時、
-  // 6 秒のタイマーより先に音源が尽きるケース)。
+  // スニペットのタイマーより先に音源が尽きるケース)。
   useEffect(() => {
     onAudioEndedRef.current = () => {
       // アンロック用の無音 WAV の ended は無視する (即座に飛んでくる)
@@ -769,7 +774,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   };
 
   /**
-   * 1 つ前へ戻る。直前が評価 / スキップならそれを取り消して戻り、6 秒の
+   * 1 つ前へ戻る。直前が評価 / スキップならそれを取り消して戻り、
    * 自動送りで流れただけなら位置を 1 曲戻す (評価は付いていないので
    * 取り消すものが無い)。押し続ければデッキの先頭まで遡れる。
    */
@@ -806,7 +811,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
       setDetailPlayedOut(null);
       return;
     }
-    // 流し切った曲は音源が終端にいるので、閉じても鳴らせない。無音で 6 秒
+    // 流し切った曲は音源が終端にいるので、閉じても鳴らせない。無音で
     // 待たせる意味は無いので、その時だけ閉じると同時に次の曲へ送る。
     if (current && detailPlayedOut === current.id) advance(position);
   };

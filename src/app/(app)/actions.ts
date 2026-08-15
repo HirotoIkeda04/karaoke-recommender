@@ -153,7 +153,7 @@ export interface SimilarSongsResult {
 /**
  * デッキの詳細表示に出す「似た音域の楽曲」。
  *
- * 曲は 6 秒ごと / 評価ごとに変わるので、楽曲ページのように全評価を
+ * 曲はスニペットの尺ごと / 評価ごとに変わるので、楽曲ページのように全評価を
  * ページ送りで舐める処理 (fetchRatedSimilarSongs) は使わない。音域で
  * 絞った 3 本のクエリだけで済む fetchSimilarSongs に寄せてある。
  *
