@@ -48,7 +48,10 @@ export async function rateSong(input: RateSongInput): Promise<RateSongResult> {
     return { ok: false, error: error.message };
   }
 
-  revalidatePath("/");
+  // ホーム ("/") は revalidate しない。force-dynamic でキャッシュが無く、
+  // デッキはクライアントが保持しているので、再レンダーしても結果は捨てられる
+  // (record-deck.tsx の groups は useState で initialGroups を差し替えない)。
+  // ここで revalidate すると評価のたびに buildDeck が丸ごと走り直す。
   revalidatePath("/library");
   revalidatePath(`/songs/${input.songId}`);
   return { ok: true };
@@ -76,7 +79,7 @@ export async function unrateSong(songId: string): Promise<RateSongResult> {
     return { ok: false, error: error.message };
   }
 
-  revalidatePath("/");
+  // ホームを revalidate しない理由は rateSong と同じ。
   revalidatePath("/library");
   revalidatePath(`/songs/${songId}`);
   return { ok: true };
@@ -110,8 +113,8 @@ export async function markSkipped(songId: string): Promise<RateSongResult> {
     return { ok: false, error: error.message };
   }
 
-  // skip は library/songs ページに表示されないので、トップだけ revalidate。
-  revalidatePath("/");
+  // skip は library/songs ページに表示されず、ホームも revalidate しない
+  // (理由は rateSong を参照) ので、ここでは何も revalidate しない。
   return { ok: true };
 }
 

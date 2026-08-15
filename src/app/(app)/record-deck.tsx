@@ -1420,7 +1420,7 @@ function clamp(v: number, min: number, max: number): number {
  * レコード盤らしい範囲にクランプする。
  * CORS で読めない画像は null のまま (呼び出し側が無彩色 fallback)。
  */
-function useVinylColor(src: string | null): string | null {
+function useVinylColor(src: string | null, immediate = true): string | null {
   // 抽出完了時に再レンダーを起こすためのバージョンカウンタ。
   // 色自体は render 時にキャッシュから読む (effect 内の同期 setState を避ける)
   const [, setVersion] = useState(0);
@@ -1428,6 +1428,11 @@ function useVinylColor(src: string | null): string | null {
   useEffect(() => {
     if (!src || vinylColorCache.has(src)) return;
     let cancelled = false;
+    // 抽出用の取得は表示用の <img> とは別の CORS リクエストになるため、
+    // 見えている 1 枚以外は idle まで待たせる。マウント直後に全枚数ぶん
+    // 走らせると、今まさに見えている盤の取得と帯域を奪い合う。
+    let idleId: number | undefined;
+    let timerId: number | undefined;
     const img = new window.Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
@@ -1520,11 +1525,23 @@ function useVinylColor(src: string | null): string | null {
         // CORS 汚染 (getImageData 不可) 等。fallback の無彩色のままにする
       }
     };
-    img.src = src;
+    const start = () => {
+      if (!cancelled) img.src = src;
+    };
+    if (immediate) {
+      start();
+    } else if (typeof window.requestIdleCallback === "function") {
+      idleId = window.requestIdleCallback(start, { timeout: 2000 });
+    } else {
+      // requestIdleCallback を持たない環境 (Safari 16.3 以前) の代替
+      timerId = window.setTimeout(start, 400);
+    }
     return () => {
       cancelled = true;
+      if (idleId !== undefined) window.cancelIdleCallback?.(idleId);
+      if (timerId !== undefined) window.clearTimeout(timerId);
     };
-  }, [src]);
+  }, [src, immediate]);
 
   return src ? (vinylColorCache.get(src) ?? null) : null;
 }
@@ -1626,7 +1643,8 @@ function pillowColorOf(vinylColor: string | null): string {
 function GroupThumb({ seed, isActive }: { seed: Song; isActive: boolean }) {
   const thumbSrc = seed.image_url_medium ?? seed.image_url_large;
   // 厚みが陰として読めるよう、代表色を大きく暗くして背表紙に塗る
-  const spineColor = spineColorOf(useVinylColor(thumbSrc) ?? "#3f3f46");
+  // 背表紙の色は現在の組だけ先に出す (残り 6 組ぶんは idle まで待たせる)。
+  const spineColor = spineColorOf(useVinylColor(thumbSrc, isActive) ?? "#3f3f46");
   const spineStyle = {
     backgroundColor: spineColor,
     borderRadius: GROUP_THUMB_RADIUS_PX,
@@ -1736,7 +1754,8 @@ interface RecordDiscProps {
  */
 function RecordDisc({ song, active }: RecordDiscProps) {
   const src = song.image_url_large ?? song.image_url_medium;
-  const vinylColor = useVinylColor(src);
+  // 隣の盤の代表色は今すぐ要らない (縮小 + 半透明で端に覗くだけ)。
+  const vinylColor = useVinylColor(src, active);
   return (
     <div className="relative h-full w-full">
       {/* 回転体: 代表色の盤面 + 溝 + 中央ラベル (ジャケット)。
@@ -1799,7 +1818,11 @@ function RecordDisc({ song, active }: RecordDiscProps) {
               alt={`${song.title} のジャケット`}
               fill
               sizes="10.5rem"
-              loading="eager"
+              // 組の全曲ぶんの盤が同時に居るので、今見えている 1 枚だけを
+              // 先に取りに行く。隣の盤を同格で eager にすると、一番大事な
+              // 1 枚が数百 KB の非表示の盤と帯域を分け合うことになる。
+              loading={active ? "eager" : "lazy"}
+              fetchPriority={active ? "high" : "low"}
               className="rounded-full object-cover"
               draggable={false}
             />
