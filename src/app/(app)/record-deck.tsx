@@ -192,9 +192,27 @@ interface DeckPosition {
 }
 
 /**
- * 直前のユーザー操作。「戻る」で取り消すために保持する。
+ * 1 つ前の位置 (組の先頭からは前の組の末尾へ)。デッキの先頭にいる時だけ
+ * null。自動送りで流れていった曲へ戻るために使う。
+ */
+function previousPositionOf(
+  groups: Song[][],
+  position: DeckPosition,
+): DeckPosition | null {
+  if (position.song > 0) {
+    return { group: position.group, song: position.song - 1 };
+  }
+  const prev = groups[position.group - 1];
+  if (!prev?.length) return null;
+  return { group: position.group - 1, song: prev.length - 1 };
+}
+
+/**
+ * 直前のユーザー操作。戻るボタンで取り消すために保持する。
  * rating が null の場合はナビゲーションのみ (組スキップ) で、
- * undo は位置の復元だけを行う。それ以外は DB 行も削除する。
+ * 位置の復元だけを行う。それ以外は DB 行も削除する。
+ * これが無い (自動送りで進んだだけの) 時は、戻るボタンは位置を
+ * 1 曲戻すだけの移動になる。
  */
 interface LastAction {
   position: DeckPosition;
@@ -309,6 +327,8 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
 
   const group = groups[position.group];
   const current = group?.[position.song];
+  // 戻るボタンの行き先。デッキの先頭にいる時だけ null (= 押せない)。
+  const previousPosition = previousPositionOf(groups, position);
 
   // アーティスト名の枕は「1 枚目のレコード」の代表色の反対色。組が
   // 変わると 1 枚目も変わるので、組の先頭曲のジャケットから引く。
@@ -748,20 +768,33 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     });
   };
 
-  const handleUndo = () => {
-    if (!lastAction) return;
+  /**
+   * 1 つ前へ戻る。直前が評価 / スキップならそれを取り消して戻り、6 秒の
+   * 自動送りで流れただけなら位置を 1 曲戻す (評価は付いていないので
+   * 取り消すものが無い)。押し続ければデッキの先頭まで遡れる。
+   */
+  const handleBack = () => {
+    if (lastAction) {
+      triggerHaptic();
+      setError(null);
+      const { position: prevPosition, song, rating } = lastAction;
+      setLastAction(null);
+      setPosition(prevPosition);
+      if (rating === null) return;
+      startTransition(async () => {
+        const result = await unrateSong(song.id);
+        if (!result.ok) {
+          setError(result.error ?? "戻す操作に失敗しました");
+        }
+      });
+      return;
+    }
+    if (!previousPosition) return;
     triggerHaptic();
     setError(null);
-    const { position: prevPosition, song, rating } = lastAction;
-    setLastAction(null);
-    setPosition(prevPosition);
-    if (rating === null) return;
-    startTransition(async () => {
-      const result = await unrateSong(song.id);
-      if (!result.ok) {
-        setError(result.error ?? "戻す操作に失敗しました");
-      }
-    });
+    // 連打で 2 曲飛ばないよう、行き先はレンダー時の値ではなく
+    // 更新時点の位置から引き直す。
+    setPosition((p) => previousPositionOf(groups, p) ?? p);
   };
 
   const toggleDetail = (next: boolean) => {
@@ -1347,10 +1380,10 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         </button>
         <button
           type="button"
-          onClick={handleUndo}
-          disabled={!lastAction}
+          onClick={handleBack}
+          disabled={!lastAction && !previousPosition}
           className="relative mx-auto flex size-14 items-center justify-center rounded-full text-zinc-700 transition active:brightness-90 disabled:opacity-30 dark:text-zinc-100"
-          aria-label="直前の操作を取り消して戻る"
+          aria-label="前の曲に戻る"
         >
           <GlassSurface variant="control" />
           <Undo2 className="relative size-5" />
