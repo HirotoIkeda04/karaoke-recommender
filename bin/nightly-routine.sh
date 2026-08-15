@@ -5,8 +5,9 @@
 # 1 セッション内で Spotify quota (500 call/夜) を超えない範囲で:
 #   1. match:dam --max-new 400  (fame_cache 候補曲を Spotify と紐付け)
 #   2. backfill:itunes-metadata --order fame --limit 500  (メタ補完)
-#   3. fetch:weekly-rankings  (月曜のみ)
-#   4. refresh:browse-snapshot  (検索タブの共有データを再計算)
+#   3. backfill:itunes-previews --limit 300  (試聴音源 URL 補完)
+#   4. fetch:weekly-rankings  (月曜のみ)
+#   5. refresh:browse-snapshot  (検索タブの共有データを再計算)
 #
 # 累計 ~500 call → quota の安全境界内。
 #
@@ -78,7 +79,15 @@ run_step "match:dam --max-new 400" \
 run_step "backfill:itunes-metadata --order fame --limit 500" \
   node --import tsx scripts/backfill-itunes-metadata.ts --order fame --limit 500
 
-# Step 3: 週次ランキング取得 (月曜のみ)
+# Step 3: backfill:itunes-previews (ホームのレコードデッキの試聴音源 URL)
+# itunes_preview_checked_at IS NULL の曲を is_popular → fame_score 順に処理。
+# これが無いと新規追加曲は itunes_preview_url が NULL のままで試聴が無音になる。
+# Step 2 と同じ iTunes Search API を叩くので、直列実行のまま ~17 req/min を維持
+# (公称 20/min 内)。300 件 = ~18 分。
+run_step "backfill:itunes-previews --limit 300" \
+  node --import tsx scripts/backfill-itunes-previews.ts --limit 300
+
+# Step 4: 週次ランキング取得 (月曜のみ)
 # date +%u: 1=Mon ... 7=Sun。Spotify Top 50 + Apple Top 100 を合算して
 # weekly_rankings に upsert する。所要 Spotify call: ~100 (Apple 100 件 ×
 # search 1 回ずつ) — quota 残量に注意。
@@ -90,7 +99,7 @@ else
   echo "===== [$(date +%H:%M:%S)] fetch:weekly-rankings skipped (DOW=$DOW, not Monday) =====" | tee -a "$LOG_FILE"
 fi
 
-# Step 4: 検索タブの共有ブラウズデータを1行JSONへ事前計算
+# Step 5: 検索タブの共有ブラウズデータを1行JSONへ事前計算
 run_step "refresh:browse-snapshot" \
   node --import tsx scripts/refresh-browse-snapshot.ts
 
