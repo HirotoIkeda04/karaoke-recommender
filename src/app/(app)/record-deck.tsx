@@ -6,6 +6,7 @@ import {
   Dices,
   FastForward,
   Minus,
+  ScrollText,
   SkipForward,
   Undo2,
   Volume2,
@@ -21,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { GlassSurface } from "@/components/ui/glass-surface";
 import { JacketImage } from "@/components/ui/jacket-image";
 import { triggerHaptic } from "@/lib/haptics";
+import { formatDuration, midiToKaraoke, noteChipColor } from "@/lib/note";
 import { triggerRatingSound } from "@/lib/rating-sound";
 import type { Database } from "@/types/database";
 
@@ -59,6 +61,28 @@ const SILENT_WAV =
  */
 const DISC_SIZE =
   "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.75rem - env(safe-area-inset-bottom))))";
+
+/**
+ * 詳細表示 (下スワイプ) 中のディスク径。組カルーセル (3.5rem) と
+ * スキップ行 (3.5rem) + それぞれの gap (1.5rem ずつ) の 10rem が消え、
+ * 代わりに楽曲情報 (mt-4 + 3 行 = 7.75rem) と歌詞ボタン (mt-2 + 2.25rem)
+ * の 10.5rem が入るので、予約は 0.5rem だけ増える。
+ */
+const DISC_SIZE_DETAIL =
+  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 33.25rem - env(safe-area-inset-bottom))))";
+
+/**
+ * 詳細表示を切り替えるスワイプの最小縦移動量 (px)。評価ボタンのタップや
+ * 指ブレで誤爆しないだけの距離を取る。横移動が縦移動を上回る間は無視する。
+ */
+const DETAIL_SWIPE_PX = 48;
+
+/** 表示切替のトランジション。opacity を先に畳んでから高さを詰める */
+const DETAIL_TRANSITION = {
+  duration: 0.24,
+  ease: "easeOut",
+  opacity: { duration: 0.14 },
+} as const;
 
 /**
  * カルーセルの隣接ディスク間隔 (自身の幅に対する %)。
@@ -180,6 +204,13 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const [lastAction, setLastAction] = useState<LastAction | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [shuffling, setShuffling] = useState(false);
+  // 下スワイプで入る擬似的な楽曲詳細表示。組カルーセル / スキップ行 /
+  // シャッフルを畳み、代わりに楽曲情報と歌詞ボタンを出す (上スワイプで戻る)。
+  // レコードの回転 (= 6 秒ごとの曲送り) はそのまま続くので、表示は常に
+  // 「再生中の曲」を追う。
+  const [detail, setDetail] = useState(false);
+  // 進行中のスワイプの起点。pointerId で 1 本目の指だけを追う。
+  const swipeRef = useRef<{ id: number; x: number; y: number } | null>(null);
   // 試聴 ON/OFF (ユーザーの意思)。デフォルト ON。ON でも音源が無い曲は
   // 無音で回る。ブラウザに自動再生をブロックされた場合は
   // needsGestureRetryRef を立て、最初の画面操作で再生を再試行する。
@@ -526,6 +557,36 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     });
   };
 
+  const toggleDetail = (next: boolean) => {
+    if (next === detail) return;
+    triggerHaptic();
+    setDetail(next);
+  };
+
+  /**
+   * デッキ全体の縦スワイプで詳細表示を出し入れする。
+   * ハンドラは root に置いてあるので、ディスクでもボタンの上でも拾える。
+   * 判定を満たした時点で起点を捨て、1 ジェスチャで 1 回だけ切り替える。
+   */
+  const handleSwipeStart = (event: React.PointerEvent) => {
+    swipeRef.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
+  };
+
+  const handleSwipeMove = (event: React.PointerEvent) => {
+    const start = swipeRef.current;
+    if (!start || start.id !== event.pointerId) return;
+    const dy = event.clientY - start.y;
+    const dx = event.clientX - start.x;
+    // 横に流れているスワイプ (カルーセル的な操作) では切り替えない
+    if (Math.abs(dy) < DETAIL_SWIPE_PX || Math.abs(dy) <= Math.abs(dx)) return;
+    swipeRef.current = null;
+    toggleDetail(dy > 0);
+  };
+
+  const handleSwipeEnd = () => {
+    swipeRef.current = null;
+  };
+
   if (!current) {
     return (
       <div className="mx-auto flex min-h-[70dvh] max-w-md flex-col items-center justify-center gap-4 p-8 text-center">
@@ -554,7 +615,20 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   // スクロール可能領域を作ってしまい、フォーカス移動等の scrollIntoView で
   // レイアウト全体が横にずれる。clip はスクロール自体を不可能にする。
   return (
-    <div className="relative mx-auto flex max-w-md select-none flex-col items-center gap-6 overflow-clip px-4 pb-2 pt-8">
+    <div
+      className="relative mx-auto flex max-w-md select-none flex-col items-center gap-6 overflow-clip px-4 pb-2 pt-8"
+      // 縦のパンをブラウザに渡さない (渡すと縦スワイプ中に pointercancel が
+      // 飛んで判定が落ちる)。横パンとピンチズームはそのまま許可する。
+      style={{ touchAction: "pan-x pinch-zoom" }}
+      onPointerDown={handleSwipeStart}
+      onPointerMove={handleSwipeMove}
+      onPointerUp={handleSwipeEnd}
+      onPointerCancel={handleSwipeEnd}
+      onWheel={(event) => {
+        if (Math.abs(event.deltaY) < 8) return;
+        toggleDetail(event.deltaY > 0);
+      }}
+    >
       {/* 次の組の先頭ジャケットを裏で先読み (現在の組は全ディスクが即ロードされる) */}
       {(nextGroup ?? []).slice(0, 2).map((song) => {
         const preloadSrc = song.image_url_large ?? song.image_url_medium;
@@ -578,11 +652,22 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
 
       {/* 組ごとのカルーセル: 各組のシード曲ジャケット。現在の組が中央に来る。
           組の切替アニメーションと独立させるため、下の AnimatePresence の外に置く */}
-      <div
+      <motion.div
         role="group"
         aria-roledescription="カルーセル"
         aria-label="デッキ内の組"
-        className="relative h-14 w-full"
+        className="relative w-full"
+        inert={detail}
+        initial={false}
+        // 詳細表示では高さごと畳む。marginBottom で親の gap-6 も相殺して、
+        // 消えた分だけディスクが上がるようにする。子は absolute なので
+        // 縮む途中ははみ出すが、opacity を先に落として見えなくしている。
+        animate={{
+          height: detail ? "0rem" : "3.5rem",
+          marginBottom: detail ? "-1.5rem" : "0rem",
+          opacity: detail ? 0 : 1,
+        }}
+        transition={DETAIL_TRANSITION}
         // 子の rotateY に奥行きを与える (カバーフロー風の遠近)
         style={{ perspective: "700px" }}
       >
@@ -625,7 +710,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
             </motion.div>
           );
         })}
-      </div>
+      </motion.div>
 
       {/* 組単位で左へ流れる。中は曲単位のカルーセル + 曲情報。
           シャッフル / 消音トグルは組遷移で消えないよう AnimatePresence の外に重ねる */}
@@ -635,9 +720,13 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           onClick={handleShuffle}
           disabled={shuffling}
           aria-label="デッキをシャッフルする"
+          inert={detail}
           // 背景色は敷かない。敷くとガラスが背後を拾えず「黒い丸」になる。
           // 明るいジャケットへの対策は GlassSurface の DIM (乗算) 側で行う。
           className="absolute left-1 top-0 z-20 flex size-10 items-center justify-center rounded-full text-white transition active:brightness-90 disabled:opacity-60"
+          // 詳細表示では消す。disabled:opacity-60 と競合しないよう
+          // クラスではなくインラインで上書きする。
+          style={detail ? { opacity: 0 } : undefined}
         >
           <GlassSurface variant="overlay" />
           <Dices
@@ -675,7 +764,11 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
             aria-roledescription="カルーセル"
             aria-label="同じアーティストの楽曲"
             className="relative mx-auto"
-            style={{ width: DISC_SIZE, height: DISC_SIZE }}
+            style={{
+              width: detail ? DISC_SIZE_DETAIL : DISC_SIZE,
+              height: detail ? DISC_SIZE_DETAIL : DISC_SIZE,
+              transition: "width 0.24s ease-out, height 0.24s ease-out",
+            }}
           >
             {group.map((song, index) => {
               const delta = index - position.song;
@@ -745,6 +838,68 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                   current.artist
                 )}
               </p>
+
+              {/* 詳細表示でだけアーティスト名の下に出る、シートと同じ楽曲情報。
+                  外側の AnimatePresence は曲が変わるたびに作り直されるので、
+                  initial={false} で「曲送りでは開閉アニメを再生しない」。 */}
+              <AnimatePresence initial={false}>
+                {detail ? (
+                  <motion.div
+                    key="detail"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={DETAIL_TRANSITION}
+                    className="overflow-hidden"
+                  >
+                    <dl className="mt-4 divide-y divide-zinc-200 rounded-xl bg-zinc-100 px-5 text-left text-sm dark:divide-zinc-700/60 dark:bg-zinc-800/60">
+                      <div className="flex items-baseline py-2">
+                        <dt className="w-16 shrink-0 text-zinc-600 dark:text-zinc-400">
+                          地声
+                        </dt>
+                        <dd className="font-mono">
+                          {current.range_low_midi == null &&
+                          current.range_high_midi == null ? (
+                            "—"
+                          ) : (
+                            <>
+                              <ColoredNote midi={current.range_low_midi} />
+                              {" — "}
+                              <ColoredNote midi={current.range_high_midi} />
+                            </>
+                          )}
+                        </dd>
+                      </div>
+                      <div className="flex items-baseline py-2">
+                        <dt className="w-16 shrink-0 text-zinc-600 dark:text-zinc-400">
+                          裏声
+                        </dt>
+                        <dd className="font-mono">
+                          <ColoredNote midi={current.falsetto_max_midi} />
+                        </dd>
+                      </div>
+                      <div className="flex items-baseline py-2">
+                        <dt className="w-16 shrink-0 text-zinc-600 dark:text-zinc-400">
+                          長さ
+                        </dt>
+                        <dd className="font-mono">
+                          {formatDuration(current.duration_ms) || "—"}
+                        </dd>
+                      </div>
+                    </dl>
+                    <Link
+                      href={`https://www.uta-net.com/search/?target=song&type=in&Keyword=${encodeURIComponent(current.title)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="歌詞ネットで歌詞を見る"
+                      className="mt-2 inline-flex h-9 items-center justify-center gap-2 rounded-full bg-zinc-100/80 px-4 text-xs font-medium text-zinc-700 backdrop-blur-sm transition hover:bg-zinc-200/85 active:bg-zinc-200/85 dark:bg-zinc-800/75 dark:text-zinc-200 dark:hover:bg-zinc-700/80 dark:active:bg-zinc-700/80"
+                    >
+                      <ScrollText className="size-4" aria-hidden />
+                      <span>歌詞を見る</span>
+                    </Link>
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
             </motion.div>
           </AnimatePresence>
         </motion.div>
@@ -773,7 +928,19 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         ))}
       </div>
 
-      {/* スキップ 2 種 (同サイズ) + 戻る */}
+      {/* スキップ 2 種 (同サイズ) + 戻る。詳細表示では高さごと畳む
+          (marginTop で直前の gap-6 も相殺する) */}
+      <motion.div
+        inert={detail}
+        initial={false}
+        animate={{
+          height: detail ? "0rem" : "3.5rem",
+          marginTop: detail ? "-1.5rem" : "0rem",
+          opacity: detail ? 0 : 1,
+        }}
+        transition={DETAIL_TRANSITION}
+        className="w-full overflow-hidden"
+      >
       <div className="grid w-full grid-cols-[1fr_1fr_3.5rem] items-center gap-3">
         <button
           type="button"
@@ -804,7 +971,18 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           <Undo2 className="relative size-5" />
         </button>
       </div>
+      </motion.div>
     </div>
+  );
+}
+
+/** 音域ノートを高さ由来の色で表示する。null は無印 "—" (楽曲ページと同じ)。 */
+function ColoredNote({ midi }: { midi: number | null | undefined }) {
+  if (midi == null) return <>—</>;
+  return (
+    <span style={{ color: noteChipColor(midi).background }}>
+      {midiToKaraoke(midi)}
+    </span>
   );
 }
 
