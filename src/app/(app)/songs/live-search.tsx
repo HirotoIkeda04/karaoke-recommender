@@ -60,6 +60,19 @@ interface LiveSearchProps {
   rankingCovers?: string[];
   /** 検索タブに表示する、今週のランキング上位曲 */
   rankingPreview?: Array<{ rank: number; song: Song }>;
+  /**
+   * ゲスト (未ログイン) に公開している曲。渡された時はゲストモードになる。
+   *
+   * 検索もおすすめも、ログイン中はブラウザから Supabase の RPC を直接叩いて
+   * いる。ゲストの anon ロールにはその実行権限が無い (artists 系の view を
+   * 読めないため) ので、この配列を手元で絞り込む形に切り替える。
+   */
+  guestSongs?: Song[];
+}
+
+/** ゲスト検索の突き合わせ用。全角/半角と大小文字の差を吸収する */
+function normalizeForSearch(value: string): string {
+  return value.normalize("NFKC").toLowerCase().trim();
 }
 
 // 写真に色を被せず、ジャンルごとの落ち着いた単色をカード全面に使う。
@@ -147,7 +160,9 @@ export function LiveSearch({
   genreCovers = {},
   rankingCovers = [],
   rankingPreview = [],
+  guestSongs,
 }: LiveSearchProps) {
+  const isGuest = guestSongs != null;
   const [query, setQuery] = useState("");
   const [highNote, setHighNote] = useState("");
   const [lowNote, setLowNote] = useState("");
@@ -188,11 +203,29 @@ export function LiveSearch({
     [recommendations, lowMidi, highMidi, selectedDecades],
   );
 
-  const filteredResults = useMemo<SearchResponse | null>(() => {
-    if (!results) return null;
+  // ゲスト検索は公開 70 曲を手元で絞り込むだけなので、サーバー検索のように
+  // state に溜めず、その場で導出する。アーティストは結果に出さない
+  // (アーティストページはログイン必須で、開けないものを並べても仕方ない)。
+  const guestResults = useMemo<SearchResponse | null>(() => {
+    const trimmedQuery = query.trim();
+    if (!guestSongs || trimmedQuery.length === 0) return null;
+    const needle = normalizeForSearch(trimmedQuery);
     return {
-      ...results,
-      songs: results.songs.filter((song) =>
+      artists: [],
+      songs: guestSongs.filter(
+        (song) =>
+          normalizeForSearch(song.title).includes(needle) ||
+          normalizeForSearch(song.artist).includes(needle),
+      ),
+    };
+  }, [guestSongs, query]);
+
+  const filteredResults = useMemo<SearchResponse | null>(() => {
+    const source = guestResults ?? results;
+    if (!source) return null;
+    return {
+      ...source,
+      songs: source.songs.filter((song) =>
         matchesSongFilters(
           song,
           lowMidi,
@@ -201,13 +234,22 @@ export function LiveSearch({
         ),
       ),
     };
-  }, [results, lowMidi, highMidi, selectedDecades]);
+  }, [guestResults, results, lowMidi, highMidi, selectedDecades]);
 
   useEffect(() => {
     queryRef.current = query;
   }, [query]);
 
   const loadRecommendations = useCallback((filters: RecommendationFilters) => {
+    // ゲストのおすすめは公開 70 曲そのもの。絞り込みは
+    // filteredRecommendations が手元で掛けるので、ここでは全部渡すだけ。
+    if (guestSongs) {
+      setRecommendations(guestSongs);
+      setRecommendationsLoading(false);
+      setRecommendationsError(false);
+      return;
+    }
+
     const sortedDecades = [...filters.selectedDecades].sort((a, b) => a - b);
     const cacheKey = recommendationCacheKey({
       ...filters,
@@ -264,12 +306,14 @@ export function LiveSearch({
         }
       }
     })();
-  }, [supabase]);
+  }, [supabase, guestSongs]);
 
   // 絞り込み条件を DB 側へ渡し、条件適用後の候補を最大50曲取得する。
   // 連続タップは短くまとめ、切り替え前の結果は新しい結果が届くまで保持する。
   useEffect(() => {
-    if (!isSearchOpen || queryRef.current.length > 0) return;
+    // ゲストは検索欄を開かなくてもおすすめ一覧が初期画面なので、
+    // 開いていなくても読み込む (ジャンル一覧の代わりに出している)。
+    if ((!isSearchOpen && !isGuest) || queryRef.current.length > 0) return;
 
     const timer = window.setTimeout(() => {
       loadRecommendations({
@@ -282,6 +326,7 @@ export function LiveSearch({
     return () => window.clearTimeout(timer);
   }, [
     highMidi,
+    isGuest,
     isSearchOpen,
     loadRecommendations,
     lowMidi,
@@ -377,7 +422,7 @@ export function LiveSearch({
 
   // サーバー検索 (debounce + AbortController で多重発火を抑制)
   useEffect(() => {
-    if (trimmedQ.length === 0) return;
+    if (isGuest || trimmedQ.length === 0) return;
     const ctrl = new AbortController();
     const timer = window.setTimeout(async () => {
       setLoading(true);
@@ -405,13 +450,15 @@ export function LiveSearch({
       ctrl.abort();
       window.clearTimeout(timer);
     };
-  }, [trimmedQ, lowNote, highNote, supabase]);
+  }, [isGuest, trimmedQ, lowNote, highNote, supabase]);
 
   // 検索タブを「通常」「検索を開いた未入力」「検索を開いた入力あり」の
   // 3 状態に分ける。空白も入力として扱い、入力あり画面を維持する。
+  // ゲストはジャンル別一覧もランキングもログイン必須なので、browse
+  // (ジャンルカードの一覧) には入らず常におすすめ一覧を見せる。
   const mode: SearchMode = hasQueryInput
     ? "search-results"
-    : isSearchOpen
+    : isSearchOpen || isGuest
       ? "search-empty"
       : "browse";
 
@@ -549,6 +596,7 @@ export function LiveSearch({
               knownSet={knownSet}
               onSelectSong={handleSelectSong}
             />
+            {isGuest ? <GuestScopeNotice /> : null}
           </>
         ) : mode === "search-results" ? (
           <>
@@ -579,6 +627,7 @@ export function LiveSearch({
                 onSelectSong={handleSelectSong}
                 onSelectArtist={handleSelectArtist}
               />
+              {isGuest ? <GuestScopeNotice /> : null}
             </section>
           </>
         ) : null}
@@ -594,6 +643,26 @@ export function LiveSearch({
         />
       ) : null}
     </div>
+  );
+}
+
+// ============================================================================
+// ゲスト: 検索範囲がお試しの曲に限られていることの但し書き + ログイン導線。
+// 「探した曲が出てこない」が一番ログインの動機になる場面なので、
+// 結果リストの直後に出す。
+// ============================================================================
+
+function GuestScopeNotice() {
+  return (
+    <p className="mt-3 rounded-xl bg-zinc-100 px-3 py-2.5 text-[11px] leading-relaxed text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400">
+      ログインしていない間は、お試しの曲だけが検索対象です。
+      <Link
+        href="/login?next=%2Fsongs"
+        className="ml-1 font-medium text-zinc-900 underline underline-offset-2 dark:text-zinc-100"
+      >
+        ログインすると全曲から探せます
+      </Link>
+    </p>
   );
 }
 

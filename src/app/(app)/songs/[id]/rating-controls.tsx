@@ -5,9 +5,9 @@ import { useEffect, useState, useTransition } from "react";
 import { createPortal } from "react-dom";
 
 import { DumbbellMini } from "@/components/icons/dumbbell-mini";
+import { useIsGuest } from "@/components/session-provider";
+import { useGuestRatings, useRatingActions } from "@/hooks/use-rating-actions";
 import type { Database } from "@/types/database";
-
-import { rateSong, unrateSong } from "../../actions";
 
 type Rating = Database["public"]["Enums"]["rating_type"];
 
@@ -66,7 +66,15 @@ export function RatingControls({
   initialRating,
   compact = false,
 }: RatingControlsProps) {
-  const [rating, setRating] = useState<Rating | null>(initialRating);
+  const isGuest = useIsGuest();
+  const { rateSong, unrateSong } = useRatingActions();
+  const guestRatings = useGuestRatings();
+  const [ownRating, setOwnRating] = useState<Rating | null>(initialRating);
+  // ゲストの評価は localStorage が唯一の置き場で、書き込みは同期的に
+  // 反映される。ローカル state と二重に持つとズレるので、表示はストアの
+  // 値をそのまま使う (initialRating はサーバーからは常に null で来る)。
+  const rating = isGuest ? (guestRatings[songId]?.rating ?? null) : ownRating;
+  const setRating = setOwnRating;
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);

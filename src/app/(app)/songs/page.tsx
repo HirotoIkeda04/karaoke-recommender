@@ -1,7 +1,9 @@
 import { getBrowseSnapshot } from "@/lib/browse-snapshot";
+import { getGuestSongs } from "@/lib/guest-songs.server";
 import { getUserKnownSongIds } from "@/lib/spotify/known-songs";
 import { createClient } from "@/lib/supabase/server";
 
+import { GuestLiveSearch } from "./guest-live-search";
 import { LiveSearch } from "./live-search";
 
 export const dynamic = "force-dynamic";
@@ -17,14 +19,22 @@ export default async function SongsPage() {
   } = await supabase.auth.getSession();
   const userId = session?.user?.id;
 
+  // ゲスト (未ログイン) は検索 RPC を実行できないので、公開 70 曲を渡して
+  // 手元で絞り込ませる。評価バッジも localStorage 由来になる。
+  if (!userId) {
+    return (
+      <div className="mx-auto max-w-md space-y-4 px-4 py-4">
+        <GuestLiveSearch songs={getGuestSongs()} />
+      </div>
+    );
+  }
+
   const [knownIds, evalsRes, browseSnapshot] = await Promise.all([
     getUserKnownSongIds(supabase, userId),
-    userId
-      ? supabase
-          .from("evaluations")
-          .select("song_id,rating")
-          .eq("user_id", userId)
-      : Promise.resolve({ data: [] as Array<{ song_id: string; rating: string }> }),
+    supabase
+      .from("evaluations")
+      .select("song_id,rating")
+      .eq("user_id", userId),
     getBrowseSnapshot(),
   ]);
 

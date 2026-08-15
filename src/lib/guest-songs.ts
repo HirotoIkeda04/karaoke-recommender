@@ -129,6 +129,49 @@ export function filterUnratedGroups(
     .filter((group) => group.length > 0);
 }
 
+/** 「似た音域の楽曲」で音域が離れすぎと見なす閾値 (半音)。曲詳細と同じ値 */
+const SIMILAR_RANGE_WINDOW = 12;
+
+/**
+ * ゲスト公開曲の中から音域の近い曲を探す。
+ *
+ * ログイン中は曲詳細が DB を引いて「同アーティスト / 有名曲 / 同ジャンル」を
+ * 混ぜているが、ゲストの母集団は 70 曲しかないので、素直に音域の距離だけで
+ * 並べる (母集団が小さいのに条件を重ねると 0 件になりやすい)。
+ */
+export function findGuestSimilarSongs(
+  songs: readonly GuestSongRecord[],
+  target: GuestSongRecord,
+  limit: number,
+): GuestSongRecord[] {
+  if (target.range_low_midi == null || target.range_high_midi == null) return [];
+  const low = target.range_low_midi;
+  const high = target.range_high_midi;
+
+  return songs
+    .filter(
+      (song) =>
+        song.id !== target.id &&
+        song.range_low_midi != null &&
+        song.range_high_midi != null &&
+        Math.abs(song.range_low_midi - low) <= SIMILAR_RANGE_WINDOW &&
+        Math.abs(song.range_high_midi - high) <= SIMILAR_RANGE_WINDOW,
+    )
+    .map((song) => ({
+      song,
+      distance:
+        Math.abs(song.range_low_midi! - low) +
+        Math.abs(song.range_high_midi! - high),
+    }))
+    .sort(
+      (a, b) =>
+        a.distance - b.distance ||
+        (b.song.fame_score ?? 0) - (a.song.fame_score ?? 0),
+    )
+    .slice(0, limit)
+    .map((entry) => entry.song);
+}
+
 /**
  * 組の並びをシャッフルする (組の中身の順序は保つ)。
  * ゲストのデッキは固定 10 組で引き直す先が無いため、サイコロボタンは

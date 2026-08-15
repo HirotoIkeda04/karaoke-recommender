@@ -3,9 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BackButton } from "@/components/back-button";
+import { buttonVariants } from "@/components/ui/button";
 import { SongCard } from "@/components/song-card";
 import { JacketImage } from "@/components/ui/jacket-image";
 import { SongFloatingHeader } from "@/components/song-floating-header";
+import { findGuestSimilarSongs, toSong } from "@/lib/guest-songs";
+import { getGuestSong, getGuestSongs } from "@/lib/guest-songs.server";
 import { midiToKaraoke, noteChipColor } from "@/lib/note";
 import { fetchAllPaginated } from "@/lib/supabase/paginate";
 import { createClient } from "@/lib/supabase/server";
@@ -53,6 +56,35 @@ function ColoredNote({ midi }: { midi: number | null | undefined }) {
     <span style={{ color: noteChipColor(midi).background }}>
       {midiToKaraoke(midi)}
     </span>
+  );
+}
+
+/**
+ * ゲストが公開 70 曲の外の曲を開いた時 (共有リンク・ブックマーク等)。
+ * 曲名すら出せないので、ログインすれば見られることだけ伝える。
+ */
+function GuestSongLocked({ songId }: { songId: string }) {
+  return (
+    <div className="mx-auto flex max-w-md flex-col items-center gap-4 p-8 text-center">
+      <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+        この曲を見るにはログインが必要です
+      </h1>
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        ログインしていない間は、お試しの曲だけを表示しています。
+      </p>
+      <Link
+        href={`/login?next=${encodeURIComponent(`/songs/${songId}`)}`}
+        className={buttonVariants({ size: "lg" })}
+      >
+        ログインする
+      </Link>
+      <Link
+        href="/songs"
+        className="text-xs text-zinc-500 underline underline-offset-2 dark:text-zinc-400"
+      >
+        お試しの曲を見る
+      </Link>
+    </div>
   );
 }
 
@@ -201,24 +233,35 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return null;
 
-  const [songRes, evalRes, logsRes] = await Promise.all([
-    supabase.from("songs").select("*").eq("id", id).maybeSingle(),
-    supabase
-      .from("evaluations")
-      .select("rating")
-      .eq("user_id", user.id)
-      .eq("song_id", id)
-      .maybeSingle(),
-    supabase
-      .from("song_logs")
-      .select("id, logged_at, equipment, key_shift, score, body")
-      .eq("user_id", user.id)
-      .eq("song_id", id)
-      .order("logged_at", { ascending: false })
-      .order("created_at", { ascending: false }),
-  ]);
+  // ゲスト (未ログイン) はカタログ全体を引けないので、公開 70 曲の中の
+  // 曲だけ表示する。範囲外はログイン導線を出す (共有リンクを踏んだ時など)。
+  const guestRecord = user ? null : getGuestSong(id);
+  if (!user && !guestRecord) return <GuestSongLocked songId={id} />;
+
+  const [songRes, evalRes, logsRes] = user
+    ? await Promise.all([
+        supabase.from("songs").select("*").eq("id", id).maybeSingle(),
+        supabase
+          .from("evaluations")
+          .select("rating")
+          .eq("user_id", user.id)
+          .eq("song_id", id)
+          .maybeSingle(),
+        supabase
+          .from("song_logs")
+          .select("id, logged_at, equipment, key_shift, score, body")
+          .eq("user_id", user.id)
+          .eq("song_id", id)
+          .order("logged_at", { ascending: false })
+          .order("created_at", { ascending: false }),
+      ])
+    : [
+        // ゲストの評価は localStorage にあるので RatingControls が自分で読む
+        { data: toSong(guestRecord!), error: null },
+        { data: null },
+        { data: [] },
+      ];
 
   if (songRes.error) {
     return (
@@ -237,25 +280,36 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
   const hasRange =
     song.range_low_midi != null && song.range_high_midi != null;
 
-  const [recommended, ratedSimilarSongs] = hasRange
-    ? await Promise.all([
-        fetchSimilarSongs(
-          supabase,
-          song.id,
-          song.artist_id,
-          song.genres,
-          song.range_low_midi!,
-          song.range_high_midi!,
-        ),
-        fetchRatedSimilarSongs(
-          supabase,
-          user.id,
-          song.id,
-          song.range_low_midi!,
-          song.range_high_midi!,
-        ),
-      ])
-    : [[], []];
+  const [recommended, ratedSimilarSongs] =
+    user && hasRange
+      ? await Promise.all([
+          fetchSimilarSongs(
+            supabase,
+            song.id,
+            song.artist_id,
+            song.genres,
+            song.range_low_midi!,
+            song.range_high_midi!,
+          ),
+          fetchRatedSimilarSongs(
+            supabase,
+            user.id,
+            song.id,
+            song.range_low_midi!,
+            song.range_high_midi!,
+          ),
+        ])
+      : [
+          // ゲストは 70 曲の中から音域が近いものを出す
+          guestRecord
+            ? findGuestSimilarSongs(
+                getGuestSongs(),
+                guestRecord,
+                SIMILAR_RANGE_LIMIT,
+              ).map(toSong)
+            : [],
+          [],
+        ];
 
   // 評価済みの似た音域曲を先頭に置き、残りを一般推薦で埋める (重複は除外)
   const similarSongs: { id: string; song: SimilarSong; rating?: string }[] = [];
@@ -319,7 +373,9 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
               {song.title}
             </h1>
             <p className="mt-0.5 truncate text-sm text-zinc-600 dark:text-zinc-400">
-              {song.artist_id ? (
+              {/* アーティストページはログイン必須なので、ゲストには
+                  リンクにせず名前だけ出す (開けない導線を作らない) */}
+              {song.artist_id && user ? (
                 <Link
                   href={`/artists/${song.artist_id}`}
                   className="underline-offset-2 hover:underline"
@@ -401,7 +457,8 @@ export default async function SongDetailPage({ params }: SongDetailProps) {
         </dl>
       </section>
 
-      <SongLogs songId={song.id} initialLogs={logs} />
+      {/* カラオケの記録はアカウントに紐づくので、ゲストには出さない */}
+      {user ? <SongLogs songId={song.id} initialLogs={logs} /> : null}
 
       {similarSongs.length > 0 ? (
         <section className="space-y-2">

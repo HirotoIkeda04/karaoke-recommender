@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 
+import { useIsGuest } from "@/components/session-provider";
+
 import { useSongSheetScrolled } from "./song-sheet-scroll-context";
 
 interface SongFloatingHeaderProps {
@@ -20,6 +22,9 @@ export function SongFloatingHeader({
   image,
 }: SongFloatingHeaderProps) {
   const scrollProgress = useSongSheetScrolled();
+  // アーティストページはログイン必須。ゲストには開けないリンクを見せない
+  // (曲詳細の本文側の表記と揃える)。
+  const isGuest = useIsGuest();
 
   return (
     <div
@@ -45,7 +50,7 @@ export function SongFloatingHeader({
           {title}
         </p>
         <p className="truncate text-xs text-white/80">
-          {artistId ? (
+          {artistId && !isGuest ? (
             <Link href={`/artists/${artistId}`} className="underline-offset-2 hover:underline">
               {artist}
             </Link>

@@ -890,7 +890,9 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
               transition={{ duration: 0.12 }}
               className="flex max-w-full justify-center"
             >
-              {current.artist_id ? (
+              {/* アーティストページはログイン必須なので、ゲストの時は
+                  リンクにせず枕だけ出す (開けない導線を作らない) */}
+              {current.artist_id && !isGuest ? (
                 <Link
                   href={`/artists/${current.artist_id}`}
                   className="line-clamp-1 max-w-full px-2.5 py-0.5 text-sm font-bold tracking-tight transition active:brightness-90"
