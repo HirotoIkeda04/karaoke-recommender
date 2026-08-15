@@ -165,5 +165,25 @@
       "大阪しぐれ",
       "好きになった人"
     ]
+  },
+  {
+    "artist": "SEKAI NO OWARI",
+    "limit": 10,
+    "required_top_titles": [
+      "RPG",
+      "Dragon Night",
+      "Habit",
+      "スターライトパレード",
+      "サザンカ"
+    ]
+  },
+  {
+    "artist": "KANA-BOON",
+    "limit": 5,
+    "required_top_titles": [
+      "シルエット",
+      "ないものねだり",
+      "フルドライブ"
+    ]
   }
 ]
