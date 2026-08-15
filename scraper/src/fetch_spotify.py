@@ -48,7 +48,9 @@ class SpotifyTrack:
     image_url_small: str | None  # ≤ 200 px
     duration_ms: int | None = None  # 曲の長さ (ms)
     popularity: int | None = None  # Spotify popularity 0-100
-    preview_url: str | None = None  # 30 秒試聴 mp3 URL (権利上 null も多い)
+    # preview_url は持たない。2026-02 の API 変更で Dev Mode アプリには
+    # 常に null が返るようになったため。試聴音源は iTunes 由来
+    # (songs.itunes_preview_url / scripts/backfill-itunes-previews.ts) を使う。
     explicit: bool | None = None  # 露骨な歌詞フラグ
     isrc: str | None = None  # external_ids.isrc
 
@@ -101,7 +103,6 @@ def _track_from_api(item: dict[str, Any]) -> SpotifyTrack:
     popularity = int(popularity_raw) if isinstance(popularity_raw, (int, float)) else None
     explicit_raw = item.get("explicit")
     explicit = bool(explicit_raw) if isinstance(explicit_raw, bool) else None
-    preview_url = item.get("preview_url") or None
     external_ids = item.get("external_ids") or {}
     isrc = external_ids.get("isrc") or None
     return SpotifyTrack(
@@ -114,7 +115,6 @@ def _track_from_api(item: dict[str, Any]) -> SpotifyTrack:
         image_url_small=small,
         duration_ms=duration_ms,
         popularity=popularity,
-        preview_url=preview_url,
         explicit=explicit,
         isrc=isrc,
     )

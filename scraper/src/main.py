@@ -100,6 +100,11 @@ def _append_match_cache(path: Path, result: MatchResult) -> None:
 
 def _result_from_cache(song: RawSong, entry: dict) -> MatchResult:
     track_data = entry.get("track")
+    # 古いキャッシュには今は存在しないキー (preview_url 等) が残っているため、
+    # 現在の SpotifyTrack が持つフィールドだけを拾って TypeError を避ける。
+    if track_data:
+        known = {f.name for f in dataclasses.fields(SpotifyTrack)}
+        track_data = {k: v for k, v in track_data.items() if k in known}
     track = SpotifyTrack(**track_data) if track_data else None
     return MatchResult(
         raw_song=song,
@@ -128,7 +133,6 @@ def _build_enriched(result: MatchResult) -> EnrichedSong:
         image_url_small=track.image_url_small,
         duration_ms=track.duration_ms,
         spotify_popularity=track.popularity,
-        spotify_preview_url=track.preview_url,
         spotify_explicit=track.explicit,
         spotify_isrc=track.isrc,
         source_urls=[

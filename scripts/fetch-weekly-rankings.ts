@@ -6,8 +6,9 @@
  *
  * 処理フロー:
  *   1. Apple Music Top 100 RSS を取得
- *   2. 各 Apple トラックを既存 songs と (title+artist 正規化) でマッチ
- *   3. 未マッチは Spotify search で track を解決し ISRC/ID で再マッチ →
+ *   2. RSS の id (= iTunes trackId) を iTunes lookup で一括解決し、
+ *      itunes_track_id → 正規化 title+artist の順に既存 songs とマッチ
+ *   3. それでも未マッチのものだけ Spotify search で解決 →
  *      無ければ新規 INSERT (画像・メタフル付与)
  *   4. 正規化 Borda スコアを採番し weekly_rankings に upsert
  *      (week_start = 今週月曜 UTC)
@@ -17,9 +18,14 @@
  *     2024 後半に Spotify が新規 app の /v1/playlists を 403/404 で遮断
  *     (project_spotify_playlist_blocked.md)。Top 50 取得は恒久的に不能の
  *     ため該当コードを削除し Apple Music RSS 一本化した (2026-05-15)。
- *   - Spotify search (/v1/search) は引き続き 200 なので、Apple トラックの
- *     Spotify ID 解決・新規 INSERT のエンリッチには使用する。
- *   - Apple RSS は ISRC を持たないため title+artist の正規化マッチに依存。
+ *   - Spotify search (/v1/search) は引き続き 200 なので、iTunes でも既存曲に
+ *     結び付かなかった曲の新規 INSERT (spotify_track_id の採取) にだけ使う。
+ *   - Apple RSS は ISRC を持たないが id (= iTunes trackId) を持つ。以前は
+ *     これを捨てて Spotify search の曖昧マッチに頼っており、週 ~100 call を
+ *     消費した上に MIN_TITLE_SIM を割った曲がチャートから脱落していた。
+ *     iTunes lookup なら id で完全一致し、100 曲を 1 リクエストで解決できる
+ *     (2026-08-16 に切替)。previewUrl も同時に取れるので、ホームの試聴用
+ *     itunes_preview_url をチャート取り込みと同時に埋められる。
  *
  * 使い方:
  *   pnpm fetch:weekly-rankings --dry-run
@@ -29,6 +35,7 @@ import { createAdminClient } from "../src/lib/supabase/admin";
 import type { Database } from "../src/types/database";
 
 type SongInsert = Database["public"]["Tables"]["songs"]["Insert"];
+type SongUpdate = Database["public"]["Tables"]["songs"]["Update"];
 type ArtistInsert = Database["public"]["Tables"]["artists"]["Insert"];
 type WeeklyRankingInsert =
   Database["public"]["Tables"]["weekly_rankings"]["Insert"];
@@ -40,6 +47,12 @@ const SPOTIFY_SEARCH_URL = "https://api.spotify.com/v1/search";
 // 100 件取得 = .../most-played/100/songs.json
 const APPLE_TOP100_JP_RSS =
   "https://rss.applemarketingtools.com/api/v2/jp/music/most-played/100/songs.json";
+
+// iTunes lookup。RSS の id をカンマ区切りで一括指定できる (認証不要)。
+const ITUNES_LOOKUP_URL = "https://itunes.apple.com/lookup";
+const ITUNES_LOOKUP_CHUNK = 50;
+const ITUNES_USER_AGENT =
+  "karaoke-recommender-research/0.1 (hiroto.lalapalooza.ikeda@gmail.com)";
 
 const INTERVAL_MS = 1500;
 const MAX_RETRY_AFTER_SEC = 120;
@@ -241,6 +254,59 @@ async function fetchAppleTop100(): Promise<
   return results.map((entry, i) => ({ rank: i + 1, entry }));
 }
 
+// --- iTunes lookup ---------------------------------------------------------
+
+interface ItunesTrack {
+  trackId: number;
+  trackName: string;
+  artistName: string;
+  artworkUrl100?: string;
+  trackTimeMillis?: number;
+  releaseDate?: string;
+  previewUrl?: string;
+  trackViewUrl?: string;
+}
+
+/** `100x100bb.jpg` → `600x600bb.jpg` のようにサイズ部分だけ差し替える */
+function resizeArtwork(url: string, size: number): string {
+  return url.replace(/\d+x\d+bb\.(jpg|png)/i, `${size}x${size}bb.$1`);
+}
+
+/**
+ * Apple RSS の id (= iTunes trackId) を lookup で一括解決する。
+ * 失敗しても致命的ではない (呼び出し側が従来の Spotify 経路にフォールバック
+ * する) ので、例外は投げず取れた分だけ返す。
+ */
+async function fetchItunesLookup(
+  ids: string[],
+): Promise<Map<string, ItunesTrack>> {
+  const out = new Map<string, ItunesTrack>();
+  for (let i = 0; i < ids.length; i += ITUNES_LOOKUP_CHUNK) {
+    const chunk = ids.slice(i, i + ITUNES_LOOKUP_CHUNK);
+    const url = new URL(ITUNES_LOOKUP_URL);
+    url.searchParams.set("id", chunk.join(","));
+    url.searchParams.set("country", "jp");
+    url.searchParams.set("entity", "song");
+    try {
+      const res = await fetch(url.toString(), {
+        headers: { "User-Agent": ITUNES_USER_AGENT },
+      });
+      if (!res.ok) {
+        console.warn(`[itunes] lookup failed: ${res.status} (chunk ${i})`);
+        continue;
+      }
+      const json = (await res.json()) as { results?: ItunesTrack[] };
+      for (const r of json.results ?? []) {
+        if (r.trackId) out.set(String(r.trackId), r);
+      }
+    } catch (e) {
+      console.warn(`[itunes] lookup error (chunk ${i}): ${(e as Error).message}`);
+    }
+    if (i + ITUNES_LOOKUP_CHUNK < ids.length) await sleep(INTERVAL_MS);
+  }
+  return out;
+}
+
 // --- 集計 & DB upsert ------------------------------------------------------
 
 /**
@@ -264,36 +330,76 @@ function computeScore(sources: RankedSongBucket["sources"]): number {
   return s;
 }
 
-/** songs テーブルから (spotify_track_id, isrc, title_norm+artist_norm) 索引を作る */
+/**
+ * songs テーブルから (itunes_track_id, spotify_track_id, isrc,
+ * title_norm+artist_norm) 索引を作る。
+ * needsItunesFill は itunes_preview_url が未設定の song_id 集合で、
+ * チャート解決のついでにプレビュー URL を埋める対象になる。
+ */
 async function buildSongIndex(
   supabase: ReturnType<typeof createAdminClient>,
 ): Promise<{
+  byItunesId: Map<string, string>;
   bySpotifyId: Map<string, string>;
   byIsrc: Map<string, string>;
   byNormKey: Map<string, string>;
+  needsItunesFill: Set<string>;
 }> {
+  const byItunesId = new Map<string, string>();
   const bySpotifyId = new Map<string, string>();
   const byIsrc = new Map<string, string>();
   const byNormKey = new Map<string, string>();
+  const needsItunesFill = new Set<string>();
   const PAGE = 1000;
   for (let from = 0; ; from += PAGE) {
     const { data, error } = await supabase
       .from("songs")
-      .select("id, title, artist, spotify_track_id, spotify_isrc")
+      .select(
+        "id, title, artist, spotify_track_id, spotify_isrc, itunes_track_id, itunes_preview_url",
+      )
       .order("id", { ascending: true })
       .range(from, from + PAGE - 1);
     if (error) throw error;
     if (!data || data.length === 0) break;
     for (const r of data) {
+      if (r.itunes_track_id) byItunesId.set(String(r.itunes_track_id), r.id);
       if (r.spotify_track_id) bySpotifyId.set(r.spotify_track_id, r.id);
       if (r.spotify_isrc) byIsrc.set(r.spotify_isrc, r.id);
+      if (!r.itunes_preview_url) needsItunesFill.add(r.id);
       const k =
         normalizeArtistName(r.artist ?? "") + "|" + normalizeTitle(r.title);
       if (!byNormKey.has(k)) byNormKey.set(k, r.id);
     }
     if (data.length < PAGE) break;
   }
-  return { bySpotifyId, byIsrc, byNormKey };
+  return { byItunesId, bySpotifyId, byIsrc, byNormKey, needsItunesFill };
+}
+
+/** artists に該当が無ければ最低限の行を作って artist_id を返す。 */
+async function ensureArtistId(
+  supabase: ReturnType<typeof createAdminClient>,
+  artistName: string,
+  artistByNorm: Map<string, string>,
+): Promise<string | null> {
+  const aKey = normalizeArtistName(artistName);
+  const existing = artistByNorm.get(aKey);
+  if (existing) return existing;
+  const ins: ArtistInsert = {
+    name: artistName || "(unknown)",
+    name_norm: aKey || normalizeArtistName(artistName || "unknown"),
+    genres: [],
+  };
+  const { data, error } = await supabase
+    .from("artists")
+    .insert(ins)
+    .select("id")
+    .single();
+  if (error) {
+    console.warn(`  [WARN-ARTIST] ${artistName}: ${error.message}`);
+    return null;
+  }
+  artistByNorm.set(aKey, data.id);
+  return data.id;
 }
 
 /**
@@ -304,30 +410,13 @@ async function insertSongFromSpotify(
   supabase: ReturnType<typeof createAdminClient>,
   track: SpotifyTrack,
   artistByNorm: Map<string, string>,
+  itunes: ItunesTrack | null,
 ): Promise<string | null> {
   const title = track.name;
   const artistName = track.artists[0]?.name ?? "";
-  const aKey = normalizeArtistName(artistName);
 
-  let artistId = artistByNorm.get(aKey);
-  if (!artistId) {
-    const ins: ArtistInsert = {
-      name: artistName || "(unknown)",
-      name_norm: aKey || normalizeArtistName(artistName || "unknown"),
-      genres: [],
-    };
-    const { data, error } = await supabase
-      .from("artists")
-      .insert(ins)
-      .select("id")
-      .single();
-    if (error) {
-      console.warn(`  [WARN-ARTIST] ${artistName}: ${error.message}`);
-      return null;
-    }
-    artistId = data.id;
-    artistByNorm.set(aKey, artistId);
-  }
+  const artistId = await ensureArtistId(supabase, artistName, artistByNorm);
+  if (!artistId) return null;
 
   const album = track.album;
   const artworkLarge = album.images?.[0]?.url ?? null;
@@ -354,6 +443,19 @@ async function insertSongFromSpotify(
     is_popular: true,
     source_urls: [`https://open.spotify.com/track/${track.id}`],
   };
+  // iTunes 側が解決できていれば、試聴音源を最初から埋めておく。
+  // (これが無いと backfill:itunes-previews が拾うまでデッキで無音になる)
+  if (itunes) {
+    songRow.itunes_track_id = itunes.trackId;
+    songRow.itunes_preview_url = itunes.previewUrl ?? null;
+    songRow.itunes_preview_checked_at = new Date().toISOString();
+    if (itunes.trackViewUrl) {
+      songRow.source_urls = [
+        ...(songRow.source_urls as string[]),
+        itunes.trackViewUrl,
+      ];
+    }
+  }
   const { data, error } = await supabase
     .from("songs")
     .insert(songRow)
@@ -364,6 +466,76 @@ async function insertSongFromSpotify(
     return null;
   }
   return data.id;
+}
+
+/**
+ * Spotify で解決できなかったチャート曲を iTunes の情報だけで INSERT する。
+ * spotify_track_id は付かないが、以前はここで取りこぼして順位ごと欠落して
+ * いたので、チャートの完全性を優先する。Spotify ID は後日 match:dam が拾う。
+ */
+async function insertSongFromItunes(
+  supabase: ReturnType<typeof createAdminClient>,
+  itunes: ItunesTrack,
+  artistByNorm: Map<string, string>,
+): Promise<string | null> {
+  const artistName = itunes.artistName ?? "";
+  const artistId = await ensureArtistId(supabase, artistName, artistByNorm);
+  if (!artistId) return null;
+
+  const artworkSmall = itunes.artworkUrl100 ?? null;
+  const releaseYear = itunes.releaseDate
+    ? parseInt(itunes.releaseDate.slice(0, 4), 10)
+    : null;
+
+  const songRow: SongInsert = {
+    title: itunes.trackName,
+    artist: artistName,
+    artist_id: artistId,
+    release_year: Number.isFinite(releaseYear) ? releaseYear : null,
+    image_url_small: artworkSmall,
+    image_url_medium: artworkSmall ? resizeArtwork(artworkSmall, 600) : null,
+    image_url_large: artworkSmall ? resizeArtwork(artworkSmall, 1200) : null,
+    duration_ms: itunes.trackTimeMillis ?? null,
+    itunes_track_id: itunes.trackId,
+    itunes_preview_url: itunes.previewUrl ?? null,
+    itunes_preview_checked_at: new Date().toISOString(),
+    is_popular: true,
+    source_urls: itunes.trackViewUrl ? [itunes.trackViewUrl] : [],
+  };
+  const { data, error } = await supabase
+    .from("songs")
+    .insert(songRow)
+    .select("id")
+    .single();
+  if (error) {
+    console.warn(
+      `  [WARN-INSERT-SONG-IT] ${artistName} | ${itunes.trackName}: ${error.message}`,
+    );
+    return null;
+  }
+  return data.id;
+}
+
+/** 既存曲に iTunes 由来のプレビュー情報が欠けていれば埋める (上書きはしない)。 */
+async function fillItunesPreview(
+  supabase: ReturnType<typeof createAdminClient>,
+  songId: string,
+  itunes: ItunesTrack,
+): Promise<boolean> {
+  const updates: SongUpdate = {
+    itunes_track_id: itunes.trackId,
+    itunes_preview_checked_at: new Date().toISOString(),
+  };
+  if (itunes.previewUrl) updates.itunes_preview_url = itunes.previewUrl;
+  const { error } = await supabase
+    .from("songs")
+    .update(updates)
+    .eq("id", songId);
+  if (error) {
+    console.warn(`  [WARN-FILL-IT] ${songId}: ${error.message}`);
+    return false;
+  }
+  return Boolean(itunes.previewUrl);
 }
 
 async function loadArtistIndex(
@@ -406,7 +578,23 @@ async function main() {
   );
   console.log(`  artists: ${artistByNorm.size}`);
 
-  const token = await getSpotifyToken();
+  // Spotify token は「iTunes でも既存曲に結び付かなかった曲」が出た時にだけ
+  // 必要なので遅延取得する。多くの週は 1 度も呼ばれずに終わる。
+  let spotifyToken: string | null = null;
+  let spotifyUnavailable = false;
+  const ensureSpotifyToken = async (): Promise<string | null> => {
+    if (spotifyUnavailable) return null;
+    if (spotifyToken) return spotifyToken;
+    try {
+      spotifyToken = await getSpotifyToken();
+      return spotifyToken;
+    } catch (e) {
+      spotifyUnavailable = true;
+      console.warn(`[spotify] token 取得失敗: ${(e as Error).message}`);
+      console.warn("[spotify] 以降は iTunes の情報だけで取り込む");
+      return null;
+    }
+  };
 
   // --- 1. Apple Top 100 ----------------------------------------------------
   const appleItems = await fetchAppleTop100();
@@ -416,6 +604,12 @@ async function main() {
     console.error("Apple RSS 取得失敗。終了。");
     process.exit(1);
   }
+
+  // --- 2. RSS の id (= iTunes trackId) を一括解決 --------------------------
+  const itunesById = await fetchItunesLookup(appleItems.map((a) => a.entry.id));
+  console.log(
+    `itunes lookup: ${itunesById.size}/${appleItems.length} resolved`,
+  );
 
   // --- 3. song_id への解決 + 新規取り込み ---------------------------------
   const buckets = new Map<string, RankedSongBucket>();
@@ -429,24 +623,46 @@ async function main() {
     return b;
   };
 
+  let spotifySearches = 0;
+  let previewsFilled = 0;
+
   for (const { rank, entry } of appleItems) {
-    // 既存マッチをまず試す (Spotify を呼ばずに済むなら省略)
+    const it = itunesById.get(entry.id) ?? null;
+
+    // 既存マッチ: itunes_track_id の完全一致 → 正規化 title+artist
+    // (RSS 表記と iTunes 正規表記の両方で引く)
     const normKey =
       normalizeArtistName(entry.artistName) + "|" + normalizeTitle(entry.name);
-    let songId = songIdx.byNormKey.get(normKey);
+    let songId =
+      songIdx.byItunesId.get(entry.id) ?? songIdx.byNormKey.get(normKey);
+    if (!songId && it) {
+      const itKey =
+        normalizeArtistName(it.artistName) + "|" + normalizeTitle(it.trackName);
+      songId = songIdx.byNormKey.get(itKey);
+    }
 
     if (!songId) {
-      // Spotify search で track ID を解決し、その後 ISRC でもマッチ試行 → 無ければ INSERT
+      // DB 未収録。Spotify で解決できれば spotify_track_id 付きで INSERT し、
+      // 駄目でも iTunes の情報だけで INSERT してチャートからは落とさない。
+      const token = await ensureSpotifyToken();
       let candidates: SpotifyTrack[] = [];
-      try {
-        candidates = await searchSpotify(token, entry.name, entry.artistName);
-        await sleep(INTERVAL_MS);
-      } catch (e) {
-        if (e instanceof QuotaExceededError) {
-          console.warn(`  [QUOTA] apple search 中止 rank=${rank}`);
-          break;
+      if (token) {
+        try {
+          candidates = await searchSpotify(token, entry.name, entry.artistName);
+          spotifySearches++;
+          await sleep(INTERVAL_MS);
+        } catch (e) {
+          if (e instanceof QuotaExceededError) {
+            console.warn(
+              `  [QUOTA] spotify search 打ち切り rank=${rank} (以降は iTunes のみ)`,
+            );
+            spotifyUnavailable = true;
+          } else {
+            console.warn(
+              `  [WARN-SEARCH] apple rank=${rank}: ${(e as Error).message}`,
+            );
+          }
         }
-        console.warn(`  [WARN-SEARCH] apple rank=${rank}: ${(e as Error).message}`);
       }
       const match = pickBestMatch(entry.name, entry.artistName, candidates);
       if (match) {
@@ -466,6 +682,7 @@ async function main() {
               supabase,
               tr,
               artistByNorm,
+              it,
             );
             if (newId) {
               songId = newId;
@@ -473,7 +690,21 @@ async function main() {
               if (tr.external_ids?.isrc)
                 songIdx.byIsrc.set(tr.external_ids.isrc, newId);
               songIdx.byNormKey.set(normKey, newId);
+              if (it) songIdx.byItunesId.set(entry.id, newId);
             }
+          }
+        }
+      } else if (it) {
+        if (dryRun) {
+          console.log(
+            `  [DRY-NEW-IT] rank=${rank} ${it.artistName} | ${it.trackName}`,
+          );
+        } else {
+          const newId = await insertSongFromItunes(supabase, it, artistByNorm);
+          if (newId) {
+            songId = newId;
+            songIdx.byItunesId.set(entry.id, newId);
+            songIdx.byNormKey.set(normKey, newId);
           }
         }
       } else {
@@ -481,13 +712,22 @@ async function main() {
           `  [NOMATCH-AP] rank=${rank} ${entry.artistName} | ${entry.name}`,
         );
       }
+    } else if (it && songIdx.needsItunesFill.has(songId) && !dryRun) {
+      // 既存曲だがプレビュー未取得。チャート解決のついでに埋めておく
+      // (backfill:itunes-previews の順番待ちを飛ばせる)。
+      if (await fillItunesPreview(supabase, songId, it)) previewsFilled++;
+      songIdx.needsItunesFill.delete(songId);
+      songIdx.byItunesId.set(entry.id, songId);
     }
+
     if (songId) {
       ensureBucket(songId).sources.apple = rank;
     }
   }
 
-  console.log(`resolved buckets: ${buckets.size}`);
+  console.log(
+    `resolved buckets: ${buckets.size} (spotify search: ${spotifySearches} calls, itunes preview filled: ${previewsFilled})`,
+  );
 
   // --- 4. スコア合算 + final_rank 採番 -----------------------------------
   const ranked = Array.from(buckets.values())
