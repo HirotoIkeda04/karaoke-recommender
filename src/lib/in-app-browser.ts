@@ -77,22 +77,63 @@ export function buildChromeSchemeUrl(currentUrl: string, os: MobileOS): string |
   }
 
   if (os === "android") {
-    const url = new URL(currentUrl);
-    const fallback = encodeURIComponent(currentUrl);
-    // intent://<host><path><query>#Intent;scheme=<scheme>;package=com.android.chrome;S.browser_fallback_url=<fallback>;end
-    return (
-      "intent://" +
-      url.host +
-      url.pathname +
-      url.search +
-      url.hash +
-      "#Intent;scheme=" +
-      url.protocol.replace(":", "") +
-      ";package=com.android.chrome;S.browser_fallback_url=" +
-      fallback +
-      ";end"
-    );
+    return buildAndroidIntentUrl(currentUrl, "com.android.chrome");
   }
+
+  return null;
+}
+
+/**
+ * Android の intent:// URL を組み立てる。package を省くと OS の
+ * ブラウザ選択 (既定のブラウザ) に委ねられる。
+ * S.browser_fallback_url を付けておくと、対象が無い時は元の URL に戻る。
+ */
+function buildAndroidIntentUrl(
+  currentUrl: string,
+  packageName: string | null,
+): string {
+  const url = new URL(currentUrl);
+  const fallback = encodeURIComponent(currentUrl);
+  return (
+    "intent://" +
+    url.host +
+    url.pathname +
+    url.search +
+    url.hash +
+    "#Intent;scheme=" +
+    url.protocol.replace(":", "") +
+    (packageName ? ";package=" + packageName : "") +
+    ";S.browser_fallback_url=" +
+    fallback +
+    ";end"
+  );
+}
+
+/**
+ * 「Chrome 以外の既定ブラウザ」で開かせる URL を組み立てる。
+ *
+ * iOS には Safari を名指しで開く URL scheme が存在しない (googlechromes:// に
+ * 相当するものが無い)。唯一の逃げ道が LINE の openExternalBrowser=1 で、
+ * これを付けた URL を LINE 内ブラウザで開くと OS の既定ブラウザ
+ * (= 多くの端末で Safari) に移る。LINE 以外のアプリ内ブラウザには同種の
+ * 仕組みが無いので null を返し、呼び出し側は「メニューからブラウザで開く」の
+ * 手順を案内するしかない。
+ *
+ * 参考: https://developers.line.biz/ja/docs/line-mini-app/development/setting-up-liff/
+ */
+export function buildExternalBrowserUrl(
+  currentUrl: string,
+  os: MobileOS,
+  kind: InAppBrowser | null,
+): string | null {
+  if (kind === "line") {
+    const url = new URL(currentUrl);
+    url.searchParams.set("openExternalBrowser", "1");
+    return url.toString();
+  }
+
+  // Android は package 指定なしの intent:// で既定のブラウザに渡せる
+  if (os === "android") return buildAndroidIntentUrl(currentUrl, null);
 
   return null;
 }

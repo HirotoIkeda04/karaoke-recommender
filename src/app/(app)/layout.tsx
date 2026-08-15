@@ -1,5 +1,7 @@
 import { AppHeader } from "@/components/app-header";
 import { AppBottomNav } from "@/components/app-bottom-nav";
+import { GuestRatingsImporter } from "@/components/guest-ratings-importer";
+import { InAppBrowserGate } from "@/components/in-app-browser-gate";
 import { SessionProvider } from "@/components/session-provider";
 import { createClient } from "@/lib/supabase/server";
 
@@ -23,6 +25,10 @@ export default async function AppLayout({
 
   return (
     <SessionProvider isGuest={isGuest}>
+      {/* ゲスト中に付けた評価が localStorage に残っていたら DB へ移す */}
+      <GuestRatingsImporter />
+      {/* LINE 等のアプリ内ブラウザなら、まず外部ブラウザへの導線を出す */}
+      <InAppBrowserGate />
       {/* min-h-dvh: 動的ビューポート高 (iOS Safari の URL バー伸縮に追従、
           100vh のような固定値ではなく現在の表示領域を毎フレーム反映する) */}
       <div className="flex min-h-dvh flex-col">
