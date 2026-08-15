@@ -31,36 +31,43 @@ import { cn } from "@/lib/utils";
  * バーの構成は iOS 26 の App Store に倣う。
  *
  *   通常       [ 評価 | ライブラリ | ルーム ]   ○ 検索
- *   検索タブ   ○ タブ   [ 🔍 検索欄 .................... ]
+ *   検索欄あり  ○ 直前のタブ   [ 🔍 検索欄 ................. ]
  *
  * くっつく / 離れるの基準は「行き先か、道具か」。評価・ライブラリ・ルームは
  * 行き先なので 1 つのカプセルに入れて相互の関係を見せる。検索はどの画面から
  * でも呼ぶ道具なので、カプセルから外して単独の円ボタンにする。
  *
- * 検索タブに入るとタブのカプセルは 1 つの丸へ畳まれ、空いた幅を検索欄が
- * 占める (App Store と同じ)。丸を押せばタブが戻るので、行き先へは常に
- * 1 タップで到達できる。検索欄まわりの形の変化は AppSearchBar 側。
+ * 検索欄のあるページではタブのカプセルが 1 つの丸へ畳まれ、空いた幅を
+ * 検索欄が占める (App Store と同じ)。畳まれた丸は「直前に開いていたタブ」を
+ * 指すので、来た道をそのまま 1 タップで戻れる。検索欄まわりの形の変化と
+ * 液体でのくっつき / 分離は AppSearchBar 側。
  */
-const TAB_ITEMS = [
+export const TAB_ITEMS = [
   { href: "/", label: "評価", icon: Home },
   { href: "/library", label: "ライブラリ", icon: LibraryBig },
   { href: "/rooms", label: "ルーム", icon: Users },
 ] as const;
 
+export type TabItem = (typeof TAB_ITEMS)[number];
+
 const SEARCH_HREF = "/songs";
+
+/**
+ * 検索欄を下部バーに出すページと、その placeholder。
+ *
+ * 「検索タブだけ」と決め打ちにせず表にしてあるのは、他のタブにも検索欄を
+ * 足したくなったときにここへ 1 行足すだけで済むようにするため。
+ * pathname の完全一致で引く (配下の詳細ページには出さない)。
+ */
+const SEARCH_FIELD_PAGES: Record<string, { placeholder: string }> = {
+  [SEARCH_HREF]: { placeholder: "楽曲・アーティストを検索" },
+};
 
 export function AppBottomNav() {
   const pathname = usePathname();
   const songSheetSegment = useSelectedLayoutSegment("songSheet");
   const songSheetOpen = isSongSheetOpen(pathname, songSheetSegment);
   const keyboardInset = useKeyboardInset();
-
-  // 検索タブで、畳んだタブバーを一時的に開いている状態。
-  // 行き先を選んで移動すれば用は済むので、遷移したら畳み直したい。
-  // そこで真偽値ではなく「どのページで開いたか」を持ち、現在地と一致する
-  // 間だけ開いているとみなす。これで遷移時に畳む effect が要らなくなる。
-  const [expandedAt, setExpandedAt] = useState<string | null>(null);
-  const tabsExpanded = expandedAt === pathname;
 
   // カプセル内タブの現在地。タブ外のページ (/friends, /artists/... 等) では
   // -1 になり、その間はインジケータごと外す。
@@ -69,9 +76,35 @@ export function AppBottomNav() {
   );
   const searchActive = pathname.startsWith(SEARCH_HREF);
 
-  // 検索欄を出すのは検索トップだけ。曲詳細やジャンル一覧では入力欄の
-  // 行き場がないので、通常のタブバー (検索を選択状態) に戻す。
-  const showSearchBar = pathname === SEARCH_HREF && !tabsExpanded;
+  // 検索欄を出すのはページ単位。曲詳細やジャンル一覧では入力欄の行き場が
+  // ないので、通常のタブバー (検索を選択状態) に戻る。
+  const searchField = SEARCH_FIELD_PAGES[pathname];
+  const showSearchBar = searchField != null;
+
+  // 検索欄のページでは行き先タブのカプセルが 1 つの丸に畳まれる。その丸が
+  // 指すのは「検索欄に入る直前に開いていたタブ」。固定でホームにすると、
+  // ライブラリから検索に来た人がホーム経由で戻る羽目になる。
+  //
+  // effect ではなく描画中に前回値と比べて更新する (React 公式の
+  // 「props 変化に合わせて state を調整する」形)。effect にすると
+  // 遷移のたびに再レンダリングが 1 往復増える。
+  const [tabMemo, setTabMemo] = useState({
+    at: pathname,
+    href: TAB_ITEMS[0].href as string,
+  });
+  if (tabMemo.at !== pathname) {
+    setTabMemo({
+      at: pathname,
+      // 検索欄のページ自体はタブでも「戻り先」にはしない (自分自身に戻る
+      // ボタンになってしまう)。それ以外のタブに居たときだけ控える。
+      href:
+        activeIndex >= 0 && !showSearchBar
+          ? TAB_ITEMS[activeIndex].href
+          : tabMemo.href,
+    });
+  }
+  const backTab =
+    TAB_ITEMS.find((item) => item.href === tabMemo.href) ?? TAB_ITEMS[0];
 
   // キーボードはレイアウトビューポートを変えないので、fixed のこのバーは
   // 放っておくとキーボードの裏に入る。覆われた分だけ自力で持ち上げる。
@@ -102,7 +135,10 @@ export function AppBottomNav() {
         style={{ height: `${BAR_HEIGHT_REM}rem` }}
       >
         {showSearchBar ? (
-          <AppSearchBar onExpandTabs={() => setExpandedAt(pathname)} />
+          <AppSearchBar
+            backTab={backTab}
+            placeholder={searchField.placeholder}
+          />
         ) : (
           <>
             {/* ── 行き先のタブ (くっつく側) ───────────────────── */}
@@ -190,15 +226,7 @@ export function AppBottomNav() {
                 自前の明るいレイヤーで行う。 */}
             <Link
               href={SEARCH_HREF}
-              onClick={(e) => {
-                triggerHaptic();
-                // 検索タブでタブを開いている間は、ここが「検索欄に戻る」。
-                // 遷移は起きないので自前で畳み直す。
-                if (pathname === SEARCH_HREF) {
-                  e.preventDefault();
-                  setExpandedAt(null);
-                }
-              }}
+              onClick={() => triggerHaptic()}
               aria-label="検索"
               aria-current={searchActive ? "page" : undefined}
               className={cn(

@@ -15,9 +15,10 @@
  */
 
 import { Liquid } from "liquid-gooey";
-import { Home, LibraryBig, Search, Users } from "lucide-react";
+import { Search } from "lucide-react";
 import { useState } from "react";
 
+import { TAB_ITEMS } from "@/components/app-bottom-nav";
 import { AppSearchBar } from "@/components/app-search-bar";
 import {
   BAR_HEIGHT_PX,
@@ -34,12 +35,6 @@ import {
 import { SearchBarProvider } from "@/components/search-bar-context";
 import { GlassSurface } from "@/components/ui/glass-surface";
 
-const TAB_ITEMS = [
-  { label: "評価", icon: Home },
-  { label: "ライブラリ", icon: LibraryBig },
-  { label: "ルーム", icon: Users },
-];
-
 const SWATCHES = [
   "linear-gradient(135deg,#f43f5e,#f59e0b)",
   "linear-gradient(135deg,#8b5cf6,#ec4899)",
@@ -53,14 +48,17 @@ export default function NavLabPage() {
   // -1 = 検索が現在地。本番の pathname === "/songs" に相当し、
   // このときバーは検索欄の姿になる。
   const [active, setActive] = useState(0);
-  // 検索タブでタブバーを一時的に開いている状態 (本番の tabsExpanded)。
-  const [tabsExpanded, setTabsExpanded] = useState(false);
+  // 検索欄に入る直前に開いていたタブ (本番の tabMemo に相当)。
+  const [backIndex, setBackIndex] = useState(0);
 
   const searchActive = active < 0;
-  const showSearchBar = searchActive && !tabsExpanded;
+  const showSearchBar = searchActive;
 
   return (
     <SearchBarProvider>
+      {/* Next の開発インジケータは画面左下に出て、バー左端の丸をちょうど
+          覆ってしまう。ここはその丸を見るためのルートなので隠す。 */}
+      <style>{`nextjs-portal { display: none; }`}</style>
       <div className="min-h-dvh bg-background pb-40">
         <div className="space-y-2 p-3">
           {Array.from({ length: 24 }).map((_, i) => (
@@ -90,7 +88,10 @@ export default function NavLabPage() {
             }}
           >
             {showSearchBar ? (
-              <AppSearchBar onExpandTabs={() => setTabsExpanded(true)} />
+              <AppSearchBar
+                backTab={TAB_ITEMS[backIndex]}
+                placeholder="楽曲・アーティストを検索"
+              />
             ) : (
               <>
                 {/* 行き先のタブ (くっつく側) */}
@@ -132,10 +133,7 @@ export default function NavLabPage() {
                           <li key={item.label} className="min-w-0">
                             <button
                               type="button"
-                              onClick={() => {
-                                setActive(i);
-                                setTabsExpanded(false);
-                              }}
+                              onClick={() => setActive(i)}
                               aria-current={isActive ? "page" : undefined}
                               className={`flex w-full flex-col items-center justify-center gap-[3px] px-1 ${
                                 isActive ? "text-white" : "text-zinc-400"
@@ -160,8 +158,8 @@ export default function NavLabPage() {
                 <button
                   type="button"
                   onClick={() => {
+                    if (active >= 0) setBackIndex(active);
                     setActive(-1);
-                    setTabsExpanded(false);
                   }}
                   aria-label="検索"
                   aria-current={searchActive ? "page" : undefined}
