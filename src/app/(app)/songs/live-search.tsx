@@ -16,12 +16,12 @@ import {
 } from "@/lib/genres";
 import { karaokeToMidi } from "@/lib/note";
 import {
+  clearHistory,
   loadHistory,
   pushHistory,
   type RecentArtist,
   type RecentItem,
   type RecentSong,
-  removeHistoryItem,
 } from "@/lib/search-history";
 import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/types/database";
@@ -452,14 +452,11 @@ export function LiveSearch({
     setHistory(next);
   }, []);
 
-  const handleRemoveHistory = useCallback(
-    (e: React.MouseEvent, type: RecentItem["type"], id: string) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setHistory(removeHistoryItem(type, id));
-    },
-    [],
-  );
+  const handleClearHistory = useCallback(() => {
+    if (!window.confirm("最近の検索をすべて削除しますか？")) return;
+    clearHistory();
+    setHistory([]);
+  }, []);
 
   const handleToggleDecade = useCallback((start: number) => {
     setSelectedDecades((previous) =>
@@ -519,7 +516,7 @@ export function LiveSearch({
           <>
             <HistoryList
               history={history}
-              onRemove={handleRemoveHistory}
+              onClear={handleClearHistory}
               onSelectSong={handleSelectSong}
               onSelectArtist={handleSelectArtist}
               ratings={ratings}
@@ -879,21 +876,18 @@ function BrowseGrid({
 // History: タップした曲/アーティストの「最近の検索」
 //   - アーティストは X (Twitter) の検索履歴風に丸アイコンの横スクロール
 //   - 楽曲は従来通りの縦リストで、カルーセルの下に置く
+//   - 削除は見出し行の × に集約する (項目ごとの × は常時表示で邪魔になる)
 // ============================================================================
 function HistoryList({
   history,
-  onRemove,
+  onClear,
   onSelectSong,
   onSelectArtist,
   ratings,
   knownSet,
 }: {
   history: RecentItem[];
-  onRemove: (
-    e: React.MouseEvent,
-    type: RecentItem["type"],
-    id: string,
-  ) => void;
+  onClear: () => void;
   onSelectSong: (s: Song) => void;
   onSelectArtist: (a: ArtistRowData) => void;
   ratings: Record<string, string>;
@@ -908,14 +902,28 @@ function HistoryList({
 
   return (
     <section>
-      <h2 className="mb-2 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-        最近の検索
-      </h2>
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+          最近の検索
+        </h2>
+        {artists.length > 0 || songs.length > 0 ? (
+          // -my-1 で見出し行の高さを変えずにタップ領域だけ広げる
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={onClear}
+            aria-label="最近の検索をすべて削除"
+            className="-my-1 -mr-1 grid size-7 shrink-0 place-items-center rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+          >
+            <X className="size-4" aria-hidden />
+          </button>
+        ) : null}
+      </div>
       {artists.length > 0 ? (
         // px-6 = ページの px-4 + SongCard の p-2。下の曲リストと左端を揃える
         <ul className="-mx-4 mb-2 flex gap-3 overflow-x-auto px-6 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {artists.map((item) => (
-            <li key={item.id} className="relative w-16 shrink-0">
+            <li key={item.id} className="w-16 shrink-0">
               <Link
                 href={`/artists/${item.id}`}
                 onClick={() =>
@@ -947,16 +955,6 @@ function HistoryList({
                   {item.name}
                 </p>
               </Link>
-              {/* 丸アイコンの右上角 (画像の外側) に重ねるので縦にはみ出さない */}
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={(e) => onRemove(e, "artist", item.id)}
-                aria-label={`${item.name} を履歴から削除`}
-                className="absolute right-0 top-0 grid size-5 place-items-center rounded-full bg-zinc-900/70 text-zinc-100 backdrop-blur-sm dark:bg-zinc-700/85"
-              >
-                <X className="size-3" aria-hidden />
-              </button>
             </li>
           ))}
         </ul>
@@ -964,35 +962,24 @@ function HistoryList({
       {songs.length > 0 ? (
         <ul>
           {songs.map((item) => (
-            <li key={item.id} className="flex items-center gap-1">
-              <div className="min-w-0 flex-1">
-                <SongCard
-                  song={{
-                    id: item.id,
-                    title: item.title,
-                    artist: item.artist,
-                    release_year: null,
-                    range_low_midi: null,
-                    range_high_midi: null,
-                    falsetto_max_midi: null,
-                    image_url_small: item.image,
-                    image_url_medium: null,
-                    duration_ms: null,
-                  }}
-                  rating={ratings[item.id] ?? null}
-                  isKnown={knownSet.has(item.id)}
-                  onSelect={onSelectSong}
-                />
-              </div>
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={(e) => onRemove(e, "song", item.id)}
-                aria-label="履歴から削除"
-                className="grid size-8 shrink-0 place-items-center rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
-              >
-                <X className="size-4" aria-hidden />
-              </button>
+            <li key={item.id}>
+              <SongCard
+                song={{
+                  id: item.id,
+                  title: item.title,
+                  artist: item.artist,
+                  release_year: null,
+                  range_low_midi: null,
+                  range_high_midi: null,
+                  falsetto_max_midi: null,
+                  image_url_small: item.image,
+                  image_url_medium: null,
+                  duration_ms: null,
+                }}
+                rating={ratings[item.id] ?? null}
+                isKnown={knownSet.has(item.id)}
+                onSelect={onSelectSong}
+              />
             </li>
           ))}
         </ul>
