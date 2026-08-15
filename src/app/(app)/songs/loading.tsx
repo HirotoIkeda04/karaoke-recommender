@@ -20,7 +20,7 @@ export default function Loading() {
         {[0, 1, 2, 3, 4, 5].map((i) => (
           <li
             key={i}
-            className="aspect-[16/9] animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800"
+            className="aspect-square animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800"
           />
         ))}
       </ul>

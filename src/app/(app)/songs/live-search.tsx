@@ -117,9 +117,9 @@ const GENRE_LABEL_COLORS: Record<GenreCode, string> = {
 // 端でわずかに見切れる。
 const GENRE_COVER_TRIO = [
   // covers[0] を中央に置きたいので、描画順は左 → 中央 → 右で並べ替える
-  { coverIndex: 1, className: "w-[39%] translate-y-[22%]", ring: false },
-  { coverIndex: 0, className: "z-10 -mx-[3%] w-[50%]", ring: true },
-  { coverIndex: 2, className: "w-[39%] translate-y-[22%]", ring: false },
+  { coverIndex: 1, className: "w-[41%] translate-y-[22%]", ring: false },
+  { coverIndex: 0, className: "z-10 -mx-[3%] w-[53%]", ring: true },
+  { coverIndex: 2, className: "w-[41%] translate-y-[22%]", ring: false },
 ] as const;
 
 const DEBOUNCE_MS = 200;
@@ -922,14 +922,14 @@ function BrowseGrid({
             <li key={code}>
               <Link
                 href={`/songs/genre/${code}`}
-                className="relative flex aspect-[3/2] flex-col overflow-hidden rounded-lg px-2 pb-1.5 pt-0.5 transition active:scale-[0.98]"
+                className="relative flex aspect-square flex-col overflow-hidden rounded-lg px-2 pb-1.5 pt-0.5 transition active:scale-[0.98]"
                 style={{ backgroundColor: GENRE_CARD_COLORS[code] }}
               >
                 {covers.length > 0 ? (
-                  // 円は高さ基準で作る (h-full + aspect-square)。3 枚の合計幅は
-                  // カード幅を少し超えるので、左右が端でわずかに見切れる。
+                  // 3 枚の合計幅はカード幅を少し超えるので、左右が端で
+                  // わずかに見切れる。縦は中央寄せ。
                   <div
-                    className="flex min-h-0 flex-1 items-start justify-center"
+                    className="flex min-h-0 flex-1 items-center justify-center"
                     aria-hidden
                   >
                     {GENRE_COVER_TRIO.map(({ coverIndex, className, ring }) => {
@@ -962,7 +962,7 @@ function BrowseGrid({
                   </div>
                 ) : null}
                 <span
-                  className="truncate text-[11px] font-extrabold leading-tight tracking-tight"
+                  className="truncate text-[13px] font-extrabold leading-tight tracking-tight"
                   style={{ color: GENRE_LABEL_COLORS[code] }}
                 >
                   {GENRE_LABELS[code]}
