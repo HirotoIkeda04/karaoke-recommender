@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import type { Session } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 
 import type { Database } from "@/types/database";
@@ -9,6 +10,14 @@ import type { Database } from "@/types/database";
  * ないので、末尾一致で弾いてある。
  */
 const AUTH_COOKIE_RE = /^sb-.+-auth-token(\.\d+)?$/;
+
+/**
+ * 壊れた Cookie を捨てる時の対象。こちらは前方一致で、チャンク (`.0`) も
+ * OAuth 途中の `-code-verifier` もまとめて落とす。中身が読めない以上
+ * 「どこまでが生きているか」は当てにならないので、auth 関連は一掃して
+ * ログインからやり直させるのが確実。
+ */
+const AUTH_COOKIE_PREFIX_RE = /^sb-.+-auth-token/;
 
 /**
  * middleware 側でセッションを前倒しリフレッシュする余裕 (ms)。
@@ -45,6 +54,37 @@ function redirectPreservingCookies(
     redirect.cookies.set(cookie);
   }
   return redirect;
+}
+
+/**
+ * 壊れた auth Cookie を、このリクエストからもブラウザからも取り除く。
+ *
+ * request 側も消すのは、middleware を抜けた先の Server Component
+ * (server.ts) が同じ Cookie を読んで同じ例外を投げるため。
+ * `NextResponse.next({ request })` は生成時点の request ヘッダーを写し取る
+ * ので、消してから作り直さないと下流には古い Cookie が渡る。
+ */
+function clearAuthCookies(
+  request: NextRequest,
+  response: NextResponse,
+): NextResponse {
+  const names = request.cookies
+    .getAll()
+    .map(({ name }) => name)
+    .filter((name) => AUTH_COOKIE_PREFIX_RE.test(name));
+  if (names.length === 0) return response;
+
+  request.cookies.delete(names);
+  const cleared = NextResponse.next({ request });
+  for (const cookie of response.cookies.getAll()) {
+    cleared.cookies.set(cookie);
+  }
+  // maxAge: 0 で失効させる。path は @supabase/ssr の既定 ("/") に合わせる。
+  // 一致しないと同名 Cookie が消えず、次のリクエストでまた壊れる。
+  for (const name of names) {
+    cleared.cookies.set(name, "", { path: "/", maxAge: 0 });
+  }
+  return cleared;
 }
 
 function loginUrl(request: NextRequest, pathname: string): URL {
@@ -106,9 +146,22 @@ export async function updateSession(
   //   - 書き込み系 server action は getUser を使う
   //   - データアクセスは RLS が JWT 署名から auth.uid() を取得して防御
   // 個人+友人レベルではこの程度のラグは許容範囲。
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  //
+  // getSession() は Cookie を読むだけに見えて、値のデコードで例外を投げる
+  // ことがある (中身が不正な `base64-` 付き Cookie で @supabase/ssr の
+  // stringFromBase64URL が Invalid UTF-8 sequence)。ここで抜けると
+  // middleware ごと落ちて全リクエストが 500 になり、ブラウザは壊れた
+  // Cookie を送り続けるので、手で消すまで誰も復帰できない。
+  // 読めない Cookie は「セッション無し」と見なし、下で捨てて復帰させる。
+  let session: Session | null = null;
+  let authCookieUnreadable = false;
+  try {
+    ({
+      data: { session },
+    } = await supabase.auth.getSession());
+  } catch {
+    authCookieUnreadable = true;
+  }
   let user = session?.user ?? null;
 
   // Server Component がリフレッシュ役になってしまう窓を塞ぐ (上の
@@ -128,6 +181,28 @@ export async function updateSession(
     paths.some((p) => pathname === p || pathname.startsWith(`${p}/`));
   const isPublic = matches(publicPaths);
   const isGuestPath = matches(guestPaths);
+
+  // 壊れた Cookie は必ずここで捨てる。捨てない限り次のリクエストも同じ所で
+  // 落ちるので、ログイン画面に置いた「サインインし直す」導線すら踏めない。
+  // 公開パス (/login 自体や招待リンク) はそのまま開かせる。ここから更に
+  // /login へ飛ばすと、削除がブラウザに効かなかった時にリダイレクトが
+  // 無限ループになる。
+  if (authCookieUnreadable) {
+    response = clearAuthCookies(request, response);
+    if (!isPublic) {
+      const url = loginUrl(request, pathname);
+      url.searchParams.set(
+        "error",
+        "サインイン情報を読み取れませんでした。もう一度サインインしてください",
+      );
+      // これも「Cookie は届いていたが使えなかった」側。中身の破損は
+      // auth-session-trace.ts が言う cookie-unusable そのものなので、
+      // 期限切れ経路と同じ印で記録させる。ここで消してしまう以上、画面側から
+      // Cookie の有無を見ても判定できないのも同じ。
+      url.searchParams.set("reason", "stale-cookie");
+      return redirectPreservingCookies(response, url);
+    }
+  }
 
   if (!user && !isPublic && !isGuestPath) {
     return redirectPreservingCookies(response, loginUrl(request, pathname));
