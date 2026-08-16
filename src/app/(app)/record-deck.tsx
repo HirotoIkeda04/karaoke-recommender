@@ -23,6 +23,7 @@ import {
   useEffect,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react";
 
 import { DumbbellMini } from "@/components/icons/dumbbell-mini";
@@ -252,6 +253,12 @@ function previousPositionOf(
   return { group: position.group - 1, song: prev.length - 1 };
 }
 
+/** document.hidden の購読 (useSyncExternalStore 用。参照を固定するため外に置く) */
+function subscribeVisibility(onChange: () => void): () => void {
+  document.addEventListener("visibilitychange", onChange);
+  return () => document.removeEventListener("visibilitychange", onChange);
+}
+
 /**
  * 直前のユーザー操作。戻るボタンで取り消すために保持する。
  * rating が null の場合はナビゲーションのみ (組スキップ) で、
@@ -338,6 +345,16 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   // 詳細表示で 30 秒を流し切った曲の id。曲を替えれば自動的に外れるので、
   // 「今の曲が流し終わったか」は下で id を突き合わせて導出する。
   const [detailPlayedOut, setDetailPlayedOut] = useState<string | null>(null);
+  // タブ / アプリがバックグラウンドに回っているか。この間は試聴だけでなく
+  // 尺のタイマーも止める。裏で数え続けると、戻ってきた時に見ていない曲が
+  // 何曲も送られた後になってしまう。裏のタブで開かれた場合は最初の
+  // visibilitychange が「表に出た時」まで来ないので、初期値も document から
+  // 直接読む (サーバーでは常に false = 表示中として描く)。
+  const backgrounded = useSyncExternalStore(
+    subscribeVisibility,
+    () => document.hidden,
+    () => false,
+  );
   // 進行中のスワイプの起点。pointerId で 1 本目の指だけを追う。
   const swipeRef = useRef<{ id: number; x: number; y: number } | null>(null);
   // 試聴 ON/OFF (ユーザーの意思)。デフォルト ON。ON でも音源が無い曲は
@@ -649,13 +666,13 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const willPlayPreview =
     audioOn && !audioBlocked && Boolean(current?.itunes_preview_url);
   useEffect(() => {
-    if (!detail || !currentId || willPlayPreview) return;
+    if (!detail || !currentId || willPlayPreview || backgrounded) return;
     const timer = window.setTimeout(() => {
       setDetailPlayedOut(currentId);
       playersRef.current?.[activeRef.current].el.pause();
     }, DETAIL_PLAY_MS);
     return () => window.clearTimeout(timer);
-  }, [detail, currentId, willPlayPreview]);
+  }, [detail, currentId, willPlayPreview, backgrounded]);
 
   // 似た音域の楽曲。詳細を開いている曲のぶんだけ取りに行き、曲 id で
   // キャッシュする (曲送りで開き直しても取り直さない)。
@@ -701,6 +718,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   // バックグラウンドでは試聴を止める。Android は放置すると裏で音が流れ
   // 続け、iOS は OS に止められた後で無音のままになるため、復帰時は
   // 現在の曲を頭から再生し直す (回転は次の周回で自然に再同期する)。
+  // 曲送りの方は backgrounded を見るスニペットのタイマー側で止まる。
   useEffect(() => {
     const onVisibility = () => {
       const players = playersRef.current;
@@ -774,12 +792,16 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   // たびに音を頭出しする必要があった。タイマーに移したことで回転は見た目
   // だけの存在になり、角度が何度であっても音の連続性に影響しない。
   // フル尺モード (詳細表示 / 楽曲シート) の間は張らない = 自動送りも止まる。
+  // バックグラウンドの間も同様に張らない。裏でも数え続けると、他のアプリを
+  // 触っている間にデッキだけが進み (Android では次の曲の再生まで始まり)、
+  // 戻ってきた時に聴いていない曲が評価対象から流れてしまう。復帰時はここが
+  // 張り直されるので、その曲の 10 秒はまた頭から数え直しになる。
   // 同じタイマーで、尺の終わり CROSSFADE_AUTO_MS 前に次の曲を重ね始める
   // (表示が切り替わる前に次の曲が鳴り始めるのがクロスフェード)。次の曲の
   // 読み込みはその手前で済ませておく。開始を CROSSFADE_AUTO_MS + 0.5 秒に
   // しているのは、現在の曲の取得 (実測 1 秒弱) と重ねないため。
   useEffect(() => {
-    if (fullPlayback || !current) return;
+    if (fullPlayback || backgrounded || !current) return;
     const next = nextSongOf(groups, position);
     const prefetchTimer = window.setTimeout(
       () => prefetchSong(next),
@@ -796,6 +818,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     };
   }, [
     fullPlayback,
+    backgrounded,
     current,
     position,
     groups,
