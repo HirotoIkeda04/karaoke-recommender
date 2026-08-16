@@ -143,6 +143,10 @@ export async function updateSession(
       "error",
       "セッションの有効期限が切れました。もう一度サインインしてください",
     );
+    // 「Cookie は届いていたが使えなかった」ことをログイン画面へ伝える。
+    // ここを通る時点で auth-js が削除 Cookie を積んでいるので、画面側から
+    // Cookie の有無を見ても判定できない (src/lib/auth-session-trace.ts)。
+    url.searchParams.set("reason", "stale-cookie");
     return redirectPreservingCookies(response, url);
   }
 

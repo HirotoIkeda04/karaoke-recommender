@@ -3,6 +3,8 @@
 import { LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { clearSignedInMark } from "@/lib/auth-session-trace";
+
 export function SignOutButton() {
   const [open, setOpen] = useState(false);
 
@@ -54,7 +56,14 @@ export function SignOutButton() {
               >
                 キャンセル
               </button>
-              <form action="/auth/signout" method="post" className="flex-1">
+              {/* 自分でログアウトした時は「意図しないログアウト」の印を
+                  消しておく (残すと次にゲストで開いた時に誤検出する) */}
+              <form
+                action="/auth/signout"
+                method="post"
+                className="flex-1"
+                onSubmit={clearSignedInMark}
+              >
                 <button
                   type="submit"
                   className="w-full rounded-full bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700 active:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 dark:active:bg-red-600"

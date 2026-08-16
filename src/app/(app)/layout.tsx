@@ -1,5 +1,6 @@
 import { AppHeader } from "@/components/app-header";
 import { AppBottomNav } from "@/components/app-bottom-nav";
+import { AuthDropNotice } from "@/components/auth-drop-notice";
 import { DeckDetailProvider } from "@/components/deck-detail-context";
 import { GuestRatingsImporter } from "@/components/guest-ratings-importer";
 import { InAppBrowserGate } from "@/components/in-app-browser-gate";
@@ -28,6 +29,8 @@ export default async function AppLayout({
     <SessionProvider isGuest={isGuest}>
       {/* ゲスト中に付けた評価が localStorage に残っていたら DB へ移す */}
       <GuestRatingsImporter />
+      {/* 意図しないログアウトに気づけるようにする (黙ってゲストに落ちない) */}
+      <AuthDropNotice />
       {/* LINE 等のアプリ内ブラウザなら、まず外部ブラウザへの導線を出す */}
       <InAppBrowserGate />
       {/* min-h-dvh: 動的ビューポート高 (iOS Safari の URL バー伸縮に追従、

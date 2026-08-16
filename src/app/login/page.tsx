@@ -1,7 +1,8 @@
 import { GoogleLoginButton } from "./google-login-button";
+import { SessionDropDetail } from "./session-drop-detail";
 
 interface LoginPageProps {
-  searchParams: Promise<{ next?: string; error?: string }>;
+  searchParams: Promise<{ next?: string; error?: string; reason?: string }>;
 }
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
@@ -26,6 +27,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             {decodeURIComponent(error)}
           </div>
         ) : null}
+
+        <SessionDropDetail reason={params.reason} />
 
         <GoogleLoginButton next={next} />
 
