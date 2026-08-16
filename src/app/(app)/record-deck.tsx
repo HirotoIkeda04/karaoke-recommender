@@ -88,6 +88,16 @@ const ROTATION_MS = 10000;
 const CROSSFADE_AUTO_MS = 2000;
 
 /**
+ * 評価した瞬間に試聴を絞る量と時間 (サイドチェイン)。評価音は試聴より
+ * ずっと小さいので、そのままだと音楽に埋もれて聞こえない。押した直後だけ
+ * 試聴を下げ、評価音が鳴り終わる頃に戻す。
+ */
+const DUCK_LEVEL = 0.25;
+const DUCK_ATTACK_S = 0.06;
+const DUCK_HOLD_S = 0.22;
+const DUCK_RELEASE_S = 0.45;
+
+/**
  * 評価 / スキップ / 戻る で送った時のクロスフェード長 (ms)。タップへの
  * 反応なので自動送りより短くする (長いと操作が重く感じる)。曲の頭出しや
  * 消音解除のフェードインにもこの長さを使う。
@@ -459,6 +469,9 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   // 捨てると、次の曲から鳴らなくなる)。
   const playersRef = useRef<SnippetPlayer[] | null>(null);
   const activeRef = useRef(0);
+  // 2 台の後ろに置く共通の音量。評価時の一瞬の絞り込みはここだけ動かすので、
+  // 各プレイヤーのクロスフェード (個別 gain) と干渉しない。
+  const masterGainRef = useRef<GainNode | null>(null);
   // 2 台とも一度はユーザー操作の文脈で play() したか (iOS のアンロック)。
   const unlockedRef = useRef(false);
   // 現役プレイヤーに載っている曲 id。タップ起点の再生と曲送り effect の
@@ -535,6 +548,16 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const ensurePlayers = useCallback((): SnippetPlayer[] => {
     if (playersRef.current) return playersRef.current;
     const ctx = getAudioContext();
+    let master: GainNode | null = null;
+    if (ctx) {
+      try {
+        master = ctx.createGain();
+        master.connect(ctx.destination);
+      } catch {
+        master = null;
+      }
+    }
+    masterGainRef.current = master;
     const create = (): SnippetPlayer => {
       const el = new Audio();
       el.preload = "auto";
@@ -548,7 +571,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           ctx
             .createMediaElementSource(el)
             .connect(gain)
-            .connect(ctx.destination);
+            .connect(master ?? ctx.destination);
         } catch {
           // Web Audio が使えない環境は要素の volume にフォールバックする
           // (= iOS Safari 以外ではフェード無しの切り替えになる)
@@ -588,6 +611,25 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     },
     [],
   );
+
+  /**
+   * 評価音を聞かせるために試聴を一瞬だけ絞る。グラフを通せない環境
+   * (Web Audio 無し) では何もしない。要素の volume は iOS で動かせず、
+   * 絞ったまま戻らない事故の方が高くつく。
+   */
+  const duckPreview = useCallback(() => {
+    const ctx = getAudioContext();
+    const master = masterGainRef.current;
+    if (!ctx || !master) return;
+    const now = ctx.currentTime;
+    const g = master.gain;
+    const holdUntil = now + DUCK_ATTACK_S + DUCK_HOLD_S;
+    g.cancelScheduledValues(now);
+    g.setValueAtTime(g.value, now);
+    g.linearRampToValueAtTime(DUCK_LEVEL, now + DUCK_ATTACK_S);
+    g.setValueAtTime(DUCK_LEVEL, holdUntil);
+    g.linearRampToValueAtTime(1, holdUntil + DUCK_RELEASE_S);
+  }, []);
 
   /** 今の再生が実際に聞こえる状態か (グラフ経由なら context 次第) */
   const markPlaybackStarted = useCallback((player: SnippetPlayer) => {
@@ -936,6 +978,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     if (!current) return;
     triggerHaptic();
     triggerRatingSound(rating);
+    duckPreview();
     // 押したボタンの中心から火花を飛ばす。塗りはこの間に描かれる。
     const spec = RATINGS.find((r) => r.value === rating);
     if (button && spec) {
