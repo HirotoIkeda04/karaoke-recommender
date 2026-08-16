@@ -230,6 +230,31 @@
     U+FF00-FFEF;
 }
 
+/* 評価ボタンの塗り。太いペンの線を上から順に伸ばして中を埋める。
+   dasharray の 2 つ目 (間隔) を長く取り、待機時の dashoffset を 1 より
+   大きくしてあるのは、破線の切れ目に丸い線端が乗って点として見えるのを
+   避けるため (offset = 1 ちょうどだと端点が線の上に来る)。 */
+.rating-ink {
+  stroke-dasharray: 1 6;
+  stroke-dashoffset: 1.3;
+  transition: stroke-dashoffset 0.26s ease-out;
+}
+.rating-ink[data-filled] {
+  stroke-dashoffset: 0;
+}
+
+/* 記号は塗りが乗ってから白 (黄だけ濃茶) へ切り替える */
+.rating-glyph {
+  transition: color 0.22s ease 0.1s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rating-ink,
+  .rating-glyph {
+    transition-duration: 0.01ms;
+  }
+}
+
 /* ホームのレコード盤回転。1 周 = 1 曲の表示時間で、record-deck.tsx が
    animationiteration イベントを使って周回ごとに次の曲へ送る。 */
 @keyframes record-spin {

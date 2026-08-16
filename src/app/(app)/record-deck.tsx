@@ -41,7 +41,9 @@ import {
 import { readGuestRatings } from "@/lib/guest-ratings";
 import { filterUnratedGroups, shuffleGroups } from "@/lib/guest-songs";
 import { triggerHaptic } from "@/lib/haptics";
+import { buildMarkerFill, type MarkerFill } from "@/lib/marker-fill";
 import { formatDuration, midiToKaraoke, noteChipColor } from "@/lib/note";
+import { emitSparks } from "@/lib/rating-particles";
 import { triggerRatingSound } from "@/lib/rating-sound";
 import type { SimilarSong } from "@/lib/similar-songs";
 import type { Database } from "@/types/database";
@@ -276,37 +278,119 @@ const RATINGS: ReadonlyArray<{
   value: Rating;
   label: string;
   Icon: typeof X;
-  color: string;
+  /** 枠線・記号・塗り・火花に共通で使う評価色 (濃淡 3 段) */
+  hue: string;
+  light: string;
+  dark: string;
+  /** 塗り終わりの記号色。黄だけ白では読めないので濃茶にする */
+  onGlyph: string;
+  /** 「太いペンで塗った」塗りつぶし。評価ごとに固定 (毎回同じ跡になる) */
+  fill: MarkerFill;
 }> = [
   {
     value: "hard",
     label: "苦手",
     Icon: X,
-    color:
-      "bg-[linear-gradient(135deg,#f87171_0%,#ef4444_28%,#ef4444_72%,#b91c1c_100%)] hover:brightness-110 active:brightness-95",
+    hue: "#ef4444",
+    light: "#f87171",
+    dark: "#b91c1c",
+    onGlyph: "#fff",
+    fill: buildMarkerFill("hard"),
   },
   {
     value: "medium",
     label: "普通",
     Icon: Minus,
-    color:
-      "bg-[linear-gradient(135deg,#fcd34d_0%,#eab308_28%,#eab308_72%,#a16207_100%)] hover:brightness-110 active:brightness-95",
+    hue: "#eab308",
+    light: "#fcd34d",
+    dark: "#a16207",
+    onGlyph: "#3f2d05",
+    fill: buildMarkerFill("medium"),
   },
   {
     value: "easy",
     label: "得意",
     Icon: Check,
-    color:
-      "bg-[linear-gradient(135deg,#34d399_0%,#10b981_28%,#10b981_72%,#047857_100%)] hover:brightness-110 active:brightness-95",
+    hue: "#10b981",
+    light: "#34d399",
+    dark: "#047857",
+    onGlyph: "#fff",
+    fill: buildMarkerFill("easy"),
   },
   {
     value: "practicing",
     label: "練習中",
     Icon: DumbbellMini,
-    color:
-      "bg-[linear-gradient(135deg,#c084fc_0%,#a855f7_28%,#a855f7_72%,#7e22ce_100%)] hover:brightness-110 active:brightness-95",
+    hue: "#a855f7",
+    light: "#c084fc",
+    dark: "#7e22ce",
+    onGlyph: "#fff",
+    fill: buildMarkerFill("practicing"),
   },
 ];
+
+/** 塗りを見せておく時間 (ms)。評価するとすぐ次の曲へ進むので、余韻の分だけ */
+const RATING_FLASH_MS = 900;
+
+/**
+ * 評価ボタン。押していない間は枠線だけで、押すと中が太いペンで塗られる。
+ * 塗りは上から順に 1 本ずつ、少し傾けて引く (marker-fill.ts)。
+ */
+function RatingKnob({
+  rating,
+  filled,
+}: {
+  rating: (typeof RATINGS)[number];
+  filled: boolean;
+}) {
+  const clipId = `rating-fill-${rating.value}`;
+  return (
+    <span className="relative block size-14">
+      <svg viewBox="0 0 56 56" className="block size-full" aria-hidden>
+        <defs>
+          <clipPath id={clipId}>
+            <path d={rating.fill.area} />
+          </clipPath>
+        </defs>
+        <g clipPath={`url(#${clipId})`} opacity={0.98}>
+          <g transform={`rotate(${rating.fill.tiltDeg} 28 28)`}>
+            {rating.fill.strokes.map((d, i) => (
+              <path
+                key={i}
+                className="rating-ink"
+                d={d}
+                pathLength={1}
+                stroke={rating.hue}
+                strokeWidth={rating.fill.penWidth}
+                strokeLinecap="round"
+                fill="none"
+                style={{ transitionDelay: `${i * 46}ms` }}
+                data-filled={filled ? "" : undefined}
+              />
+            ))}
+          </g>
+        </g>
+        <circle
+          cx="28"
+          cy="28"
+          r="25"
+          fill="none"
+          stroke={rating.hue}
+          strokeWidth="2"
+        />
+        {/* 記号は 24 単位の入れ子 SVG。幅高を明示しておく (省略すると
+            入れ子 SVG は親のビューポート全体に広がってしまう) */}
+        <g
+          transform="translate(16 16)"
+          className="rating-glyph"
+          style={{ color: filled ? rating.onGlyph : rating.hue }}
+        >
+          <rating.Icon width={24} height={24} />
+        </g>
+      </svg>
+    </span>
+  );
+}
 
 interface RecordDeckProps {
   /** 組 (同一アーティストの楽曲群) の配列。各組は [推薦シード, ...人気順] */
@@ -336,6 +420,8 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const [position, setPosition] = useState<DeckPosition>({ group: 0, song: 0 });
   const [lastAction, setLastAction] = useState<LastAction | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // 今しがた押された評価。押したボタンだけを一瞬塗り、余韻を過ぎたら戻す。
+  const [flashRating, setFlashRating] = useState<Rating | null>(null);
   const [shuffling, setShuffling] = useState(false);
   // 上スワイプで入る擬似的な楽曲詳細表示。組カルーセル / スキップ行 /
   // シャッフルを畳み、代わりに楽曲情報と歌詞ボタンを出す (下スワイプで戻る)。
@@ -846,10 +932,24 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     };
   });
 
-  const handleRate = (rating: Rating) => {
+  const handleRate = (rating: Rating, button?: HTMLElement) => {
     if (!current) return;
     triggerHaptic();
     triggerRatingSound(rating);
+    // 押したボタンの中心から火花を飛ばす。塗りはこの間に描かれる。
+    const spec = RATINGS.find((r) => r.value === rating);
+    if (button && spec) {
+      const box = button.getBoundingClientRect();
+      emitSparks(box.left + box.width / 2, box.top + 28, [
+        spec.light,
+        spec.hue,
+        spec.dark,
+      ]);
+    }
+    setFlashRating(rating);
+    window.setTimeout(() => {
+      setFlashRating((current) => (current === rating ? null : current));
+    }, RATING_FLASH_MS);
     setError(null);
     const action: LastAction = { position, song: current, rating };
     setLastAction(action);
@@ -1471,15 +1571,11 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
           <button
             key={r.value}
             type="button"
-            onClick={() => handleRate(r.value)}
-            className="flex flex-col items-center gap-1.5 transition"
+            onClick={(event) => handleRate(r.value, event.currentTarget)}
+            className="flex flex-col items-center gap-1.5 transition active:scale-95"
             aria-label={r.label}
           >
-            <span
-              className={`flex size-14 items-center justify-center rounded-full text-white shadow-sm transition ${r.color}`}
-            >
-              <r.Icon className="size-6" />
-            </span>
+            <RatingKnob rating={r} filled={flashRating === r.value} />
             <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
               {r.label}
             </span>
