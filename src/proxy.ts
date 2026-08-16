@@ -33,8 +33,6 @@ const GUEST_PATHS = [
   "/library", // ライブラリ (localStorage 由来)
 ] as const;
 
-const UNAUTHENTICATED_PATHS = [...PUBLIC_PATHS, ...GUEST_PATHS];
-
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -48,7 +46,10 @@ export async function proxy(request: NextRequest) {
     return new NextResponse(null, { status: 404 });
   }
 
-  return updateSession(request, UNAUTHENTICATED_PATHS);
+  return updateSession(request, {
+    publicPaths: PUBLIC_PATHS,
+    guestPaths: GUEST_PATHS,
+  });
 }
 
 export const config = {
