@@ -265,3 +265,42 @@
     transform: rotate(360deg);
   }
 }
+
+/* 詳細表示の音域表。紙に寄せるため、仕切りは細かい点線、ラベルは細字を
+   横に詰めて置く。CSS の dotted は点の大きさが線幅で決まって細かくできない
+   ので、1px の点を等間隔に並べた背景で描く。
+   このファイルの前半 (@font-face 群の直後) に置くとビルドで丸ごと落ちるため、
+   末尾に置いてある。 */
+.spec-rule {
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--color-zinc-200) 0 1px,
+    transparent 1px 3px
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  background-position: top left;
+}
+
+@media (prefers-color-scheme: dark) {
+  .spec-rule {
+    background-image: repeating-linear-gradient(
+      to right,
+      var(--color-zinc-700) 0 1px,
+      transparent 1px 3px
+    );
+  }
+}
+
+.spec-label {
+  font-weight: 200;
+  letter-spacing: -0.05em;
+}
+
+/* 日本語には縦長の書体が無いので、横方向は transform で詰める。
+   左端基準なので列の先頭は揃ったまま右側だけ縮む。 */
+.spec-label > span {
+  display: inline-block;
+  transform: scaleX(0.94);
+  transform-origin: left center;
+}

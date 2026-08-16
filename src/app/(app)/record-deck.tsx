@@ -43,6 +43,11 @@ import { readGuestRatings } from "@/lib/guest-ratings";
 import { filterUnratedGroups, shuffleGroups } from "@/lib/guest-songs";
 import { triggerHaptic } from "@/lib/haptics";
 import { buildMarkerFill, type MarkerFill } from "@/lib/marker-fill";
+import {
+  HIGHLIGHT_OPACITY,
+  HIGHLIGHT_TILT_DEG,
+  buildHighlight,
+} from "@/lib/marker-highlight";
 import { formatDuration, midiToKaraoke, noteChipColor } from "@/lib/note";
 import { emitSparks } from "@/lib/rating-particles";
 import { triggerRatingSound } from "@/lib/rating-sound";
@@ -1656,10 +1661,10 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                   transition={DETAIL_TRANSITION}
                   className="w-full overflow-hidden text-center"
                 >
-                  <dl className="mx-auto max-w-60 divide-y divide-zinc-200 rounded-xl bg-zinc-100 px-4 text-left text-sm dark:divide-zinc-700/60 dark:bg-zinc-800/60">
+                  <dl className="mx-auto max-w-60 bg-zinc-100 px-4 text-left text-sm dark:bg-zinc-800/60">
                     <div className="flex items-baseline py-2">
-                      <dt className="w-14 shrink-0 text-zinc-600 dark:text-zinc-400">
-                        地声
+                      <dt className="spec-label w-12 shrink-0 text-zinc-600 dark:text-zinc-400">
+                        <span>地声</span>
                       </dt>
                       <dd className="font-mono">
                         {current.range_low_midi == null &&
@@ -1674,19 +1679,19 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                         )}
                       </dd>
                     </div>
-                    <div className="flex items-baseline py-2">
-                      <dt className="w-14 shrink-0 text-zinc-600 dark:text-zinc-400">
-                        裏声
+                    <div className="spec-rule flex items-baseline py-2">
+                      <dt className="spec-label w-12 shrink-0 text-zinc-600 dark:text-zinc-400">
+                        <span>裏声</span>
                       </dt>
                       <dd className="font-mono">
                         <ColoredNote midi={current.falsetto_max_midi} />
                       </dd>
                     </div>
-                    <div className="flex items-baseline py-2">
-                      <dt className="w-14 shrink-0 text-zinc-600 dark:text-zinc-400">
-                        長さ
+                    <div className="spec-rule flex items-baseline py-2">
+                      <dt className="spec-label w-12 shrink-0 text-zinc-600 dark:text-zinc-400">
+                        <span>長さ</span>
                       </dt>
-                      <dd className="font-mono">
+                      <dd className="font-mono font-medium">
                         {formatDuration(current.duration_ms) || "—"}
                       </dd>
                     </div>
@@ -1861,12 +1866,77 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   );
 }
 
-/** 音域ノートを高さ由来の色で表示する。null は無印 "—" (楽曲ページと同じ)。 */
+/**
+ * 音域ノートを、高さ由来の色のマーカーで引いた形で表示する。
+ * null は無印 "—" (楽曲ページと同じ)。
+ *
+ * 帯は文字幅に合わせて組むので、描く前に一度実測する。書体が後から
+ * 差し替わっても追従するよう ResizeObserver で見張る。
+ */
 function ColoredNote({ midi }: { midi: number | null | undefined }) {
+  const textRef = useRef<HTMLSpanElement>(null);
+  const [box, setBox] = useState<{ w: number; h: number } | null>(null);
+
+  useEffect(() => {
+    const el = textRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const measure = () => {
+      const w = el.offsetWidth;
+      const h = el.offsetHeight;
+      if (w > 0 && h > 0) {
+        setBox((prev) => (prev?.w === w && prev?.h === h ? prev : { w, h }));
+      }
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [midi]);
+
   if (midi == null) return <>—</>;
+
+  const label = midiToKaraoke(midi);
+  const { background, foreground } = noteChipColor(midi);
+  const mark = box ? buildHighlight(label, box.w, box.h) : null;
+
   return (
-    <span style={{ color: noteChipColor(midi).background }}>
-      {midiToKaraoke(midi)}
+    <span className="relative inline-block">
+      {mark ? (
+        <svg
+          width={mark.width}
+          height={mark.height}
+          viewBox={`0 0 ${mark.width} ${mark.height}`}
+          className="pointer-events-none absolute"
+          style={{
+            left: mark.offset,
+            top: mark.offset,
+            opacity: HIGHLIGHT_OPACITY,
+            // 乗算を紙面まで巻き込ませない (重なった帯だけを濃くする)
+            isolation: "isolate",
+          }}
+          aria-hidden
+        >
+          <g
+            transform={`rotate(${HIGHLIGHT_TILT_DEG} ${mark.width / 2} ${mark.height / 2})`}
+          >
+            {mark.paths.map((d, i) => (
+              <path
+                key={i}
+                d={d}
+                fill={background}
+                style={i === 1 ? { mixBlendMode: "multiply" } : undefined}
+              />
+            ))}
+          </g>
+        </svg>
+      ) : null}
+      <span
+        ref={textRef}
+        className="relative px-0.5"
+        style={{ color: mark ? foreground : background }}
+      >
+        {label}
+      </span>
     </span>
   );
 }
