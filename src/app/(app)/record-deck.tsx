@@ -21,6 +21,7 @@ import {
   startTransition,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   useSyncExternalStore,
@@ -343,6 +344,52 @@ const RATINGS: ReadonlyArray<{
 const RATING_FLASH_MS = 900;
 
 /**
+ * 塗りの層。太いペンの線を上から順に伸ばし、塗ってよい範囲で切る。
+ * 枠線を持つボタン (評価 / スキップ / 戻る) で共有する。
+ */
+function MarkerInk({
+  fill,
+  filled,
+  clipId,
+  color,
+}: {
+  fill: MarkerFill;
+  filled: boolean;
+  clipId: string;
+  color: string;
+}) {
+  return (
+    <>
+      <defs>
+        <clipPath id={clipId}>
+          <path d={fill.area} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${clipId})`} opacity={0.98}>
+        <g
+          transform={`rotate(${fill.tiltDeg} ${fill.width / 2} ${fill.height / 2})`}
+        >
+          {fill.strokes.map((d, i) => (
+            <path
+              key={i}
+              className="rating-ink"
+              d={d}
+              pathLength={1}
+              stroke={color}
+              strokeWidth={fill.penWidth}
+              strokeLinecap="round"
+              fill="none"
+              style={{ transitionDelay: `${i * 46}ms` }}
+              data-filled={filled ? "" : undefined}
+            />
+          ))}
+        </g>
+      </g>
+    </>
+  );
+}
+
+/**
  * 評価ボタン。押していない間は枠線だけで、押すと中が太いペンで塗られる。
  * 塗りは上から順に 1 本ずつ、少し傾けて引く (marker-fill.ts)。
  */
@@ -353,33 +400,15 @@ function RatingKnob({
   rating: (typeof RATINGS)[number];
   filled: boolean;
 }) {
-  const clipId = `rating-fill-${rating.value}`;
   return (
     <span className="relative block size-14">
       <svg viewBox="0 0 56 56" className="block size-full" aria-hidden>
-        <defs>
-          <clipPath id={clipId}>
-            <path d={rating.fill.area} />
-          </clipPath>
-        </defs>
-        <g clipPath={`url(#${clipId})`} opacity={0.98}>
-          <g transform={`rotate(${rating.fill.tiltDeg} 28 28)`}>
-            {rating.fill.strokes.map((d, i) => (
-              <path
-                key={i}
-                className="rating-ink"
-                d={d}
-                pathLength={1}
-                stroke={rating.hue}
-                strokeWidth={rating.fill.penWidth}
-                strokeLinecap="round"
-                fill="none"
-                style={{ transitionDelay: `${i * 46}ms` }}
-                data-filled={filled ? "" : undefined}
-              />
-            ))}
-          </g>
-        </g>
+        <MarkerInk
+          fill={rating.fill}
+          filled={filled}
+          clipId={`rating-fill-${rating.value}`}
+          color={rating.hue}
+        />
         <circle
           cx="28"
           cy="28"
@@ -400,6 +429,70 @@ function RatingKnob({
       </svg>
     </span>
   );
+}
+
+/**
+ * スキップ / 戻る用の枠線と塗り。
+ *
+ * 色はラベルとは別にグレー (zinc-700) で持つ。評価ボタンが 4 色で主張する
+ * 行なので、ここは白ではなく暗い灰色に落として脇役に置く。塗りも同じ色に
+ * なるので、塗られている間はラベル側を明るく反転させる (呼び出し側)。
+ *
+ * ピル型は幅が端末で変わるため、呼び出し側が実寸を測って fill を組む。
+ */
+function MarkerSurface({
+  fill,
+  filled,
+  id,
+}: {
+  fill: MarkerFill | null;
+  filled: boolean;
+  id: string;
+}) {
+  if (!fill) return null;
+  const inset = 1;
+  return (
+    <svg
+      viewBox={`0 0 ${fill.width} ${fill.height}`}
+      preserveAspectRatio="none"
+      className="pointer-events-none absolute inset-0 size-full text-zinc-700"
+      aria-hidden
+    >
+      <MarkerInk
+        fill={fill}
+        filled={filled}
+        clipId={`action-fill-${id}`}
+        color="currentColor"
+      />
+      <rect
+        x={inset}
+        y={inset}
+        width={fill.width - inset * 2}
+        height={fill.height - inset * 2}
+        rx={(fill.height - inset * 2) / 2}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+    </svg>
+  );
+}
+
+/** 要素の実寸 (幅) を測る。2px 刻みに丸めて塗りの組み直しを抑える */
+function useElementWidth<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width ?? 0;
+      if (w > 0) setWidth(Math.round(w / 2) * 2);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return [ref, width] as const;
 }
 
 interface RecordDeckProps {
@@ -432,6 +525,12 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const [error, setError] = useState<string | null>(null);
   // 今しがた押された評価。押したボタンだけを一瞬塗り、余韻を過ぎたら戻す。
   const [flashRating, setFlashRating] = useState<Rating | null>(null);
+  // スキップ / 戻るも押した瞬間だけ塗る (粒は飛ばさない)
+  const [flashAction, setFlashAction] = useState<
+    "skip-song" | "skip-group" | "back" | null
+  >(null);
+  // ピル型 2 つは同じ幅なので、片方を測って両方に使う
+  const [skipRef, skipWidth] = useElementWidth<HTMLButtonElement>();
   const [shuffling, setShuffling] = useState(false);
   // 上スワイプで入る擬似的な楽曲詳細表示。組カルーセル / スキップ行 /
   // シャッフルを畳み、代わりに楽曲情報と歌詞ボタンを出す (下スワイプで戻る)。
@@ -492,6 +591,35 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const current = group?.[position.song];
   // 戻るボタンの行き先。デッキの先頭にいる時だけ null (= 押せない)。
   const previousPosition = previousPositionOf(groups, position);
+
+  // スキップ / 戻るの塗り。幅が確定するまでは枠も塗りも出さない
+  // (0 幅で組むと形が壊れるため)。高さは 3.5rem 固定。
+  const skipSongFill = useMemo(
+    () =>
+      skipWidth > 0
+        ? buildMarkerFill("skip-song", { width: skipWidth, height: 56 })
+        : null,
+    [skipWidth],
+  );
+  const skipGroupFill = useMemo(
+    () =>
+      skipWidth > 0
+        ? buildMarkerFill("skip-group", { width: skipWidth, height: 56 })
+        : null,
+    [skipWidth],
+  );
+  const backFill = useMemo(() => buildMarkerFill("back"), []);
+
+  /** スキップ / 戻るの塗りを一瞬だけ見せる */
+  const flashActionButton = useCallback(
+    (key: "skip-song" | "skip-group" | "back") => {
+      setFlashAction(key);
+      window.setTimeout(() => {
+        setFlashAction((now) => (now === key ? null : now));
+      }, RATING_FLASH_MS);
+    },
+    [],
+  );
 
   // アーティスト名の枕は「1 枚目のレコード」の代表色の反対色。組が
   // 変わると 1 枚目も変わるので、組の先頭曲のジャケットから引く。
@@ -1010,6 +1138,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const handleSkipSong = () => {
     if (!current) return;
     triggerHaptic();
+    flashActionButton("skip-song");
     setError(null);
     const action: LastAction = { position, song: current, rating: "skip" };
     setLastAction(action);
@@ -1028,6 +1157,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const handleSkipGroup = () => {
     if (!current) return;
     triggerHaptic();
+    flashActionButton("skip-group");
     setError(null);
     setLastAction({ position, song: current, rating: null });
     setPosition({ group: position.group + 1, song: 0 });
@@ -1077,6 +1207,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   const handleBack = () => {
     if (lastAction) {
       triggerHaptic();
+      flashActionButton("back");
       setError(null);
       const { position: prevPosition, song, rating } = lastAction;
       setLastAction(null);
@@ -1092,6 +1223,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
     }
     if (!previousPosition) return;
     triggerHaptic();
+    flashActionButton("back");
     setError(null);
     // 連打で 2 曲飛ばないよう、行き先はレンダー時の値ではなく
     // 更新時点の位置から引き直す。
@@ -1664,33 +1796,64 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         className="w-full overflow-hidden"
       >
         <div className="grid w-full grid-cols-[1fr_1fr_3.5rem] items-center gap-3">
+          {/* 枠線と塗りは currentColor なので、ボタンの文字色がそのまま
+              乗る。塗られている間だけ中身を地の色へ反転させる。 */}
           <button
+            ref={skipRef}
             type="button"
             onClick={handleSkipSong}
-            className="relative flex h-14 items-center justify-center gap-1.5 rounded-full text-sm font-medium text-zinc-700 transition active:brightness-90 dark:text-zinc-100"
+            className="relative flex h-14 items-center justify-center gap-1.5 rounded-full text-sm font-medium text-zinc-800 transition active:scale-95 dark:text-zinc-300"
           >
-            <GlassSurface variant="control" />
-            <SkipForward className="relative size-4" aria-hidden />
-            <span className="relative">1曲スキップ</span>
+            <MarkerSurface
+              fill={skipSongFill}
+              filled={flashAction === "skip-song"}
+              id="skip-song"
+            />
+            <span
+              className={`relative flex items-center gap-1.5 transition-colors duration-200 ${
+                flashAction === "skip-song" ? "text-zinc-50" : ""
+              }`}
+            >
+              <SkipForward className="size-4" aria-hidden />
+              1曲スキップ
+            </span>
           </button>
           <button
             type="button"
             onClick={handleSkipGroup}
-            className="relative flex h-14 items-center justify-center gap-1.5 rounded-full text-sm font-medium text-zinc-700 transition active:brightness-90 dark:text-zinc-100"
+            className="relative flex h-14 items-center justify-center gap-1.5 rounded-full text-sm font-medium text-zinc-800 transition active:scale-95 dark:text-zinc-300"
           >
-            <GlassSurface variant="control" />
-            <FastForward className="relative size-4" aria-hidden />
-            <span className="relative">次の組へ</span>
+            <MarkerSurface
+              fill={skipGroupFill}
+              filled={flashAction === "skip-group"}
+              id="skip-group"
+            />
+            <span
+              className={`relative flex items-center gap-1.5 transition-colors duration-200 ${
+                flashAction === "skip-group" ? "text-zinc-50" : ""
+              }`}
+            >
+              <FastForward className="size-4" aria-hidden />
+              次の組へ
+            </span>
           </button>
           <button
             type="button"
             onClick={handleBack}
             disabled={!lastAction && !previousPosition}
-            className="relative mx-auto flex size-14 items-center justify-center rounded-full text-zinc-700 transition active:brightness-90 disabled:opacity-30 dark:text-zinc-100"
+            className="relative mx-auto flex size-14 items-center justify-center rounded-full text-zinc-800 transition active:scale-95 disabled:opacity-30 dark:text-zinc-300"
             aria-label="前の曲に戻る"
           >
-            <GlassSurface variant="control" />
-            <Undo2 className="relative size-5" />
+            <MarkerSurface
+              fill={backFill}
+              filled={flashAction === "back"}
+              id="back"
+            />
+            <Undo2
+              className={`relative size-5 transition-colors duration-200 ${
+                flashAction === "back" ? "text-zinc-50" : ""
+              }`}
+            />
           </button>
         </div>
       </motion.div>

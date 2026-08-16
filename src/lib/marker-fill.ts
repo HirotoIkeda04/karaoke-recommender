@@ -13,10 +13,8 @@
  * 4 つぶんをモジュール読み込み時に 1 度だけ組めば、以後の描画は静的。
  */
 
-/** ボタンの SVG 座標系 (56 x 56) と枠の半径 */
-const VIEW = 56;
-const CENTER = VIEW / 2;
-const RING_R = 25.5;
+/** 枠線の太さ。塗りは枠の内側に収める */
+const RING_STROKE = 2;
 
 /** ペンの太さ */
 const PEN = 12;
@@ -37,7 +35,13 @@ const STEP_RATIO = 0.88;
 /** 線を範囲より長く引いておく量 (切られる前提) */
 const OVERSHOOT = 3.5;
 
-export interface MarkerFill {
+export interface MarkerFillShape {
+  /** ボタンの実寸 (SVG の viewBox もこの値で書く) */
+  width: number;
+  height: number;
+}
+
+export interface MarkerFill extends MarkerFillShape {
   /** 塗ってよい範囲 (clipPath 用のパス) */
   area: string;
   /** 上から順に引く線。この順で少しずつ遅らせて描く */
@@ -89,50 +93,85 @@ function closedPath(pts: ReadonlyArray<[number, number]>): string {
   return d;
 }
 
-export function buildMarkerFill(key: string): MarkerFill {
-  const rand = rng(seedOf(key));
-  const gap = GAP_MIN + rand() * GAP_RANGE;
-  const rx = RING_R - gap;
-  // 縦は横よりごく僅かに小さいだけ (潰すと上下だけ余分に空く)
-  const ry = (RING_R - gap) * 0.99;
-  const cx = CENTER + (rand() - 0.5) * GAP_RANGE * 0.3;
-  const cy = CENTER + (rand() - 0.5) * GAP_RANGE * 0.3;
-
-  // 傾きは範囲の形にも焼き込む。clipPath は要素の transform より前の
-  // 座標系で効くので、ここで回しておかないと線とずれる。
-  const rad = (TILT_DEG * Math.PI) / 180;
-  const cos = Math.cos(rad);
-  const sin = Math.sin(rad);
+/**
+ * 角丸長方形の輪郭を等間隔でサンプルする。丸ボタン (w = h) なら円、
+ * ピル (w > h) なら両端が半円の形になる。inward は内側への押し込み量。
+ */
+function roundedRectPoints(
+  width: number,
+  height: number,
+  inset: number,
+  inward: (i: number) => number,
+  step = 6,
+): [number, number][] {
+  const r = Math.max(0, height / 2 - inset);
+  const left = inset + r;
+  const right = width - inset - r;
+  const cy = height / 2;
   const pts: [number, number][] = [];
-  for (let a = 0; a < 360; a += 18) {
-    const t = (a * Math.PI) / 180;
-    const wob = -rand() * WOBBLE;
-    const x = Math.cos(t) * (rx + wob);
-    const y = Math.sin(t) * (ry + wob);
-    pts.push([cx + x * cos - y * sin, cy + x * sin + y * cos]);
-  }
+  // 右の半円 → 上辺 (右→左) → 左の半円 → 下辺 (左→右) の順に一周する
+  const arc = (cx: number, from: number, to: number) => {
+    const steps = Math.max(4, Math.round((Math.abs(to - from) * r) / step));
+    for (let i = 0; i <= steps; i++) {
+      const a = from + ((to - from) * i) / steps;
+      const push = inward(pts.length);
+      pts.push([cx + Math.cos(a) * (r - push), cy + Math.sin(a) * (r - push)]);
+    }
+  };
+  const edge = (x1: number, x2: number, y: number, dir: 1 | -1) => {
+    const steps = Math.max(1, Math.round(Math.abs(x2 - x1) / step));
+    for (let i = 1; i < steps; i++) {
+      const x = x1 + ((x2 - x1) * i) / steps;
+      pts.push([x, y + dir * inward(pts.length)]);
+    }
+  };
+  arc(right, -Math.PI / 2, Math.PI / 2);
+  edge(right, left, height - inset, -1);
+  arc(left, Math.PI / 2, (Math.PI * 3) / 2);
+  edge(left, right, inset, 1);
+  return pts;
+}
 
+/**
+ * key ごとに決まった塗りを組む。丸ボタンは width = height = 56 が既定。
+ * スキップのようなピル型は実寸を渡す (幅は端末によって変わるので、
+ * 呼び出し側が測ってから渡す)。
+ */
+export function buildMarkerFill(
+  key: string,
+  shape: MarkerFillShape = { width: 56, height: 56 },
+): MarkerFill {
+  const { width, height } = shape;
+  const rand = rng(seedOf(key));
+  const gap = RING_STROKE / 2 + GAP_MIN + rand() * GAP_RANGE;
+  const jitters = Array.from({ length: 256 }, () => rand() * WOBBLE);
+
+  const area = closedPath(
+    roundedRectPoints(width, height, gap, (i) => jitters[i % jitters.length]),
+  );
+
+  // 線は水平に引いてから全体を傾けるので、長い線ほど端が上下へ逃げる。
+  // 逃げる量 (drift) のぶん上下に段を足しておかないと、幅の広いピルでは
+  // 左上と右下が三角に塗り残る。左右も同じ理由で伸ばしておく。
+  const rad = (TILT_DEG * Math.PI) / 180;
+  const drift = Math.abs(Math.tan(rad)) * (width / 2);
+  const lean = Math.abs(Math.tan(rad)) * height;
+  const top = gap - drift;
+  const bottom = height - gap + drift;
   const strokes: string[] = [];
   const step = PEN * STEP_RATIO;
-  const top = cy - ry - PEN * 0.4;
-  const bottom = cy + ry + PEN * 0.4;
-  for (let y = top; y <= bottom + 0.01; y += step) {
-    const t = (y - cy) / ry;
-    const half = rx * Math.sqrt(Math.max(0, 1 - Math.min(1, t * t)));
-    const left = cx - half - OVERSHOOT;
-    const right = cx + half + OVERSHOOT;
+  for (let y = top; y <= bottom + step; y += step) {
+    const yy = Math.min(y, bottom);
+    const left = -OVERSHOOT - lean;
+    const right = width + OVERSHOOT + lean;
     const bow = (rand() - 0.5) * 0.9;
-    const y1 = y + (rand() - 0.5) * 0.5;
-    const y2 = y + (rand() - 0.5) * 0.5;
+    const y1 = yy + (rand() - 0.5) * 0.5;
+    const y2 = yy + (rand() - 0.5) * 0.5;
     strokes.push(
-      `M ${f(left)} ${f(y1)} Q ${f(cx)} ${f(y + bow)} ${f(right)} ${f(y2)}`,
+      `M ${f(left)} ${f(y1)} Q ${f(width / 2)} ${f(yy + bow)} ${f(right)} ${f(y2)}`,
     );
+    if (yy >= bottom) break;
   }
 
-  return {
-    area: closedPath(pts),
-    strokes,
-    penWidth: PEN,
-    tiltDeg: TILT_DEG,
-  };
+  return { area, strokes, penWidth: PEN, tiltDeg: TILT_DEG, width, height };
 }
