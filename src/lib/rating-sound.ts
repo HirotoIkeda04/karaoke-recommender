@@ -1,12 +1,17 @@
-import { getAudioContext, resumeAudioContext } from "@/lib/audio-context";
 import type { Database } from "@/types/database";
 
 type Rating = Database["public"]["Enums"]["rating_type"];
 
 // Web Audio で「練習中」音 (Cmaj7 ハープ + 低域ドン + 高域シマー) を
 // ベースに、4 つの評価ボタンで和音 voicing と細部だけ変えて A/B 比較
-// できるようにする。AudioContext は試聴のクロスフェードと共有する
-// (audio-context.ts)。
+// できるようにする。
+//
+// AudioContext はこのファイル専用に持ち、試聴のクロスフェード
+// (audio-context.ts) とは共有しない。共有すると、デッキのマウント時
+// (= ユーザー操作の外) に context が作られて suspended で始まるため、
+// タップ内で鳴らそうとしても resume が非同期に間に合わず無音になる。
+// ここで作れば必ずタップの文脈なので、生成直後から鳴る。
+let audioCtx: AudioContext | null = null;
 
 function playLowThump(
   ctx: AudioContext,
@@ -52,10 +57,31 @@ function playPartial(
 
 export function triggerRatingSound(rating: Rating) {
   if (typeof window === "undefined") return;
-  const ctx = getAudioContext();
-  if (!ctx) return;
+  const Ctor =
+    window.AudioContext ??
+    (window as unknown as { webkitAudioContext?: typeof AudioContext })
+      .webkitAudioContext;
+  if (!Ctor) return;
   try {
-    resumeAudioContext();
+    if (!audioCtx) audioCtx = new Ctor();
+    const ctx = audioCtx;
+    if (ctx.state === "suspended") {
+      // 再開を待ってから鳴らす。suspended のまま予約すると、resume 完了時
+      // には予約時刻を過ぎていて音が捨てられる。
+      void ctx.resume().then(
+        () => schedule(ctx, rating),
+        () => {},
+      );
+      return;
+    }
+    schedule(ctx, rating);
+  } catch {
+    // 音が出せなくても評価操作自体は止めない。
+  }
+}
+
+function schedule(ctx: AudioContext, rating: Rating) {
+  try {
     const now = ctx.currentTime;
 
     // 共通: 低域ドン + 上にハープアルペジオのみ (高域シマー / ガラス音は廃止)。
