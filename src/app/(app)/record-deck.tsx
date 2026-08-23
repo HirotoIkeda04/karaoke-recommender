@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Check,
+  ChevronUp,
   Dices,
   FastForward,
   Minus,
@@ -121,14 +122,16 @@ const SILENT_WAV =
 /**
  * ディスク径。横幅いっぱい (左右 1.75rem マージン) を基本に、
  * 縦に収まらない小さい画面ではヘッダー + 組カルーセル + 曲名 +
- * ボタン群 + ナビの予約分 (約 29.25rem) を引いた残りへ縮める。上限 20rem。
+ * ボタン群 + ナビの予約分 (約 32.375rem) を引いた残りへ縮める。上限 20rem。
  * loading.tsx の skeleton と式を揃えること。
  * 内訳: pt-3 0.75 + 組カルーセル 3.5 + gap 1.5 + 曲名 1.75 + gap 1.5 +
- * (盤) + gap 1.5 + 評価 4.875 + gap 1.5 + スキップ行 3.5 + pb-2 0.5 から
- * 曲名行の -my-2 (1rem) を引いた 20.125rem に、ヘッダーと浮いたナビの実測 9.125rem を足した値。
+ * (盤) + gap 1.5 + 楽曲情報チップ 2.25 + gap 1.5 + 評価 4.875 + gap 1.5 +
+ * スキップ行 3.5 + pb-2 0.5 から、曲名行の -my-2 (1rem) と
+ * チップの -mt-2.5 (0.625rem) を引いた 23.25rem に、
+ * ヘッダーと浮いたナビの実測 9.125rem を足した値。
  */
 const DISC_SIZE =
-  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 29.25rem - env(safe-area-inset-bottom))))";
+  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.375rem - env(safe-area-inset-bottom))))";
 
 /**
  * 詳細表示 (上スワイプ) 中のディスク径。通常時に対して、組カルーセルの行が
@@ -194,6 +197,18 @@ const DETAIL_TRANSITION = {
   ease: "easeOut",
   opacity: { duration: 0.14 },
 } as const;
+
+/**
+ * チップ ⇄ 楽曲情報の中身の入れ替え。畳んだ姿と開いた姿は箱を共有して
+ * いるので、両方が同時に見えていると 1 行ぶんの高さに 3 行が潰れて
+ * 重なる。畳む側を先に消し切ってから開く側を出すことで、その重なりを
+ * 見せない (箱の変形自体は DETAIL_TRANSITION のまま一続き)。
+ */
+const SPEC_FACE_OUT = { ...DETAIL_TRANSITION, opacity: { duration: 0.1 } };
+const SPEC_FACE_IN = {
+  ...DETAIL_TRANSITION,
+  opacity: { duration: 0.12, delay: 0.12 },
+};
 
 /**
  * カルーセルの隣接ディスク間隔 (自身の幅に対する %)。
@@ -1327,6 +1342,13 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   // アーティスト名も混ぜる。
   const serviceSearchTerm = `${current.title} ${current.artist}`;
 
+  // 畳んだ楽曲情報 (チップ) に載せる数字があるか。音域も長さも無い曲では
+  // "— / —" が並ぶだけになるので、その時は文言に差し替える。
+  const hasSpec =
+    current.range_low_midi != null ||
+    current.range_high_midi != null ||
+    current.duration_ms != null;
+
   // overflow-clip: transform で外側に置いた隣のディスクが overflow-hidden だと
   // スクロール可能領域を作ってしまい、フォーカス移動等の scrollIntoView で
   // レイアウト全体が横にずれる。clip はスクロール自体を不可能にする。
@@ -1647,100 +1669,184 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
               })}
             </motion.div>
 
-            {/* 詳細表示でだけレコードの下に出る、シートと同じ楽曲情報。
-              外側の AnimatePresence は組が変わるたびに作り直されるので、
-              initial={false} で「組送りでは開閉アニメを再生しない」。
-              曲送りでは中身のテキストだけが差し替わる。 */}
-            <AnimatePresence initial={false}>
-              {detail ? (
-                <motion.div
-                  key="detail"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={DETAIL_TRANSITION}
-                  className="w-full overflow-hidden text-center"
+            {/* レコードの下の「楽曲情報」の面。通常時は評価ボタンの 2/3
+              (h-9) に畳んだチップ、詳細表示ではシートと同じ一覧に育つ。
+              畳んだ姿と開いた姿は layoutId で framer に同じ面として繋がせて
+              あるので、幅・高さ・角丸が一続きに動く。外側を包む高さの
+              アニメだけは CSS の流れに乗せてある (layout 投影だと下の
+              評価ボタン以降が動かず、面だけが伸びて重なるため)。
+              initial={false} なので、組送りで開閉アニメは再生されない。 */}
+            <motion.div
+              initial={false}
+              animate={{
+                // 通常時はチップ 1 行 (2.25rem) だけ見せ、サービスの行は
+                // 畳んで隠す。-0.625rem は親の gap-6 を 14px まで詰める分
+                // (盤とチップの間だけ、評価ボタン側の 24px より近づける)。
+                height: detail ? "auto" : "2.25rem",
+                marginTop: detail ? "0rem" : "-0.625rem",
+              }}
+              transition={DETAIL_TRANSITION}
+              className="relative flex w-full flex-col items-center overflow-hidden"
+            >
+              <AnimatePresence mode="popLayout" initial={false}>
+                {detail ? (
+                  <motion.div
+                    key="spec-panel"
+                    layoutId="deck-spec-surface"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1, transition: SPEC_FACE_IN }}
+                    exit={{ opacity: 0, transition: SPEC_FACE_OUT }}
+                    transition={DETAIL_TRANSITION}
+                    className="relative w-60 bg-zinc-100 px-4 text-left text-sm dark:bg-zinc-800/60"
+                  >
+                    {/* 一覧の意味 (dl) を壊さずタップで閉じられるよう、
+                        閉じるボタンは上に重ねる */}
+                    <button
+                      type="button"
+                      onClick={() => toggleDetail(false)}
+                      aria-label="楽曲詳細を閉じる"
+                      className="absolute inset-0 z-10"
+                    />
+                    <dl>
+                      <div className="flex items-baseline py-2">
+                        <dt className="spec-label w-12 shrink-0 text-zinc-600 dark:text-zinc-400">
+                          <span>地声</span>
+                        </dt>
+                        <dd className="font-mono">
+                          {current.range_low_midi == null &&
+                          current.range_high_midi == null ? (
+                            "—"
+                          ) : (
+                            <>
+                              <ColoredNote midi={current.range_low_midi} />
+                              {" — "}
+                              <ColoredNote midi={current.range_high_midi} />
+                            </>
+                          )}
+                        </dd>
+                      </div>
+                      <div className="spec-rule flex items-baseline py-2">
+                        <dt className="spec-label w-12 shrink-0 text-zinc-600 dark:text-zinc-400">
+                          <span>裏声</span>
+                        </dt>
+                        <dd className="font-mono">
+                          <ColoredNote midi={current.falsetto_max_midi} />
+                        </dd>
+                      </div>
+                      <div className="spec-rule flex items-baseline py-2">
+                        <dt className="spec-label w-12 shrink-0 text-zinc-600 dark:text-zinc-400">
+                          <span>長さ</span>
+                        </dt>
+                        <dd className="font-mono font-medium">
+                          {formatDuration(current.duration_ms) || "—"}
+                        </dd>
+                      </div>
+                    </dl>
+                  </motion.div>
+                ) : (
+                  <motion.button
+                    key="spec-chip"
+                    layoutId="deck-spec-surface"
+                    type="button"
+                    onClick={() => toggleDetail(true)}
+                    aria-label="楽曲詳細を開く"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1, transition: SPEC_FACE_IN }}
+                    exit={{ opacity: 0, transition: SPEC_FACE_OUT }}
+                    transition={DETAIL_TRANSITION}
+                    className="flex h-9 items-center gap-2 rounded-full bg-zinc-100/80 px-3 text-xs backdrop-blur-sm transition-colors active:bg-zinc-200/85 dark:bg-zinc-800/75 dark:active:bg-zinc-700/80"
+                  >
+                    {hasSpec ? (
+                      <>
+                        <span className="text-zinc-500 dark:text-zinc-400">
+                          地声
+                        </span>
+                        <span className="font-mono text-zinc-800 dark:text-zinc-100">
+                          {current.range_low_midi == null &&
+                          current.range_high_midi == null ? (
+                            "—"
+                          ) : (
+                            <>
+                              <ColoredNote midi={current.range_low_midi} />
+                              {" — "}
+                              <ColoredNote midi={current.range_high_midi} />
+                            </>
+                          )}
+                        </span>
+                        <span
+                          className="h-3.5 w-px bg-zinc-300 dark:bg-zinc-700"
+                          aria-hidden
+                        />
+                        <span className="font-mono font-medium text-zinc-800 dark:text-zinc-100">
+                          {formatDuration(current.duration_ms) || "—"}
+                        </span>
+                      </>
+                    ) : (
+                      // 音域も長さも無い曲では読むものが無いので、
+                      // 数字の代わりに何が開くのかだけを出す
+                      <span className="text-zinc-700 dark:text-zinc-200">
+                        楽曲詳細
+                      </span>
+                    )}
+                    <ChevronUp
+                      className="size-3.5 text-zinc-500 dark:text-zinc-400"
+                      aria-hidden
+                    />
+                  </motion.button>
+                )}
+              </AnimatePresence>
+
+              {/* 各サービスへの導線 (詳細表示のみ)。通常時は上の height で
+                  畳まれて見えないので、フォーカスも inert で止める。 */}
+              <motion.div
+                inert={!detail}
+                initial={false}
+                animate={{ opacity: detail ? 1 : 0 }}
+                transition={DETAIL_TRANSITION}
+                className="mt-2 flex flex-wrap items-center justify-center gap-1.5"
+              >
+                {/* sort=4 = 歌詞ネットの人気順。検索結果をいきなり
+                    人気順で開いて、目当ての曲を探す手間を省く */}
+                <Link
+                  href={`https://www.uta-net.com/search/?target=song&type=in&Keyword=${encodeURIComponent(current.title)}&sort=4`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="歌詞ネットで歌詞を見る"
+                  className={DETAIL_ACTION_CLASS}
                 >
-                  <dl className="mx-auto max-w-60 bg-zinc-100 px-4 text-left text-sm dark:bg-zinc-800/60">
-                    <div className="flex items-baseline py-2">
-                      <dt className="spec-label w-12 shrink-0 text-zinc-600 dark:text-zinc-400">
-                        <span>地声</span>
-                      </dt>
-                      <dd className="font-mono">
-                        {current.range_low_midi == null &&
-                        current.range_high_midi == null ? (
-                          "—"
-                        ) : (
-                          <>
-                            <ColoredNote midi={current.range_low_midi} />
-                            {" — "}
-                            <ColoredNote midi={current.range_high_midi} />
-                          </>
-                        )}
-                      </dd>
-                    </div>
-                    <div className="spec-rule flex items-baseline py-2">
-                      <dt className="spec-label w-12 shrink-0 text-zinc-600 dark:text-zinc-400">
-                        <span>裏声</span>
-                      </dt>
-                      <dd className="font-mono">
-                        <ColoredNote midi={current.falsetto_max_midi} />
-                      </dd>
-                    </div>
-                    <div className="spec-rule flex items-baseline py-2">
-                      <dt className="spec-label w-12 shrink-0 text-zinc-600 dark:text-zinc-400">
-                        <span>長さ</span>
-                      </dt>
-                      <dd className="font-mono font-medium">
-                        {formatDuration(current.duration_ms) || "—"}
-                      </dd>
-                    </div>
-                  </dl>
-                  <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5">
-                    {/* sort=4 = 歌詞ネットの人気順。検索結果をいきなり
-                          人気順で開いて、目当ての曲を探す手間を省く */}
-                    <Link
-                      href={`https://www.uta-net.com/search/?target=song&type=in&Keyword=${encodeURIComponent(current.title)}&sort=4`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="歌詞ネットで歌詞を見る"
-                      className={DETAIL_ACTION_CLASS}
-                    >
-                      <ScrollText className="size-4" aria-hidden />
-                      <span>歌詞を見る</span>
-                    </Link>
-                    {/* songs に Apple 側の id は持っていないので、曲名 +
-                          アーティストの検索で開く (Music アプリの universal
-                          link なので、iOS なら Music が直接立ち上がる) */}
-                    <Link
-                      href={`https://music.apple.com/jp/search?term=${encodeURIComponent(serviceSearchTerm)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="iTunes で聴く"
-                      className={DETAIL_ACTION_CLASS}
-                    >
-                      <Music className="size-4" aria-hidden />
-                      <span>iTunesで聴く</span>
-                    </Link>
-                    {/* track id があれば曲へ直接、無ければ検索へ逃がす */}
-                    <Link
-                      href={
-                        current.spotify_track_id
-                          ? `https://open.spotify.com/track/${current.spotify_track_id}`
-                          : `https://open.spotify.com/search/${encodeURIComponent(serviceSearchTerm)}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Spotify で聴く"
-                      className={DETAIL_ACTION_CLASS}
-                    >
-                      <Play className="size-3.5 fill-current" aria-hidden />
-                      <span>Spotifyで聴く</span>
-                    </Link>
-                  </div>
-                </motion.div>
-              ) : null}
-            </AnimatePresence>
+                  <ScrollText className="size-4" aria-hidden />
+                  <span>歌詞を見る</span>
+                </Link>
+                {/* songs に Apple 側の id は持っていないので、曲名 +
+                    アーティストの検索で開く (Music アプリの universal
+                    link なので、iOS なら Music が直接立ち上がる) */}
+                <Link
+                  href={`https://music.apple.com/jp/search?term=${encodeURIComponent(serviceSearchTerm)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="iTunes で聴く"
+                  className={DETAIL_ACTION_CLASS}
+                >
+                  <Music className="size-4" aria-hidden />
+                  <span>iTunesで聴く</span>
+                </Link>
+                {/* track id があれば曲へ直接、無ければ検索へ逃がす */}
+                <Link
+                  href={
+                    current.spotify_track_id
+                      ? `https://open.spotify.com/track/${current.spotify_track_id}`
+                      : `https://open.spotify.com/search/${encodeURIComponent(serviceSearchTerm)}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Spotify で聴く"
+                  className={DETAIL_ACTION_CLASS}
+                >
+                  <Play className="size-3.5 fill-current" aria-hidden />
+                  <span>Spotifyで聴く</span>
+                </Link>
+              </motion.div>
+            </motion.div>
           </motion.div>
         </AnimatePresence>
       </div>
