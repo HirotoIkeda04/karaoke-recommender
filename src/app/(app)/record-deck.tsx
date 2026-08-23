@@ -123,16 +123,17 @@ const SILENT_WAV =
 /**
  * ディスク径。横幅いっぱい (左右 1.75rem マージン) を基本に、
  * 縦に収まらない小さい画面ではヘッダー + 組カルーセル + 曲名 +
- * ボタン群 + ナビの予約分 (約 32.625rem) を引いた残りへ縮める。上限 20rem。
+ * ボタン群 + ナビの予約分 (約 31.625rem) を引いた残りへ縮める。上限 20rem。
  * loading.tsx の skeleton と式を揃えること。
  * 内訳: pt-3 0.75 + 組カルーセル 3.5 + gap 1.5 + 曲名 1.75 + gap 1.5 +
  * (盤) + gap 1.5 + 楽曲情報チップ 2 + gap 1.5 + 評価 4.875 + gap 1.5 +
- * スキップ行 3.5 + pb-2 0.5 から、曲名行の -my-2 (1rem) と
- * チップの -mt-2.5 (0.625rem) を引き、チップ下の mb-2 (0.5rem) を
- * 足した 23.5rem に、ヘッダーと浮いたナビの実測 9.125rem を足した値。
+ * スキップ行 3.5 から、曲名行の -my-2 (1rem) と チップの -mt-2.5
+ * (0.625rem) と スキップ行の -mt-2 (0.5rem) を引き、チップ下の mb-2
+ * (0.5rem) を足した 22.5rem に、
+ * ヘッダーと浮いたナビの実測 9.125rem を足した値。
  */
 const DISC_SIZE =
-  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.625rem - env(safe-area-inset-bottom))))";
+  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 31.625rem - env(safe-area-inset-bottom))))";
 
 /**
  * 詳細表示 (上スワイプ) 中のディスク径。通常時に対して、組カルーセルの行が
@@ -143,7 +144,7 @@ const DISC_SIZE =
  * 縦の狭い端末では盤を通常時より小さく畳んで全部を収めるため。
  */
 const DISC_SIZE_DETAIL =
-  "min(20rem, calc(100vw - 3.5rem), max(6rem, calc(100svh - 35.75rem - env(safe-area-inset-bottom))))";
+  "min(20rem, calc(100vw - 3.5rem), max(6rem, calc(100svh - 35.25rem - env(safe-area-inset-bottom))))";
 
 /**
  * 座布団の top (px)。サムネイル (56px) の下辺をまたいで貼り、
@@ -1357,7 +1358,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
   // レイアウト全体が横にずれる。clip はスクロール自体を不可能にする。
   return (
     <div
-      className="relative mx-auto flex max-w-md select-none flex-col items-center gap-6 overflow-clip px-4 pb-2 pt-3"
+      className="relative mx-auto flex max-w-md select-none flex-col items-center gap-6 overflow-clip px-4 pt-3"
       // 縦のパンをブラウザに渡さない (渡すと縦スワイプ中に pointercancel が
       // 飛んで判定が落ちる)。横パンとピンチズームはそのまま許可する。
       //
@@ -1686,9 +1687,9 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         initial={false}
         animate={{
           // 通常時はチップ 1 行 (2rem) だけ見せ、カードの中身は畳んで
-          // 隠す。マージンで親の gap-6 (24px) を上下に振り分け、盤側は
-          // 14px まで寄せて評価ボタン側は 32px 空ける。チップは盤に属する
-          // ものなので上に寄せ、下は評価ボタンと明確に切る。
+          // 隠す。マージンで親の gap-6 (1.5rem) を上下に振り分け、盤側は
+          // 0.875rem まで寄せて評価ボタン側は 2rem 空ける。チップは盤に
+          // 属するものなので上に寄せ、下は評価ボタンと明確に切る。
           height: detail ? "auto" : "2rem",
           marginTop: detail ? "0rem" : "-0.625rem",
           marginBottom: detail ? "0rem" : "0.5rem",
@@ -1940,13 +1941,15 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
       </AnimatePresence>
 
       {/* スキップ 2 種 (同サイズ) + 戻る。詳細表示では高さごと畳む
-          (marginTop で直前の gap-6 も相殺する) */}
+          (marginTop で直前の gap-6 も相殺する)。通常時も -0.5rem 詰めて、
+          評価ボタンとの間を 1rem にしている (下段のボタン 2 行は 1 かたまり
+          として読ませたいので、盤まわりより間を狭くする) */}
       <motion.div
         inert={detail}
         initial={false}
         animate={{
           height: detail ? "0rem" : "3.5rem",
-          marginTop: detail ? "-1.5rem" : "0rem",
+          marginTop: detail ? "-1.5rem" : "-0.5rem",
           opacity: detail ? 0 : 1,
         }}
         transition={DETAIL_TRANSITION}

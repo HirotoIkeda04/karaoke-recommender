@@ -9,7 +9,7 @@
 export default function Loading() {
   return (
     <div
-      className="mx-auto flex max-w-md flex-col items-center gap-6 overflow-hidden px-4 pb-2 pt-3"
+      className="mx-auto flex max-w-md flex-col items-center gap-6 overflow-hidden px-4 pt-3"
       role="status"
       aria-label="読み込み中"
     >
@@ -42,7 +42,7 @@ export default function Loading() {
         className="animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800"
         style={{
           width:
-            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.625rem - env(safe-area-inset-bottom))))",
+            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 31.625rem - env(safe-area-inset-bottom))))",
           aspectRatio: "1 / 1",
         }}
       />
@@ -60,8 +60,8 @@ export default function Loading() {
         ))}
       </div>
 
-      {/* スキップ 2 種 + 戻る */}
-      <div className="grid w-full grid-cols-[1fr_1fr_3.5rem] items-center gap-3">
+      {/* スキップ 2 種 + 戻る (-mt-2 は record-deck.tsx のスキップ行と対応) */}
+      <div className="-mt-2 grid w-full grid-cols-[1fr_1fr_3.5rem] items-center gap-3">
         <div className="h-14 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
         <div className="h-14 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
         <div className="mx-auto size-14 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
