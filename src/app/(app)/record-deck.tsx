@@ -7,8 +7,6 @@ import {
   Dices,
   FastForward,
   Minus,
-  Music,
-  Play,
   ScrollText,
   SkipForward,
   Undo2,
@@ -28,7 +26,10 @@ import {
   useSyncExternalStore,
 } from "react";
 
+import { AppleMusicMark } from "@/components/icons/apple-music-mark";
 import { DumbbellMini } from "@/components/icons/dumbbell-mini";
+import { ItunesMark } from "@/components/icons/itunes-mark";
+import { SpotifyMark } from "@/components/icons/spotify-mark";
 import { useDeckDetail } from "@/components/deck-detail-context";
 import { useIsGuest } from "@/components/session-provider";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -122,16 +123,16 @@ const SILENT_WAV =
 /**
  * ディスク径。横幅いっぱい (左右 1.75rem マージン) を基本に、
  * 縦に収まらない小さい画面ではヘッダー + 組カルーセル + 曲名 +
- * ボタン群 + ナビの予約分 (約 31.875rem) を引いた残りへ縮める。上限 20rem。
+ * ボタン群 + ナビの予約分 (約 32.625rem) を引いた残りへ縮める。上限 20rem。
  * loading.tsx の skeleton と式を揃えること。
  * 内訳: pt-3 0.75 + 組カルーセル 3.5 + gap 1.5 + 曲名 1.75 + gap 1.5 +
  * (盤) + gap 1.5 + 楽曲情報チップ 2 + gap 1.5 + 評価 4.875 + gap 1.5 +
  * スキップ行 3.5 + pb-2 0.5 から、曲名行の -my-2 (1rem) と
- * チップの上下マージン (0.875rem) を引いた 22.75rem に、
- * ヘッダーと浮いたナビの実測 9.125rem を足した値。
+ * チップの -mt-2.5 (0.625rem) を引き、チップ下の mb-2 (0.5rem) を
+ * 足した 23.5rem に、ヘッダーと浮いたナビの実測 9.125rem を足した値。
  */
 const DISC_SIZE =
-  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 31.875rem - env(safe-area-inset-bottom))))";
+  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.625rem - env(safe-area-inset-bottom))))";
 
 /**
  * 詳細表示 (上スワイプ) 中のディスク径。通常時に対して、組カルーセルの行が
@@ -170,12 +171,14 @@ const PILLOW_FONT = '"CondensedDisplay", "JapaneseDisplay", var(--font-sans)';
 
 /**
  * 詳細表示のアクションボタン (歌詞 / 各サービス) の共通スタイル。
- * 3 つを 375px 幅で 1 行に収めるため、パディングとアイコン間隔を詰めてある
- * (合計 329px + 間隔 12px < 内容幅 343px)。それより狭い端末では
- * flex-wrap で 2 行に折れて、その分だけ盤が縮む。
+ * カードの下に内容幅いっぱいで並ぶ。375px 幅で 1 行に収めるため、
+ * パディングとアイコン間隔を詰めてある (歌詞 96 + iTunes 110 +
+ * Spotify の丸 36 + Apple Music の丸 36 + 間隔 18 = 296px < 内容幅 343px)。
+ * whitespace-nowrap: 折り返さずボタンごと次の行へ送る (幅の足りない端末で
+ * 「歌詞を見/る」と 2 行に割れるのを防ぐ)。
  */
 const DETAIL_ACTION_CLASS =
-  "inline-flex h-9 items-center justify-center gap-1 rounded-full bg-zinc-100/80 px-2 text-xs font-medium text-zinc-700 backdrop-blur-sm transition hover:bg-zinc-200/85 active:bg-zinc-200/85 dark:bg-zinc-800/75 dark:text-zinc-200 dark:hover:bg-zinc-700/80 dark:active:bg-zinc-700/80";
+  "inline-flex h-9 shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-full bg-zinc-100/80 px-2 text-xs font-medium text-zinc-700 backdrop-blur-sm transition hover:bg-zinc-200/85 active:bg-zinc-200/85 dark:bg-zinc-800/75 dark:text-zinc-200 dark:hover:bg-zinc-700/80 dark:active:bg-zinc-700/80";
 
 /**
  * 詳細表示を切り替えるスワイプの最小縦移動量 (px)。評価ボタンのタップや
@@ -1682,13 +1685,13 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
       <motion.div
         initial={false}
         animate={{
-          // 通常時はチップ 1 行 (2rem) だけ見せ、サービスの行は畳んで
-          // 隠す。負のマージンは親の gap-6 (24px) を詰める分で、盤側は
-          // 14px まで寄せ、評価ボタン側は 20px 残す (チップは盤に属する
-          // ものなので、上に寄せて下を空ける)。
+          // 通常時はチップ 1 行 (2rem) だけ見せ、カードの中身は畳んで
+          // 隠す。マージンで親の gap-6 (24px) を上下に振り分け、盤側は
+          // 14px まで寄せて評価ボタン側は 32px 空ける。チップは盤に属する
+          // ものなので上に寄せ、下は評価ボタンと明確に切る。
           height: detail ? "auto" : "2rem",
           marginTop: detail ? "0rem" : "-0.625rem",
-          marginBottom: detail ? "0rem" : "-0.25rem",
+          marginBottom: detail ? "0rem" : "0.5rem",
         }}
         transition={DETAIL_TRANSITION}
         className="relative flex w-full flex-col items-center overflow-hidden"
@@ -1716,7 +1719,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                     className="relative w-60 bg-zinc-100 px-4 text-left text-sm dark:bg-zinc-800/60"
                   >
                     {/* 一覧の意味 (dl) を壊さずタップで閉じられるよう、
-                        閉じるボタンは上に重ねる */}
+                        閉じるボタンはカード全面に重ねる */}
                     <button
                       type="button"
                       onClick={() => toggleDetail(false)}
@@ -1770,16 +1773,14 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                     animate={{ opacity: 1, transition: SPEC_FACE_IN }}
                     exit={{ opacity: 0, transition: SPEC_FACE_OUT }}
                     transition={DETAIL_TRANSITION}
-                    className="flex h-8 items-center gap-2.5 rounded-full bg-zinc-100/80 px-3.5 text-sm backdrop-blur-sm transition-colors active:bg-zinc-200/85 dark:bg-zinc-800/75 dark:active:bg-zinc-700/80"
+                    className="flex h-8 items-center gap-2 rounded-full bg-zinc-200/80 px-3.5 text-xs backdrop-blur-sm transition-colors active:bg-zinc-300/85 dark:bg-zinc-900/80 dark:active:bg-zinc-800/85"
                   >
                     {hasSpec ? (
                       <>
-                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                          地声
-                        </span>
                         {/* 畳んでいる間は帯を引かず、音名そのものを高さ由来の
                             色で出す (小さい面にマーカーを載せると、色面が
-                            チップの地と喧嘩して字が読めなくなる) */}
+                            チップの地と喧嘩して字が読めなくなる)。
+                            「地声」の見出しは開いた先の一覧にあるので省く。 */}
                         <span className="font-mono font-medium">
                           {current.range_low_midi == null &&
                           current.range_high_midi == null ? (
@@ -1797,7 +1798,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                           )}
                         </span>
                         <span
-                          className="h-4 w-px bg-zinc-300 dark:bg-zinc-700"
+                          className="h-3.5 w-px bg-zinc-300 dark:bg-zinc-700"
                           aria-hidden
                         />
                         <span className="font-mono font-medium text-zinc-800 dark:text-zinc-100">
@@ -1812,15 +1813,16 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                       </span>
                     )}
                     <ChevronUp
-                      className="size-4 text-zinc-500 dark:text-zinc-400"
+                      className="size-3.5 text-zinc-500 dark:text-zinc-400"
                       aria-hidden
                     />
                   </motion.button>
                 )}
               </AnimatePresence>
 
-              {/* 各サービスへの導線 (詳細表示のみ)。通常時は上の height で
-                  畳まれて見えないので、フォーカスも inert で止める。 */}
+              {/* 各サービスへの導線 (詳細表示のみ)。カードの下に、内容幅
+                  いっぱいで並ぶ。通常時は上の height で畳まれて見えないので、
+                  フォーカスも inert で止める。 */}
               <motion.div
                 inert={!detail}
                 initial={false}
@@ -1840,20 +1842,27 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                   <ScrollText className="size-4" aria-hidden />
                   <span>歌詞を見る</span>
                 </Link>
-                {/* songs に Apple 側の id は持っていないので、曲名 +
-                    アーティストの検索で開く (Music アプリの universal
-                    link なので、iOS なら Music が直接立ち上がる) */}
+                {/* iTunes Store の楽曲ページ (購入側)。?app=itunes が
+                    Apple Music ではなく Store の文脈を指す指定で、最終 URL
+                    にもそのまま残る。track id が無い曲は曲名 + アーティストの
+                    検索へ逃がす。universal link なので iOS では Store が直接
+                    立ち上がる。 */}
                 <Link
-                  href={`https://music.apple.com/jp/search?term=${encodeURIComponent(serviceSearchTerm)}`}
+                  href={
+                    current.itunes_track_id
+                      ? `https://music.apple.com/jp/song/${current.itunes_track_id}?app=itunes`
+                      : `https://music.apple.com/jp/search?term=${encodeURIComponent(serviceSearchTerm)}&app=itunes`
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="iTunes で聴く"
                   className={DETAIL_ACTION_CLASS}
                 >
-                  <Music className="size-4" aria-hidden />
+                  <ItunesMark className="size-4" aria-hidden />
                   <span>iTunesで聴く</span>
                 </Link>
-                {/* track id があれば曲へ直接、無ければ検索へ逃がす */}
+                {/* track id があれば曲へ直接、無ければ検索へ逃がす。
+                    文言を持たないので、他の 2 つと同じ高さの丸にする */}
                 <Link
                   href={
                     current.spotify_track_id
@@ -1863,11 +1872,26 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Spotify で聴く"
-                  className={DETAIL_ACTION_CLASS}
+                  className={`${DETAIL_ACTION_CLASS} size-9! px-0!`}
                 >
-                  <Play className="size-3.5 fill-current" aria-hidden />
-                  <span>Spotifyで聴く</span>
+                  <SpotifyMark className="size-4" aria-hidden />
                 </Link>
+                {/* Apple Music の楽曲ページ。/song/{id} は曲名スラッグ付きの
+                    正規 URL へ 302 で飛ぶので id だけで足りる。universal
+                    link なので iOS では Music アプリが直接開く。
+                    直リンクを作れる曲でだけ出す (id が無い曲は、左の
+                    「iTunesで聴く」が検索へ逃がす)。 */}
+                {current.itunes_track_id ? (
+                  <Link
+                    href={`https://music.apple.com/jp/song/${current.itunes_track_id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Apple Music で聴く"
+                    className={`${DETAIL_ACTION_CLASS} size-9! px-0!`}
+                  >
+                    <AppleMusicMark className="size-4" aria-hidden />
+                  </Link>
+                ) : null}
               </motion.div>
           </motion.div>
         </AnimatePresence>

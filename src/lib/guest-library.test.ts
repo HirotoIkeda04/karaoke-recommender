@@ -39,6 +39,7 @@ function song(
     image_url_medium: null,
     image_url_large: null,
     itunes_preview_url: null,
+    itunes_track_id: null,
     spotify_track_id: null,
     duration_ms: null,
     fame_score: null,

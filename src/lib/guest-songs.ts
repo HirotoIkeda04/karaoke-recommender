@@ -33,6 +33,9 @@ export const GUEST_SONG_COLUMNS = [
   "image_url_medium",
   "image_url_large",
   "itunes_preview_url",
+  // Apple Music の楽曲ページへ直リンクするための id。無い曲は詳細表示で
+  // Apple Music のマークを出さない (検索へ逃がす「iTunesで聴く」は残る)。
+  "itunes_track_id",
   "spotify_track_id",
   "duration_ms",
   "fame_score",
@@ -74,7 +77,6 @@ const OMITTED_COLUMN_DEFAULTS = {
   fame_updated_at: null,
   fame_views: null,
   itunes_preview_checked_at: null,
-  itunes_track_id: null,
   last_spotify_attempt_at: null,
   match_status: "matched",
   original_release_year_check_details: null,
