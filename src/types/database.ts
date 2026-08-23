@@ -825,6 +825,49 @@ export type Database = {
         }
         Returns: Json
       }
+      get_deck_seeds: {
+        Args: { p_count?: number; p_exclude_artist_ids?: string[] }
+        Returns: {
+          artist: string
+          artist_id: string | null
+          cert_label: string | null
+          cert_score: number | null
+          cert_updated_at: string | null
+          created_at: string
+          dam_request_no: string | null
+          duration_ms: number | null
+          falsetto_max_midi: number | null
+          fame_article: string | null
+          fame_score: number | null
+          fame_updated_at: string | null
+          fame_views: number | null
+          genres: string[] | null
+          id: string
+          image_url_large: string | null
+          image_url_medium: string | null
+          image_url_small: string | null
+          last_spotify_attempt_at: string | null
+          match_status: Database["public"]["Enums"]["song_match_status"]
+          range_high_midi: number | null
+          range_low_midi: number | null
+          release_year: number | null
+          source_urls: string[] | null
+          spotify_attempt_count: number
+          spotify_explicit: boolean | null
+          spotify_isrc: string | null
+          spotify_track_id: string | null
+          title: string
+          updated_at: string
+          wikidata_qid: string | null
+          wikipedia_article: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "songs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_unrated_songs_v2: {
         Args: { p_limit?: number; p_require_image?: boolean }
         Returns: {

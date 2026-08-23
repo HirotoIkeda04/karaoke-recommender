@@ -66,7 +66,7 @@ const popularityScore = (song: Song) =>
   Math.max(song.fame_score ?? 0, song.cert_score ?? 0);
 
 /**
- * スキップの除外期間。get_unrated_songs_v2 の `interval '20 days'` と
+ * スキップの除外期間。get_deck_seeds の `interval '20 days'` と
  * 必ず同じ値にすること (039 で導入し 055 で復元した仕様)。
  */
 export const SKIP_TTL_MS = 20 * 24 * 60 * 60 * 1000;
@@ -93,16 +93,16 @@ export function isExcludedFromDeck(
  * 推薦から除外すべき song_id を集める。
  * Supabase は 1 リクエスト最大 1000 行なのでページ送りで集める。
  *
- * 除外の条件は推薦 RPC (get_unrated_songs_v2) と完全に一致させる:
+ * 除外の条件は推薦 RPC (get_deck_seeds) と完全に一致させる:
  *   - skip 以外の評価 … 永久に除外
  *   - skip           … updated_at から 20 日の間だけ除外 (経過したら候補へ戻す)
  *
  * ここを「評価行があれば一律除外」にすると、RPC が TTL 経過で候補に戻した曲を
  * TS 側が再び捨ててしまい、デッキが空になる。実際 2026-08 にこれで
- * 「代表曲をすべて評価しました」が出続ける不具合になった (RPC が返した 20 件が
- * 全て 75〜103 日前の skip で、全部ここで落ちていた)。RPC の artist_boost は
- * 高評価アーティストを最大 5 倍に重み付けするため、サンプリングは
- * 「スキップし尽くしたアーティストのカタログ」に寄りやすく、全滅は普通に起きる。
+ * 「代表曲をすべて評価しました」が出続ける不具合になった (旧・曲単位 RPC が
+ * 返した 20 件が全て 75〜103 日前の skip で、全部ここで落ちていた)。
+ * 現行の get_deck_seeds もなじみブースト (最大 2 倍) を持つため、
+ * 「スキップし尽くしたアーティスト」が選ばれ得る構図は変わらない。
  */
 async function fetchEvaluatedSongIds(
   supabase: SupabaseServerClient,
@@ -220,15 +220,16 @@ export async function buildDeck(
 
   let rpcError: string | undefined;
   if (seeds.length < GROUP_COUNT) {
-    // 不足分の補充は従来の推薦 RPC: ジャンル嗜好 × アーティストブースト ×
-    // 知名度 × 年代バケットの重み付きサンプリング。評価済み/スキップ済みは
-    // RPC 側で除外される。020 までの get_unrated_songs では PostgREST 接続
-    // プールが旧プランをキャッシュし続けた問題があり、_v2 に別名で作り直した。
+    // 不足分の補充はアーティスト単位の重み付き抽選 (058)。返り値は
+    // 「当選アーティストの未評価トップ曲」なので 1 行 = 1 組が保証される。
+    // cookie 復元済みの組と衝突しないよう、使用済みアーティストを除外して
+    // 不足数ぴったりを引く。評価済み/スキップ済み (TTL 20 日) は RPC 側で
+    // 除外される。
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.rpc as any)(
-      "get_unrated_songs_v2",
-      { p_limit: 20, p_require_image: true },
-    );
+    const { data, error } = await (supabase.rpc as any)("get_deck_seeds", {
+      p_count: GROUP_COUNT - seeds.length,
+      p_exclude_artist_ids: [...usedArtistIds],
+    });
     if (error) rpcError = error.message;
     for (const song of (data ?? []) as Song[]) pushSeed(song);
   }

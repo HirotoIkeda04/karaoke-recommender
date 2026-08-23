@@ -44,7 +44,7 @@ const MAX_ROWS = 200;
  * 方が確かなため。
  *
  * updated_at はゲストが評価した時刻をそのまま入れる。skip の TTL 20 日
- * (get_unrated_songs_v2) がこの列を見ているので、今の時刻で入れ直すと
+ * (get_deck_seeds) がこの列を見ているので、今の時刻で入れ直すと
  * スキップの期限が不当に伸びる。
  */
 export async function importGuestRatings(

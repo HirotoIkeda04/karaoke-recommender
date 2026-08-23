@@ -87,7 +87,7 @@ export async function unrateSong(songId: string): Promise<RateSongResult> {
 
 /**
  * 「知らない / スキップ」を永続化する。rating='skip' で行を入れることで
- * 推薦関数 get_unrated_songs_v2 が TTL 20 日除外する。再スキップで TTL 延長。
+ * 推薦関数 get_deck_seeds が TTL 20 日除外する。再スキップで TTL 延長。
  * 学習信号 (user_genre_distribution / user_artist_pref) は positive rating のみ
  * 参照しているので、ジャンル/アーティスト嗜好には影響しない。
  */
