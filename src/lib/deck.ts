@@ -238,7 +238,9 @@ export async function buildDeck(
     return { groups: [], persistToken: null, error: rpcError };
   }
 
-  // 各アーティストの人気曲候補 (画像必須) を並行取得する。
+  // 各アーティストの人気曲候補 (画像必須・有名曲のみ) を並行取得する。
+  // 「有名曲」の基準はアーティストページの「人気の楽曲」と同じ
+  // max(fame_score, cert_score) > 0 (060 で RPC 側の候補にも同条件を適用)。
   // PostgREST は NOT EXISTS を書けないので評価済み除外は TS 側で行う
   // (アーティストページと同じパターン)。
   const candidateLists = await Promise.all(
@@ -251,6 +253,7 @@ export async function buildDeck(
             .select("*")
             .eq("artist_id", seed.artist_id)
             .or("image_url_large.not.is.null,image_url_medium.not.is.null")
+            .or("fame_score.gt.0,cert_score.gt.0")
             .order("fame_score", { ascending: false, nullsFirst: false })
             .order("cert_score", { ascending: false, nullsFirst: false })
             .limit(CANDIDATES_PER_ARTIST)
