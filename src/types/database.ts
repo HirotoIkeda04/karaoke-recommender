@@ -21,6 +21,7 @@ export type Database = {
           id: string
           name: string
           name_norm: string
+          name_search: string | null
           updated_at: string
           wikidata_qid: string | null
           wikipedia_article: string | null
@@ -412,6 +413,7 @@ export type Database = {
         Row: {
           artist: string
           artist_id: string | null
+          artist_search: string | null
           cert_label: string | null
           cert_score: number | null
           cert_updated_at: string | null
@@ -450,6 +452,7 @@ export type Database = {
           spotify_isrc: string | null
           spotify_track_id: string | null
           title: string
+          title_search: string | null
           updated_at: string
           wikidata_qid: string | null
           wikipedia_article: string | null
@@ -684,6 +687,7 @@ export type Database = {
           is_labeled: boolean | null
           name: string | null
           name_norm: string | null
+          name_search: string | null
           song_count: number | null
           updated_at: string | null
         }
@@ -893,6 +897,7 @@ export type Database = {
         }[]
       }
       normalize_artist_name: { Args: { name: string }; Returns: string }
+      normalize_search_key: { Args: { input: string }; Returns: string }
       refresh_browse_snapshot: { Args: never; Returns: undefined }
       search_songs_and_artists: {
         Args: {

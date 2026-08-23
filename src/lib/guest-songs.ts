@@ -87,6 +87,9 @@ const OMITTED_COLUMN_DEFAULTS = {
   spotify_attempt_count: 0,
   spotify_explicit: null,
   spotify_isrc: null,
+  // 検索キーは DB の生成列。ゲスト用の固定 JSON では持たないので null。
+  title_search: null,
+  artist_search: null,
   wikidata_qid: null,
   wikipedia_article: null,
 } satisfies Omit<Song, GuestSongColumn>;
