@@ -99,6 +99,7 @@ def _fetch_null_range_songs(
     service_key: str,
     year_from: int | None = None,
     order: str = "recent",
+    artist: str | None = None,
 ) -> list[dict]:
     """range_high_midi NULL 曲を全取得。
 
@@ -107,6 +108,7 @@ def _fetch_null_range_songs(
         "fame"   -> fame_score.desc.nullslast,title.asc (有名曲のページを優先)
 
     year_from を指定すると release_year >= year_from のみに絞る。
+    artist を指定すると artist 部分一致 (大小無視) のみに絞る。
     """
     headers = {
         "apikey": service_key,
@@ -114,6 +116,7 @@ def _fetch_null_range_songs(
         "Accept": "application/json",
     }
     year_filter = f"&release_year=gte.{year_from}" if year_from else ""
+    artist_filter = f"&artist=ilike.*{quote(artist)}*" if artist else ""
     order_clause = (
         "fame_score.desc.nullslast,title.asc"
         if order == "fame"
@@ -129,6 +132,7 @@ def _fetch_null_range_songs(
             f"select=id,title,artist,release_year,range_low_midi,range_high_midi,falsetto_max_midi"
             f"&range_high_midi=is.null"
             f"{year_filter}"
+            f"{artist_filter}"
             f"&order={order_clause}"
             f"&limit={page_size}&offset={offset}"
         )
@@ -257,6 +261,7 @@ def run(
     year_from: int | None = None,
     retry_misses: bool = False,
     order: str = "recent",
+    artist: str | None = None,
 ) -> int:
     contact = require("SCRAPER_CONTACT_EMAIL")
     supabase_url, service_key = _load_env_supabase()
@@ -267,11 +272,12 @@ def run(
     checkpoint_path = output_dir / "range_results.json"
 
     songs = _fetch_null_range_songs(
-        supabase_url, service_key, year_from=year_from, order=order
+        supabase_url, service_key, year_from=year_from, order=order, artist=artist
     )
-    logger.info("DB: %d songs need range data%s (order=%s)",
+    logger.info("DB: %d songs need range data%s%s (order=%s)",
                 len(songs),
                 f" (release_year >= {year_from})" if year_from else "",
+                f' (artist~="{artist}")' if artist else "",
                 order)
     if limit:
         songs = songs[:limit]
@@ -379,6 +385,10 @@ def main(argv: list[str] | None = None) -> int:
         help="recent=新曲優先(既定) / fame=有名曲(fame_score)優先",
     )
     parser.add_argument(
+        "--artist", default=None,
+        help="artist 部分一致で対象を絞る (例: YOASOBI)",
+    )
+    parser.add_argument(
         "--retry-misses", action="store_true",
         help="対象曲のキャッシュ miss エントリを破棄して再試行 (新ソース投入時)",
     )
@@ -398,6 +408,7 @@ def main(argv: list[str] | None = None) -> int:
         year_from=args.year_from,
         retry_misses=args.retry_misses,
         order=args.order,
+        artist=args.artist,
     )
 
 

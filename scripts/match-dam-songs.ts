@@ -198,15 +198,17 @@ function loadResumeCache(): Set<string> {
   return set;
 }
 
-async function fetchAllNullSongs(): Promise<NullSong[]> {
+async function fetchAllNullSongs(artist: string | null): Promise<NullSong[]> {
   const sb = createAdminClient();
   const PAGE = 1000;
   const acc: NullSong[] = [];
   for (let from = 0; ; from += PAGE) {
-    const { data, error } = await sb
+    let q = sb
       .from("songs")
       .select("id, title, artist")
-      .is("spotify_track_id", null)
+      .is("spotify_track_id", null);
+    if (artist) q = q.ilike("artist", `%${artist}%`);
+    const { data, error } = await q
       .order("id", { ascending: true })
       .range(from, from + PAGE - 1);
     if (error) throw error;
@@ -230,8 +232,12 @@ function pickBest(
 async function main() {
   const args = process.argv.slice(2);
   let maxNew = 300;
+  // --artist: 特定アーティストの穴埋め用。指定時は fame_cache 未登録でも対象に含める
+  // (アーティスト単位の補完では候補が数曲しかなく、fame 未取得で全滅するため)。
+  let artist: string | null = null;
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--max-new") maxNew = parseInt(args[i + 1] ?? "300", 10);
+    else if (args[i] === "--artist") artist = args[i + 1] ?? null;
   }
 
   const clientId = process.env.SPOTIFY_CLIENT_ID;
@@ -246,15 +252,19 @@ async function main() {
   const resumeCache = loadResumeCache();
   console.log(`fame entries: ${fame.size}, aliases: ${aliases.size}, resume: ${resumeCache.size} already processed`);
 
-  const nullSongs = await fetchAllNullSongs();
-  console.log(`DB null songs: ${nullSongs.length}`);
+  const nullSongs = await fetchAllNullSongs(artist);
+  console.log(
+    `DB null songs: ${nullSongs.length}${artist ? ` (artist~="${artist}")` : ""}`,
+  );
 
   const candidates = nullSongs
-    .filter((s) => fame.has(`${s.title}\t${s.artist}`))
+    .filter((s) => artist !== null || fame.has(`${s.title}\t${s.artist}`))
     .filter((s) => !resumeCache.has(s.id))
-    .map((s) => ({ ...s, fame: fame.get(`${s.title}\t${s.artist}`)! }));
+    .map((s) => ({ ...s, fame: fame.get(`${s.title}\t${s.artist}`) ?? 0 }));
   candidates.sort((a, b) => b.fame - a.fame);
-  console.log(`candidates (fame既知 ∩ 未処理): ${candidates.length}`);
+  console.log(
+    `candidates (${artist ? "artist 一致" : "fame既知"} ∩ 未処理): ${candidates.length}`,
+  );
 
   const targets = candidates.slice(0, maxNew);
   console.log(`processing top ${targets.length} (--max-new=${maxNew})`);
@@ -320,6 +330,9 @@ async function main() {
           image_url_small: small?.url ?? null,
           release_year: Number.isFinite(releaseYear) ? releaseYear : null,
           is_popular: true,
+          // migration 005 の不変条件: spotify_track_id が入った行は 'matched'。
+          // ここで更新しないと enrichment 用の pending index に残り続ける。
+          match_status: "matched",
         })
         .eq("id", t.id);
       if (error) {

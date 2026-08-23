@@ -27323,11 +27323,95 @@
       "source": "blaxeason",
       "source_url": "https://blaxeason.com/snowman-dd/",
       "similarity": 1.0
+    },
+    {
+      "id": "ec240d1a-3cce-4f06-979d-b3cc30d9c3fd",
+      "title": "Watch me!",
+      "artist": "YOASOBI",
+      "release_year": 2025,
+      "range_low_midi": 55,
+      "range_high_midi": 77,
+      "falsetto_max_midi": null,
+      "source": "keytube",
+      "source_url": "https://keytube.net/song/detail/134116",
+      "similarity": 1.0
+    },
+    {
+      "id": "5b8a7812-6310-40dd-8833-b6f590060e7c",
+      "title": "あの夢をなぞって",
+      "artist": "YOASOBI",
+      "release_year": 2020,
+      "range_low_midi": 53,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "source": "keytube",
+      "source_url": "https://keytube.net/song/detail/20451",
+      "similarity": 1.0
+    },
+    {
+      "id": "9f0db47f-b422-4d9e-9fa1-bd41c9c0f926",
+      "title": "アドベンチャー",
+      "artist": "YOASOBI",
+      "release_year": null,
+      "range_low_midi": 56,
+      "range_high_midi": 77,
+      "falsetto_max_midi": null,
+      "source": "keytube",
+      "source_url": "https://keytube.net/song/detail/95414",
+      "similarity": 1.0
+    },
+    {
+      "id": "55ca6faf-6edc-4446-bd0a-cb5568183d0e",
+      "title": "アンコール",
+      "artist": "YOASOBI",
+      "release_year": null,
+      "range_low_midi": 54,
+      "range_high_midi": 74,
+      "falsetto_max_midi": 79,
+      "source": "vocal-range",
+      "source_url": "https://vocal-range.com/archives/post-7473.html",
+      "similarity": 1.0
+    },
+    {
+      "id": "679cd974-1ae1-4a2c-8276-c24d899a3625",
+      "title": "ハルカ",
+      "artist": "YOASOBI",
+      "release_year": null,
+      "range_low_midi": 55,
+      "range_high_midi": 78,
+      "falsetto_max_midi": null,
+      "source": "keytube",
+      "source_url": "https://keytube.net/song/detail/42547",
+      "similarity": 1.0
+    },
+    {
+      "id": "f9440389-58d1-425d-944c-60d83db023e7",
+      "title": "ハルジオン",
+      "artist": "YOASOBI",
+      "release_year": null,
+      "range_low_midi": 55,
+      "range_high_midi": 75,
+      "falsetto_max_midi": null,
+      "source": "keytube",
+      "source_url": "https://keytube.net/song/detail/20494",
+      "similarity": 1.0
+    },
+    {
+      "id": "cf7cd19a-d213-4c17-bffb-d8ec532f4023",
+      "title": "ミスター",
+      "artist": "YOASOBI",
+      "release_year": null,
+      "range_low_midi": 54,
+      "range_high_midi": 76,
+      "falsetto_max_midi": null,
+      "source": "keytube",
+      "source_url": "https://keytube.net/song/detail/97045",
+      "similarity": 1.0
     }
   ],
   "metadata": {
-    "scraped_at": "2026-04-30T01:02:20.730396+00:00",
-    "applied_count": 2277,
-    "tried_total": 2881
+    "scraped_at": "2026-08-23T20:50:54.903819+00:00",
+    "applied_count": 2284,
+    "tried_total": 2888
   }
 }

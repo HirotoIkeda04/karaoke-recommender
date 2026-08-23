@@ -376,15 +376,18 @@ function parseArgs() {
   const args = process.argv.slice(2);
   let limit: number | null = null;
   let dryRun = false;
+  // --artist: 特定アーティストの画像欠損だけを埋めたいとき用 (部分一致)
+  let artist: string | null = null;
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--limit") limit = parseInt(args[i + 1] ?? "0", 10);
     else if (args[i] === "--dry-run") dryRun = true;
+    else if (args[i] === "--artist") artist = args[i + 1] ?? null;
   }
-  return { limit, dryRun };
+  return { limit, dryRun, artist };
 }
 
 async function main() {
-  const { limit, dryRun } = parseArgs();
+  const { limit, dryRun, artist } = parseArgs();
   const supabase = createAdminClient();
   const processed = loadProcessedSongIds();
   console.log(`resume cache: ${processed.size} song_ids already attempted`);
@@ -401,10 +404,12 @@ async function main() {
   let offset = 0;
   const PAGE = 1000;
   for (;;) {
-    const { data, error } = await supabase
+    let query = supabase
       .from("songs")
       .select("id, title, artist, release_year, duration_ms, created_at")
-      .is("image_url_medium", null)
+      .is("image_url_medium", null);
+    if (artist) query = query.ilike("artist", `%${artist}%`);
+    const { data, error } = await query
       .order("created_at", { ascending: false })
       .range(offset, offset + PAGE - 1);
     if (error) throw error;
