@@ -31,6 +31,7 @@
     "cleanup:wikidata-romanized": "node --env-file=.env.local --import tsx scripts/cleanup-wikidata-romanized.ts",
     "seed:dam-ranking": "node --env-file=.env.local --import tsx scripts/seed-from-dam-ranking.ts",
     "seed:joysound-ranking": "node --env-file=.env.local --import tsx scripts/seed-from-joysound-ranking.ts",
+    "fetch:joysound-kana": "node --env-file=.env.local --import tsx scripts/fetch-joysound-kana.ts",
     "dedup:songs": "node --env-file=.env.local --import tsx scripts/dedup-songs.ts",
     "cleanup:anime-suffixes": "node --env-file=.env.local --import tsx scripts/cleanup-anime-suffixes.ts",
     "import:wanted-songs": "node --env-file=.env.local --import tsx scripts/import-wanted-songs.ts",

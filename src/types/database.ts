@@ -20,6 +20,8 @@ export type Database = {
           genres: string[]
           id: string
           name: string
+          name_kana: string | null
+          name_kana_search: string | null
           name_norm: string
           name_search: string | null
           updated_at: string
@@ -31,6 +33,7 @@ export type Database = {
           genres?: string[]
           id?: string
           name: string
+          name_kana?: string | null
           name_norm: string
           updated_at?: string
           wikidata_qid?: string | null
@@ -41,6 +44,7 @@ export type Database = {
           genres?: string[]
           id?: string
           name?: string
+          name_kana?: string | null
           name_norm?: string
           updated_at?: string
           wikidata_qid?: string | null
@@ -686,6 +690,8 @@ export type Database = {
           id: string | null
           is_labeled: boolean | null
           name: string | null
+          name_kana: string | null
+          name_kana_search: string | null
           name_norm: string | null
           name_search: string | null
           song_count: number | null
