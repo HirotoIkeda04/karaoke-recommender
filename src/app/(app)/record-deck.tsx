@@ -122,16 +122,16 @@ const SILENT_WAV =
 /**
  * ディスク径。横幅いっぱい (左右 1.75rem マージン) を基本に、
  * 縦に収まらない小さい画面ではヘッダー + 組カルーセル + 曲名 +
- * ボタン群 + ナビの予約分 (約 32.375rem) を引いた残りへ縮める。上限 20rem。
+ * ボタン群 + ナビの予約分 (約 31.875rem) を引いた残りへ縮める。上限 20rem。
  * loading.tsx の skeleton と式を揃えること。
  * 内訳: pt-3 0.75 + 組カルーセル 3.5 + gap 1.5 + 曲名 1.75 + gap 1.5 +
- * (盤) + gap 1.5 + 楽曲情報チップ 2.25 + gap 1.5 + 評価 4.875 + gap 1.5 +
+ * (盤) + gap 1.5 + 楽曲情報チップ 2 + gap 1.5 + 評価 4.875 + gap 1.5 +
  * スキップ行 3.5 + pb-2 0.5 から、曲名行の -my-2 (1rem) と
- * チップの -mt-2.5 (0.625rem) を引いた 23.25rem に、
+ * チップの上下マージン (0.875rem) を引いた 22.75rem に、
  * ヘッダーと浮いたナビの実測 9.125rem を足した値。
  */
 const DISC_SIZE =
-  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.375rem - env(safe-area-inset-bottom))))";
+  "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 31.875rem - env(safe-area-inset-bottom))))";
 
 /**
  * 詳細表示 (上スワイプ) 中のディスク径。通常時に対して、組カルーセルの行が
@@ -1669,25 +1669,41 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
               })}
             </motion.div>
 
-            {/* レコードの下の「楽曲情報」の面。通常時は評価ボタンの 2/3
-              (h-9) に畳んだチップ、詳細表示ではシートと同じ一覧に育つ。
-              畳んだ姿と開いた姿は layoutId で framer に同じ面として繋がせて
-              あるので、幅・高さ・角丸が一続きに動く。外側を包む高さの
-              アニメだけは CSS の流れに乗せてある (layout 投影だと下の
-              評価ボタン以降が動かず、面だけが伸びて重なるため)。
-              initial={false} なので、組送りで開閉アニメは再生されない。 */}
-            <motion.div
-              initial={false}
-              animate={{
-                // 通常時はチップ 1 行 (2.25rem) だけ見せ、サービスの行は
-                // 畳んで隠す。-0.625rem は親の gap-6 を 14px まで詰める分
-                // (盤とチップの間だけ、評価ボタン側の 24px より近づける)。
-                height: detail ? "auto" : "2.25rem",
-                marginTop: detail ? "0rem" : "-0.625rem",
-              }}
-              transition={DETAIL_TRANSITION}
-              className="relative flex w-full flex-col items-center overflow-hidden"
-            >
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* レコードの下の「楽曲情報」の面。通常時は評価ボタンより一回り低い
+        チップ (h-11)、詳細表示ではシートと同じ一覧に育つ。畳んだ姿と
+        開いた姿は layoutId で framer に同じ面として繋がせてあるので、
+        幅・高さ・角丸が一続きに動く。
+        高さを持つこの外側は組送りで作り直さない (作り直すと組が変わる
+        たびに畳むアニメが 1 回走る)。組ごとの出入りは中の 1 枚が担当する。 */}
+      <motion.div
+        initial={false}
+        animate={{
+          // 通常時はチップ 1 行 (2rem) だけ見せ、サービスの行は畳んで
+          // 隠す。負のマージンは親の gap-6 (24px) を詰める分で、盤側は
+          // 14px まで寄せ、評価ボタン側は 20px 残す (チップは盤に属する
+          // ものなので、上に寄せて下を空ける)。
+          height: detail ? "auto" : "2rem",
+          marginTop: detail ? "0rem" : "-0.625rem",
+          marginBottom: detail ? "0rem" : "-0.25rem",
+        }}
+        transition={DETAIL_TRANSITION}
+        className="relative flex w-full flex-col items-center overflow-hidden"
+      >
+        {/* 組送りの出入り。盤 (右から入って左へ抜ける) とは左右逆に流して、
+            2 つの行が互い違いにすれ違うようにしている。 */}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={position.group}
+            initial={{ x: -72, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 72, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="flex w-full flex-col items-center"
+          >
               <AnimatePresence mode="popLayout" initial={false}>
                 {detail ? (
                   <motion.div
@@ -1754,27 +1770,34 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                     animate={{ opacity: 1, transition: SPEC_FACE_IN }}
                     exit={{ opacity: 0, transition: SPEC_FACE_OUT }}
                     transition={DETAIL_TRANSITION}
-                    className="flex h-9 items-center gap-2 rounded-full bg-zinc-100/80 px-3 text-xs backdrop-blur-sm transition-colors active:bg-zinc-200/85 dark:bg-zinc-800/75 dark:active:bg-zinc-700/80"
+                    className="flex h-8 items-center gap-2.5 rounded-full bg-zinc-100/80 px-3.5 text-sm backdrop-blur-sm transition-colors active:bg-zinc-200/85 dark:bg-zinc-800/75 dark:active:bg-zinc-700/80"
                   >
                     {hasSpec ? (
                       <>
-                        <span className="text-zinc-500 dark:text-zinc-400">
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
                           地声
                         </span>
-                        <span className="font-mono text-zinc-800 dark:text-zinc-100">
+                        {/* 畳んでいる間は帯を引かず、音名そのものを高さ由来の
+                            色で出す (小さい面にマーカーを載せると、色面が
+                            チップの地と喧嘩して字が読めなくなる) */}
+                        <span className="font-mono font-medium">
                           {current.range_low_midi == null &&
                           current.range_high_midi == null ? (
-                            "—"
+                            <span className="text-zinc-800 dark:text-zinc-100">
+                              —
+                            </span>
                           ) : (
                             <>
-                              <ColoredNote midi={current.range_low_midi} />
-                              {" — "}
-                              <ColoredNote midi={current.range_high_midi} />
+                              <NoteText midi={current.range_low_midi} />
+                              <span className="px-1 text-zinc-400 dark:text-zinc-500">
+                                —
+                              </span>
+                              <NoteText midi={current.range_high_midi} />
                             </>
                           )}
                         </span>
                         <span
-                          className="h-3.5 w-px bg-zinc-300 dark:bg-zinc-700"
+                          className="h-4 w-px bg-zinc-300 dark:bg-zinc-700"
                           aria-hidden
                         />
                         <span className="font-mono font-medium text-zinc-800 dark:text-zinc-100">
@@ -1789,7 +1812,7 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                       </span>
                     )}
                     <ChevronUp
-                      className="size-3.5 text-zinc-500 dark:text-zinc-400"
+                      className="size-4 text-zinc-500 dark:text-zinc-400"
                       aria-hidden
                     />
                   </motion.button>
@@ -1846,10 +1869,9 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
                   <span>Spotifyで聴く</span>
                 </Link>
               </motion.div>
-            </motion.div>
           </motion.div>
         </AnimatePresence>
-      </div>
+      </motion.div>
 
       {/* 4 評価ボタン (丸いアイコンボタン + ラベル) */}
       <div className="grid w-full grid-cols-[repeat(4,3.5rem)] justify-around">
@@ -1969,6 +1991,21 @@ export function RecordDeck({ initialGroups, persistToken }: RecordDeckProps) {
         </div>
       </motion.div>
     </div>
+  );
+}
+
+/**
+ * 音域ノートを、帯を引かずに文字だけ高さ由来の色で表示する。
+ * 畳んだチップと、似た音域のカルーセル / 楽曲ページの音名と同じ扱い。
+ */
+function NoteText({ midi }: { midi: number | null | undefined }) {
+  if (midi == null) {
+    return <span className="text-zinc-500 dark:text-zinc-400">—</span>;
+  }
+  return (
+    <span style={{ color: noteChipColor(midi).background }}>
+      {midiToKaraoke(midi)}
+    </span>
   );
 }
 

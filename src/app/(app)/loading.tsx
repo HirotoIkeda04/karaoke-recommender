@@ -42,13 +42,13 @@ export default function Loading() {
         className="animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800"
         style={{
           width:
-            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 32.375rem - env(safe-area-inset-bottom))))",
+            "min(20rem, calc(100vw - 3.5rem), max(8rem, calc(100svh - 31.875rem - env(safe-area-inset-bottom))))",
           aspectRatio: "1 / 1",
         }}
       />
 
-      {/* 畳んだ楽曲情報のチップ (-mt-2.5 は record-deck.tsx の面と対応) */}
-      <div className="-mt-2.5 h-9 w-48 animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800" />
+      {/* 畳んだ楽曲情報のチップ (上下マージンは record-deck.tsx の面と対応) */}
+      <div className="-mt-2.5 -mb-1 h-8 w-52 animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800" />
 
       {/* 4 評価ボタン (丸 size-14 + ラベル) */}
       <div className="grid w-full grid-cols-[repeat(4,3.5rem)] justify-around">
