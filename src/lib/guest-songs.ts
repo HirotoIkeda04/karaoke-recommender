@@ -34,12 +34,10 @@ export const GUEST_SONG_COLUMNS = [
   "image_url_large",
   "itunes_preview_url",
   "spotify_track_id",
-  "spotify_popularity",
   "duration_ms",
   "fame_score",
   "cert_score",
   "karaoke_score",
-  "is_popular",
 ] as const satisfies readonly (keyof Song)[];
 
 type GuestSongColumn = (typeof GUEST_SONG_COLUMNS)[number];
@@ -89,7 +87,6 @@ const OMITTED_COLUMN_DEFAULTS = {
   spotify_attempt_count: 0,
   spotify_explicit: null,
   spotify_isrc: null,
-  spotify_preview_url: null,
   wikidata_qid: null,
   wikipedia_article: null,
 } satisfies Omit<Song, GuestSongColumn>;

@@ -82,13 +82,9 @@ const hasRange = (song: Song) =>
 /** ゲストに出してよい曲か (ジャケット + 音域が揃っているか) */
 const isPresentable = (song: Song) => hasImage(song) && hasRange(song);
 
-/** デッキと同じ並び (is_popular → 人気度 → spotify_popularity) */
+/** デッキと同じ並び (人気度 = fame/cert) */
 function byPopularity(a: Song, b: Song) {
-  return (
-    Number(b.is_popular) - Number(a.is_popular) ||
-    popularityScore(b) - popularityScore(a) ||
-    (b.spotify_popularity ?? 0) - (a.spotify_popularity ?? 0)
-  );
+  return popularityScore(b) - popularityScore(a);
 }
 
 type Client = ReturnType<typeof createAdminClient>;
@@ -126,7 +122,6 @@ async function fetchArtistTopSongs(
     .from("songs")
     .select("*")
     .eq("artist_id", artistId)
-    .order("is_popular", { ascending: false })
     .order("fame_score", { ascending: false, nullsFirst: false })
     .order("cert_score", { ascending: false, nullsFirst: false })
     .limit(80);
@@ -152,7 +147,6 @@ async function fetchByGenre(
       .from("songs")
       .select("*")
       .contains("genres", [genre])
-      .order("is_popular", { ascending: false })
       .order("fame_score", { ascending: false, nullsFirst: false })
       .order("cert_score", { ascending: false, nullsFirst: false })
       .limit(limit),
@@ -172,7 +166,6 @@ async function fetchByGenre(
         .from("songs")
         .select("*")
         .in("artist_id", chunk)
-        .order("is_popular", { ascending: false })
         .order("fame_score", { ascending: false, nullsFirst: false })
         .limit(limit),
     ),

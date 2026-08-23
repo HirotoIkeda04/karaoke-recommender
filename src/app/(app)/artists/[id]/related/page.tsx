@@ -23,7 +23,6 @@ type RepresentativeSong = Pick<
   | "image_url_medium"
   | "fame_score"
   | "cert_score"
-  | "spotify_popularity"
 >;
 
 interface RelatedArtistsPageProps {
@@ -31,11 +30,7 @@ interface RelatedArtistsPageProps {
 }
 
 function popularityScore(song: RepresentativeSong) {
-  return Math.max(
-    song.fame_score ?? 0,
-    song.cert_score ?? 0,
-    (song.spotify_popularity ?? 0) / 20,
-  );
+  return Math.max(song.fame_score ?? 0, song.cert_score ?? 0);
 }
 
 export default async function RelatedArtistsPage({
@@ -69,7 +64,7 @@ export default async function RelatedArtistsPage({
     const { data: songRows } = await supabase
       .from("songs")
       .select(
-        "id, artist_id, title, release_year, image_url_small, image_url_medium, fame_score, cert_score, spotify_popularity",
+        "id, artist_id, title, release_year, image_url_small, image_url_medium, fame_score, cert_score",
       )
       .in("artist_id", relatedIds)
       .limit(1000);

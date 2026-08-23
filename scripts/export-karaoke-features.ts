@@ -19,7 +19,7 @@ const OUTPUT_PATH = resolve(
   "scraper/output/karaoke_features.jsonl",
 );
 const SONG_SELECT =
-  "id, title, artist, artist_id, fame_score, fame_views, cert_score, spotify_popularity, release_year, duration_ms, genres, range_low_midi, range_high_midi, falsetto_max_midi";
+  "id, title, artist, artist_id, fame_score, fame_views, cert_score, release_year, duration_ms, genres, range_low_midi, range_high_midi, falsetto_max_midi";
 
 interface ArtistRow {
   id: string;
@@ -34,7 +34,6 @@ interface SongRow {
   fame_score: number | null;
   fame_views: number | null;
   cert_score: number | null;
-  spotify_popularity: number | null;
   release_year: number | null;
   duration_ms: number | null;
   genres: string[] | null;
@@ -115,9 +114,6 @@ async function main() {
     aggregate.songCount += 1;
     if (song.fame_score !== null) aggregate.fameScores.push(song.fame_score);
     if (song.cert_score !== null) aggregate.certScores.push(song.cert_score);
-    if (song.spotify_popularity !== null) {
-      aggregate.spotifyPopularities.push(song.spotify_popularity);
-    }
     aggregates.set(key, aggregate);
   }
 
@@ -135,7 +131,6 @@ async function main() {
       fame_score: song.fame_score,
       fame_views: song.fame_views,
       cert_score: song.cert_score,
-      spotify_popularity: song.spotify_popularity,
       release_year: song.release_year,
       duration_ms: song.duration_ms,
       genres: song.genres ?? [],
@@ -149,8 +144,6 @@ async function main() {
       artist_max_fame_score: maximum(aggregate.fameScores),
       artist_mean_fame_score: mean(aggregate.fameScores),
       artist_max_cert_score: maximum(aggregate.certScores),
-      artist_max_spotify_popularity: maximum(aggregate.spotifyPopularities),
-      artist_mean_spotify_popularity: mean(aggregate.spotifyPopularities),
     });
   });
 

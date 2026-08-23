@@ -5,7 +5,6 @@
  *
  * 仕様:
  * - スプライ ID (`spotify_track_id`) を競合キーとした upsert(再実行で重複しない)
- * - is_popular は scraper の代表曲フラグ(現状 seed は featured のみ → 全件 true)
  * - バッチサイズ 100 で投入(PostgREST のリクエストサイズ制限を回避)
  */
 import { readFileSync } from "node:fs";
@@ -28,10 +27,6 @@ interface SeedRow {
   image_url_medium: string | null;
   image_url_small: string | null;
   duration_ms: number | null;
-  spotify_popularity: number | null;
-  // 旧 seed ファイルにのみ存在する。scraper は 2026-08 以降出力しない
-  // (Spotify が preview_url の提供を停止したため)。
-  spotify_preview_url?: string | null;
   spotify_explicit: boolean | null;
   spotify_isrc: string | null;
   source_urls: string[];
@@ -74,12 +69,9 @@ async function main() {
       image_url_medium: s.image_url_medium,
       image_url_small: s.image_url_small,
       duration_ms: s.duration_ms,
-      spotify_popularity: s.spotify_popularity,
-      spotify_preview_url: s.spotify_preview_url ?? null,
       spotify_explicit: s.spotify_explicit,
       spotify_isrc: s.spotify_isrc,
       source_urls: s.source_urls,
-      is_popular: true,
     }));
 
   // 既存行が (title, artist) 同一・spotify_track_id=NULL の場合、
@@ -122,12 +114,9 @@ async function main() {
         image_url_medium: row.image_url_medium,
         image_url_small: row.image_url_small,
         duration_ms: row.duration_ms,
-        spotify_popularity: row.spotify_popularity,
-        spotify_preview_url: row.spotify_preview_url ?? null,
         spotify_explicit: row.spotify_explicit,
         spotify_isrc: row.spotify_isrc,
         source_urls: row.source_urls,
-        is_popular: true,
       })
       .eq("id", id);
     if (error) {

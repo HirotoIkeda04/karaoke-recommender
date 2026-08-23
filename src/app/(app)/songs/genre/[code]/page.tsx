@@ -38,7 +38,7 @@ export default async function GenreSongsPage({ params }: GenrePageProps) {
     .filter((id): id is string => !!id);
 
   const songSelect =
-    "id, title, artist, artist_id, release_year, original_release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, duration_ms, karaoke_score, fame_score, cert_score, spotify_popularity, dam_request_no, spotify_track_id";
+    "id, title, artist, artist_id, release_year, original_release_year, range_low_midi, range_high_midi, falsetto_max_midi, image_url_small, image_url_medium, duration_ms, karaoke_score, fame_score, cert_score, dam_request_no, spotify_track_id";
 
   const [byArtistRes, byTagRes] = await Promise.all([
     artistIds.length > 0
@@ -48,7 +48,6 @@ export default async function GenreSongsPage({ params }: GenrePageProps) {
           .in("artist_id", artistIds)
           .order("karaoke_score", { ascending: false, nullsFirst: false })
           .order("fame_score", { ascending: false, nullsFirst: false })
-          .order("spotify_popularity", { ascending: false, nullsFirst: false })
           .order("release_year", { ascending: false, nullsFirst: false })
           .order("title", { ascending: true })
           .limit(SONG_LIMIT)
@@ -59,7 +58,6 @@ export default async function GenreSongsPage({ params }: GenrePageProps) {
       .contains("genres", [code])
       .order("karaoke_score", { ascending: false, nullsFirst: false })
       .order("fame_score", { ascending: false, nullsFirst: false })
-      .order("spotify_popularity", { ascending: false, nullsFirst: false })
       .order("release_year", { ascending: false, nullsFirst: false })
       .order("title", { ascending: true })
       .limit(SONG_LIMIT),

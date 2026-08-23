@@ -9,8 +9,6 @@
  *   - release_year (← Spotify の release_date から年だけ)
  *
  * 取れなくなったフィールド (新規アプリ向け制限 2024-2025):
- *   - popularity
- *   - preview_url
  *   - /v1/tracks?ids= バッチエンドポイント (403)
  *   - /v1/artists/{id}/top-tracks (403)
  *
@@ -40,8 +38,6 @@ interface SongRow {
   id: string;
   spotify_track_id: string;
   duration_ms: number | null;
-  spotify_popularity: number | null;
-  spotify_preview_url: string | null;
   spotify_explicit: boolean | null;
   spotify_isrc: string | null;
   release_year: number | null;
@@ -126,7 +122,7 @@ async function main() {
   const { data, error } = await supabase
     .from("songs")
     .select(
-      "id, spotify_track_id, duration_ms, spotify_popularity, spotify_preview_url, spotify_explicit, spotify_isrc, release_year",
+      "id, spotify_track_id, duration_ms, spotify_explicit, spotify_isrc, release_year",
     )
     .not("spotify_track_id", "is", null)
     .or("duration_ms.is.null,spotify_explicit.is.null,spotify_isrc.is.null,release_year.is.null")

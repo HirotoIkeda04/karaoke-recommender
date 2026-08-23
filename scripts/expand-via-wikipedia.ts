@@ -393,7 +393,6 @@ async function main() {
           release_year: s.releaseYear,
           wikidata_qid: s.qid,
           wikipedia_article: null,
-          is_popular: true,
           source_urls: [`https://www.wikidata.org/wiki/${s.qid}`],
         });
         // 同一バッチ内の二重防止

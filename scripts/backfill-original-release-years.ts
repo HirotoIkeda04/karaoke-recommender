@@ -43,7 +43,6 @@ interface SongRow {
   karaoke_score: number | null;
   fame_score: number | null;
   cert_score: number | null;
-  spotify_popularity: number | null;
   dam_request_no: string | null;
   spotify_track_id: string | null;
   range_low_midi: number | null;
@@ -223,7 +222,7 @@ async function loadAllSongs(
     const { data, error } = await supabase
       .from("songs")
       .select(
-        "id, title, artist, artist_id, genres, release_year, original_release_year, original_release_year_check_status, karaoke_score, fame_score, cert_score, spotify_popularity, dam_request_no, spotify_track_id, range_low_midi, range_high_midi",
+        "id, title, artist, artist_id, genres, release_year, original_release_year, original_release_year_check_status, karaoke_score, fame_score, cert_score, dam_request_no, spotify_track_id, range_low_midi, range_high_midi",
       )
       .order("id")
       .range(offset, offset + PAGE_SIZE - 1);

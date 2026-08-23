@@ -459,11 +459,8 @@ async function insertSongFromSpotify(
     image_url_small: artworkSmall,
     duration_ms: track.duration_ms,
     spotify_track_id: track.id,
-    spotify_popularity: track.popularity ?? null,
-    spotify_preview_url: track.preview_url,
     spotify_explicit: track.explicit,
     spotify_isrc: track.external_ids?.isrc ?? null,
-    is_popular: true,
     source_urls: [`https://open.spotify.com/track/${track.id}`],
   };
   // iTunes 側が解決できていれば、試聴音源を最初から埋めておく。
@@ -522,7 +519,6 @@ async function insertSongFromItunes(
     itunes_track_id: itunes.trackId,
     itunes_preview_url: itunes.previewUrl ?? null,
     itunes_preview_checked_at: new Date().toISOString(),
-    is_popular: true,
     source_urls: itunes.trackViewUrl ? [itunes.trackViewUrl] : [],
   };
   const { data, error } = await supabase

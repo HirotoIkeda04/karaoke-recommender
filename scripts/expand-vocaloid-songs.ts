@@ -19,7 +19,7 @@
  *   - 名前正規化 (NFKC + lowercase) で類似度判定 (≥ 0.8)
  *   - 既に同じ spotify_track_id を持つ songs 行があればスキップ (insert は冪等)
  *   - 同一アーティストの同タイトル (例: ライブ版 / リミックス) は最初の 1 件のみ採用
- *   - 新規行は match_status='matched', is_popular=true, artist_id を埋める
+ *   - 新規行は match_status='matched', artist_id を埋める
  *   - 音域 (range_*_midi) は null のまま (別ソースで埋める想定)
  *   - rate limit: 1.5s 間隔, 429 で Retry-After>120s なら停止
  *   - 結果は scraper/output/expand_vocaloid_cache.jsonl に append (resume 用)
@@ -461,7 +461,6 @@ async function main() {
         image_url_large: imgs.large,
         image_url_medium: imgs.medium,
         image_url_small: imgs.small,
-        is_popular: true,
         match_status: "matched",
         source_urls: [`https://open.spotify.com/track/${t.id}`],
       };

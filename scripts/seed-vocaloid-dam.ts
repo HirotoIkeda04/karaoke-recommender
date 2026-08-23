@@ -181,7 +181,6 @@ async function main() {
         .update({
           dam_request_no: s.dam_request_no,
           source_urls: newUrls,
-          is_popular: true,
         })
         .eq("id", target.id);
       if (updErr) {
@@ -215,7 +214,6 @@ async function main() {
       image_url_medium: null,
       image_url_small: null,
       source_urls: [damSourceUrl(s.dam_request_no)],
-      is_popular: true,
       match_status: "pending",
       dam_request_no: s.dam_request_no,
     };

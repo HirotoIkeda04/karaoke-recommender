@@ -323,7 +323,6 @@ async function main() {
       title: s.title,
       artist: s.artist,
       artist_id: artistId,
-      is_popular: true,
       source_urls: ["https://www.clubdam.com/ranking/"],
     });
   }

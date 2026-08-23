@@ -118,7 +118,6 @@ interface SongRow {
   artist: string;
   artist_id: string | null;
   spotify_track_id: string | null;
-  spotify_preview_url: string | null;
   image_url_small: string | null;
   image_url_medium: string | null;
   image_url_large: string | null;
@@ -131,7 +130,7 @@ interface SongRow {
 }
 
 const SONG_COLS =
-  "id, title, artist, artist_id, spotify_track_id, spotify_preview_url, " +
+  "id, title, artist, artist_id, spotify_track_id, " +
   "image_url_small, image_url_medium, image_url_large, duration_ms, " +
   "release_year, itunes_preview_url, itunes_track_id, " +
   "itunes_preview_checked_at, created_at";
@@ -165,7 +164,6 @@ function backfillUpdates(keeper: SongRow, loser: SongRow): SongUpdate {
   const updates: Record<string, unknown> = {};
   const FIELDS: (keyof SongRow)[] = [
     "spotify_track_id",
-    "spotify_preview_url",
     "image_url_small",
     "image_url_medium",
     "image_url_large",

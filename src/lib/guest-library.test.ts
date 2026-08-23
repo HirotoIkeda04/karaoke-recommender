@@ -40,12 +40,10 @@ function song(
     image_url_large: null,
     itunes_preview_url: null,
     spotify_track_id: null,
-    spotify_popularity: null,
     duration_ms: null,
     fame_score: null,
     cert_score: null,
     karaoke_score: null,
-    is_popular: true,
     effective_genres: ["j_pop"],
     ...overrides,
   };

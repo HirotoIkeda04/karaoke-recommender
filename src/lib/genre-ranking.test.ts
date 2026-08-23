@@ -21,7 +21,6 @@ function song(
     karaoke_score: karaokeScore,
     fame_score: null,
     cert_score: null,
-    spotify_popularity: null,
     release_year: 2020,
     original_release_year: null,
     dam_request_no: "1234-56",

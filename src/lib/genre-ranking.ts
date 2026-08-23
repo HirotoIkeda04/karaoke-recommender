@@ -6,7 +6,6 @@ export interface GenreRankingCandidate {
   karaoke_score: number | null;
   fame_score: number | null;
   cert_score: number | null;
-  spotify_popularity: number | null;
   release_year: number | null;
   original_release_year: number | null;
   dam_request_no: string | null;
@@ -46,7 +45,6 @@ export function genreRankingScore(
   const damCatalog = song.dam_request_no ? 0.12 : 0;
   const fame = 0.08 * clamp01((song.fame_score ?? 0) / 6);
   const certification = 0.04 * clamp01((song.cert_score ?? 0) / 5);
-  const spotify = 0.08 * clamp01((song.spotify_popularity ?? 0) / 100);
   // 再発・再配信年で過去曲を新曲扱いしない。未照合曲だけ従来値へ戻す。
   const releaseYear = song.original_release_year ?? song.release_year;
   const recency =
@@ -59,7 +57,6 @@ export function genreRankingScore(
     damCatalog +
     fame +
     certification +
-    spotify +
     recency +
     completeness
   );
@@ -88,11 +85,6 @@ function compareSongs(
   const fameDifference =
     (b.fame_score ?? -Infinity) - (a.fame_score ?? -Infinity);
   if (fameDifference !== 0) return fameDifference;
-
-  const spotifyDifference =
-    (b.spotify_popularity ?? -Infinity) -
-    (a.spotify_popularity ?? -Infinity);
-  if (spotifyDifference !== 0) return spotifyDifference;
 
   const yearDifference =
     (b.original_release_year ?? b.release_year ?? -Infinity) -

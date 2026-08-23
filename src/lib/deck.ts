@@ -227,7 +227,7 @@ export async function buildDeck(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase.rpc as any)(
       "get_unrated_songs_v2",
-      { p_limit: 20, p_popular_only: true, p_require_image: true },
+      { p_limit: 20, p_require_image: true },
     );
     if (error) rpcError = error.message;
     for (const song of (data ?? []) as Song[]) pushSeed(song);
@@ -244,17 +244,14 @@ export async function buildDeck(
     seeds.map((seed) =>
       seed.artist_id
         ? // DB 側の窓 (limit) を TS 側の popularityScore ランキングと同じ複合キーで
-          // 切る。fame_score 単キーだと多作アーティストで is_popular / 認定曲が
-          // 窓の外に落ちる。
+          // 切る。fame_score 単キーだと多作アーティストで認定曲が窓の外に落ちる。
           supabase
             .from("songs")
             .select("*")
             .eq("artist_id", seed.artist_id)
             .or("image_url_large.not.is.null,image_url_medium.not.is.null")
-            .order("is_popular", { ascending: false })
             .order("fame_score", { ascending: false, nullsFirst: false })
             .order("cert_score", { ascending: false, nullsFirst: false })
-            .order("spotify_popularity", { ascending: false, nullsFirst: false })
             .limit(CANDIDATES_PER_ARTIST)
         : null,
     ),
@@ -271,12 +268,7 @@ export async function buildDeck(
     }
     const followers = ((result?.data ?? []) as Song[])
       .filter((song) => song.id !== seed.id && !evaluatedIds.has(song.id))
-      .sort(
-        (a, b) =>
-          Number(b.is_popular) - Number(a.is_popular) ||
-          popularityScore(b) - popularityScore(a) ||
-          (b.spotify_popularity ?? 0) - (a.spotify_popularity ?? 0),
-      )
+      .sort((a, b) => popularityScore(b) - popularityScore(a))
       .slice(0, GROUP_SIZE - 1);
     return [seed, ...followers];
   });

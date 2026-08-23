@@ -107,7 +107,6 @@ export async function getRelatedArtistPreviews(
     .select("artist_id, image_url_small, image_url_medium")
     .in("artist_id", relatedIds)
     .order("fame_score", { ascending: false, nullsFirst: false })
-    .order("spotify_popularity", { ascending: false, nullsFirst: false })
     .limit(Math.max(relatedIds.length * 20, 100));
 
   const imageByArtist = new Map<string, string>();

@@ -4,7 +4,7 @@
  * 試聴再生 (頭 6 秒スニペット) に使う。
  *
  * 設計判断 (2026-08-11):
- *  - Spotify の spotify_preview_url は 2026-02 の API 変更で Dev Mode
+ *  - Spotify のプレビュー URL は 2026-02 の API 変更で Dev Mode
  *    アプリに返らなくなったため、音源は iTunes を正とする。
  *  - 検索・マッチング・レート制御は backfill-itunes-metadata.ts と同一
  *    (fetch_itunes.py 移植のカラオケ/カバー版除外 + 類似度マッチ)。
@@ -14,8 +14,8 @@
  *
  * 対象選定:
  *  - itunes_preview_checked_at IS NULL の曲
- *  - デフォルトはホームに出やすい順 (is_popular 降順 → fame_score 降順
- *    NULLS LAST)。--order recent で created_at 降順に切替可能。
+ *  - デフォルトはホームに出やすい順 (fame_score 降順 NULLS LAST)。
+ *    --order recent で created_at 降順に切替可能。
  *
  * 補完ポリシー:
  *  - itunes_preview_url / itunes_track_id: マッチしたらセット (主目的)
@@ -267,7 +267,7 @@ function parseArgs() {
   const args = process.argv.slice(2);
   let limit: number | null = null;
   let dryRun = false;
-  // order: "popular" = is_popular 降順 → fame_score 降順 (ホームに出る曲を優先)
+  // order: "popular" = fame_score 降順 (ホームに出る曲を優先)
   //        "recent"  = created_at 降順 (新曲優先, iTunes ヒット率高)
   let order: "popular" | "recent" = "popular";
   for (let i = 0; i < args.length; i++) {
@@ -290,7 +290,7 @@ async function main() {
   );
 
   // itunes_preview_checked_at IS NULL の曲を取得。
-  //   order=popular: is_popular 降順 → fame_score 降順 (ホーム表示曲を優先)
+  //   order=popular: fame_score 降順 (ホーム表示曲を優先)
   //   order=recent:  created_at 降順
   const targets: SongRow[] = [];
   let offset = 0;
@@ -302,9 +302,7 @@ async function main() {
       .is("itunes_preview_checked_at", null);
     query =
       order === "popular"
-        ? query
-            .order("is_popular", { ascending: false })
-            .order("fame_score", { ascending: false, nullsFirst: false })
+        ? query.order("fame_score", { ascending: false, nullsFirst: false })
         : query.order("created_at", { ascending: false });
     // 同値の並びが頁間で揺れて取りこぼさないよう PK で安定化
     query = query.order("id", { ascending: true });

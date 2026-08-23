@@ -409,11 +409,8 @@ async function main() {
       image_url_small: artworkSmall,
       duration_ms: t.duration_ms,
       spotify_track_id: t.id,
-      spotify_popularity: t.popularity,
-      spotify_preview_url: t.preview_url,
       spotify_explicit: t.explicit,
       spotify_isrc: t.external_ids?.isrc ?? null,
-      is_popular: true,
       source_urls: [`https://open.spotify.com/track/${t.id}`],
     };
 

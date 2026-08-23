@@ -118,7 +118,6 @@ function buildInsert(s: DamSeedRow): SongInsert {
     image_url_medium: s.image_url_medium,
     image_url_small: s.image_url_small,
     source_urls: buildSourceUrls(s, null),
-    is_popular: true,
     dam_request_no: s.dam_request_no,
     match_status: "pending",
   };

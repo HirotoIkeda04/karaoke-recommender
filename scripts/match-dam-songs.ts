@@ -329,7 +329,6 @@ async function main() {
           image_url_medium: medium?.url ?? null,
           image_url_small: small?.url ?? null,
           release_year: Number.isFinite(releaseYear) ? releaseYear : null,
-          is_popular: true,
           // migration 005 の不変条件: spotify_track_id が入った行は 'matched'。
           // ここで更新しないと enrichment 用の pending index に残り続ける。
           match_status: "matched",
