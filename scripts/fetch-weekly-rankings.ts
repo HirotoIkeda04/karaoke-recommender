@@ -34,6 +34,8 @@
 import { createAdminClient } from "../src/lib/supabase/admin";
 import type { Database } from "../src/types/database";
 
+import { normalizeArtistName as canonicalNameNorm } from "./lib/normalize-artist-name";
+
 type SongInsert = Database["public"]["Tables"]["songs"]["Insert"];
 type SongUpdate = Database["public"]["Tables"]["songs"]["Update"];
 type ArtistInsert = Database["public"]["Tables"]["artists"]["Insert"];
@@ -84,6 +86,11 @@ function normalizeTitle(s: string): string {
     .trim();
 }
 
+/**
+ * 曖昧マッチ用の緩いキー。括弧の中身ごと落とすので SQL の
+ * normalize_artist_name とは別物であり、artists.name_norm には使わないこと
+ * (name_norm は canonicalNameNorm を使う)。
+ */
 function normalizeArtistName(s: string): string {
   return s
     .normalize("NFKC")
@@ -409,7 +416,8 @@ async function ensureArtistId(
   if (existing) return existing;
   const ins: ArtistInsert = {
     name: artistName || "(unknown)",
-    name_norm: aKey || normalizeArtistName(artistName || "unknown"),
+    // name_norm は SQL の normalize_artist_name と一致させる (aKey は緩すぎる)
+    name_norm: canonicalNameNorm(artistName || "unknown"),
     genres: [],
   };
   const { data, error } = await supabase

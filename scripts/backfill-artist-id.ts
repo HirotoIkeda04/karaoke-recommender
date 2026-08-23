@@ -18,13 +18,8 @@
  */
 import { createAdminClient } from "../src/lib/supabase/admin";
 
-// migrations/033_strict_normalize_artist_name.sql と同等
-function normalizeArtistName(name: string): string {
-  return name
-    .normalize("NFKC")
-    .toLowerCase()
-    .replace(/[\s\.\-_,'"!?·•・/\\()\[\]{}（）「」『』【】]+/g, "");
-}
+// name_norm の計算は SQL の normalize_artist_name と一枚岩にする
+import { normalizeArtistName } from "./lib/normalize-artist-name";
 
 async function main() {
   const dry = process.argv.includes("--dry");

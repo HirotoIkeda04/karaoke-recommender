@@ -20,6 +20,9 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { createAdminClient } from "../src/lib/supabase/admin";
+
+// name_norm の計算は SQL の normalize_artist_name と一枚岩にする
+import { normalizeArtistName } from "./lib/normalize-artist-name";
 import type { Database } from "../src/types/database";
 
 type SongInsert = Database["public"]["Tables"]["songs"]["Insert"];
@@ -34,14 +37,6 @@ interface SeedRow {
 interface SeedFile {
   songs: SeedRow[];
   metadata: { source_html: string; source_pages: string[]; total_count: number };
-}
-
-// migrations/033_strict_normalize_artist_name.sql と同等
-function normalizeArtistName(name: string): string {
-  return name
-    .normalize("NFKC")
-    .toLowerCase()
-    .replace(/[\s\.\-_,'"!?·•・/\\()\[\]{}（）「」『』【】]+/g, "");
 }
 
 function damSourceUrl(requestNo: string): string {
