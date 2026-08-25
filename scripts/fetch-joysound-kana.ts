@@ -87,7 +87,11 @@ function compareKey(s: string): string {
   const stripped = s
     .normalize("NFKC")
     .toLowerCase()
-    .replace(/[\s.\-_,、，!?'"’“”・･/\\()[\]{}（）「」『』【】&＆=＝+＋~〜:：;；*#@]/g, "");
+    // 。は NFKC で畳まれないので明示的に落とす (「ゲスの極み乙女。」対策)
+    .replace(
+      /[\s.。｡\-_,、，!?'"’“”・･/\\()[\]{}（）「」『』【】&＆=＝+＋~〜:：;；*#@]/g,
+      "",
+    );
   let out = "";
   for (const ch of stripped) {
     const code = ch.codePointAt(0)!;
@@ -114,9 +118,18 @@ function stripFeat(name: string): string {
   return m && m.index != null && m.index > 0 ? name.slice(0, m.index).trim() : name;
 }
 
-/** 括弧の中身。「ゴスペラーズ(The Gospellers)」は JOYSOUND では The Gospellers 名義 */
+/**
+ * 括弧の中身。「ゴスペラーズ(The Gospellers)」は JOYSOUND では The Gospellers 名義。
+ *
+ * 括弧が 2 つ以上ある名前では使わない。「アラジン(中村倫也)&ジャスミン(木下晴香)」
+ * のような連名では、括弧の中身は別名ではなく構成員であり、拾うと
+ * ユニットの行に個人の読みが入る (実際に「中村倫也 → ナカムラトモヤ」を
+ * 当ててしまった)。括弧 1 つなら「koyori(電ポルP)」のように同一人物の別名。
+ */
 function parenContent(name: string): string {
-  return name.match(/[(（]([^)）]+)[)）]/)?.[1].trim() ?? "";
+  const groups = name.match(/[(（][^)）]+[)）]/g) ?? [];
+  if (groups.length !== 1) return "";
+  return groups[0].slice(1, -1).trim();
 }
 
 /**
