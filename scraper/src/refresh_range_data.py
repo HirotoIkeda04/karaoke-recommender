@@ -1,7 +1,9 @@
 """DB の range NULL 曲に対して複数音域サイトを試行して埋めるバッチ。
 
 仕様:
-    - Supabase REST から range_high_midi IS NULL 曲を取得 (release_year DESC)
+    - range_high_midi IS NULL 曲を取得 (release_year DESC)
+      KYOKUMOKU_API_BASE + BATCH_TOKEN があれば KyokuMoku (Cloudflare D1) の
+      /api/batch/null-range-songs から、無ければ従来どおり Supabase REST から
     - 各曲につきソース順に試行: vocal-range.com → keytube.net
     - per-song time budget (デフォルト 15s) を超えたら諦める
     - 結果を range_results.jsonl に逐次追記 (cache + 結果出力兼用)
@@ -69,29 +71,68 @@ def _to_result(
     )
 
 
+def _read_env_file(path: Path) -> dict[str, str]:
+    """KEY=VALUE 形式の env ファイルを辞書で返す (無ければ空)。"""
+    out: dict[str, str] = {}
+    if not path.exists():
+        return out
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, v = line.split("=", 1)
+        out[k.strip()] = v.strip().strip('"').strip("'")
+    return out
+
+
+def _load_env_kyokumoku() -> tuple[str, str] | None:
+    """KyokuMoku (Cloudflare) 側の API ベース URL と BATCH_TOKEN。
+
+    環境変数 → 隣の kyokumoku リポの .env.batch の順に探す。揃わなければ None
+    (= Supabase にフォールバック)。
+    """
+    env = dict(_read_env_file(PROJECT_ROOT.parent / "kyokumoku" / ".env.batch"))
+    env.update({k: v for k, v in os.environ.items() if k in ("KYOKUMOKU_API_BASE", "BATCH_TOKEN")})
+    base = env.get("KYOKUMOKU_API_BASE")
+    token = env.get("BATCH_TOKEN")
+    if base and token:
+        return base.rstrip("/"), token
+    return None
+
+
 def _load_env_supabase() -> tuple[str, str]:
     """親 .env.local から Supabase URL + service_role key を読む。"""
-    env_path = PROJECT_ROOT / ".env.local"
-    url = key = None
-    if env_path.exists():
-        for line in env_path.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            if "=" not in line:
-                continue
-            k, v = line.split("=", 1)
-            k = k.strip()
-            v = v.strip().strip('"').strip("'")
-            if k == "NEXT_PUBLIC_SUPABASE_URL":
-                url = v
-            elif k == "SUPABASE_SERVICE_ROLE_KEY":
-                key = v
+    env = _read_env_file(PROJECT_ROOT / ".env.local")
+    url = env.get("NEXT_PUBLIC_SUPABASE_URL")
+    key = env.get("SUPABASE_SERVICE_ROLE_KEY")
     if not url or not key:
         raise RuntimeError(
             "NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY が .env.local に見当たりません"
         )
     return url, key
+
+
+def _fetch_null_range_songs_d1(
+    api_base: str,
+    batch_token: str,
+    year_from: int | None = None,
+    order: str = "recent",
+    artist: str | None = None,
+) -> list[dict]:
+    """KyokuMoku API (D1) から range_high_midi NULL 曲を取得。並び・列は Supabase 版と同じ。"""
+    params: dict[str, str] = {"order": order}
+    if year_from:
+        params["year_from"] = str(year_from)
+    if artist:
+        params["artist"] = artist
+    resp = requests.get(
+        f"{api_base}/api/batch/null-range-songs",
+        params=params,
+        headers={"Authorization": f"Bearer {batch_token}", "Accept": "application/json"},
+        timeout=60,
+    )
+    resp.raise_for_status()
+    return resp.json()
 
 
 def _fetch_null_range_songs(
@@ -264,17 +305,27 @@ def run(
     artist: str | None = None,
 ) -> int:
     contact = require("SCRAPER_CONTACT_EMAIL")
-    supabase_url, service_key = _load_env_supabase()
+    kyokumoku = _load_env_kyokumoku()
 
     output_dir = SCRAPER_ROOT / "output"
     output_dir.mkdir(parents=True, exist_ok=True)
     cache_path = output_dir / "range_results_cache.jsonl"
     checkpoint_path = output_dir / "range_results.json"
 
-    songs = _fetch_null_range_songs(
-        supabase_url, service_key, year_from=year_from, order=order, artist=artist
-    )
-    logger.info("DB: %d songs need range data%s%s (order=%s)",
+    if kyokumoku:
+        api_base, batch_token = kyokumoku
+        songs = _fetch_null_range_songs_d1(
+            api_base, batch_token, year_from=year_from, order=order, artist=artist
+        )
+        db_label = f"D1 ({api_base})"
+    else:
+        supabase_url, service_key = _load_env_supabase()
+        songs = _fetch_null_range_songs(
+            supabase_url, service_key, year_from=year_from, order=order, artist=artist
+        )
+        db_label = "Supabase"
+    logger.info("%s: %d songs need range data%s%s (order=%s)",
+                db_label,
                 len(songs),
                 f" (release_year >= {year_from})" if year_from else "",
                 f' (artist~="{artist}")' if artist else "",
